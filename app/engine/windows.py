@@ -108,7 +108,7 @@ class WindowManager(Dict[str, SWFWindow]):
         self.client.logger.debug(f'Loading new window: {window}')
         return super().__setitem__(name, window)
     
-    def get_window(self, url: str | None = None, name: str | None = None):
+    def get_window(self, name: str | None = None, url: str | None = None):
         assert url or name, 'You must provide either a url or a name for the window.'
 
         if name in self:
@@ -117,7 +117,11 @@ class WindowManager(Dict[str, SWFWindow]):
         elif url.split('/')[-1] in self:
             return self[url]
 
-        return SWFWindow(self.client, url, name)
+        self[name] = (
+            SWFWindow(self.client, url, name)
+        )
+
+        return self[name]
 
     def load(self):
         self.client.logger.debug(f'Loading window manager...')
