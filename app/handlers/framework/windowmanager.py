@@ -60,8 +60,15 @@ def on_room_to_room_screen_closed(client: Penguin, data: dict):
 
 @Instance.triggers.register('windowReady')
 def on_window_ready(client: Penguin, data: dict):
-    ...
+    window_name = data['windowUrl'].split('/')[-1]
+    client.logger.debug(f'Loaded window: "{window_name}"')
 
 @Instance.triggers.register('windowClosed')
 def on_window_closed(client: Penguin, data: dict):
-    ...
+    window_name = data['windowUrl'].split('/')[-1]
+    client.logger.debug(f'Closed window: "{window_name}"')
+
+    try:
+        del client.window_manager[window_name]
+    except KeyError:
+        pass

@@ -48,7 +48,7 @@ class SWFWindow:
         )
 
     def load(self, initial_payload: dict = None, **kwargs):
-        self.client.logger.debug(f'{self.client} Loading Window {self}')
+        self.client.logger.debug(f'{self.client} Loading window {self}')
         self.send(
             {
                 'windowUrl': self.url,
@@ -62,7 +62,7 @@ class SWFWindow:
         )
 
     def close(self, **kwargs):
-        self.client.logger.debug(f'{self.client} Closing Window: {self}')
+        self.client.logger.debug(f'{self.client} Closing window: {self}')
         self.send(
             {
                 'targetWindow': self.url,
