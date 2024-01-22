@@ -38,7 +38,7 @@ class SWFWindow:
     def __repr__(self) -> str:
         return f"<SWF ({self.name})>"
 
-    def send(self, content: dict, message_type = MessageType.RECEIVED_JSON, **kwargs):
+    def send(self, content: dict = {}, message_type = MessageType.RECEIVED_JSON, **kwargs):
         content.update(kwargs)
         self.client.send_tag(
             'UI_CLIENTEVENT',
@@ -72,7 +72,7 @@ class SWFWindow:
             **kwargs
         )
 
-    def send_payload(self, trigger_name: str, payload: dict, type = EventType.IMMEDIATE, **kwargs):
+    def send_payload(self, trigger_name: str, payload: dict = {}, type = EventType.IMMEDIATE, **kwargs):
         self.client.logger.debug(f'{self} Sending payload to Window: \n{json.dumps(payload, indent=4)}')
         self.send(
             {
