@@ -129,10 +129,11 @@ class WindowManager(Dict[str, SWFWindow]):
     def get_window(self, name: str | None = None, url: str | None = None):
         assert url or name, 'You must provide either a url or a name for the window.'
 
-        if name in self:
+        # TODO: Refactor this
+        if (name in self):
             return self[name]
 
-        elif url.split('/')[-1] in self:
+        elif (url != None) and (url.split('/')[-1] in self):
             return self[url]
 
         self[name] = (
