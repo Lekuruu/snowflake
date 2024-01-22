@@ -14,4 +14,9 @@ def ready_handler(client: Penguin):
     client.send_tag('UI_ALIGN', 101, 0, 0, 'center', 'scale_none')
     client.send_tag('W_PLACE', 0, 1, 0)
 
-    # TODO: ...
+    client.load_assets()
+
+@Instance.events.register('/place_ready')
+def on_place_ready(client: Penguin):
+    # TODO: Camera setup
+    client.send_tag('O_PLAYER', 1)
