@@ -20,17 +20,20 @@ class Receiver(LineOnlyReceiver):
         self.server = server
         self.logger = logging.getLogger(address.host)
 
+    def dataReceived(self, data: bytes):
+        if data.startswith(b'<policy-file-request/>'):
+            self.logger.debug(f'-> "{data}"')
+            self.sendLine(POLICY_FILE.encode())
+            self.close_connection()
+            return
+
+        return super().dataReceived(data)
+
     def lineReceived(self, line: bytes):
         try:
             data = line.decode("utf-8")
         except UnicodeDecodeError:
             self.logger.warning(f'Invalid request: "{line}"')
-            self.close_connection()
-            return
-
-        if data.startswith('<policy-file-request/>'):
-            self.logger.debug(f'-> "{data}"')
-            self.sendLine(POLICY_FILE.encode())
             self.close_connection()
             return
 
