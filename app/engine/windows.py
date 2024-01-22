@@ -22,9 +22,11 @@ class SWFWindow:
             layer: str = 'topLayer'
         ) -> None:
         if not name:
+            # "filename.swf"
             name = url.split('/')[-1]
 
         elif not url:
+            # Default location
             url = f'http://{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows/{name}'
 
         assert url or name, 'You must provide either a url or a name for the window.'
@@ -48,7 +50,7 @@ class SWFWindow:
         )
 
     def load(self, initial_payload: dict = None, **kwargs):
-        self.client.logger.debug(f'{self.client} Loading window {self}')
+        self.client.logger.debug(f'Loading window {self}')
         self.send(
             {
                 'windowUrl': self.url,
@@ -62,7 +64,7 @@ class SWFWindow:
         )
 
     def close(self, **kwargs):
-        self.client.logger.debug(f'{self.client} Closing window: {self}')
+        self.client.logger.debug(f'Closing window: {self}')
         self.send(
             {
                 'targetWindow': self.url,
@@ -73,7 +75,7 @@ class SWFWindow:
         )
 
     def send_payload(self, trigger_name: str, payload: dict = {}, type = EventType.IMMEDIATE, **kwargs):
-        self.client.logger.debug(f'{self} Sending payload to Window: \n{json.dumps(payload, indent=4)}')
+        self.client.logger.debug(f'Sending payload to window: \n{json.dumps(payload, indent=4)}')
         self.send(
             {
                 'jsonPayload': payload,
@@ -86,7 +88,7 @@ class SWFWindow:
         )
 
     def send_action(self, action: str, type = EventType.IMMEDIATE, **kwargs):
-        self.client.logger.debug(f'{self} Sending action to Window: {action}')
+        self.client.logger.debug(f'Sending action to window: {action}')
         self.send(
             {
                 'action': action,
@@ -115,12 +117,6 @@ class WindowManager(Dict[str, SWFWindow]):
 
         self.loaded = False
         self.ready = False
-
-        self['windowmanager.swf'] = SWFWindow(
-            self.client,
-            self.swf_url,
-            'windowmanager.swf'
-        )
 
     def __setitem__(self, name: str, window: SWFWindow) -> None:
         self.client.logger.debug(f'Loading new window: {window}')
@@ -158,3 +154,9 @@ class WindowManager(Dict[str, SWFWindow]):
             self.command_prefix
         )
         self.loaded = True
+
+        self['windowmanager.swf'] = SWFWindow(
+            self.client,
+            self.swf_url,
+            'windowmanager.swf'
+        )
