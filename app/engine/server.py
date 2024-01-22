@@ -1,11 +1,13 @@
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
+from twisted.internet import reactor
 
 from ..data import ServerType, BuildType
 from .penguin import Penguin
 
 import logging
+import config
 
 class SnowflakeEngine(Factory):
     def __init__(self):
@@ -22,3 +24,11 @@ class SnowflakeEngine(Factory):
         self.logger.info(f'-> "{address.host}:{address.port}"')
         self.players.add(player := self.protocol(self, address))
         return player
+
+    def stopFactory(self):
+        self.logger.warning("Shutting down...")
+
+    def run(self):
+        self.logger.info(f"Starting engine: {self} ({config.PORT})")
+        reactor.listenTCP(config.PORT, self)
+        reactor.run()
