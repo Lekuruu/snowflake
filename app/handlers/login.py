@@ -1,6 +1,7 @@
 
 from ..engine import Instance, Penguin
 
+import logging
 import config
 
 @Instance.events.register('/version', login_required=False)
@@ -23,6 +24,7 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
 
     client.pid = pid
     client.token = token
+    client.logger = logging.getLogger(client.pid)
 
     # TODO: Validate
 
