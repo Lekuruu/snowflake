@@ -38,36 +38,32 @@ class Receiver(LineOnlyReceiver):
             self.close_connection()
             return
 
-        if data.startswith('/'):
-            try:
-                parsed = shlex.split(data)
-                command, args = parsed[0], parsed[1:]
-            except (ValueError, UnicodeDecodeError):
-                self.logger.warning(f'Invalid request: "{data}"')
-                self.close_connection()
-                return
-
-            for index, argument in enumerate(args):
-                if argument.startswith('{'):
-                    # Try to convert the argument to a JSON object
-                    # TODO: Refactor this mess
-                    try:
-                        args = [json.loads(' '.join(data.split(' ')[1:]))]
-                        break
-                    except json.JSONDecodeError:
-                        pass
-
-                try:
-                    # Try to convert the argument to a Python object
-                    args[index] = ast.literal_eval(argument)
-                except (ValueError, SyntaxError):
-                    pass
-
-            self.logger.debug(f'-> "{command}": {args}')
-            self.command_received(command, args)
+        try:
+            parsed = shlex.split(data)
+            command, args = parsed[0], parsed[1:]
+        except (ValueError, UnicodeDecodeError):
+            self.logger.warning(f'Invalid request: "{data}"')
+            self.close_connection()
             return
 
-        self.logger.warning(f'Unknown request: "{data}"')
+        for index, argument in enumerate(args):
+            if argument.startswith('{'):
+                # Try to convert the argument to a JSON object
+                # TODO: Refactor this mess
+                try:
+                    args = [json.loads(' '.join(data.split(' ')[1:]))]
+                    break
+                except json.JSONDecodeError:
+                    pass
+
+            try:
+                # Try to convert the argument to a Python object
+                args[index] = ast.literal_eval(argument)
+            except (ValueError, SyntaxError):
+                pass
+
+        self.logger.debug(f'-> "{command}": {args}')
+        self.command_received(command, args)
 
     def connectionLost(self, reason: Failure | None = None) -> None:
         if (reason is not None) and (reason.type != ConnectionDone):
