@@ -1,7 +1,7 @@
 
 from app.engine import Penguin, Instance
 
-from . import *
+from . import game, windowmanager
 
 @Instance.events.register('payloadBILogAction')
 def action(client: Penguin, json: dict):
