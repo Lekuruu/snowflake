@@ -36,7 +36,7 @@ def on_window_manager_ready(client: Penguin, data: dict):
     player_select.load(
         {
             'game': 'snow',
-            'name': 'Penguin', # debug
+            'name': client.name,
             'powerCardsFire': 2,
             'powerCardsWater': 3,
             'powerCardsSnow': 4
