@@ -56,7 +56,7 @@ class Penguin(Receiver):
         )
 
     def load_assets(self) -> None:
-        # TODO: Load assets
+        self.send_tag('UI_BGCOLOR', 34, 164, 243)
         self.send_tag('P_ASSETSCOMPLETE')
 
     def send_login_reply(self):
