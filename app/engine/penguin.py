@@ -43,6 +43,10 @@ class Penguin(Receiver):
         window.layer = 'toolLayer'
         window.load(type=EventType.IMMEDIATE.value)
 
+    def load_assets(self) -> None:
+        # TODO: Load assets
+        self.send_tag('P_ASSETSCOMPLETE')
+
     def send_login_reply(self):
         self.send_tag(
             'S_LOGIN',
