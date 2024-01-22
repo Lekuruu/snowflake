@@ -9,9 +9,12 @@ class EventHandler:
 
     def call(self, client, type, args) -> None:
         self.logger.debug(f'Called "{type}": {args}')
+
         if type in self.handlers:
-            for handler in self.handlers[type]:
-                handler(client, *args)
+            self.handlers[type](client, *args)
+            return
+
+        self.logger.warning(f'Unknown event: "{type}"')
 
     def register(self, type: str, login_required: bool = True) -> Callable:
         def wrapper(handler: Callable) -> Callable:
