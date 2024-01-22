@@ -4,18 +4,18 @@ from ..engine import Instance, Penguin
 import config
 
 @Instance.events.register('/version', login_required=False)
-def get_version(client: Penguin):
+def version_handler(client: Penguin):
     client.send_tag('S_VERSION', config.VERSION)
 
 @Instance.events.register("/place_context", login_required=False)
-def placeContextHandler(client: Penguin, location: str, params: str):
+def context_handler(client: Penguin, location: str, params: str):
     # TODO: What is this?
     # location: "snow_lobby"
     # params: battleMode=0&base_asset_url=https://media1.localhost/game/mpassets/
     ...
 
 @Instance.events.register('/login', login_required=False)
-def handle_login(client: Penguin, server_type: str, pid: int, token: str):
+def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     if client.logged_in:
         client.send_login_error(900)
         client.close_connection()
