@@ -66,7 +66,7 @@ class Receiver(LineOnlyReceiver):
 
     def send_tag(self, tag: str, *args):
         self.logger.debug(f'<- "{tag}": {args}')
-        self.sendLine(f'[{tag.name}]|' + '|'.join(str(a) for a in args))
+        self.sendLine(f'[{tag}]|' + '|'.join(str(a) for a in args) + '|')
 
     def command_received(self, command: str, args: List[str]):
         ...
