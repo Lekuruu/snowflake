@@ -34,11 +34,13 @@ def on_window_manager_ready(client: Penguin, data: dict):
     # Load player select screen
     player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')
     player_select.load(
-        game="snow",
-        name=client.name,
-        powerCardsFire=5,   # TODO
-        powerCardsWater=12, # TODO
-        powerCardsSnow=22,  # TODO
+        {
+            'game': 'snow',
+            'name': 'Penguin', # debug
+            'powerCardsFire': 2,
+            'powerCardsWater': 3,
+            'powerCardsSnow': 4
+        },
         loadDescription="",
         xPercent=0,
         yPercent=0
