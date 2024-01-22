@@ -5,8 +5,11 @@ from typing import Any, List
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 
+from .windows import WindowManager, SWFWindow
+from ..data import BuildType, MessageType
 from .receiver import Receiver
-from ..data import BuildType
+
+import json
 
 class Penguin(Receiver):
     def __init__(self, server: Factory, address: IPv4Address | IPv6Address):
@@ -16,6 +19,8 @@ class Penguin(Receiver):
         self.name: str = ""
         self.token: str = ""
         self.logged_in: bool = False
+
+        self.window_manager = WindowManager(self)
 
     def __repr__(self) -> str:
         return f"<{self.name} ({self.pid})>"
@@ -32,14 +37,23 @@ class Penguin(Receiver):
             self.close_connection()
             return
 
+    def send_login_reply(self):
+        self.send_tag(
+            'S_LOGIN',
+            self.pid
+        )
+
     def send_login_message(self, message: str):
-        self.send_tag('S_LOGINDEBUG', message)
+        self.send_tag(
+            'S_LOGINDEBUG',
+            message
+        )
 
     def send_login_error(self, code: int = 900):
-        self.send_tag('S_LOGINDEBUG', f'user code {code}')
-
-    def send_login_reply(self):
-        self.send_tag('S_LOGIN', self.pid)
+        self.send_tag(
+            'S_LOGINDEBUG',
+            f'user code {code}'
+        )
 
     def send_world_type(self):
         self.send_tag(
