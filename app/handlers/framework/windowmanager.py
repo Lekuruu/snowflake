@@ -43,3 +43,23 @@ def on_window_manager_ready(client: Penguin, data: dict):
         xPercent=0,
         yPercent=0
     )
+
+@Instance.triggers.register('roomToRoomComplete')
+def on_room_to_room_complete(client: Penguin, data: dict):
+    ...
+
+@Instance.triggers.register('roomToRoomMinTime')
+def on_room_to_room_min_time(client: Penguin, data: dict):
+    ...
+
+@Instance.triggers.register('roomToRoomScreenClosed')
+def on_room_to_room_screen_closed(client: Penguin, data: dict):
+    ...
+
+@Instance.triggers.register('windowReady')
+def on_window_ready(client: Penguin, data: dict):
+    ...
+
+@Instance.triggers.register('windowClosed')
+def on_window_closed(client: Penguin, data: dict):
+    ...
