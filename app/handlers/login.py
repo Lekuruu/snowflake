@@ -24,7 +24,7 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
 
     client.pid = pid
     client.token = token
-    client.logger = logging.getLogger(client.pid)
+    client.logger = logging.getLogger(str(client.pid))
 
     # TODO: Validate
 
