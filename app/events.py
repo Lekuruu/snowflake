@@ -1,6 +1,6 @@
 
 from typing import Callable, Dict, List
-from app import engine
+from app.engine import Penguin
 
 import logging
 
@@ -9,7 +9,7 @@ class EventHandler:
         self.handlers: Dict[str, Callable] = {}
         self.logger = logging.getLogger("events")
 
-    def call(self, client: engine.Penguin, type: str, args: List[str]) -> None:
+    def call(self, client: "Penguin", type: str, args: List[str]) -> None:
         self.logger.debug(f'Called "{type}": {args}')
 
         if type in self.handlers:
@@ -38,7 +38,7 @@ class TriggerHandler(EventHandler):
         self.handlers: Dict[str, Callable] = {}
         self.logger = logging.getLogger("triggers")
 
-    def call(self, trigger: str, client: engine.Penguin, json: dict) -> None:
+    def call(self, trigger: str, client: "Penguin", json: dict) -> None:
         if not client.window_manager.loaded:
             return
         return super().call(client, trigger, [json])
@@ -55,7 +55,7 @@ class ActionHandler(EventHandler):
         self.handlers: Dict[str, Callable] = {}
         self.logger = logging.getLogger("actions")
 
-    def call(self, action: str, client: engine.Penguin, json: dict) -> None:
+    def call(self, action: str, client: "Penguin", json: dict) -> None:
         if not client.window_manager.loaded:
             return
         return super().call(client, action, [json])
