@@ -5,7 +5,7 @@ from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.protocols.basic import LineOnlyReceiver
 from twisted.internet.error import ConnectionDone
 from twisted.python.failure import Failure
-from typing import List
+from typing import List, Any
 
 from app.data import POLICY_FILE
 from app import engine
@@ -30,7 +30,13 @@ class Receiver(LineOnlyReceiver):
             return
 
         if data.startswith('/'):
-            command, args = shlex.split(data)
+            try:
+                parsed = shlex.split(data)
+                command, args = parsed[0], parsed[1:]
+            except (ValueError, UnicodeDecodeError):
+                self.logger.warning(f'Invalid request: "{data}"')
+                self.close_connection()
+                return
 
             for index, argument in enumerate(args):
                 try:
@@ -58,7 +64,9 @@ class Receiver(LineOnlyReceiver):
 
     def send_tag(self, tag: str, *args):
         self.logger.debug(f'<- "{tag}": {args}')
-        self.sendLine(f'[{tag}]|' + '|'.join(str(a) for a in args) + '|')
+        self.sendLine(
+            (f'[{tag}]|' + '|'.join(str(a) for a in args) + '|').encode()
+        )
 
-    def command_received(self, command: str, args: List[str]):
+    def command_received(self, command: str, args: List[Any]):
         ...
