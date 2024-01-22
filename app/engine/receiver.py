@@ -12,6 +12,7 @@ from app import engine
 
 import logging
 import shlex
+import json
 import ast
 
 class Receiver(LineOnlyReceiver):
@@ -47,6 +48,15 @@ class Receiver(LineOnlyReceiver):
                 return
 
             for index, argument in enumerate(args):
+                if argument.startswith('{'):
+                    # Try to convert the argument to a JSON object
+                    # TODO: Refactor this mess
+                    try:
+                        args = [json.loads(' '.join(data.split(' ')[1:]))]
+                        break
+                    except json.JSONDecodeError:
+                        pass
+
                 try:
                     # Try to convert the argument to a Python object
                     args[index] = ast.literal_eval(argument)
