@@ -5,8 +5,8 @@ from typing import Any, List
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 
+from ..data import BuildType, MessageType, EventType
 from .windows import WindowManager, SWFWindow
-from ..data import BuildType, MessageType
 from .receiver import Receiver
 
 import json
@@ -36,6 +36,12 @@ class Penguin(Receiver):
             self.logger.error(f'Failed to execute event: {e}', exc_info=e)
             self.close_connection()
             return
+
+    def send_to_room(self) -> None:
+        # This will load a window, that sends the player back to the room
+        window = self.window_manager.get_window('cardjitsu_snowexternalinterfaceconnector.swf')
+        window.layer = 'toolLayer'
+        window.load(type=EventType.IMMEDIATE.value)
 
     def send_login_reply(self):
         self.send_tag(
