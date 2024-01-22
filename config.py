@@ -1,0 +1,16 @@
+
+# TODO: Move to environment variables
+
+REDIS_HOST='localhost'
+REDIS_PORT=6379
+REDIS_DB=0
+REDIS_PASSWORD=None
+
+POSTGRES_HOST='localhost'
+POSTGRES_PORT=5432
+POSTGRES_DB='postgres'
+POSTGRES_PASSWORD='postgres'
+
+PORT=7002
+VERSION="FY15-20150206 (4954)r"
+MEDIA_LOCATION="media.localhost"
