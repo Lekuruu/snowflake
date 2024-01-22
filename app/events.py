@@ -11,8 +11,6 @@ class EventHandler:
         self.logger = logging.getLogger("events")
 
     def call(self, client: "Penguin", type: str, args: List[str]) -> None:
-        self.logger.debug(f'Called "{type}": {args}')
-
         if type in self.handlers:
             self.handlers[type](client, *args)
             return
