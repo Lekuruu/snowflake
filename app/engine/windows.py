@@ -91,17 +91,18 @@ class WindowManager(Dict[str, SWFWindow]):
         client: engine.Penguin,
         swf_url: str = f'http://{config.MEDIA_LOCATION}/game/mpassets//minigames/cjsnow/en_US/deploy/swf/windowManager/windowmanager.swf'
     ) -> None:
-        self.element_name   = "WindowManagerSwf"
+        self.element_name = "WindowManagerSwf"
         self.command_prefix = "/framework"
-        self.element_id     = client.server.world_id
-        self.swf_url        = swf_url
-        self.client         = client
+        self.element_id = client.server.world_id
+        self.swf_url = swf_url
+        self.client = client
 
-        self.parent_id  = 0
-        self.swf_x      = 0
-        self.swf_y      = 0
-        self.swf_width  = 0
+        self.parent_id = 0
+        self.swf_x = 0
+        self.swf_y = 0
+        self.swf_width = 0
         self.swf_height = 0
+        self.loaded = False
 
     def __setitem__(self, name: str, window: SWFWindow) -> None:
         self.client.logger.debug(f'Loading new window: {window}')
@@ -120,7 +121,6 @@ class WindowManager(Dict[str, SWFWindow]):
 
     def load(self):
         self.client.logger.debug(f'Loading window manager...')
-
         self.client.send_tag(
             'UI_CROSSWORLDSWFREF',
             self.element_id,
@@ -134,3 +134,4 @@ class WindowManager(Dict[str, SWFWindow]):
             self.swf_url,
             self.command_prefix
         )
+        self.loaded = True
