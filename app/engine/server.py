@@ -3,8 +3,8 @@ from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 
+from ..events import EventHandler, ActionHandler, TriggerHandler
 from ..data import ServerType, BuildType
-from ..events import EventHandler
 from .penguin import Penguin
 
 import logging
@@ -22,7 +22,10 @@ class SnowflakeEngine(Factory):
         self.world_name = "clubpenguin_town_en_3"
 
         self.logger = logging.getLogger("snowflake")
+
         self.events = EventHandler()
+        self.actions = ActionHandler()
+        self.triggers = TriggerHandler()
 
     def buildProtocol(self, address: IPv4Address | IPv6Address):
         self.logger.info(f'-> "{address.host}:{address.port}"')
