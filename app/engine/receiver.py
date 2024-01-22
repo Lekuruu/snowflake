@@ -3,10 +3,12 @@ from __future__ import annotations
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.protocols.basic import LineOnlyReceiver
-from twisted.internet.protocol import Factory
+from twisted.internet.error import ConnectionDone
+from twisted.python.failure import Failure
 from typing import List
 
 from app.data import POLICY_FILE
+from app import engine
 
 import logging
 import shlex
@@ -14,7 +16,7 @@ import json
 import ast
 
 class Receiver(LineOnlyReceiver):
-    def __init__(self, server: Factory, address: IPv4Address | IPv6Address):
+    def __init__(self, server: engine.SnowflakeEngine, address: IPv4Address | IPv6Address):
         self.address = address
         self.server = server
         self.logger = logging.getLogger(address.host)
@@ -50,6 +52,13 @@ class Receiver(LineOnlyReceiver):
             return
 
         self.logger.warning(f'Unknown request: "{data}"')
+
+    def connectionLost(self, reason: Failure = ...) -> None:
+        if reason.type != ConnectionDone:
+            self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
+
+        self.server.players.remove(self)
+        # TODO: Handle Matchmaking
 
     def close_connection(self):
         self.transport.loseConnection()
