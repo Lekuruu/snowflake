@@ -85,6 +85,16 @@ class SWFWindow:
             **kwargs
         )
 
+    def send_action(self, action: str, type = EventType.IMMEDIATE, **kwargs):
+        self.client.logger.debug(f'{self} Sending action to Window: {action}')
+        self.send(
+            {
+                'action': action,
+                'type': type.value
+            },
+            **kwargs
+        )
+
 class WindowManager(Dict[str, SWFWindow]):
     def __init__(
         self,
@@ -102,7 +112,15 @@ class WindowManager(Dict[str, SWFWindow]):
         self.swf_y = 0
         self.swf_width = 0
         self.swf_height = 0
+
         self.loaded = False
+        self.ready = False
+
+        self['windowmanager.swf'] = SWFWindow(
+            self.client,
+            self.swf_url,
+            'windowmanager.swf'
+        )
 
     def __setitem__(self, name: str, window: SWFWindow) -> None:
         self.client.logger.debug(f'Loading new window: {window}')
