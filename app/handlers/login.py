@@ -12,6 +12,7 @@ def placeContextHandler(client: Penguin, location: str, params: str):
     # TODO: What is this?
     # location: "snow_lobby"
     # params: battleMode=0&base_asset_url=https://media1.localhost/game/mpassets/
+    ...
 
 @Instance.events.register('/login', login_required=False)
 def handle_login(client: Penguin, server_type: str, pid: int, token: str):
