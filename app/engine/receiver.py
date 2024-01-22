@@ -21,7 +21,12 @@ class Receiver(LineOnlyReceiver):
         self.logger = logging.getLogger(address.host)
 
     def lineReceived(self, line: bytes):
-        data = line.decode("utf-8")
+        try:
+            data = line.decode("utf-8")
+        except UnicodeDecodeError:
+            self.logger.warning(f'Invalid request: "{line}"')
+            self.close_connection()
+            return
 
         if data.startswith('<policy-file-request/>'):
             self.logger.debug(f'-> "{data}"')
@@ -42,7 +47,7 @@ class Receiver(LineOnlyReceiver):
                 try:
                     # Try to convert the argument to a Python object
                     args[index] = ast.literal_eval(argument)
-                except ValueError:
+                except (ValueError, SyntaxError):
                     pass
 
             self.logger.debug(f'-> "{command}": {args}')
@@ -51,16 +56,21 @@ class Receiver(LineOnlyReceiver):
 
         self.logger.warning(f'Unknown request: "{data}"')
 
-    def connectionLost(self, reason: Failure = ...) -> None:
-        if reason.type != ConnectionDone:
+    def connectionLost(self, reason: Failure | None = None) -> None:
+        if (reason is not None) and (reason.type != ConnectionDone):
             self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
 
-        self.server.players.remove(self)
+        try:
+            # TODO: Add better handling for this
+            self.server.players.remove(self)
+        except KeyError:
+            pass
+
         # TODO: Handle Matchmaking
 
     def close_connection(self):
         self.transport.loseConnection()
-        self.logger.info("Connection closed.")
+        self.connectionLost()
 
     def send_tag(self, tag: str, *args):
         self.logger.debug(f'<- "{tag}": {args}')
