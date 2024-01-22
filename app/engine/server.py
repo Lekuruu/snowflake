@@ -4,6 +4,7 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 
 from ..data import ServerType, BuildType
+from ..events import EventHandler
 from .penguin import Penguin
 
 import logging
@@ -19,6 +20,7 @@ class SnowflakeEngine(Factory):
         self.world_id = 101
 
         self.logger = logging.getLogger("snowflake")
+        self.events = EventHandler()
 
     def buildProtocol(self, address: IPv4Address | IPv6Address):
         self.logger.info(f'-> "{address.host}:{address.port}"')
@@ -32,3 +34,5 @@ class SnowflakeEngine(Factory):
         self.logger.info(f"Starting engine: {self} ({config.PORT})")
         reactor.listenTCP(config.PORT, self)
         reactor.run()
+
+Instance = SnowflakeEngine()
