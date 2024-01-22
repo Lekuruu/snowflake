@@ -12,7 +12,6 @@ from app import engine
 
 import logging
 import shlex
-import json
 import ast
 
 class Receiver(LineOnlyReceiver):
@@ -34,13 +33,6 @@ class Receiver(LineOnlyReceiver):
             command, args = shlex.split(data)
 
             for index, argument in enumerate(args):
-                try:
-                    # Try to load json
-                    args[index] = json.loads(argument)
-                    continue
-                except json.JSONDecodeError:
-                    pass
-
                 try:
                     # Try to convert the argument to a Python object
                     args[index] = ast.literal_eval(argument)
