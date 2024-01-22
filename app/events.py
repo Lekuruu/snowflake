@@ -20,6 +20,7 @@ class EventHandler:
                 handler(client, *args)
 
             if login_required:
+                # Add wrapper function that checks for login
                 handler = login_wrapper
 
             self.handlers[type] = handler
