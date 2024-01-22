@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from typing import Any, List
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
@@ -18,6 +19,18 @@ class Penguin(Receiver):
 
     def __repr__(self) -> str:
         return f"<{self.name} ({self.pid})>"
+
+    def command_received(self, command: str, args: List[Any]):
+        try:
+            self.server.events.call(
+                self,
+                command,
+                args
+            )
+        except Exception as e:
+            self.logger.error(f'Failed to execute event: {e}', exc_info=e)
+            self.close_connection()
+            return
 
     def send_login_message(self, message: str):
         self.send_tag('S_LOGINDEBUG', message)
