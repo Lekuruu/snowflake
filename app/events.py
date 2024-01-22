@@ -27,11 +27,12 @@ class EventHandler:
 
             if login_required:
                 # Add wrapper function that checks for login
-                handler = login_wrapper
+                self.handlers[type] = login_wrapper
+            else:
+                self.handlers[type] = handler
 
-            self.handlers[type] = handler
             self.logger.info(f'Registered event: "{type}"')
-            return handler
+            return self.handlers[type]
         return wrapper
 
 class TriggerHandler(EventHandler):
