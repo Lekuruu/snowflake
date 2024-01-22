@@ -18,5 +18,14 @@ def ready_handler(client: Penguin):
 
 @Instance.events.register('/place_ready')
 def on_place_ready(client: Penguin):
-    # TODO: Camera setup
+    # Setup camera
+    client.send_tag('O_HERE', 1, '0:1', 0, 0, 0, 1, 0, 0, 0, '', '0:1', 0, 1, 0)
+    client.send_tag('P_CAMERA', 4.5, 2.49333, 0, 0, 1)
+    client.send_tag('P_ZOOM', 1.000000)
+
+    # Prevent player from modifying the camera
+    client.send_tag('P_LOCKCAMERA', 1)
+    client.send_tag('P_LOCKZOOM', 1)
+
+    # Set player target id
     client.send_tag('O_PLAYER', 1)
