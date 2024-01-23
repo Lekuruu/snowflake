@@ -26,10 +26,6 @@ class Players(Set[Penguin]):
         with self.lock:
             return f'<Players ({len(self)})>'
 
-    @property
-    def ids(self) -> List[int]:
-        return {player.pid for player in self}
-
     def add(self, player: Penguin) -> None:
         return super().add(player)
 
