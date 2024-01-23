@@ -69,12 +69,7 @@ class Receiver(LineOnlyReceiver):
         if (reason is not None) and (reason.type != ConnectionDone):
             self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
 
-        try:
-            # TODO: Add better handling for this
-            self.server.players.remove(self)
-        except KeyError:
-            pass
-
+        self.server.players.remove(self)
         # TODO: Handle Matchmaking
 
     def close_connection(self):
