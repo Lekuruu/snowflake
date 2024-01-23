@@ -1,6 +1,6 @@
 GameData = {
 	"Ninjas": {
-		"Fire": {
+		"fire": {
 			"HP": 100,
 			"Range": 2,
 			"Attack": 8,
@@ -13,7 +13,7 @@ GameData = {
 				"y": 10
 			}
 		},
-		"Water": {
+		"water": {
 			"HP": 100,
 			"Range": 3,
 			"Attack": 6,
@@ -26,7 +26,7 @@ GameData = {
 				"y": 10
 			}
 		},
-		"Snow": {
+		"snow": {
 			"HP": 100,
 			"Range": 1,
 			"Attack": 10,
