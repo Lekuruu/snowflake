@@ -1,4 +1,6 @@
 
+from __future__ import annotations
+
 from .penguin import Penguin
 
 from typing import Set, List, Iterator
@@ -52,3 +54,6 @@ class Players(Set[Penguin]):
 
     def with_token(self, token: str) -> List[Penguin]:
         return [player for player in self if player.token == token]
+
+    def with_element(self, element: str) -> List[Penguin]:
+        return [player for player in self if player.element == element]
