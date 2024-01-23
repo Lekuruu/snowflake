@@ -4,7 +4,7 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 
 from ..events import EventHandler, ActionHandler, TriggerHandler
-from ..data import ServerType, BuildType
+from ..data import ServerType, BuildType, Postgres
 from .penguin import Penguin
 
 import logging
@@ -26,6 +26,13 @@ class SnowflakeEngine(Factory):
         self.events = EventHandler()
         self.actions = ActionHandler()
         self.triggers = TriggerHandler()
+
+        self.database = Postgres(
+            config.POSTGRES_USER,
+            config.POSTGRES_PASSWORD,
+            config.POSTGRES_HOST,
+            config.POSTGRES_PORT
+        )
 
     def buildProtocol(self, address: IPv4Address | IPv6Address):
         self.logger.info(f'-> "{address.host}:{address.port}"')
