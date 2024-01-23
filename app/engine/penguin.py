@@ -22,6 +22,14 @@ class Penguin(Receiver):
         self.logged_in: bool = False
         self.object: PenguinObject | None = None
 
+        self.element: str = ""
+        self.tip_mode: bool = True
+
+        self.hp: int = 0
+        self.range: int = 0
+        self.power: int = 0
+        self.move: int = 0
+
         self.window_manager = WindowManager(self)
 
     def __repr__(self) -> str:
