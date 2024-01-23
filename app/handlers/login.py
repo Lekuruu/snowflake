@@ -34,6 +34,10 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.name = penguin.nickname
     client.logger = logging.getLogger(client.name)
 
+    if (other := Instance.players.by_id(pid)) and other != client:
+        # TODO: Send error message
+        other.close_connection()
+
     # TODO: Validate token
 
     if server_type.upper() != Instance.server_type.name:
