@@ -58,6 +58,7 @@ class ActionHandler(EventHandler):
     def call(self, action: str, client: "Penguin", json: dict) -> None:
         if not client.window_manager.loaded:
             return
+        # TODO: Add datadog logging for funnel analysis
         return super().call(client, action, [json])
 
     def register(self, action: str):
