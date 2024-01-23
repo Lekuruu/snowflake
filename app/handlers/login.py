@@ -1,5 +1,6 @@
 
 from ..engine import Instance, Penguin
+from ..data import penguins
 
 import logging
 import config
@@ -24,9 +25,16 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
 
     client.pid = pid
     client.token = token
-    client.logger = logging.getLogger(str(client.pid))
 
-    # TODO: Validate
+    if not (penguin := penguins.fetch_by_id(pid)):
+        client.send_login_error(900)
+        client.close_connection()
+        return
+
+    client.name = penguin.nickname
+    client.logger = logging.getLogger(client.name)
+
+    # TODO: Validate token
 
     if server_type.upper() != Instance.server_type.name:
         client.send_login_error(900)
