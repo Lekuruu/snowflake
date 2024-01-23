@@ -19,31 +19,36 @@ def context_handler(client: Penguin, location: str, params: str):
 @Instance.events.register('/login', login_required=False)
 def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     if client.logged_in:
+        client.logger.warning('Login attempt failed: Already logged in')
+        client.send_login_error(900)
+        client.close_connection()
+        return
+
+    if server_type.upper() != Instance.server_type.name:
+        client.logger.warning(f'Login attempt failed: Invalid server type "{server_type}"')
+        client.send_login_error(900)
+        client.close_connection()
+        return
+
+    if not (penguin := penguins.fetch_by_id(pid)):
+        client.logger.warning('Login attempt failed: Penguin not found')
         client.send_login_error(900)
         client.close_connection()
         return
 
     client.pid = pid
     client.token = token
-
-    if not (penguin := penguins.fetch_by_id(pid)):
-        client.send_login_error(900)
-        client.close_connection()
-        return
-
     client.name = penguin.nickname
-    client.logger = logging.getLogger(client.name)
 
     if (other := Instance.players.by_id(pid)) and other != client:
         # TODO: Send error message
+        other.logger.warning('Closing duplicate connection.')
         other.close_connection()
 
     # TODO: Validate token
 
-    if server_type.upper() != Instance.server_type.name:
-        client.send_login_error(900)
-        client.close_connection()
-        return
+    client.logger.info(f'Logged in as "{penguin.nickname}" ({penguin.id})')
+    client.logger = logging.getLogger(client.name)
 
     client.logged_in = True
     client.send_login_message('Finalizing login')
