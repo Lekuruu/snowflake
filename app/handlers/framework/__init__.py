@@ -1,7 +1,7 @@
 
 from app.engine import Penguin, Instance
 
-from . import game, windowmanager
+from . import game, windowmanager, matchmaking
 
 @Instance.events.register("/framework")
 def framework(client: Penguin, json: dict):
