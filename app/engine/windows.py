@@ -15,12 +15,12 @@ import json
 
 class SWFWindow:
     def __init__(
-            self,
-            client: engine.Penguin,
-            url: str | None = None,
-            name: str | None = None,
-            layer: str = 'topLayer'
-        ) -> None:
+        self,
+        client: engine.Penguin,
+        url: str | None = None,
+        name: str | None = None,
+        layer: str = 'topLayer'
+    ) -> None:
         if not name:
             # "filename.swf"
             name = url.split('/')[-1]
