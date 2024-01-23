@@ -5,6 +5,7 @@ from twisted.internet import reactor
 
 from ..events import EventHandler, ActionHandler, TriggerHandler
 from ..data import ServerType, BuildType, Postgres
+from .matchmaking import MatchmakingQueue
 from .collections import Players
 from .penguin import Penguin
 
@@ -27,6 +28,7 @@ class SnowflakeEngine(Factory):
         self.events = EventHandler()
         self.actions = ActionHandler()
         self.triggers = TriggerHandler()
+        self.matchmaking = MatchmakingQueue()
 
         self.database = Postgres(
             config.POSTGRES_USER,
