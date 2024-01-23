@@ -70,6 +70,9 @@ class MatchmakingQueue:
                 }
             )
 
+            # Remove from matchmaking queue
+            self.remove(client)
+
         # Start game loop
         threading.Thread(
             target=game.start,
