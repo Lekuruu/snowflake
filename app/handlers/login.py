@@ -40,10 +40,14 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.token = token
     client.name = penguin.nickname
 
-    if (other := Instance.players.by_id(pid)) and other != client:
-        # TODO: Send error message
-        other.logger.warning('Closing duplicate connection.')
-        other.close_connection()
+    other_connections = Instance.players.with_id(pid)
+    other_connections.remove(client)
+
+    if other_connections:
+        for player in other_connections:
+            # TODO: Send error message
+            player.logger.warning('Closing duplicate connection.')
+            player.close_connection()
 
     # TODO: Validate token
 
