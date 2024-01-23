@@ -70,7 +70,7 @@ class Receiver(LineOnlyReceiver):
             self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
 
         self.server.players.remove(self)
-        # TODO: Handle Matchmaking
+        self.server.matchmaking.remove(self)
 
     def close_connection(self):
         self.transport.loseConnection()
