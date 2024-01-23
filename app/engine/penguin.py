@@ -30,6 +30,10 @@ class Penguin(Receiver):
         self.power: int = 0
         self.move: int = 0
 
+        self.in_queue: bool = False
+        self.in_game: bool = False
+        self.is_host: bool = False
+
         self.window_manager = WindowManager(self)
 
     def __repr__(self) -> str:
