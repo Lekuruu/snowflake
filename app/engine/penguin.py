@@ -5,8 +5,9 @@ from typing import Any, List
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 
-from ..data import BuildType, MessageType, EventType
-from .windows import WindowManager, SWFWindow
+from ..data.objects import Penguin as PenguinObject
+from ..data import BuildType, EventType
+from .windows import WindowManager
 from .receiver import Receiver
 
 import json
@@ -19,6 +20,7 @@ class Penguin(Receiver):
         self.name: str = ""
         self.token: str = ""
         self.logged_in: bool = False
+        self.object: PenguinObject | None = None
 
         self.window_manager = WindowManager(self)
 
