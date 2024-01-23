@@ -5,7 +5,9 @@ from typing import Tuple
 
 from .collections import Players
 from .penguin import Penguin
+from .game import Game
 
+import threading
 import logging
 
 class MatchmakingQueue:
@@ -55,4 +57,22 @@ class MatchmakingQueue:
         snow.in_queue = False
         water.in_queue = False
 
-        # TODO: Create game
+        game = Game(fire, snow, water)
+
+        for client in game.clients:
+            player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')
+            player_select.send_payload(
+                'matchFound',
+                {
+                    1: fire.name,
+                    2: water.name,
+                    4: snow.name
+                }
+            )
+
+        # Start game loop
+        threading.Thread(
+            target=game.start,
+            daemon=True
+        ).start()
+        # TODO: Refactor thread creation
