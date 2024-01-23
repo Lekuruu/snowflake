@@ -38,9 +38,9 @@ class MatchmakingQueue:
         players = [player]
 
         for element in elements:
-            if (match := self.players.with_element(element)):
+            if (matches := self.players.with_element(element)):
                 # TODO: Sort players by different criteria
-                players.append(match[0])
+                players.append(matches[0])
 
         if len(players) != 3:
             return
