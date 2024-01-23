@@ -5,6 +5,7 @@ from twisted.internet import reactor
 
 from ..events import EventHandler, ActionHandler, TriggerHandler
 from ..data import ServerType, BuildType, Postgres
+from .collections import Players
 from .penguin import Penguin
 
 import logging
@@ -12,7 +13,7 @@ import config
 
 class SnowflakeEngine(Factory):
     def __init__(self):
-        self.players: set[Penguin] = set()
+        self.players = Players()
         self.protocol = Penguin
 
         self.server_type = ServerType.LIVE
