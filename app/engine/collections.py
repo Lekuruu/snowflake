@@ -43,3 +43,12 @@ class Players(Set[Penguin]):
 
     def by_token(self, token: str) -> Penguin | None:
         return next((player for player in self if player.token == token), None)
+
+    def with_id(self, id: int) -> List[Penguin]:
+        return [player for player in self if player.pid == id]
+
+    def with_name(self, name: str) -> List[Penguin]:
+        return [player for player in self if player.name == name]
+
+    def with_token(self, token: str) -> List[Penguin]:
+        return [player for player in self if player.token == token]
