@@ -1,7 +1,7 @@
 
+from dataclasses import dataclass
 from .asset import Asset
 
-# TODO
-
+@dataclass
 class Sprite(Asset):
     ...
