@@ -80,7 +80,10 @@ class GameObjectCollection(Set[GameObject]):
     def __init__(self) -> None:
         super().__init__()
 
-    def add(self, game_object: GameObject) -> None:
+    def add(self, game_object: GameObject, assign_id=True) -> None:
+        if assign_id:
+            game_object.id = self.get_id()
+
         return super().add(game_object)
 
     def remove(self, game_object: GameObject) -> None:
@@ -91,6 +94,9 @@ class GameObjectCollection(Set[GameObject]):
 
     def by_name(self, name: str) -> GameObject | None:
         return next((game_object for game_object in self if game_object.name == name), None)
+
+    def get_id(self) -> int:
+        return max([game_object.id for game_object in self]) + 1
 
 class SpriteCollection(AssetCollection):
     def __init__(self) -> None:
