@@ -74,9 +74,32 @@ class Penguin(Receiver):
         )
 
     def initialize_game(self) -> None:
+        self.send_tag('P_MAPBLOCK', 't', 1, 1, 'iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAAAAACyOJm3AAAADklEQVQImWNghgEGIlkADWEAiDEh28IAAAAASUVORK5CYII=')
+        self.send_tag('P_MAPBLOCK', 'h', 1, 1, 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAAAAADfm1AaAAAADklEQVQImWOohwMG8pgA1rMdxRJRFewAAAAASUVORK5CYII=')
+
+        self.send_tag('UI_ALIGN', self.server.world_id, 0, 0, 'center', 'scale_none')
         self.send_tag('UI_BGCOLOR', 34, 164, 243)
-        # TODO: Load assets
+        self.send_tag('W_PLACE', 0, 1, 0)
+
+        self.send_tag('P_ZOOMLIMIT', -1.000000, -1.000000)
+        self.send_tag('P_RENDERFLAGS', 0, 48)
+        self.send_tag('P_SIZE', 9, 5)
+        self.send_tag('P_VIEW', 5)
+        self.send_tag('P_START', 5, 2.5, 0)
+        self.send_tag('P_LOCKVIEW', 0)
+        self.send_tag('P_TITLESIZE', 100)
+        self.send_tag('P_ELEVSCALE', 0.031250)
+        self.send_tag('P_RELIEF', 1)
+        self.send_tag('P_LOCKSCROLL', 1, 0, 0, 0)
+        self.send_tag('P_LOCKOBJECTS', 0)
+        self.send_tag('P_HEIGHTMAPSCALE', 0.5, 0)
+        self.send_tag('P_HEIGHTMAPDIVISION', 1)
+        self.send_tag('P_DRAG', 0)
+        self.send_tag('P_CAMLIMITS', 0, 0, 0, 0)
+        self.send_tag('P_LOCKRENDERSIZE', 0, 1024, 768)
         self.send_tag('P_ASSETSCOMPLETE')
+
+        # TODO: Find out what all of the tags do
 
     def send_login_reply(self):
         self.send_tag(
