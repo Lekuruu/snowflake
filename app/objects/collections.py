@@ -101,7 +101,7 @@ class ObjectCollection(Set[Union["GameObject", "Sprite"]]):
         return next((object for object in self if object.name == name), None)
 
     def get_id(self) -> int:
-        return max([object.id for object in self]) + 1
+        return max([object.id for object in self] or [0]) + 1
 
 class SoundCollection(AssetCollection):
     def __init__(self) -> None:
