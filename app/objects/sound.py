@@ -2,8 +2,6 @@
 from ..engine.game import Game
 from .asset import Asset
 
-# TODO
-
 class Sound(Asset):
     handle_id: int
     looping: bool = False
