@@ -27,7 +27,7 @@ def on_matchmaking_cancel(client: Penguin, data: dict):
 @Instance.actions.register('funnel_prepare_to_battle_4')
 def on_prepare_to_battle(client: Penguin, data: dict):
     # Wait for "prepare to battle" screen to end
-    time.sleep(1.2)
+    time.sleep(3)
 
     player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')
     player_select.close()
