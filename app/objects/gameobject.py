@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from .collections import SoundCollection
-from ..engine import Instance
 from .asset import Asset
 from .sound import Sound
 
@@ -19,6 +18,12 @@ class GameObject:
     y: int
     game: "Game"
     sounds: SoundCollection = SoundCollection()
+
+    def __eq__(self, obj: "GameObject") -> bool:
+        return self.id == obj.id
+
+    def __hash__(self) -> int:
+        return hash(self.id)
 
     def place(self) -> None:
         self.game.send_tag(
