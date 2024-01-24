@@ -20,26 +20,30 @@ class GameObject:
     game: "Game"
     sounds: SoundCollection = SoundCollection()
 
-    def initialize(self) -> None:
-        blank_asset = Instance.assets.by_name('blank_png')
-
+    def place(self) -> None:
         self.game.send_tag(
             'O_HERE',
             self.id,
-            f'0:{blank_asset.index}',
+            '0:1',  # TODO: Why do 0:1 here?
             self.x,
             self.y,
-            0,  # TODO
-            1,  # TODO
-            0,  # TODO
-            0,  # TODO
-            0,  # TODO
-            self.name,
-            f'0:{blank_asset.index}',
-            0,  # TODO
-            1,  # TODO
-            0   # TODO
+            0,      # TODO
+            1,      # TODO
+            0,      # TODO
+            0,      # TODO
+            0,      # TODO
+            '',     # TODO
+            '0:1',  # TODO
+            0,      # TODO
+            1,      # TODO
+            0       # TODO
         )
+
+    def move(self) -> None:
+        ...
+
+    def animate(self) -> None:
+        ...
 
     def add_sound(
         self,
