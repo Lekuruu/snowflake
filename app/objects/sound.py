@@ -7,7 +7,6 @@ from dataclasses import dataclass
 
 @dataclass
 class Sound(Asset):
-    handle_id: int
     looping: bool = False
     volume: int = 100
     radius: int = 0
@@ -18,7 +17,6 @@ class Sound(Asset):
     def from_index(
         cls,
         index: int,
-        handle_id: int,
         looping: bool = False,
         volume: int = 100,
         radius: int = 0,
@@ -31,7 +29,6 @@ class Sound(Asset):
             asset.index,
             asset.name,
             asset.url,
-            handle_id,
             looping,
             volume,
             radius,
@@ -43,7 +40,6 @@ class Sound(Asset):
     def from_name(
         cls,
         name: str,
-        handle_id: int,
         looping: bool = False,
         volume: int = 100,
         radius: int = 0,
@@ -56,7 +52,6 @@ class Sound(Asset):
             asset.index,
             asset.name,
             asset.url,
-            handle_id,
             looping,
             volume,
             radius,
@@ -68,10 +63,13 @@ class Sound(Asset):
         game.send_tag(
             'FX_PLAYSOUND',
             f'0:{self.index}',
-            self.handle_id,
+            0, # "handleId"
             int(self.looping),
             self.volume,
             self.game_object_id,
             self.radius,
             self.response_object_id
         )
+
+        # TODO: Add callback handler for sound completion
+        #       This can be done through the "handleId" parameter
