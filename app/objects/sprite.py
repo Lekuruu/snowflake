@@ -7,21 +7,31 @@ if TYPE_CHECKING:
 from dataclasses import dataclass
 from .asset import Asset
 
+import app.engine as engine
+
 @dataclass
 class Sprite(Asset):
     game: "Game"
 
     @classmethod
     def from_index(cls, index: int, game: "Game") -> "Sprite":
-        return cls(
-            index,
+        asset = engine.Instance.assets.by_index(index)
+
+        return Sprite(
+            asset.index,
+            asset.name,
+            asset.url,
             game
         )
 
     @classmethod
     def from_name(cls, name: str, game: "Game") -> "Sprite":
-        return cls(
-            game.assets.by_name(name).index,
+        asset = engine.Instance.assets.by_name(name)
+
+        return Sprite(
+            asset.index,
+            asset.name,
+            asset.url,
             game
         )
 
