@@ -73,7 +73,7 @@ class Penguin(Receiver):
             }
         )
 
-    def load_assets(self) -> None:
+    def initialize_game(self) -> None:
         self.send_tag('UI_BGCOLOR', 34, 164, 243)
         # TODO: Load assets
         self.send_tag('P_ASSETSCOMPLETE')

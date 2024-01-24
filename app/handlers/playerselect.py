@@ -14,7 +14,7 @@ def ready_handler(client: Penguin):
     client.send_tag('UI_ALIGN', 101, 0, 0, 'center', 'scale_none')
     client.send_tag('W_PLACE', 0, 1, 0)
 
-    client.load_assets()
+    client.initialize_game()
 
 @Instance.events.register('/place_ready')
 def on_place_ready(client: Penguin):
