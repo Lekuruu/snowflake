@@ -27,9 +27,11 @@ class SnowflakeEngine(Factory):
 
         self.events = EventHandler()
         self.actions = ActionHandler()
-        self.assets = AssetCollection()
         self.triggers = TriggerHandler()
         self.matchmaking = MatchmakingQueue()
+
+        self.assets = AssetCollection()
+        self.sound_assets = AssetCollection()
 
         self.database = Postgres(
             config.POSTGRES_USER,
