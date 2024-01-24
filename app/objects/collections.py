@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from ..engine.penguin import Penguin
 from .gameobject import GameObject
+from .sprite import Sprite
+from .sound import Sound
 from .asset import Asset
 
 from typing import Set, List, Iterator
@@ -102,6 +104,18 @@ class SpriteCollection(AssetCollection):
     def __init__(self) -> None:
         super().__init__()
 
+    def by_index(self, index: int) -> Sprite | None:
+        return next((sprite for sprite in self if sprite.index == index), None)
+
+    def by_name(self, name: str) -> Sprite | None:
+        return next((sprite for sprite in self if sprite.name == name), None)
+
 class SoundCollection(AssetCollection):
     def __init__(self) -> None:
         super().__init__()
+
+    def by_index(self, index: int) -> Sound | None:
+        return next((sound for sound in self if sound.index == index), None)
+
+    def by_name(self, name: str) -> Sound | None:
+        return next((sound for sound in self if sound.name == name), None)
