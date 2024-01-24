@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ..engine.penguin import Penguin
+from .gameobject import GameObject
 from .asset import Asset
 
 from typing import Set, List, Iterator
@@ -74,3 +75,27 @@ class AssetCollection(Set[Asset]):
 
     def by_name(self, name: str) -> Asset | None:
         return next((asset for asset in self if asset.name == name), None)
+
+class GameObjectCollection(Set[GameObject]):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def add(self, game_object: GameObject) -> None:
+        return super().add(game_object)
+
+    def remove(self, game_object: GameObject) -> None:
+        return super().remove(game_object)
+
+    def by_id(self, id: int) -> GameObject | None:
+        return next((game_object for game_object in self if game_object.id == id), None)
+
+    def by_name(self, name: str) -> GameObject | None:
+        return next((game_object for game_object in self if game_object.name == name), None)
+
+class SpriteCollection(AssetCollection):
+    def __init__(self) -> None:
+        super().__init__()
+
+class SoundCollection(AssetCollection):
+    def __init__(self) -> None:
+        super().__init__()
