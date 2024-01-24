@@ -48,5 +48,14 @@ class Sprite(Asset):
             f'0:{self.index}'
         )
 
+    def place(self) -> None:
+        self.game.send_tag(
+            'O_SPRITE',
+            self.id,
+            f'0:{self.index}',
+            0, # TODO
+            '' # TODO
+        )
+
     def animate(self) -> None:
         ...
