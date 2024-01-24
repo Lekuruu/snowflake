@@ -58,3 +58,19 @@ class Players(Set[Penguin]):
 
     def with_element(self, element: str) -> List[Penguin]:
         return [player for player in self if player.element == element]
+
+class AssetCollection(Set[Asset]):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def add(self, asset: Asset) -> None:
+        return super().add(asset)
+
+    def remove(self, asset: Asset) -> None:
+        return super().remove(asset)
+
+    def by_index(self, index: int) -> Asset | None:
+        return next((asset for asset in self if asset.index == index), None)
+
+    def by_name(self, name: str) -> Asset | None:
+        return next((asset for asset in self if asset.name == name), None)

@@ -4,9 +4,9 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 
 from ..events import EventHandler, ActionHandler, TriggerHandler
+from ..objects.collections import AssetCollection, Players
 from ..data import ServerType, BuildType, Postgres
 from .matchmaking import MatchmakingQueue
-from .collections import Players
 from .penguin import Penguin
 
 import logging
@@ -27,6 +27,7 @@ class SnowflakeEngine(Factory):
 
         self.events = EventHandler()
         self.actions = ActionHandler()
+        self.assets = AssetCollection()
         self.triggers = TriggerHandler()
         self.matchmaking = MatchmakingQueue()
 

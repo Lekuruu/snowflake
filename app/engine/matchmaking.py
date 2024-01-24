@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Tuple
 
-from .collections import Players
+from ..objects.collections import Players
 from .penguin import Penguin
 from .game import Game
 
