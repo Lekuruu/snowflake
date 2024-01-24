@@ -1,7 +1,8 @@
 
 from __future__ import annotations
 
-from .penguin import Penguin
+from ..engine.penguin import Penguin
+from .asset import Asset
 
 from typing import Set, List, Iterator
 from threading import Lock
