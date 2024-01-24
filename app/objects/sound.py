@@ -1,6 +1,10 @@
 
-from ..engine.game import Game
-from ..engine import Instance
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from ..engine.game import Game
+
+import app.engine as Engine
 from .asset import Asset
 
 from dataclasses import dataclass
@@ -13,6 +17,12 @@ class Sound(Asset):
     game_object_id: int = -1
     response_object_id: int = -1
 
+    def __eq__(self, asset: "Asset") -> bool:
+        return self.index == asset.index
+
+    def __hash__(self) -> int:
+        return hash(self.index)
+
     @classmethod
     def from_index(
         cls,
@@ -23,7 +33,7 @@ class Sound(Asset):
         game_object_id: int = -1,
         response_object_id: int = -1
     ) -> "Sound":
-        asset = Instance.sound_assets.by_index(index)
+        asset = Engine.Instance.sound_assets.by_index(index)
 
         return Sound(
             asset.index,
@@ -46,7 +56,7 @@ class Sound(Asset):
         game_object_id: int = -1,
         response_object_id: int = -1
     ) -> "Sound":
-        asset = Instance.sound_assets.by_name(name)
+        asset = Engine.Instance.sound_assets.by_name(name)
 
         return Sound(
             asset.index,
@@ -59,7 +69,7 @@ class Sound(Asset):
             response_object_id
         )
 
-    def play(self, game: Game) -> None:
+    def play(self, game: "Game") -> None:
         game.send_tag(
             'FX_PLAYSOUND',
             f'0:{self.index}',
