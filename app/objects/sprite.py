@@ -12,6 +12,13 @@ import app.engine as engine
 @dataclass
 class Sprite(Asset):
     game: "Game"
+    id: int = -1
+
+    def __eq__(self, asset: "Asset") -> bool:
+        return self.index == asset.index
+
+    def __hash__(self) -> int:
+        return hash(self.index)
 
     @classmethod
     def from_index(cls, index: int, game: "Game") -> "Sprite":
