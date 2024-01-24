@@ -4,6 +4,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .penguin import Penguin
 
+from app.objects.collections import (
+    GameObjectCollection,
+    SpriteCollection,
+    SoundCollection
+)
+
 import random
 
 class Game:
@@ -15,6 +21,10 @@ class Game:
         self.round = 1
         self.enemies = []
         self.map = random.randrange(1, 3)
+
+        self.objects = GameObjectCollection()
+        self.sprites = SpriteCollection()
+        self.sounds = SoundCollection()
 
     @property
     def clients(self) -> list["Penguin"]:
