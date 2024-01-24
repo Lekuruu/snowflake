@@ -24,7 +24,6 @@ class Game:
 
         self.objects = GameObjectCollection()
         self.sprites = SpriteCollection()
-        self.sounds = SoundCollection()
 
     @property
     def clients(self) -> list["Penguin"]:
@@ -37,8 +36,16 @@ class Game:
         self.wait_for_players()
         # TODO: ...
 
+    def send_tag(self, tag: str, *args) -> None:
+        for player in self.clients:
+            player.send_tag(tag, *args)
+
     def wait_for_players(self) -> None:
         """Wait for all players to finish loading the game"""
         for player in self.clients:
             while not player.in_game:
                 pass
+
+    def initialize_objects(self) -> None:
+        """Initialize all game objects"""
+        ...
