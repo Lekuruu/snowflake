@@ -1,5 +1,10 @@
 
-from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.engine.game import Game
+
+from dataclasses import dataclass, field
 from app.objects import (
     SoundCollection,
     AssetCollection,
@@ -8,9 +13,10 @@ from app.objects import (
     Asset
 )
 
+@dataclass
 class WaterNinja(GameObject):
     name: str = 'Water'
-    assets: AssetCollection = AssetCollection({
+    assets: AssetCollection = field(default_factory=lambda: AssetCollection({
         Asset.from_name('waterninja_move_ghost'),
         Asset.from_name('waterninja_attack_anim'),
         Asset.from_name('waterninja_idle_anim'),
@@ -26,20 +32,27 @@ class WaterNinja(GameObject):
         Asset.from_name('waterninja_revive_other_intro_anim'),
         Asset.from_name('waterninja_revive_other_loop_anim'),
         Asset.from_name('waterninja_member_revive')
-    })
-    sounds: SoundCollection = SoundCollection({
+    }))
+    sounds: SoundCollection = field(default_factory=lambda: SoundCollection({
         Sound.from_name('sfx_mg_2013_cjsnow_attackwater'),
         Sound.from_name('sfx_mg_2013_cjsnow_attackpowercardwater'),
         Sound.from_name('sfx_mg_2013_cjsnow_footsteppenguin'),
-        Sound.from_name('sfx_mg_2013_cjsnow_penguininground'),
+        Sound.from_name('sfx_mg_2013_cjsnow_penguinground'),
         Sound.from_name('sfx_mg_2013_cjsnow_penguinhitsuccess'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
-    })
+    }))
 
+    def __eq__(self, other: "GameObject") -> bool:
+        return self.id == other.id
+
+    def __hash__(self) -> int:
+        return hash(self.id)
+
+@dataclass
 class SnowNinja(GameObject):
     name: str = 'Snow'
-    assets: AssetCollection = AssetCollection({
+    assets: AssetCollection = field(default_factory=lambda: AssetCollection({
         Asset.from_name('snowninja_move_ghost'),
         Asset.from_name('snowninja_idle_anim'),
         Asset.from_name('snowninja_attack_anim'),
@@ -59,20 +72,27 @@ class SnowNinja(GameObject):
         Asset.from_name('snowninja_reviveothersintro_anim'),
         Asset.from_name('snowninja_reviveothersloop_anim'),
         Asset.from_name('snowninja_member_revive')
-    })
-    sounds: SoundCollection = SoundCollection({
+    }))
+    sounds: SoundCollection = field(default_factory=lambda: SoundCollection({
         Sound.from_name('sfx_mg_2013_cjsnow_attacksnow'),
         Sound.from_name('sfx_mg_2013_cjsnow_attackpowercardsnow'),
         Sound.from_name('sfx_mg_2013_cjsnow_footsteppenguin'),
-        Sound.from_name('sfx_mg_2013_cjsnow_penguininground'),
+        Sound.from_name('sfx_mg_2013_cjsnow_penguinground'),
         Sound.from_name('sfx_mg_2013_cjsnow_penguinhitsuccess'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
-    })
+    }))
 
+    def __eq__(self, other: "GameObject") -> bool:
+        return self.id == other.id
+
+    def __hash__(self) -> int:
+        return hash(self.id)
+
+@dataclass
 class FireNinja(GameObject):
     name: str = 'Fire'
-    assets: AssetCollection = AssetCollection({
+    assets: AssetCollection = field(default_factory=lambda: AssetCollection({
         Asset.from_name('fireninja_move_ghost'),
         Asset.from_name('fireninja_idle_anim'),
         Asset.from_name('fireninja_move_anim'),
@@ -97,13 +117,19 @@ class FireNinja(GameObject):
         Asset.from_name('fireninja_reviveotherloop_anim'),
         Asset.from_name('fireninja_power_anim'),
         Asset.from_name('fireninja_member_revive')
-    })
-    sounds: SoundCollection = SoundCollection({
+    }))
+    sounds: SoundCollection = field(default_factory=lambda: SoundCollection({
         Sound.from_name('sfx_mg_2013_cjsnow_attackfire'),
         Sound.from_name('sfx_mg_2013_cjsnow_attackpowercardfire'),
         Sound.from_name('sfx_mg_2013_cjsnow_footsteppenguinfire'),
-        Sound.from_name('sfx_mg_2013_cjsnow_penguininground'),
+        Sound.from_name('sfx_mg_2013_cjsnow_penguinground'),
         Sound.from_name('sfx_mg_2013_cjsnow_penguinhitsuccess'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
-    })
+    }))
+
+    def __eq__(self, other: "GameObject") -> bool:
+        return self.id == other.id
+
+    def __hash__(self) -> int:
+        return hash(self.id)
