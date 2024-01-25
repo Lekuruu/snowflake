@@ -1,5 +1,5 @@
 
-from app.engine.game import Game
+from dataclasses import dataclass
 from app.objects import (
     SoundCollection,
     AssetCollection,
@@ -7,9 +7,6 @@ from app.objects import (
     Sound,
     Asset
 )
-
-from dataclasses import dataclass
-from typing import Set
 
 class SlyAssets(AssetCollection):
     def __init__(self) -> None:
@@ -102,3 +99,36 @@ class Tank(GameObject):
     name: str = 'Tank'
     assets: TankAssets = TankAssets()
     sounds: TankSounds = TankSounds()
+
+class TuskAssets(AssetCollection):
+    def __init__(self) -> None:
+        super().__init__()
+        super().update({
+            Asset.from_name('tusk_background_under'),
+            Asset.from_name('tusk_idle_anim'),
+            Asset.from_name('tusk_hit_anim'),
+            Asset.from_name('tusk_pushattack_anim'),
+            Asset.from_name('tusk_lose_anim'),
+            Asset.from_name('tusk_win_anim'),
+            Asset.from_name('tusk_icicle_drop_anim'),
+            Asset.from_name('tusk_stun_anim'),
+            Asset.from_name('tusk_iciclesummon1_anim'),
+            Asset.from_name('tusk_iciclesummon2_anim'),
+        })
+
+class TuskSounds(SoundCollection):
+    def __init__(self) -> None:
+        super().__init__()
+        super().update({
+            Sound.from_name('sfx_mg_2013_cjsnow_tusklaugh'),
+            Sound.from_name('sfx_mg_2013_cjsnow_hittusk'),
+            Sound.from_name('sfx_mg_2013_cjsnow_attacktuskicicle01'),
+            Sound.from_name('sfx_mg_2013_cjsnow_attacktuskicicle02'),
+            Sound.from_name('sfx_mg_2013_cjsnow_attacktuskearthquake')
+        })
+
+@dataclass
+class Tusk(GameObject):
+    name: str = 'Tusk'
+    assets: TuskAssets = TuskAssets()
+    sounds: TuskSounds = TuskSounds()
