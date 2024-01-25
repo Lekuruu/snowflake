@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..engine.penguin import Penguin
     from .gameobject import GameObject
-    from .sprite import Sprite
     from .sound import Sound
     from .asset import Asset
 
@@ -81,38 +80,30 @@ class AssetCollection(Set["Asset"]):
     def by_name(self, name: str) -> "Asset" | None:
         return next((asset for asset in self if asset.name == name), None)
 
-class ObjectCollection(Set[Union["GameObject", "Sprite"]]):
+class ObjectCollection(Set["GameObject"]):
     def __init__(self) -> None:
         super().__init__()
 
-    @property
-    def sprites(self) -> Set["Sprite"]:
-        return {object for object in self if type(object).__name__ == "Sprite"}
-
-    @property
-    def gameobjects(self) -> Set["GameObject"]:
-        return {object for object in self if type(object).__name__ == "GameObject"}
-
-    def add(self, object: "GameObject" | "Sprite", assign_id=True) -> None:
+    def add(self, object: "GameObject", assign_id=True) -> None:
         if assign_id:
             object.id = self.get_id()
 
         return super().add(object)
 
-    def update(self, objects: List["GameObject" | "Sprite"], assign_ids=True) -> None:
+    def update(self, objects: List["GameObject"], assign_ids=True) -> None:
         if assign_ids:
             for object in objects:
                 object.id = self.get_id()
 
         super().update(objects)
 
-    def remove(self, object: "GameObject" | "Sprite") -> None:
+    def remove(self, object: "GameObject") -> None:
         return super().remove(object)
 
-    def by_id(self, id: int) -> "GameObject" | "Sprite" | None:
+    def by_id(self, id: int) -> "GameObject" | None:
         return next((object for object in self if object.id == id), None)
 
-    def by_name(self, name: str) -> "GameObject" | "Sprite" | None:
+    def by_name(self, name: str) -> "GameObject" | None:
         return next((object for object in self if object.name == name), None)
 
     def get_id(self) -> int:

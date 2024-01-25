@@ -5,7 +5,6 @@ if TYPE_CHECKING:
     from .penguin import Penguin
 
 from app.objects.collections import ObjectCollection
-from app.objects.sprite import Sprite
 from app.objects.sound import Sound
 
 import random
