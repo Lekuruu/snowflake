@@ -71,6 +71,9 @@ class Game:
             1          # PlaceInstanceId
         )
 
+        # Scale screen up to 100
+        self.send_tag('P_TILESIZE', 100)
+
         self.initialize_objects()
         self.wait_for_players()
 
