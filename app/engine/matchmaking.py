@@ -5,7 +5,6 @@ from typing import Tuple
 
 from ..objects.collections import Players
 from .penguin import Penguin
-from .game import Game
 
 import threading
 import logging
@@ -51,6 +50,8 @@ class MatchmakingQueue:
         return players
 
     def create_game(self, fire: Penguin, snow: Penguin, water: Penguin) -> None:
+        from .game import Game
+
         self.logger.info('Creating game...')
 
         fire.in_queue = False
