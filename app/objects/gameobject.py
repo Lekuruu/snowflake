@@ -1,8 +1,10 @@
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Set
 
-from .collections import SoundCollection
+import app.engine as Engine
+
+from .collections import SoundCollection, AssetCollection
 from .asset import Asset
 from .sound import Sound
 
@@ -11,12 +13,12 @@ if TYPE_CHECKING:
 
 @dataclass
 class GameObject:
-    id: int
     name: str
-    asset: Asset
-    x: int
-    y: int
     game: "Game"
+    x: int = 0
+    y: int = 0
+    id: int = 0
+    assets: AssetCollection = field(default_factory=AssetCollection)
     sounds: SoundCollection = field(default_factory=SoundCollection)
 
     def __eq__(self, obj: "GameObject") -> bool:
@@ -25,11 +27,11 @@ class GameObject:
     def __hash__(self) -> int:
         return hash(self.id)
 
-    def place(self) -> None:
+    def place_object(self) -> None:
         self.game.send_tag(
             'O_HERE',
             self.id,
-            '0:1',  # TODO: Why do 0:1 here?
+            '0:1',  # TODO
             self.x,
             self.y,
             0,      # TODO
@@ -44,10 +46,37 @@ class GameObject:
             0       # TODO
         )
 
-    def move(self) -> None:
+    def move_object(self) -> None:
         ...
 
-    def animate(self) -> None:
+    def animate_object(self) -> None:
+        ...
+
+    def place_sprite(self, name: str) -> None:
+        asset = self.assets.by_name(name)
+        self.game.send_tag(
+            'O_SPRITE',
+            self.id,
+            f'0:{asset.index}',
+            0, # TODO
+            '' # TODO
+        )
+
+    def load_sprite(self, name: str) -> None:
+        asset = self.assets.by_name(name)
+        self.game.send_tag(
+            'S_LOADSPRITE',
+            f'0:{asset.index}'
+        )
+
+    def load_sprites(self) -> None:
+        for asset in self.assets:
+            self.game.send_tag(
+                'S_LOADSPRITE',
+                f'0:{asset.index}'
+            )
+
+    def animate_sprite(self) -> None:
         ...
 
     def add_sound(
