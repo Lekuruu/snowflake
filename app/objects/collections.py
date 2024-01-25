@@ -69,6 +69,12 @@ class AssetCollection(Set["Asset"]):
         super().__init__()
         super().update(initial_data)
 
+    def __eq__(self, other: "AssetCollection") -> bool:
+        return super().__eq__(other)
+
+    def __hash__(self) -> int:
+        return hash(tuple(self))
+
     def add(self, asset: "Asset") -> None:
         return super().add(asset)
 
