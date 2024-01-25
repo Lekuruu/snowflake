@@ -9,6 +9,7 @@ from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja
 from app.objects.enemies import Sly, Scrap, Tank, Tusk
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
+from app.objects.asset import Asset
 
 import random
 import time
@@ -85,7 +86,38 @@ class Game:
             obj = self.objects.by_name(background.name)
             obj.place_sprite(background.name)
 
-        # TODO: Start animations
+        water = self.objects.by_name('Water')
+        water.x = 0.5
+        water.y = 1
+
+        water.place_object()
+        water.animate_object(
+            'waterninja_idle_anim',
+            play_style='loop',
+            reset=True
+        )
+
+        snow = self.objects.by_name('Snow')
+        snow.x = 0.5
+        snow.y = 3
+
+        snow.place_object()
+        snow.animate_object(
+            'snowninja_idle_anim',
+            play_style='loop',
+            reset=True
+        )
+
+        fire = self.objects.by_name('Fire')
+        fire.x = 0.5
+        fire.y = 5
+
+        fire.place_object()
+        fire.animate_object(
+            'fireninja_idle_anim',
+            play_style='loop',
+            reset=True
+        )
 
         for client in self.clients:
             # Close loading screen
@@ -126,23 +158,23 @@ class Game:
             background.place_object()
 
         # Ninjas
-        self.objects.add(water := WaterNinja(self, x=0, y=0))
+        self.objects.add(water := WaterNinja(self))
         water.place_object()
 
-        self.objects.add(snow := SnowNinja(self, x=0, y=1))
+        self.objects.add(snow := SnowNinja(self))
         snow.place_object()
 
-        self.objects.add(fire := FireNinja(self, x=0, y=2))
+        self.objects.add(fire := FireNinja(self))
         fire.place_object()
 
         # Enemies
-        self.objects.add(sly := Sly(self, x=1, y=0))
+        self.objects.add(sly := Sly(self))
         sly.place_object()
 
-        self.objects.add(scrap := Scrap(self, x=1, y=1))
+        self.objects.add(scrap := Scrap(self))
         scrap.place_object()
 
-        self.objects.add(tank := Tank(self, x=1, y=2))
+        self.objects.add(tank := Tank(self))
         tank.place_object()
 
         # Load sprites
