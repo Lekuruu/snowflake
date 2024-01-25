@@ -46,21 +46,6 @@ def on_window_manager_ready(client: Penguin, data: dict):
         yPercent=0
     )
 
-@Instance.triggers.register('roomToRoomComplete')
-def on_room_to_room_complete(client: Penguin, data: dict):
-    """Will be called when the loading screen transition is complete"""
-    ...
-
-@Instance.triggers.register('roomToRoomMinTime')
-def on_room_to_room_min_time(client: Penguin, data: dict):
-    """Will be called when the loading screen has started"""
-    ...
-
-@Instance.triggers.register('roomToRoomScreenClosed')
-def on_room_to_room_screen_closed(client: Penguin, data: dict):
-    """Will be called when the loading screen window is closed"""
-    ...
-
 @Instance.triggers.register('windowReady')
 def on_window_ready(client: Penguin, data: dict):
     window_name = data['windowUrl'].split('/')[-1]

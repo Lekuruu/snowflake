@@ -35,6 +35,7 @@ class Penguin(Receiver):
         self.move: int = 0
 
         self.in_queue: bool = False
+        self.is_ready: bool = False
         self.in_game: bool = False
         self.is_host: bool = False
 

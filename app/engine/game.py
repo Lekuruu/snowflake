@@ -5,7 +5,9 @@ if TYPE_CHECKING:
     from .penguin import Penguin
 
 from app.objects.collections import ObjectCollection
+from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
+from app.objects.asset import Asset
 
 import random
 import time
@@ -39,6 +41,10 @@ class Game:
         self.snow.game = self
         self.water.game = self
 
+        self.fire.in_game = True
+        self.snow.in_game = True
+        self.water.in_game = True
+
         # Wait for "prepare to battle" screen to end
         time.sleep(3)
 
@@ -66,7 +72,7 @@ class Game:
     def wait_for_players(self) -> None:
         """Wait for all players to finish loading the game"""
         for player in self.clients:
-            while not player.in_game:
+            while not player.is_ready:
                 pass
 
     def initialize_objects(self) -> None:
