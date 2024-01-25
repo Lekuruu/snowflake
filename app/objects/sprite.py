@@ -2,7 +2,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..engine.game import Game
+    from app.engine.game import Game
 
 from dataclasses import dataclass
 from .asset import Asset

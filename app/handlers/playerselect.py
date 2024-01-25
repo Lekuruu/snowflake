@@ -1,5 +1,5 @@
 
-from ..engine import Instance, Penguin
+from app.engine import Instance, Penguin
 
 @Instance.events.register('/ready')
 def ready_handler(client: Penguin):

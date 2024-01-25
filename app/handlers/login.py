@@ -1,6 +1,6 @@
 
-from ..engine import Instance, Penguin
-from ..data import penguins
+from app.engine import Instance, Penguin
+from app.data import penguins
 
 import logging
 import config

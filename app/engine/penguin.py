@@ -1,18 +1,18 @@
 
 from __future__ import annotations
 
-from typing import Any, List
+from typing import TYPE_CHECKING, Any, List
+
+if TYPE_CHECKING:
+    from .game import Game
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 
-from ..data.objects import Penguin as PenguinObject
-from ..data import BuildType, EventType
+from app.data.objects import Penguin as PenguinObject
+from app.data import BuildType, EventType
 from .windows import WindowManager
 from .receiver import Receiver
-from .game import Game
-
-import json
 
 class Penguin(Receiver):
     def __init__(self, server: Factory, address: IPv4Address | IPv6Address):
@@ -24,7 +24,7 @@ class Penguin(Receiver):
         self.logged_in: bool = False
 
         self.object: PenguinObject | None = None
-        self.game: Game | None = None
+        self.game: "Game" | None = None
 
         self.element: str = ""
         self.tip_mode: bool = True

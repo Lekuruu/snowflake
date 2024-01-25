@@ -3,9 +3,10 @@ from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 
-from ..events import EventHandler, ActionHandler, TriggerHandler
-from ..objects.collections import AssetCollection, Players
-from ..data import ServerType, BuildType, Postgres
+from app.events import EventHandler, ActionHandler, TriggerHandler
+from app.data import ServerType, BuildType, Postgres
+from app.objects import Players, AssetCollection
+
 from .matchmaking import MatchmakingQueue
 from .penguin import Penguin
 

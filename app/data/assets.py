@@ -1,6 +1,6 @@
 
-from ..objects.asset import Asset
-from ..engine import Instance
+from app.objects.asset import Asset
+from app.engine import Instance
 import config
 
 asset_url = f"http://{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/png/large"

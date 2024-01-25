@@ -4,12 +4,9 @@ from typing import TYPE_CHECKING, List
 if TYPE_CHECKING:
     from .penguin import Penguin
 
+from app.objects.collections import ObjectCollection
 from app.objects.sprite import Sprite
 from app.objects.sound import Sound
-from app.objects.collections import (
-    ObjectCollection,
-    SoundCollection
-)
 
 import random
 import time
@@ -77,5 +74,3 @@ class Game:
         """Initialize all game objects"""
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
-
-        # TODO: ...

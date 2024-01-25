@@ -1,5 +1,5 @@
 
-from ..engine import Instance, Penguin
+from app.engine import Instance, Penguin
 
 @Instance.events.register('/use')
 def use_handler(client: Penguin, object_id: int, x: int, y: int, local_x: float, local_y: float):
