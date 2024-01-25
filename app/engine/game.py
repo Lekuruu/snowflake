@@ -19,7 +19,7 @@ class Game:
         self.snow = snow
         self.water = water
 
-        self.round = 1
+        self.round = 0
         self.enemies = []
         self.map = random.randrange(1, 3)
         self.bonus_cirteria = 'under_time' # TODO: Select random
@@ -38,13 +38,12 @@ class Game:
                 GameObject.from_asset('env_mountaintop_bg', self, x=4.5, y=-1.1)
             ],
             2: [
-                GameObject.from_asset('forest_bg', self, x=0, y=0),
-                GameObject.from_asset('forest_fg', self, x=0, y=1)
+                GameObject.from_asset('forest_bg', self, x=4.5, y=-1.1),
+                GameObject.from_asset('forest_fg', self, x=4.5, y=6.1)
             ],
             3: [
-                GameObject.from_asset('cragvalley_bg', self, x=0, y=0),
-                GameObject.from_asset('cragvalley_fg', self, x=0, y=1),
-                GameObject.from_asset('crag_rock', self, x=0, y=2)
+                GameObject.from_asset('cragvalley_bg', self, x=4.5, y=-1.1),
+                GameObject.from_asset('cragvalley_fg', self, x=4.5, y=6)
             ]
         }[self.map]
 
