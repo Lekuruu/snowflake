@@ -13,19 +13,37 @@ if TYPE_CHECKING:
 
 @dataclass
 class GameObject:
-    name: str
     game: "Game"
+    name: str
     x: int = 0
     y: int = 0
     id: int = 0
     assets: AssetCollection = field(default_factory=AssetCollection)
     sounds: SoundCollection = field(default_factory=SoundCollection)
 
-    def __eq__(self, obj: "GameObject") -> bool:
-        return self.id == obj.id
+    def __eq__(self, other: "GameObject") -> bool:
+        return self.id == other.id
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    @classmethod
+    def from_asset(
+        cls,
+        name: str,
+        game: "Game",
+        x: int = 0,
+        y: int = 0
+    ) -> "GameObject":
+        asset = Asset.from_name(name)
+        return GameObject(
+            game,
+            name,
+            x,
+            y,
+            asset.index,
+            AssetCollection([asset])
+        )
 
     def place_object(self) -> None:
         self.game.send_tag(
