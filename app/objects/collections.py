@@ -85,11 +85,26 @@ class ObjectCollection(Set[Union["GameObject", "Sprite"]]):
     def __init__(self) -> None:
         super().__init__()
 
+    @property
+    def sprites(self) -> Set["Sprite"]:
+        return {object for object in self if type(object).__name__ == "Sprite"}
+
+    @property
+    def gameobjects(self) -> Set["GameObject"]:
+        return {object for object in self if type(object).__name__ == "GameObject"}
+
     def add(self, object: "GameObject" | "Sprite", assign_id=True) -> None:
         if assign_id:
             object.id = self.get_id()
 
         return super().add(object)
+
+    def update(self, objects: List["GameObject" | "Sprite"], assign_ids=True) -> None:
+        if assign_ids:
+            for object in objects:
+                object.id = self.get_id()
+
+        super().update(objects)
 
     def remove(self, object: "GameObject" | "Sprite") -> None:
         return super().remove(object)
