@@ -1,5 +1,5 @@
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from .collections import SoundCollection
@@ -7,7 +7,7 @@ from .asset import Asset
 from .sound import Sound
 
 if TYPE_CHECKING:
-    from ..engine.game import Game
+    from app.engine.game import Game
 
 @dataclass
 class GameObject:
@@ -17,7 +17,7 @@ class GameObject:
     x: int
     y: int
     game: "Game"
-    sounds: SoundCollection = SoundCollection()
+    sounds: SoundCollection = field(default_factory=SoundCollection)
 
     def __eq__(self, obj: "GameObject") -> bool:
         return self.id == obj.id
