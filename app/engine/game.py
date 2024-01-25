@@ -10,6 +10,7 @@ from app.objects.enemies import Sly, Scrap, Tank, Tusk
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
 from app.objects.asset import Asset
+from .grid import Grid
 
 import random
 import time
@@ -27,6 +28,7 @@ class Game:
         self.game_start = time.time()
 
         self.objects = ObjectCollection()
+        self.grid = Grid()
 
     @property
     def clients(self) -> List["Penguin"]:
@@ -87,9 +89,6 @@ class Game:
             obj.place_sprite(background.name)
 
         water = self.objects.by_name('Water')
-        water.x = 0.5
-        water.y = 1
-
         water.place_object()
         water.animate_object(
             'waterninja_idle_anim',
@@ -98,9 +97,6 @@ class Game:
         )
 
         snow = self.objects.by_name('Snow')
-        snow.x = 0.5
-        snow.y = 3
-
         snow.place_object()
         snow.animate_object(
             'snowninja_idle_anim',
@@ -109,9 +105,6 @@ class Game:
         )
 
         fire = self.objects.by_name('Fire')
-        fire.x = 0.5
-        fire.y = 5
-
         fire.place_object()
         fire.animate_object(
             'fireninja_idle_anim',
@@ -159,12 +152,15 @@ class Game:
 
         # Ninjas
         self.objects.add(water := WaterNinja(self))
+        self.grid[0, 0] = water
         water.place_object()
 
         self.objects.add(snow := SnowNinja(self))
+        self.grid[0, 2] = snow
         snow.place_object()
 
         self.objects.add(fire := FireNinja(self))
+        self.grid[0, 4] = fire
         fire.place_object()
 
         # Enemies
