@@ -8,127 +8,87 @@ from app.objects import (
     Asset
 )
 
-class SlyAssets(AssetCollection):
-    def __init__(self) -> None:
-        super().__init__()
-        super().update({
-            Asset.from_name('sly_idle_anim'),
-            Asset.from_name('sly_attack_anim'),
-            Asset.from_name('sly_move_anim'),
-            Asset.from_name('sly_hit_anim'),
-            Asset.from_name('sly_ko_anim'),
-            Asset.from_name('sly_projectile_anim'),
-            Asset.from_name('sly_daze_anim')
-        })
-
-class SlySounds(SoundCollection):
-    def __init__(self) -> None:
-        super().__init__()
-        super().update({
-            Sound.from_name('sfx_mg_2013_cjsnow_footstepsly_loop'),
-            Sound.from_name('sfx_mg_2013_cjsnow_attacksly'),
-            Sound.from_name('sfx_mg_2013_cjsnow_impactsly'),
-            Sound.from_name('sfx_mg_2013_cjsnow_snowmanslyhit'),
-            Sound.from_name('sly_projectile')
-        })
-
 @dataclass
 class Sly(GameObject):
     name: str = 'Sly'
-    assets: SlyAssets = SlyAssets()
-    sounds: SlySounds = SlySounds()
-
-class ScrapAssets(AssetCollection):
-    def __init__(self) -> None:
-        super().__init__()
-        super().update({
-            Asset.from_name('scrap_idle_anim'),
-            Asset.from_name('scrap_attack_anim'),
-            Asset.from_name('scrap_attackeffect_anim'),
-            Asset.from_name('scrap_attacklittleeffect_anim'),
-            Asset.from_name('scrap_projectileeast_anim'),
-            Asset.from_name('scrap_projectilenorth_anim'),
-            Asset.from_name('scrap_projectilenortheast_anim'),
-            Asset.from_name('scrap_hit_anim'),
-            Asset.from_name('scrap_move_anim'),
-            Asset.from_name('scrap_ko_anim'),
-            Asset.from_name('scrap_dazed_anim')
-        })
-
-class ScrapSounds(SoundCollection):
-    def __init__(self) -> None:
-        super().__init__()
-        super().update({
-            Sound.from_name('sfx_mg_2013_cjsnow_snowmanscraphit'),
-            Sound.from_name('sfx_mg_2013_cjsnow_impactscrap'),
-            Sound.from_name('sfx_mg_2013_cjsnow_footstepscrap_loop'),
-            Sound.from_name('sfx_mg_2013_cjsnow_attackscrap')
-        })
+    assets: AssetCollection = AssetCollection({
+        Asset.from_name('sly_idle_anim'),
+        Asset.from_name('sly_attack_anim'),
+        Asset.from_name('sly_move_anim'),
+        Asset.from_name('sly_hit_anim'),
+        Asset.from_name('sly_ko_anim'),
+        Asset.from_name('sly_projectile_anim'),
+        Asset.from_name('sly_daze_anim')
+    })
+    sounds: SoundCollection = SoundCollection({
+        Sound.from_name('sfx_mg_2013_cjsnow_footstepsly_loop'),
+        Sound.from_name('sfx_mg_2013_cjsnow_attacksly'),
+        Sound.from_name('sfx_mg_2013_cjsnow_impactsly'),
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmanslyhit'),
+        Sound.from_name('sly_projectile')
+    })
 
 @dataclass
 class Scrap(GameObject):
     name: str = 'Scrap'
-    assets: ScrapAssets = ScrapAssets()
-    sounds: ScrapSounds = ScrapSounds()
-
-class TankAssets(AssetCollection):
-    def __init__(self) -> None:
-        super().__init__()
-        super().update({
-            Asset.from_name('tank_swipe_horiz_anim'),
-            Asset.from_name('tank_swipe_vert_anim'),
-            Asset.from_name('tank_idle_anim_flaxp0000'),
-            Asset.from_name('tank_attack_anim_flaxp0000'),
-            Asset.from_name('tank_hit_anim'),
-            Asset.from_name('tank_move_anim'),
-            Asset.from_name('tank_knockout_anim'),
-            Asset.from_name('tank_daze_anim')
-        })
-
-class TankSounds(SoundCollection):
-    def __init__(self) -> None:
-        super().__init__()
-        super().update({
-            Sound.from_name('sfx_mg_2013_cjsnow_snowmantankhit'),
-            Sound.from_name('sfx_mg_2013_cjsnow_footsteptank'),
-            Sound.from_name('sfx_mg_2013_cjsnow_attacktank')
-        })
+    assets: AssetCollection = AssetCollection({
+        Asset.from_name('scrap_idle_anim'),
+        Asset.from_name('scrap_attack_anim'),
+        Asset.from_name('scrap_attackeffect_anim'),
+        Asset.from_name('scrap_attacklittleeffect_anim'),
+        Asset.from_name('scrap_projectileeast_anim'),
+        Asset.from_name('scrap_projectilenorth_anim'),
+        Asset.from_name('scrap_projectilenortheast_anim'),
+        Asset.from_name('scrap_hit_anim'),
+        Asset.from_name('scrap_move_anim'),
+        Asset.from_name('scrap_ko_anim'),
+        Asset.from_name('scrap_dazed_anim')
+    })
+    sounds: SoundCollection = SoundCollection({
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmanscraphit'),
+        Sound.from_name('sfx_mg_2013_cjsnow_impactscrap'),
+        Sound.from_name('sfx_mg_2013_cjsnow_footstepscrap_loop'),
+        Sound.from_name('sfx_mg_2013_cjsnow_attackscrap')
+    })
 
 @dataclass
 class Tank(GameObject):
     name: str = 'Tank'
-    assets: TankAssets = TankAssets()
-    sounds: TankSounds = TankSounds()
-
-class TuskAssets(AssetCollection):
-    def __init__(self) -> None:
-        super().__init__()
-        super().update({
-            Asset.from_name('tusk_background_under'),
-            Asset.from_name('tusk_idle_anim'),
-            Asset.from_name('tusk_hit_anim'),
-            Asset.from_name('tusk_pushattack_anim'),
-            Asset.from_name('tusk_lose_anim'),
-            Asset.from_name('tusk_win_anim'),
-            Asset.from_name('tusk_icicle_drop_anim'),
-            Asset.from_name('tusk_stun_anim'),
-            Asset.from_name('tusk_iciclesummon1_anim'),
-            Asset.from_name('tusk_iciclesummon2_anim'),
-        })
-
-class TuskSounds(SoundCollection):
-    def __init__(self) -> None:
-        super().__init__()
-        super().update({
-            Sound.from_name('sfx_mg_2013_cjsnow_tusklaugh'),
-            Sound.from_name('sfx_mg_2013_cjsnow_hittusk'),
-            Sound.from_name('sfx_mg_2013_cjsnow_attacktuskicicle01'),
-            Sound.from_name('sfx_mg_2013_cjsnow_attacktuskicicle02'),
-            Sound.from_name('sfx_mg_2013_cjsnow_attacktuskearthquake')
-        })
+    assets: AssetCollection = AssetCollection({
+        Asset.from_name('tank_swipe_horiz_anim'),
+        Asset.from_name('tank_swipe_vert_anim'),
+        Asset.from_name('tank_idle_anim_flaxp0000'),
+        Asset.from_name('tank_attack_anim_flaxp0000'),
+        Asset.from_name('tank_hit_anim'),
+        Asset.from_name('tank_move_anim'),
+        Asset.from_name('tank_knockout_anim'),
+        Asset.from_name('tank_daze_anim')
+    })
+    sounds: SoundCollection = SoundCollection({
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmantankhit'),
+        Sound.from_name('sfx_mg_2013_cjsnow_footsteptank'),
+        Sound.from_name('sfx_mg_2013_cjsnow_attacktank')
+    })
 
 @dataclass
 class Tusk(GameObject):
     name: str = 'Tusk'
-    assets: TuskAssets = TuskAssets()
-    sounds: TuskSounds = TuskSounds()
+    assets: AssetCollection = AssetCollection({
+        Asset.from_name('tusk_background_under'),
+        Asset.from_name('tusk_idle_anim'),
+        Asset.from_name('tusk_hit_anim'),
+        Asset.from_name('tusk_pushattack_anim'),
+        Asset.from_name('tusk_lose_anim'),
+        Asset.from_name('tusk_win_anim'),
+        Asset.from_name('tusk_icicle_drop_anim'),
+        Asset.from_name('tusk_stun_anim'),
+        Asset.from_name('tusk_iciclesummon1_anim'),
+        Asset.from_name('tusk_iciclesummon2_anim'),
+    })
+    sounds: SoundCollection = SoundCollection({
+        Sound.from_name('sfx_mg_2013_cjsnow_tusklaugh'),
+        Sound.from_name('sfx_mg_2013_cjsnow_hittusk'),
+        Sound.from_name('sfx_mg_2013_cjsnow_attacktuskicicle01'),
+        Sound.from_name('sfx_mg_2013_cjsnow_attacktuskicicle02'),
+        Sound.from_name('sfx_mg_2013_cjsnow_attacktuskearthquake')
+    })

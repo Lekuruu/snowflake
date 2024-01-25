@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from .sound import Sound
     from .asset import Asset
 
-from typing import Set, List, Iterator, Union
+from typing import Set, List, Iterator, Iterable
 from threading import Lock
 
 class Players(Set["Penguin"]):
@@ -65,8 +65,9 @@ class Players(Set["Penguin"]):
         return [player for player in self if player.element == element]
 
 class AssetCollection(Set["Asset"]):
-    def __init__(self) -> None:
+    def __init__(self, initial_data: Iterable = {}) -> None:
         super().__init__()
+        super().update(initial_data)
 
     def add(self, asset: "Asset") -> None:
         return super().add(asset)
@@ -81,8 +82,9 @@ class AssetCollection(Set["Asset"]):
         return next((asset for asset in self if asset.name == name), None)
 
 class ObjectCollection(Set["GameObject"]):
-    def __init__(self) -> None:
+    def __init__(self, initial_data: Iterable = {}) -> None:
         super().__init__()
+        super().update(initial_data)
 
     def add(self, object: "GameObject", assign_id=True) -> None:
         if assign_id:
@@ -110,8 +112,9 @@ class ObjectCollection(Set["GameObject"]):
         return max([object.id for object in self] or [0]) + 1
 
 class SoundCollection(AssetCollection):
-    def __init__(self) -> None:
+    def __init__(self, initial_data: Iterable = {}) -> None:
         super().__init__()
+        super().update(initial_data)
 
     def by_index(self, index: int) -> "Sound" | None:
         return next((sound for sound in self if sound.index == index), None)
