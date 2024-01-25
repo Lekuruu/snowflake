@@ -1,6 +1,6 @@
 
+from typing import TYPE_CHECKING, Set, Callable
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Set
 
 import app.engine as Engine
 
@@ -67,8 +67,29 @@ class GameObject:
     def move_object(self) -> None:
         ...
 
-    def animate_object(self) -> None:
-        ...
+    def animate_object(
+        self,
+        name: str,
+        play_style: str = 'play_once',
+        duration: int | None = None,
+        time_scale: int = 1,
+        reset: bool = False,
+        callback: Callable | None = None
+    ) -> None:
+        asset = self.assets.by_name(name)
+        self.game.send_tag(
+            'O_ANIM',
+            self.id,
+            f'0:{asset.index}',
+            play_style,
+            duration or '',
+            time_scale,
+            int(reset),
+            self.id, # response object id
+            0        # handle id
+        )
+
+        # TODO: Implement callbacks
 
     def place_sprite(self, name: str) -> None:
         asset = self.assets.by_name(name)
@@ -94,8 +115,23 @@ class GameObject:
                 f'0:{asset.index}'
             )
 
-    def animate_sprite(self) -> None:
-        ...
+    def animate_sprite(
+        self,
+        start_frame: int = 0,
+        end_frame: int = 0,
+        backwards: bool = False,
+        play_style = 'play_once',
+        duration: int = 50,
+    ) -> None:
+        self.game.send_tag(
+            'O_SPRITEANIM',
+            self.id,
+            start_frame + 1,
+            end_frame + 1,
+            int(backwards),
+            play_style,
+            duration
+        )
 
     def add_sound(
         self,
