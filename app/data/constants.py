@@ -38,8 +38,6 @@ class BuildType(Enum):
     PROFILE = 2
     MEMORY  = 3
 
-# TODO: INCOMPLETE!
-
 class ClientAction(str, Enum):
     LOAD_WINDOW  = "loadWindow"
     CLOSE_WINDOW = "closeWindow"
