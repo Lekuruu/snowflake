@@ -163,9 +163,13 @@ class Game:
             if (self.round > 3):
                 break
 
+            # Remove any existing enemies
             self.remove_enemies()
+
+            # Wait for round title
             self.display_round_title()
 
+            # Enemies can spawn anywhere now
             self.grid.enemy_spawns = [range(9), range(5)]
 
             # Create new enemies
