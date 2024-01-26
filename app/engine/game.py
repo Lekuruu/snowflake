@@ -1,5 +1,5 @@
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Callable, List
 
 if TYPE_CHECKING:
     from .penguin import Penguin
@@ -113,7 +113,7 @@ class Game:
         self.send_tag('P_TILESIZE', 100)
 
         self.initialize_objects()
-        self.wait_for_players()
+        self.wait_for_players(lambda player: player.is_ready)
 
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
@@ -146,10 +146,10 @@ class Game:
         for player in self.clients:
             player.send_tag(tag, *args)
 
-    def wait_for_players(self) -> None:
+    def wait_for_players(self, condition: Callable) -> None:
         """Wait for all players to finish loading the game"""
         for player in self.clients:
-            while not player.is_ready:
+            while not condition(player):
                 pass
 
     def register_input(
