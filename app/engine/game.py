@@ -14,6 +14,7 @@ from app.objects.asset import Asset
 from .grid import Grid
 
 import random
+import config
 import time
 
 class Game:
@@ -141,6 +142,7 @@ class Game:
 
         self.display_round_title()
         self.spawn_enemies()
+        self.load_ui()
 
     def send_tag(self, tag: str, *args) -> None:
         for player in self.clients:
@@ -267,6 +269,22 @@ class Game:
         for background in self.backgrounds:
             obj = self.objects.by_name(background.name)
             obj.place_sprite(background.name)
+
+    def load_ui(self) -> None:
+        for client in self.clients:
+            snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
+            snow_ui.layer = 'bottomLayer'
+            snow_ui.load(
+                {
+                    'cardsAssetPath': f'http://{config.MEDIA_LOCATION}/game/mpassets//minigames/cjsnow/en_US/deploy/',
+                    'element': client.element,
+                    'isMember': client.is_member,
+                },
+                loadDescription="",
+                assetPath="",
+                xPercent=0.5,
+                yPercent=1
+            )
 
     def display_round_title(self, wait=True) -> None:
         for client in self.clients:
