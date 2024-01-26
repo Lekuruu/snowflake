@@ -4,11 +4,14 @@ from __future__ import annotations
 from app.objects import GameObject
 from typing import List, Tuple
 
+import random
+
 class Grid:
     def __init__(self) -> None:
         self.array: List[GameObject | None] = [[None]*5]*9
         self.x_offset = 0.5
         self.y_offset = 1
+        self.enemy_spawns = [range(6, 9), range(5)]
 
     def __repr__(self) -> str:
         return f"<Grid ({self.array})>"
@@ -37,3 +40,12 @@ class Grid:
             x + self.x_offset,
             y + self.y_offset
         )
+
+    def enemy_spawn_location(self) -> Tuple[int, int]:
+        x, y = -1, -1
+
+        while not self.can_move(x, y):
+            x = random.choice(self.enemy_spawns[0])
+            y = random.choice(self.enemy_spawns[1])
+
+        return (x, y)
