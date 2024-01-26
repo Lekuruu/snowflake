@@ -149,12 +149,19 @@ class Game:
                 yPercent=0
             )
 
+        time.sleep(1)
+
         # Reset game time
         self.game_start = time.time() + 1
 
         self.display_round_title()
+        time.sleep(1.6)
+
         self.spawn_enemies()
+        time.sleep(1)
+
         self.load_ui()
+        self.send_tip(Phase.MOVE)
 
         # Run game loop until game ends
         self.run_game_loop()
@@ -175,15 +182,18 @@ class Game:
             # Remove any existing enemies
             self.remove_enemies()
 
-            # Wait for round title
-            self.display_round_title()
-
             # Enemies can spawn anywhere now
             self.grid.enemy_spawns = [range(9), range(5)]
+
+            self.display_round_title()
+            time.sleep(1.6)
 
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
+
+            time.sleep(1)
+            # TODO: Show grid
 
     def send_tag(self, tag: str, *args) -> None:
         for player in self.clients:
@@ -388,7 +398,7 @@ class Game:
             snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload('disableCards')
 
-    def display_round_title(self, wait=True) -> None:
+    def display_round_title(self) -> None:
         for client in self.clients:
             round_title = client.window_manager.get_window('cardjitsu_snowrounds.swf')
             round_title.layer = 'bottomLayer'
@@ -401,6 +411,3 @@ class Game:
                 loadDescription="",
                 assetPath=""
             )
-
-        if wait:
-            time.sleep(2.6)
