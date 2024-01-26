@@ -22,11 +22,11 @@ class Game:
         self.snow = snow
         self.water = water
 
-        self.round = 0
-        self.enemies = []
-        self.map = random.randrange(1, 3)
         self.bonus_cirteria = 'under_time' # TODO: Select random
         self.game_start = time.time()
+
+        self.map = random.randrange(1, 3)
+        self.round = 0
 
         self.objects = ObjectCollection()
         self.grid = Grid()
@@ -34,6 +34,22 @@ class Game:
     @property
     def clients(self) -> List["Penguin"]:
         return [self.fire, self.snow, self.water]
+
+    @property
+    def ninja(self) -> List[GameObject]:
+        return [
+            self.objects.by_name('Water'),
+            self.objects.by_name('Snow'),
+            self.objects.by_name('Fire')
+        ]
+
+    @property
+    def enemies(self) -> List[GameObject]:
+        return [
+            *self.objects.with_name('Sly'),
+            *self.objects.with_name('Scrap'),
+            *self.objects.with_name('Tank')
+        ]
 
     @property
     def backgrounds(self) -> List[GameObject]:
@@ -94,41 +110,15 @@ class Game:
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
 
-        # Place background sprites
-        for background in self.backgrounds:
-            obj = self.objects.by_name(background.name)
-            obj.place_sprite(background.name)
-
-        water = self.objects.by_name('Water')
-        water.place_object()
-        water.animate_object(
-            'waterninja_idle_anim',
-            play_style='loop',
-            reset=True
-        )
-
-        snow = self.objects.by_name('Snow')
-        snow.place_object()
-        snow.animate_object(
-            'snowninja_idle_anim',
-            play_style='loop',
-            reset=True
-        )
-
-        fire = self.objects.by_name('Fire')
-        fire.place_object()
-        fire.animate_object(
-            'fireninja_idle_anim',
-            play_style='loop',
-            reset=True
-        )
+        self.show_background()
+        self.spawn_ninjas()
 
         for client in self.clients:
             # Close loading screen
             player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')
             player_select.send_action('closeCjsnowRoomToRoom')
 
-            # Close game button
+            # Load exit button
             close_button = client.window_manager.get_window('cardjitsu_snowclose.swf')
             close_button.layer = 'bottomLayer'
             close_button.load(
@@ -139,10 +129,10 @@ class Game:
             )
 
         # Reset game time
-        self.game_start = time.time()
+        self.game_start = time.time() + 1
 
-        # Show round title
         self.display_round_title()
+        self.spawn_enemies()
 
     def send_tag(self, tag: str, *args) -> None:
         for player in self.clients:
@@ -175,12 +165,15 @@ class Game:
 
     def initialize_objects(self) -> None:
         """Initialize all game objects"""
-        # Background
-        for background in self.backgrounds:
-            self.objects.add(background)
-            background.place_object()
+        self.create_ninjas()
+        self.create_enemies()
+        self.create_background()
 
-        # Ninjas
+        # Load sprites
+        for object in self.objects:
+            object.load_sprites()
+
+    def create_ninjas(self) -> None:
         self.objects.add(water := WaterNinja(self))
         self.grid[0, 0] = water
         water.place_object()
@@ -193,21 +186,81 @@ class Game:
         self.grid[0, 4] = fire
         fire.place_object()
 
-        # Enemies
-        self.objects.add(sly := Sly(self))
-        sly.place_object()
+    def create_enemies(self) -> None:
+        max_enemies = {
+            0: 3,
+            1: 3,
+            2: 3,
+            4: 4,
+        }[self.round]
 
-        self.objects.add(scrap := Scrap(self))
-        scrap.place_object()
+        amount_enemies = random.randrange(1, max_enemies)
+        enemy_classes = (Sly, Scrap, Tank)
 
-        self.objects.add(tank := Tank(self))
-        tank.place_object()
+        for _ in range(amount_enemies):
+            enemy_class = random.choice(enemy_classes)
+            self.objects.add(enemy := enemy_class(self))
+            enemy.place_object()
 
-        # Load sprites
-        for object in self.objects:
-            object.load_sprites()
+    def create_background(self) -> None:
+        for background in self.backgrounds:
+            self.objects.add(background)
+            background.place_object()
 
-    def display_round_title(self) -> None:
+    def spawn_ninjas(self) -> None:
+        water = self.objects.by_name('Water')
+        water.place_object()
+        water.animate_object(
+            'waterninja_idle_anim',
+            play_style='loop',
+            reset=True
+        )
+
+        snow = self.objects.by_name('Snow')
+        snow.place_object()
+        snow.animate_object(
+            'snowninja_idle_anim',
+            play_style='loop',
+            reset=True
+        )
+
+        fire = self.objects.by_name('Fire')
+        fire.place_object()
+        fire.animate_object(
+            'fireninja_idle_anim',
+            play_style='loop',
+            reset=True
+        )
+
+        # TODO: Health bar
+
+    def spawn_enemies(self) -> None:
+        """Spawn enemies for the current round"""
+        for enemy in self.enemies:
+            # Choose spawn location on grid
+            x, y = self.grid.enemy_spawn_location()
+
+            self.grid[x, y] = enemy
+            enemy.place_object()
+
+            # Play spawn animation
+            enemy.animate_object('snowman_spawn_anim', play_style='play_once')
+            enemy.play_sound('sfx_mg_2013_cjsnow_snowmenappear')
+
+            # Play idle animation
+            enemy.animate_object(
+                f'{enemy.name.lower()}_idle_anim',
+                play_style='loop'
+            )
+
+            # TODO: Health bar
+
+    def show_background(self) -> None:
+        for background in self.backgrounds:
+            obj = self.objects.by_name(background.name)
+            obj.place_sprite(background.name)
+
+    def display_round_title(self, wait=True) -> None:
         # TODO: Implement other bonus criteria
         for client in self.clients:
             round_title = client.window_manager.get_window('cardjitsu_snowrounds.swf')
@@ -221,3 +274,6 @@ class Game:
                 loadDescription="",
                 assetPath=""
             )
+
+        if wait:
+            time.sleep(2.6)
