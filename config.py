@@ -1,16 +1,20 @@
 
-# TODO: Move to environment variables
+from dotenv import load_dotenv
+import os
 
-REDIS_HOST='localhost'
-REDIS_PORT=6379
-REDIS_DB=0
-REDIS_PASSWORD=None
+# Don't override docker environment variables
+load_dotenv(override=False)
 
-POSTGRES_HOST='localhost'
-POSTGRES_PORT=5432
-POSTGRES_USER='postgres'
-POSTGRES_PASSWORD='postgres'
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
+REDIS_DB = int(os.environ.get('REDIS_DB', 0))
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD')
 
-PORT=7002
-VERSION="FY15-20150206 (4954)r"
-MEDIA_LOCATION="media.localhost"
+POSTGRES_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
+POSTGRES_PORT = int(os.environ.get('POSTGRES_PORT', 5432))
+POSTGRES_USER = os.environ.get('POSTGRES_USER', 'postgres')
+POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'postgres')
+
+PORT = int(os.environ.get('PORT', 7002))
+VERSION = os.environ.get('VERSION', 'FY15-20150206 (4954)r')
+MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION', 'media.localhost')
