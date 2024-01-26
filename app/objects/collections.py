@@ -114,6 +114,12 @@ class ObjectCollection(Set["GameObject"]):
     def by_name(self, name: str) -> "GameObject" | None:
         return next((object for object in self if object.name == name), None)
 
+    def with_id(self, id: int) -> List["GameObject"]:
+        return [object for object in self if object.id == id]
+
+    def with_name(self, name: str) -> List["GameObject"]:
+        return [object for object in self if object.name == name]
+
     def get_id(self) -> int:
         return max([object.id for object in self] or [0]) + 1
 
