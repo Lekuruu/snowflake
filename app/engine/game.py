@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 
 from app.objects.collections import ObjectCollection, AssetCollection
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja
+from app.data.constants import KeyModifier, KeyTarget, KeyInput
 from app.objects.enemies import Sly, Scrap, Tank, Tusk
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
@@ -72,6 +73,16 @@ class Game:
             '1:10001', # PlaceId
             8,         # PlaceObjectId
             1          # PlaceInstanceId
+        )
+
+        # Register "/use" event
+        self.register_input(
+            command='/use',
+            input_id='/use',
+            script_id='4375706:1',
+            target=KeyTarget.TILE,
+            event=KeyInput.MOUSE_UP,
+            key_modifier=KeyModifier.NONE
         )
 
         # Scale screen up to 100
@@ -142,6 +153,25 @@ class Game:
         for player in self.clients:
             while not player.is_ready:
                 pass
+
+    def register_input(
+        self,
+        input_id: str,
+        script_id: int,
+        target: KeyTarget,
+        event: KeyInput,
+        key_modifier: KeyModifier,
+        command: str
+    ) -> None:
+        self.send_tag(
+            'W_INPUT',
+            input_id,
+            script_id,
+            target.value,
+            event.value,
+            key_modifier.value,
+            command
+        )
 
     def initialize_objects(self) -> None:
         """Initialize all game objects"""
