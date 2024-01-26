@@ -24,6 +24,9 @@ class Grid:
         value.x, value.y = index[0] + self.x_offset, index[1] + self.y_offset
 
     def can_move(self, x: int, y: int) -> bool:
+        if x not in range(9) or y not in range(5):
+            return False
+
         return self[x, y] is None
 
     def coordinates(self, obj: GameObject) -> Tuple[int, int]:
