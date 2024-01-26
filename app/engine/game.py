@@ -1,17 +1,21 @@
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Callable, List
 
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from twisted.python.failure import Failure
+from app.data.constants import KeyModifier, KeyTarget, KeyInput, Phase
 from app.objects.collections import ObjectCollection, AssetCollection
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja
-from app.data.constants import KeyModifier, KeyTarget, KeyInput
 from app.objects.enemies import Sly, Scrap, Tank
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
 from app.objects.asset import Asset
+
+from twisted.python.failure import Failure
+from twisted.internet import reactor
 
 from .timer import Timer
 from .grid import Grid
@@ -351,6 +355,28 @@ class Game:
                 xPercent=0.5,
                 yPercent=1
             )
+
+    def send_tip(self, phase: Phase, client: "Penguin" | None = None) -> None:
+        clients = [client] if client else self.clients
+
+        for client in clients:
+            if not client.tip_mode:
+                continue
+
+            infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
+            infotip.layer = 'bottomLayer'
+            infotip.load(
+                {
+                    'element': client.element,
+                    'phase': phase.value,
+                },
+                loadDescription="",
+                assetPath="",
+                xPercent=0.1,
+                yPercent=0
+            )
+
+        # TODO: Close tip
 
     def enable_cards(self) -> None:
         for client in self.clients:
