@@ -33,6 +33,7 @@ class Penguin(Receiver):
         self.range: int = 0
         self.power: int = 0
         self.move: int = 0
+        self.was_ko: bool = False
 
         self.in_queue: bool = False
         self.is_ready: bool = False
@@ -55,6 +56,11 @@ class Penguin(Receiver):
             self.logger.error(f'Failed to execute event: {e}', exc_info=e)
             self.close_connection()
             return
+
+    def close_connection(self):
+        if self.logged_in:
+            self.send_to_room()
+        return super().close_connection()
 
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room
