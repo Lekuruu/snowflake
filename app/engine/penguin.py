@@ -45,6 +45,10 @@ class Penguin(Receiver):
     def __repr__(self) -> str:
         return f"<{self.name} ({self.pid})>"
 
+    @property
+    def is_member(self) -> bool:
+        return True # TODO
+
     def command_received(self, command: str, args: List[Any]):
         try:
             self.server.events.call(
