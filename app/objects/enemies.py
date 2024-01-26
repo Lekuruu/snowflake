@@ -13,6 +13,10 @@ from app.objects import (
 )
 
 class Sly(GameObject):
+    range: int = 3
+    attack: int = 4
+    move: int = 3
+
     assets = AssetCollection({
         Asset.from_name('sly_idle_anim'),
         Asset.from_name('sly_attack_anim'),
@@ -33,8 +37,13 @@ class Sly(GameObject):
 
     def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
         super().__init__(game, 'Sly', x, y, id, Sly.assets, Sly.sounds)
+        self.hp = 30
 
 class Scrap(GameObject):
+    range: int = 2
+    attack: int = 5
+    move: int = 2
+
     assets = AssetCollection({
        Asset.from_name('scrap_idle_anim'),
        Asset.from_name('scrap_attack_anim'),
@@ -59,8 +68,13 @@ class Scrap(GameObject):
 
     def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
         super().__init__(game, 'Scrap', x, y, id, Scrap.assets, Scrap.sounds)
+        self.hp = 45
 
 class Tank(GameObject):
+    range: int = 1
+    attack: int = 10
+    move: int = 1
+
     assets = AssetCollection({
         Asset.from_name('tank_swipe_horiz_anim'),
         Asset.from_name('tank_swipe_vert_anim'),
@@ -81,3 +95,4 @@ class Tank(GameObject):
 
     def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
         super().__init__(game, 'Tank', x, y, id, Tank.assets, Tank.sounds)
+        self.hp = 60
