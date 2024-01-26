@@ -23,6 +23,9 @@ class Timer:
             self.tick -= 1
             self.update()
 
+            if self.game.server.shutting_down:
+                exit()
+
         self.hide()
         self.tick = 10
 

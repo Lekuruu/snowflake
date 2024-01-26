@@ -19,6 +19,7 @@ class SnowflakeEngine(Factory):
     def __init__(self):
         self.players = Players()
         self.protocol = Penguin
+        self.shutting_down = False
 
         self.server_type = ServerType.LIVE
         self.build_type = BuildType.RELEASE
@@ -50,6 +51,7 @@ class SnowflakeEngine(Factory):
 
     def stopFactory(self):
         self.logger.warning("Shutting down...")
+        self.shutting_down = True
 
         def force_exit(signal, frame):
             logging.warning("Force exiting...")
