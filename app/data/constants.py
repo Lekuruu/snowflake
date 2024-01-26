@@ -47,4 +47,12 @@ class EventType(str, Enum):
     PLAY_ACTION = "playAction"
     IMMEDIATE   = "immediateAction"
 
+class Phase(str, Enum):
+    MOVE = "Move"
+    ATTACK = "Attack"
+    CARD = "Card"
+    HEAL = "Heal"
+    CONFIRM = "Confirm"
+    MEMBER_CARD = "MemberCard"
+
 POLICY_FILE = "<cross-domain-policy><allow-access-from domain='*' to-ports='*' /></cross-domain-policy>"
