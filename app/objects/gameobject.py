@@ -75,6 +75,12 @@ class GameObject:
     def move_object(self) -> None:
         ...
 
+    def remove_object(self) -> None:
+        self.game.send_tag(
+            'O_GONE',
+            self.id
+        )
+
     def animate_object(
         self,
         name: str,
