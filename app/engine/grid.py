@@ -25,6 +25,9 @@ class Grid:
         if value is not None:
             value.x, value.y = index[0] + self.x_offset, index[1] + self.y_offset
 
+    def remove(self, obj: GameObject) -> None:
+        x, y = self.coordinates(obj)
+        self[x, y] = None
 
     def can_move(self, x: int, y: int) -> bool:
         if x not in range(9) or y not in range(5):
