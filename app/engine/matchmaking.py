@@ -1,12 +1,12 @@
 
 from __future__ import annotations
 
+from twisted.internet import threads
 from typing import Tuple
 
 from ..objects.collections import Players
 from .penguin import Penguin
 
-import threading
 import logging
 
 class MatchmakingQueue:
@@ -75,8 +75,5 @@ class MatchmakingQueue:
             self.remove(client)
 
         # Start game loop
-        threading.Thread(
-            target=game.start,
-            daemon=True
-        ).start()
-        # TODO: Refactor thread creation
+        threads.deferToThread(game.start) \
+               .addErrback(game.error_callback)

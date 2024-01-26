@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
     from .penguin import Penguin
 
+from twisted.python.failure import Failure
 from app.objects.collections import ObjectCollection, AssetCollection
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja
 from app.data.constants import KeyModifier, KeyTarget, KeyInput
@@ -11,9 +12,11 @@ from app.objects.enemies import Sly, Scrap, Tank
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
 from app.objects.asset import Asset
+
 from .timer import Timer
 from .grid import Grid
 
+import logging
 import random
 import config
 import time
@@ -34,6 +37,8 @@ class Game:
         self.objects = ObjectCollection()
         self.timer = Timer(self)
         self.grid = Grid()
+
+        self.logger = logging.getLogger('game')
 
     @property
     def clients(self) -> List["Penguin"]:
@@ -191,6 +196,16 @@ class Game:
         self.enable_cards()
         self.timer.run()
         self.disable_cards()
+
+    def error_callback(self, failure: Failure) -> None:
+        self.logger.error(
+            f'Failed to execute game thread: {failure.getBriefTraceback()}',
+            exc_info=failure.tb
+        )
+
+        for client in self.clients:
+            client.send_to_room()
+            client.close_connection()
 
     def register_input(
         self,
