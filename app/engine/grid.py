@@ -16,10 +16,10 @@ class Grid:
     def __repr__(self) -> str:
         return f"<Grid ({self.array})>"
 
-    def __getitem__(self, index: tuple[int, int]) -> GameObject | None:
+    def __getitem__(self, index: Tuple[int, int]) -> GameObject | None:
         return self.array[index[0]][index[1]]
 
-    def __setitem__(self, index: tuple[int, int], value: GameObject | None) -> None:
+    def __setitem__(self, index: Tuple[int, int], value: GameObject | None) -> None:
         self.array[index[0]][index[1]] = value
         value.x, value.y = index[0] + self.x_offset, index[1] + self.y_offset
 
