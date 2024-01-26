@@ -50,11 +50,12 @@ class Grid:
             y + self.y_offset
         )
 
-    def enemy_spawn_location(self) -> Tuple[int, int]:
-        x, y = -1, -1
-
-        while not self.can_move(x, y):
+    def enemy_spawn_location(self, max_attempts=100) -> Tuple[int, int]:
+        for _ in range(max_attempts):
             x = random.choice(self.enemy_spawns[0])
             y = random.choice(self.enemy_spawns[1])
 
-        return (x, y)
+            if self.can_move(x, y):
+                return (x, y)
+
+        return (-1, -1)
