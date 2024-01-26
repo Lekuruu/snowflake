@@ -20,6 +20,7 @@ class Receiver(LineOnlyReceiver):
         self.address = address
         self.server = server
         self.logger = logging.getLogger(address.host)
+        self.disconnected = False
 
     def dataReceived(self, data: bytes):
         if data.startswith(b'<policy-file-request/>'):
@@ -71,6 +72,7 @@ class Receiver(LineOnlyReceiver):
 
         self.server.players.remove(self)
         self.server.matchmaking.remove(self)
+        self.disconnected = True
 
     def close_connection(self):
         self.transport.loseConnection()
