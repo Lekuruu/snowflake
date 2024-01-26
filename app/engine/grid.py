@@ -8,7 +8,7 @@ import random
 
 class Grid:
     def __init__(self) -> None:
-        self.array: List[GameObject | None] = [[None]*5]*9
+        self.array: List[List[GameObject | None]] = [[None] * 5 for _ in range(9)]
         self.x_offset = 0.5
         self.y_offset = 1
         self.enemy_spawns = [range(6, 9), range(5)]
@@ -21,7 +21,10 @@ class Grid:
 
     def __setitem__(self, index: Tuple[int, int], value: GameObject | None) -> None:
         self.array[index[0]][index[1]] = value
-        value.x, value.y = index[0] + self.x_offset, index[1] + self.y_offset
+
+        if value is not None:
+            value.x, value.y = index[0] + self.x_offset, index[1] + self.y_offset
+
 
     def can_move(self, x: int, y: int) -> bool:
         if x not in range(9) or y not in range(5):
