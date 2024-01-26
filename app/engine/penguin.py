@@ -29,16 +29,14 @@ class Penguin(Receiver):
         self.element: str = ""
         self.tip_mode: bool = True
 
-        self.hp: int = 0
-        self.range: int = 0
-        self.power: int = 0
-        self.move: int = 0
-        self.was_ko: bool = False
-
         self.in_queue: bool = False
         self.is_ready: bool = False
         self.in_game: bool = False
         self.is_host: bool = False
+
+        self.used_powercard: bool = False
+        self.disconnected: bool = False
+        self.was_ko: bool = False
 
         self.window_manager = WindowManager(self)
 
