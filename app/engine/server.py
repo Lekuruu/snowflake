@@ -11,7 +11,9 @@ from .matchmaking import MatchmakingQueue
 from .penguin import Penguin
 
 import logging
+import signal
 import config
+import os
 
 class SnowflakeEngine(Factory):
     def __init__(self):
@@ -48,6 +50,12 @@ class SnowflakeEngine(Factory):
 
     def stopFactory(self):
         self.logger.warning("Shutting down...")
+
+        def force_exit(signal, frame):
+            logging.warning("Force exiting...")
+            os._exit(0)
+
+        signal.signal(signal.SIGINT, force_exit)
 
     def run(self):
         self.logger.info(f"Starting engine: {self} ({config.PORT})")
