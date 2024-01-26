@@ -11,6 +11,7 @@ from app.objects.enemies import Sly, Scrap, Tank, Tusk
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
 from app.objects.asset import Asset
+from .timer import Timer
 from .grid import Grid
 
 import random
@@ -30,6 +31,7 @@ class Game:
         self.round = 0
 
         self.objects = ObjectCollection()
+        self.timer = Timer(self)
         self.grid = Grid()
 
     @property
@@ -144,6 +146,8 @@ class Game:
         self.spawn_enemies()
         self.load_ui()
 
+        self.wait_for_timer()
+
     def send_tag(self, tag: str, *args) -> None:
         for player in self.clients:
             player.send_tag(tag, *args)
@@ -153,6 +157,12 @@ class Game:
         for player in self.clients:
             while not condition(player):
                 pass
+
+    def wait_for_timer(self) -> None:
+        """Wait for the timer to finish"""
+        self.enable_cards()
+        self.timer.run()
+        self.disable_cards()
 
     def register_input(
         self,
@@ -285,6 +295,16 @@ class Game:
                 xPercent=0.5,
                 yPercent=1
             )
+
+    def enable_cards(self) -> None:
+        for client in self.clients:
+            snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
+            snow_ui.send_payload('enableCards')
+
+    def disable_cards(self) -> None:
+        for client in self.clients:
+            snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
+            snow_ui.send_payload('disableCards')
 
     def display_round_title(self, wait=True) -> None:
         for client in self.clients:
