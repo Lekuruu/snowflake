@@ -188,13 +188,13 @@ class Game:
 
     def create_enemies(self) -> None:
         max_enemies = {
-            0: 3,
-            1: 3,
-            2: 3,
-            4: 4,
+            0: range(1, 4),
+            1: range(1, 4),
+            2: range(1, 4),
+            4: range(4, 5),
         }[self.round]
 
-        amount_enemies = random.randrange(1, max_enemies + 1)
+        amount_enemies = random.choice(max_enemies)
         enemy_classes = (Sly, Scrap, Tank)
 
         for _ in range(amount_enemies):
