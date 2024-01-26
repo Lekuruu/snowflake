@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 from app.objects.collections import ObjectCollection, AssetCollection
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja
 from app.data.constants import KeyModifier, KeyTarget, KeyInput
-from app.objects.enemies import Sly, Scrap, Tank, Tusk
+from app.objects.enemies import Sly, Scrap, Tank
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
 from app.objects.asset import Asset
@@ -20,9 +20,10 @@ import time
 
 class Game:
     def __init__(self, fire: "Penguin", snow: "Penguin", water: "Penguin") -> None:
+        self.server = fire.server
+        self.water = water
         self.fire = fire
         self.snow = snow
-        self.water = water
 
         self.bonus_cirteria = random.choice(['no_ko', 'under_time', 'full_health'])
         self.game_start = time.time()
@@ -39,7 +40,7 @@ class Game:
         return [self.fire, self.snow, self.water]
 
     @property
-    def ninja(self) -> List[GameObject]:
+    def ninjas(self) -> List[GameObject]:
         return [
             self.objects.by_name('Water'),
             self.objects.by_name('Snow'),
@@ -146,7 +147,30 @@ class Game:
         self.spawn_enemies()
         self.load_ui()
 
-        self.wait_for_timer()
+        # Run game loop until game ends
+        self.run_game_loop()
+
+        # TODO: Handle payout
+
+    def run_game_loop(self) -> None:
+        while True:
+            self.wait_for_timer()
+            self.round += 1
+
+            if (self.round > 2) and (not self.bonus_cirteria_met):
+                break
+
+            if (self.round > 3):
+                break
+
+            self.remove_enemies()
+            self.display_round_title()
+
+            self.grid.enemy_spawns = [range(9), range(5)]
+
+            # Create new enemies
+            self.create_enemies()
+            self.spawn_enemies()
 
     def send_tag(self, tag: str, *args) -> None:
         for player in self.clients:
@@ -211,7 +235,7 @@ class Game:
             0: range(1, 4),
             1: range(1, 4),
             2: range(1, 4),
-            4: range(4, 5),
+            3: range(4, 5),
         }[self.round]
 
         amount_enemies = random.choice(max_enemies)
@@ -274,6 +298,19 @@ class Game:
             )
 
             # TODO: Health bar
+
+    def remove_object(self, obj: GameObject) -> None:
+        obj.remove_object()
+        self.grid.remove(obj)
+        self.objects.remove(obj)
+
+    def remove_enemies(self) -> None:
+        for enemy in self.enemies:
+            self.remove_object(enemy)
+
+    def remove_ninjas(self) -> None:
+        for ninja in self.ninjas:
+            self.remove_object(ninja)
 
     def show_background(self) -> None:
         for background in self.backgrounds:
