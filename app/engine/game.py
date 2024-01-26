@@ -194,7 +194,7 @@ class Game:
             4: 4,
         }[self.round]
 
-        amount_enemies = random.randrange(1, max_enemies)
+        amount_enemies = random.randrange(1, max_enemies + 1)
         enemy_classes = (Sly, Scrap, Tank)
 
         for _ in range(amount_enemies):
