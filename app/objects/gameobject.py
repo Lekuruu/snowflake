@@ -84,7 +84,7 @@ class GameObject:
             play_style,
             duration or '',
             time_scale,
-            int(reset),
+            int(not reset),
             self.id, # response object id
             0        # handle id
         )
