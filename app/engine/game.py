@@ -22,7 +22,7 @@ class Game:
         self.snow = snow
         self.water = water
 
-        self.bonus_cirteria = 'under_time' # TODO: Select random
+        self.bonus_cirteria = random.choice(['no_ko', 'under_time', 'full_health'])
         self.game_start = time.time()
 
         self.map = random.randrange(1, 3)
@@ -66,6 +66,14 @@ class Game:
                 GameObject.from_asset('cragvalley_fg', self, x=4.5, y=6)
             ]
         }[self.map]
+
+    @property
+    def bonus_cirteria_met(self) -> bool:
+        return {
+            'no_ko': all(not player.was_ko for player in self.clients),
+            'full_health': all(player.hp == 100 for player in self.clients),
+            'under_time': (time.time() < self.game_start + 300)
+        }[self.bonus_cirteria]
 
     def start(self) -> None:
         self.fire.game = self
@@ -261,7 +269,6 @@ class Game:
             obj.place_sprite(background.name)
 
     def display_round_title(self, wait=True) -> None:
-        # TODO: Implement other bonus criteria
         for client in self.clients:
             round_title = client.window_manager.get_window('cardjitsu_snowrounds.swf')
             round_title.layer = 'bottomLayer'
