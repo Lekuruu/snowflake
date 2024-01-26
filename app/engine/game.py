@@ -388,8 +388,6 @@ class Game:
 
             reactor.callLater(10, infotip.send_payload, 'disable')
 
-        # TODO: Close tip
-
     def enable_cards(self) -> None:
         for client in self.clients:
             snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
