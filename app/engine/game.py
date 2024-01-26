@@ -386,6 +386,8 @@ class Game:
                 yPercent=0
             )
 
+            reactor.callLater(10, infotip.send_payload, 'disable')
+
         # TODO: Close tip
 
     def enable_cards(self) -> None:
