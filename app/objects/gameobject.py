@@ -1,8 +1,5 @@
 
 from typing import TYPE_CHECKING, Set, Callable
-from dataclasses import dataclass, field
-
-import app.engine as Engine
 
 from .collections import SoundCollection, AssetCollection
 from .asset import Asset
@@ -11,17 +8,28 @@ from .sound import Sound
 if TYPE_CHECKING:
     from app.engine.game import Game
 
-@dataclass
 class GameObject:
-    game: "Game"
-    name: str
-    x: int = 0
-    y: int = 0
-    id: int = 0
-    assets: AssetCollection = field(default_factory=AssetCollection)
-    sounds: SoundCollection = field(default_factory=SoundCollection)
+    def __init__(
+        self,
+        game: "Game",
+        name: str,
+        x: int = 0,
+        y: int = 0,
+        id: int = -1,
+        assets=AssetCollection(),
+        sounds=SoundCollection()
+    ) -> None:
+        self.game = game
+        self.name = name
+        self.x = x
+        self.y = y
+        self.id = id
+        self.assets = assets
+        self.sounds = sounds
 
-    def __eq__(self, other: "GameObject") -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not getattr(other, 'id', None):
+            return False
         return self.id == other.id
 
     def __hash__(self) -> int:
@@ -41,7 +49,7 @@ class GameObject:
             name,
             x,
             y,
-            asset.index,
+            -1,
             AssetCollection([asset])
         )
 
