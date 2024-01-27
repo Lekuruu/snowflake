@@ -177,6 +177,9 @@ class Game:
 
     def run_game_loop(self) -> None:
         while True:
+            for client in self.clients:
+                client.is_ready = False
+
             self.run_until_next_round()
             self.round += 1
 

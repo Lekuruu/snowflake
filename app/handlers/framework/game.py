@@ -16,3 +16,7 @@ def payout_handler(client: Penguin, data: dict):
 @Instance.triggers.register('roomToRoomMinTime')
 def on_room_to_room_min_time(client: Penguin, data: dict):
     client.is_ready = True
+
+@Instance.triggers.register('confirmClicked')
+def on_confirm_clicked(client: Penguin, data: dict):
+    client.is_ready = True
