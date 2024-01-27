@@ -6,6 +6,7 @@ from app.objects import GameObject, Asset
 from app.objects.ninjas import Ninja
 
 if TYPE_CHECKING:
+    from app.engine.penguin import Penguin
     from app.engine.game import Game
 
 import random
@@ -94,7 +95,8 @@ class Grid:
                     self.game,
                     f'{x}-{y}',
                     x + 0.5,
-                    y + 0.9998
+                    y + 0.9998,
+                    on_click=self.on_tile_click,
                 )
                 tile.assets.add(Asset.from_name('ui_tile_move'))
                 tile.assets.add(Asset.from_name('ui_tile_attack'))
@@ -133,3 +135,6 @@ class Grid:
 
         for tile in self.tiles:
             tile.place_sprite('blank_png')
+
+    def on_tile_click(self, client: "Penguin", tile: GameObject, *args) -> None:
+        ...
