@@ -131,10 +131,10 @@ class Grid:
 
     def hide_tiles(self) -> None:
         tile_frame = self.game.objects.by_name('ui_tile_frame')
-        tile_frame.place_sprite('blank_png')
+        tile_frame.hide()
 
         for tile in self.tiles:
-            tile.place_sprite('blank_png')
+            tile.hide()
 
     def on_tile_click(self, client: "Penguin", tile: GameObject, *args) -> None:
         x = int(tile.x - 0.5)
