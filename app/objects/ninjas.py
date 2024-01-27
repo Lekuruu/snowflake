@@ -85,6 +85,9 @@ class Ninja(GameObject):
             self.ghost.y = -1
 
     def on_ghost_click(self, client, object: GameObject, *args) -> None:
+        if client.ninja != self:
+            return
+
         self.hide_ghost()
 
     def move_animation(self) -> None:
