@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Tuple, Iterator
 from app.objects import GameObject, Asset
+from app.objects.enemies import Enemy
 from app.objects.ninjas import Ninja
 from app.data.constants import Phase
 
@@ -123,6 +124,39 @@ class Grid:
             distance = abs(x - ninja.x) + abs(y - ninja.y)
 
             if distance <= ninja.move:
+                yield tile
+
+    def attackable_tiles(self, target_x: int, target_y: int, ninja: Ninja) -> Iterator[Enemy]:
+        for tile in self.tiles:
+            tile_x = int(tile.x - 0.5)
+            tile_y = int(tile.y - 0.9998)
+
+            target_object = self[tile_x, tile_y]
+
+            if not isinstance(target_object, Enemy):
+                continue
+
+            distance = abs(tile_x - target_x) + abs(tile_y - target_y)
+
+            if distance <= ninja.range:
+                yield tile
+
+    def healable_tiles(self, target_x: int, target_y: int, ninja: Ninja) -> Iterator[Ninja]:
+        if ninja.name != 'Snow':
+            return []
+
+        for tile in self.tiles:
+            tile_x = int(tile.x - 0.5)
+            tile_y = int(tile.y - 0.9998)
+
+            target_object = self[tile_x, tile_y]
+
+            if not isinstance(target_object, Ninja):
+                continue
+
+            distance = abs(tile_x - target_x) + abs(tile_y - target_y)
+
+            if distance <= ninja.range:
                 yield tile
 
     def show_tiles(self) -> None:
