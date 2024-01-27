@@ -225,6 +225,8 @@ class Game:
             # All ninjas have been defeated
             return True
 
+        return False
+
     def send_tag(self, tag: str, *args) -> None:
         for player in self.clients:
             player.send_tag(tag, *args)
