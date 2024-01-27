@@ -29,7 +29,7 @@ def on_confirm_clicked(client: Penguin, data: dict):
     )
 
     confirm.x = client.ninja.x + 0.5
-    confirm.y = client.ninja.y + 1
+    confirm.y = client.ninja.y + 1.05
     confirm.place_object()
     confirm.place_sprite(confirm.name)
     client.is_ready = True
