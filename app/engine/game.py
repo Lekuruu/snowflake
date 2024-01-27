@@ -212,6 +212,9 @@ class Game:
 
             # TODO: Round Loop
 
+            # NOTE: Only for testing
+            self.enemies[0].remove_object()
+
             if self.check_round_completion():
                 break
 
