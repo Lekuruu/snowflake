@@ -137,4 +137,8 @@ class Grid:
             tile.place_sprite('blank_png')
 
     def on_tile_click(self, client: "Penguin", tile: GameObject, *args) -> None:
-        ...
+        x = int(tile.x - 0.5)
+        y = int(tile.y - 0.9998)
+
+        ninja = self.game.objects.by_name(client.element.capitalize())
+        ninja.place_ghost(x, y)

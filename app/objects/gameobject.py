@@ -48,18 +48,26 @@ class GameObject:
     @classmethod
     def from_asset(
         cls,
-        name: str,
+        name: str | list,
         game: "Game",
         x: int = 0,
-        y: int = 0
+        y: int = 0,
+        grid: bool = False,
+        on_click: Callable | None = None
     ) -> "GameObject":
-        asset = Asset.from_name(name)
+        if isinstance(name, list):
+            assets = AssetCollection([Asset.from_name(n) for n in name])
+        else:
+            assets = AssetCollection([Asset.from_name(name)])
+
         return GameObject(
             game,
             name,
             x,
             y,
-            AssetCollection([asset])
+            assets,
+            grid=grid,
+            on_click=on_click
         )
 
     def place_object(self) -> None:
@@ -162,6 +170,12 @@ class GameObject:
             play_style,
             duration
         )
+
+    def hide(self) -> None:
+        if not self.assets.by_name('blank_png'):
+            self.assets.add(Asset.from_name('blank_png'))
+
+        self.place_sprite('blank_png')
 
     def add_sound(
         self,

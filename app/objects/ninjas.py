@@ -35,11 +35,44 @@ class Ninja(GameObject):
         self.max_hp = 100
         self.hp = 100
 
+        self.initialize_objects()
+
+    def initialize_objects(self) -> None:
+        self.ghost = GameObject.from_asset(
+            f'{self.name.lower()}ninja_move_ghost',
+            self.game,
+            grid=True,
+            on_click=self.on_ghost_click
+        )
+
+        self.confirm = GameObject.from_asset(
+            'confirm',
+            self.game
+        )
+
     def idle_animation(self) -> None:
         self.animate_object(
             f'{self.name.lower()}ninja_idle_anim',
             play_style='loop'
         )
+
+    def place_ghost(self, x: int, y: int) -> None:
+        if (self.ghost.x == x) and (self.ghost.y == y):
+            self.hide_ghost()
+            return
+
+        self.ghost.x = x
+        self.ghost.y = y
+        self.ghost.place_object()
+        self.ghost.place_sprite(self.ghost.name)
+
+    def hide_ghost(self) -> None:
+        self.ghost.hide()
+        self.ghost.x = self.x
+        self.ghost.y = self.y
+
+    def on_ghost_click(self, client, object: GameObject, *args) -> None:
+        self.hide_ghost()
 
 class WaterNinja(Ninja):
     name: str = 'Water'
