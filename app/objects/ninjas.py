@@ -69,6 +69,9 @@ class Ninja(GameObject):
             self.hide_ghost()
             return
 
+        if not self.game.grid.can_move(x, y):
+            return
+
         self.game.grid[x, y] = self.ghost
         self.ghost.place_object()
         self.ghost.place_sprite(self.ghost.name)
