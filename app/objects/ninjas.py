@@ -80,9 +80,6 @@ class Ninja(GameObject):
         self.ghost.place_sprite(self.ghost.name)
 
     def hide_ghost(self, reset_positions: bool = True) -> None:
-        if self.client.is_ready:
-            return
-
         self.game.grid.remove(self.ghost)
         self.ghost.hide()
 
@@ -93,6 +90,10 @@ class Ninja(GameObject):
     def on_ghost_click(self, client, object: GameObject, *args) -> None:
         if client.ninja != self:
             return
+
+        if self.client.is_ready:
+            return
+
 
         self.hide_ghost()
 
