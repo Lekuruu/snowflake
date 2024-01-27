@@ -25,8 +25,8 @@ class Enemy(GameObject):
     def __init__(
         self,
         game: "Game",
-        x: int = 0,
-        y: int = 0
+        x: int = -1,
+        y: int = -1
     ) -> None:
         super().__init__(game, self.__class__.name, x, y, grid=True)
         self.assets = self.__class__.assets

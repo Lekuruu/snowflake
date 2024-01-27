@@ -25,8 +25,8 @@ class Ninja(GameObject):
     def __init__(
         self,
         game: "Game",
-        x: int = 0,
-        y: int = 0
+        x: int = -1,
+        y: int = -1
     ) -> None:
         super().__init__(game, self.__class__.name, x, y, grid=True)
         self.assets = self.__class__.assets
@@ -43,6 +43,8 @@ class Ninja(GameObject):
             f'{self.name.lower()}ninja_move_ghost',
             self.game,
             grid=True,
+            x=-1,
+            y=-1,
             on_click=self.on_ghost_click
         )
 
