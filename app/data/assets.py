@@ -26,7 +26,7 @@ Instance.assets.update([
     Asset(100067, "ui_attack_numbers_anim", f"{asset_url}/hud/ui_attack_numbers_anim_large.tpk"),
     Asset(100120, "ui_card_fire", f"{asset_url}/hud/ui_card_fire_large.tpk"),
     Asset(100121, "ui_card_snow", f"{asset_url}/hud/ui_card_snow_large.tpk"),
-    Asset(100122, "ui_card_water_flaxp0000", f"{asset_url}/hud/ui_card_water_large.tpk"),
+    Asset(100122, "ui_card_water", f"{asset_url}/hud/ui_card_water_large.tpk"),
     Asset(100195, "confirm", f"{asset_url}/hud/ui_confirm_checkmark_large.tpk"),
     Asset(100240, "tank_swipe_horiz_anim", f"{asset_url}/snowman_tank_char_anim/tank_swipe_horiz_anim_large.tpk"),
     Asset(100241, "tank_swipe_vert_anim", f"{asset_url}/snowman_tank_char_anim/tank_swipe_vert_anim_large.tpk"),
