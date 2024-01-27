@@ -174,7 +174,6 @@ class Game:
     def close(self) -> None:
         self.logger.info('Game finished.')
         # TODO: Cleanup
-        exit()
 
     def run_game_loop(self) -> None:
         while True:
