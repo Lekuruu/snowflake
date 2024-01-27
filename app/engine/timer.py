@@ -28,7 +28,7 @@ class Timer:
         self.tick = 10
         self.running = False
 
-    def update_tick(self, seconds: int = 1, interval: int = 0.1) -> None:
+    def update_tick(self, seconds: int = 1, interval: int = 0.25) -> None:
         while seconds > 0:
             time.sleep(interval)
             seconds -= interval
