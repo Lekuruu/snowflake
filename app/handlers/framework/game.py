@@ -1,5 +1,6 @@
 
 from app.engine import Penguin, Instance
+from app.objects import GameObject
 
 @Instance.triggers.register('quit')
 def quit_handler(client: Penguin, data: dict):
@@ -19,4 +20,16 @@ def on_room_to_room_min_time(client: Penguin, data: dict):
 
 @Instance.triggers.register('confirmClicked')
 def on_confirm_clicked(client: Penguin, data: dict):
+    if client.is_ready:
+        return
+
+    confirm = GameObject.from_asset(
+        'confirm',
+        client.game
+    )
+
+    confirm.x = client.ninja.x + 0.5
+    confirm.y = client.ninja.y + 1
+    confirm.place_object()
+    confirm.place_sprite(confirm.name)
     client.is_ready = True

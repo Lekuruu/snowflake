@@ -50,11 +50,6 @@ class Ninja(GameObject):
             on_click=self.on_ghost_click
         )
 
-        self.confirm = GameObject.from_asset(
-            'confirm',
-            self.game
-        )
-
     def move_object(self, x: int, y: int, duration: int = 600) -> None:
         super().move_object(x, y, duration)
         self.ghost.x = x

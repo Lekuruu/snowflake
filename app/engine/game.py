@@ -211,6 +211,7 @@ class Game:
         while True:
             self.wait_for_timer()
             self.hide_ghosts()
+            self.remove_confirm()
 
             for ninja in self.ninjas:
                 self.move_ninja(
@@ -364,6 +365,10 @@ class Game:
     def remove_ninjas(self) -> None:
         for ninja in self.ninjas:
             ninja.remove_object()
+
+    def remove_confirm(self) -> None:
+        for object in self.objects.with_name('confirm'):
+            object.remove_object()
 
     def hide_ghosts(self) -> None:
         for ninja in self.ninjas:
