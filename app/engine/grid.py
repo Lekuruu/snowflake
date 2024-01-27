@@ -42,13 +42,6 @@ class Grid:
         x, y = self.coordinates(obj)
         self[x, y] = None
 
-    def can_move(self, x: int, y: int) -> bool:
-        """Check if a tile is empty"""
-        if x not in range(9) or y not in range(5):
-            return False
-
-        return self[x, y] is None
-
     def coordinates(self, obj: GameObject) -> Tuple[int, int]:
         """Get the coordinates of an object"""
         for x in range(9):
@@ -68,6 +61,25 @@ class Grid:
                 return (x, y)
 
         return (-1, -1)
+
+    def can_move(self, x: int, y: int) -> bool:
+        """Check if a tile is empty"""
+        if x not in range(9) or y not in range(5):
+            return False
+
+        return self[x, y] is None
+
+    def can_move_to_tile(self, ninja: Ninja, x: int, y: int) -> bool:
+        """Check if a ninja can move to a tile"""
+        if x not in range(9) or y not in range(5):
+            return False
+
+        if not self.can_move(x, y):
+            return False
+
+        distance = abs(x - ninja.x) + abs(y - ninja.y)
+
+        return distance <= (ninja.move - 1)
 
     def initialize_tiles(self) -> None:
         """Initialize the tiles, and the tile frame"""
@@ -93,9 +105,6 @@ class Grid:
                 tile.place_object()
 
     def movable_tiles(self, ninja: Ninja) -> Iterator[GameObject]:
-        center_x = ninja.x
-        center_y = ninja.y
-
         for tile in self.tiles:
             x = int(tile.x - 0.5)
             y = int(tile.y - 0.9998)
@@ -103,7 +112,7 @@ class Grid:
             if not self.can_move(x, y):
                 continue
 
-            distance = abs(x - center_x) + abs(y - center_y)
+            distance = abs(x - ninja.x) + abs(y - ninja.y)
 
             if distance <= (ninja.move - 1):
                 yield tile
