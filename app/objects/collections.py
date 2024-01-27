@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..engine.penguin import Penguin
     from .gameobject import GameObject
+    from .ninjas import Ninja
     from .sound import Sound
     from .asset import Asset
 
@@ -108,16 +109,16 @@ class ObjectCollection(Set["GameObject"]):
     def remove(self, object: "GameObject") -> None:
         return super().remove(object)
 
-    def by_id(self, id: int) -> "GameObject" | None:
+    def by_id(self, id: int) -> "GameObject" | Ninja | None:
         return next((object for object in self if object.id == id), None)
 
-    def by_name(self, name: str) -> "GameObject" | None:
+    def by_name(self, name: str) -> "GameObject" | Ninja | None:
         return next((object for object in self if object.name == name), None)
 
-    def with_id(self, id: int) -> List["GameObject"]:
+    def with_id(self, id: int) -> List["GameObject" | Ninja]:
         return [object for object in self if object.id == id]
 
-    def with_name(self, name: str) -> List["GameObject"]:
+    def with_name(self, name: str) -> List["GameObject" | Ninja]:
         return [object for object in self if object.name == name]
 
     def get_id(self) -> int:
