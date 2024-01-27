@@ -53,6 +53,11 @@ class Ninja(GameObject):
             self.game
         )
 
+    def move_object(self, x: int, y: int, duration: int = 600) -> None:
+        super().move_object(x, y, duration)
+        self.ghost.x = x
+        self.ghost.y = y
+
     def idle_animation(self) -> None:
         self.animate_object(
             f'{self.name.lower()}ninja_idle_anim',
@@ -64,18 +69,26 @@ class Ninja(GameObject):
             self.hide_ghost()
             return
 
-        self.ghost.x = x
-        self.ghost.y = y
+        self.game.grid[x, y] = self.ghost
         self.ghost.place_object()
         self.ghost.place_sprite(self.ghost.name)
 
-    def hide_ghost(self) -> None:
+    def hide_ghost(self, reset_positions: bool = True) -> None:
         self.ghost.hide()
-        self.ghost.x = self.x
-        self.ghost.y = self.y
+        self.game.grid.remove(self.ghost)
+
+        if reset_positions:
+            self.ghost.x = -1
+            self.ghost.y = -1
 
     def on_ghost_click(self, client, object: GameObject, *args) -> None:
         self.hide_ghost()
+
+    def move_animation(self) -> None:
+        self.animate_object(
+            f'{self.name.lower()}ninja_move_anim',
+            play_style='play_once'
+        )
 
 class WaterNinja(Ninja):
     name: str = 'Water'
