@@ -41,6 +41,7 @@ class Penguin(Receiver):
         self.was_ko: bool = False
 
         self.window_manager = WindowManager(self)
+        self.displayed_tips = []
 
     def __repr__(self) -> str:
         return f"<{self.name} ({self.pid})>"
