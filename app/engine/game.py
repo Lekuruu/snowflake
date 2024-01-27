@@ -161,7 +161,7 @@ class Game:
         self.spawn_enemies()
         time.sleep(1)
 
-        self.load_ui()
+        self.show_ui()
         self.send_tip(Phase.MOVE)
 
         # Run game loop until game ends
@@ -208,9 +208,17 @@ class Game:
         while True:
             self.wait_for_timer()
             self.hide_ghosts()
-            time.sleep(1)
 
-            # TODO: Round Loop
+            for ninja in self.ninjas:
+                self.move_ninja(
+                    ninja,
+                    ninja.ghost.x,
+                    ninja.ghost.y
+                )
+
+            time.sleep(1)
+            # TODO: Ninja attacks
+            # TODO: Enemy attacks
 
             # NOTE: Only for testing
             self.enemies[0].remove_object()
@@ -353,14 +361,25 @@ class Game:
 
     def hide_ghosts(self) -> None:
         for ninja in self.ninjas:
-            ninja.ghost.hide()
+            ninja.hide_ghost(reset_positions=False)
+
+    def move_ninja(self, ninja: Ninja, x: int, y: int) -> None:
+        if ninja.x == x and ninja.y == y:
+            return
+
+        if x == -1 or y == -1:
+            return
+
+        ninja.move_animation()
+        ninja.idle_animation()
+        ninja.move_object(x, y)
 
     def show_background(self) -> None:
         for background in self.backgrounds:
             obj = self.objects.by_name(background.name)
             obj.place_sprite(background.name)
 
-    def load_ui(self) -> None:
+    def show_ui(self) -> None:
         for client in self.clients:
             snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
             snow_ui.layer = 'bottomLayer'
