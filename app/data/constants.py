@@ -1,5 +1,5 @@
 
-from enum import Enum
+from enum import Enum, IntEnum
 
 class MessageType(str, Enum):
     CONFIGURE_CALLBACK               = "configureCallBack"
@@ -54,5 +54,17 @@ class Phase(str, Enum):
     HEAL = "Heal"
     CONFIRM = "Confirm"
     MEMBER_CARD = "MemberCard"
+
+class MirrorMode(IntEnum):
+    NONE = 0
+    X = 1
+    Y = 2
+    XY = 3
+
+class OriginMode(IntEnum):
+    NONE = 0
+    CENTER = 1
+    BOTTOM_MIDDLE = 2
+    TOP_LEFT = 3
 
 POLICY_FILE = "<cross-domain-policy><allow-access-from domain='*' to-ports='*' /></cross-domain-policy>"
