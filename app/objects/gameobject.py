@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
+from app.data.constants import OriginMode, MirrorMode
 from .collections import SoundCollection, AssetCollection
 from .asset import Asset
 from .sound import Sound
@@ -187,6 +188,26 @@ class GameObject:
             int(backwards),
             play_style,
             duration
+        )
+
+    def sprite_settings(
+        self,
+        scale_x: int = 1,
+        scale_y: int = 1,
+        mirror_mode: MirrorMode = MirrorMode.NONE,
+        origin_mode: OriginMode = OriginMode.NONE
+    ) -> None:
+        self.game.send_tag(
+            'O_SPRITESETTINGS',
+            self.id,
+            'none', # Sprite layers
+            scale_x,
+            scale_y,
+            '',
+            '',
+            '',
+            origin_mode.value,
+            mirror_mode.value
         )
 
     def hide(self) -> None:
