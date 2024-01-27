@@ -80,7 +80,7 @@ class Grid:
 
         distance = abs(x - ninja.x) + abs(y - ninja.y)
 
-        return distance <= (ninja.move - 1)
+        return distance <= ninja.move
 
     def initialize_tiles(self) -> None:
         """Initialize the tiles, and the tile frame"""
@@ -116,7 +116,7 @@ class Grid:
 
             distance = abs(x - ninja.x) + abs(y - ninja.y)
 
-            if distance <= (ninja.move - 1):
+            if distance <= ninja.move:
                 yield tile
 
     def show_tiles(self) -> None:

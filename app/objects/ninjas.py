@@ -14,6 +14,7 @@ from app.objects import (
 
 class Ninja(GameObject):
     name: str = 'Ninja'
+    max_hp: int = 0
     range: int = 0
     attack: int = 0
     move: int = 0
@@ -32,8 +33,8 @@ class Ninja(GameObject):
         self.sounds = self.__class__.sounds
         self.attack = self.__class__.attack
         self.range = self.__class__.range
-        self.max_hp = 100
-        self.hp = 100
+        self.max_hp = self.__class__.max_hp
+        self.hp = self.__class__.max_hp
 
         self.initialize_objects()
 
@@ -76,9 +77,10 @@ class Ninja(GameObject):
 
 class WaterNinja(Ninja):
     name: str = 'Water'
+    max_hp: int = 40
     range: int = 1
-    attack: int = 6
-    move: int = 3
+    attack: int = 10
+    move: int = 2
 
     assets = AssetCollection({
         Asset.from_name('waterninja_move_ghost'),
@@ -109,9 +111,10 @@ class WaterNinja(Ninja):
 
 class SnowNinja(Ninja):
     name: str = 'Snow'
-    range: int = 1
-    attack: int = 10
-    move: int = 2
+    max_hp: int = 25
+    range: int = 3
+    attack: int = 6
+    move: int = 3
 
     assets = AssetCollection({
         Asset.from_name('snowninja_move_ghost'),
@@ -146,6 +149,7 @@ class SnowNinja(Ninja):
 
 class FireNinja(Ninja):
     name: str = 'Fire'
+    max_hp: int = 30
     range: int = 2
     attack: int = 8
     move: int = 2
