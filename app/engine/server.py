@@ -1,4 +1,6 @@
 
+from __future__ import annotations
+
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
