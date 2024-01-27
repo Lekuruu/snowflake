@@ -7,6 +7,8 @@ if TYPE_CHECKING:
     from .penguin import Penguin
 
 from app.data.constants import KeyModifier, KeyTarget, KeyInput, Phase
+from app.data.repositories import stamps
+
 from app.objects.collections import ObjectCollection, AssetCollection
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja
 from app.objects.enemies import Sly, Scrap, Tank
@@ -415,14 +417,24 @@ class Game:
             payout.layer = 'bottomLayer'
             payout.load(
                 {
-                    "coinsEarned": 0,
-                    "damage": 0,
-                    "doubleCoins": False,
+                    "coinsEarned": 0,     # TODO
+                    "damage": 0,          # TODO
+                    "doubleCoins": False, # TODO
                     "isBoss": 0,
                     "rank": client.object.snow_ninja_rank,
                     "round": self.round,
-                    "showItems": 0,
-                    "stampList": [], # TODO
+                    "showItems": 0,       # TODO
+                    "stampList": [
+                        {
+                            "stamp_id": stamp.id,
+                            "name": f'global_content.stamps.{stamp.id}.name',
+                            "description": f'global_content.stamps.{stamp.id}.description',
+                            "rank_token": f'global_content.stamps.{stamp.id}.rank_token',
+                            "rank": stamp.rank,
+                            "is_member": stamp.member,
+                        }
+                        for stamp in stamps.fetch_all_by_group(60)
+                    ],
                     "stamps": [], # TODO
                     "xpEnd": client.object.snow_ninja_progress, # TODO
                     "xpStart": client.object.snow_ninja_progress,
