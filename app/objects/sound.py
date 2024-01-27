@@ -1,7 +1,10 @@
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from app.engine.penguin import Penguin
     from app.engine.game import Game
 
 import app.engine as Engine
@@ -69,8 +72,8 @@ class Sound(Asset):
             response_object_id
         )
 
-    def play(self, game: "Game") -> None:
-        game.send_tag(
+    def play(self, target: "Game" | "Penguin") -> None:
+        target.send_tag(
             'FX_PLAYSOUND',
             f'0:{self.index}',
             0, # "handleId"
