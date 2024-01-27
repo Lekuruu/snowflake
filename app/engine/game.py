@@ -316,27 +316,15 @@ class Game:
     def spawn_ninjas(self) -> None:
         water = self.objects.by_name('Water')
         water.place_object()
-        water.animate_object(
-            'waterninja_idle_anim',
-            play_style='loop',
-            reset=True
-        )
+        water.idle_animation()
 
         snow = self.objects.by_name('Snow')
         snow.place_object()
-        snow.animate_object(
-            'snowninja_idle_anim',
-            play_style='loop',
-            reset=True
-        )
+        snow.idle_animation()
 
         fire = self.objects.by_name('Fire')
         fire.place_object()
-        fire.animate_object(
-            'fireninja_idle_anim',
-            play_style='loop',
-            reset=True
-        )
+        fire.idle_animation()
 
         # TODO: Health bar
 

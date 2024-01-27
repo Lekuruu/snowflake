@@ -35,6 +35,12 @@ class Ninja(GameObject):
         self.max_hp = 100
         self.hp = 100
 
+    def idle_animation(self) -> None:
+        self.animate_object(
+            f'{self.name.lower()}ninja_idle_anim',
+            play_style='loop'
+        )
+
 class WaterNinja(Ninja):
     range: int = 1
     attack: int = 6
