@@ -20,6 +20,7 @@ class GameObject:
         y: int = 0,
         assets=AssetCollection(),
         sounds=SoundCollection(),
+        on_click: Callable | None = None,
         grid: bool = False
     ) -> None:
         self.game = game
@@ -30,6 +31,7 @@ class GameObject:
         self.assets = assets
         self.sounds = sounds
         self.game.objects.add(self)
+        self.on_click = on_click
         self.grid = grid
 
         # Place object in grid
