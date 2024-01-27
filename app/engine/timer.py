@@ -24,10 +24,10 @@ class Timer:
             self.update()
 
             if self.game.server.shutting_down:
-                self.game.close()
+                break
 
             if all(client.disconnected for client in self.game.clients):
-                self.game.close()
+                break
 
         self.hide()
         self.tick = 10
