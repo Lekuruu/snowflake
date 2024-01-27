@@ -84,7 +84,7 @@ class Game:
     def bonus_cirteria_met(self) -> bool:
         return {
             'no_ko': all(not player.was_ko for player in self.clients),
-            'full_health': all(player.hp == 100 for player in self.clients),
+            'full_health': all(ninja.hp == 100 for ninja in self.ninjas),
             'under_time': (time.time() < self.game_start + 300)
         }[self.bonus_cirteria]
 
@@ -251,16 +251,13 @@ class Game:
             object.load_sprites()
 
     def create_ninjas(self) -> None:
-        self.objects.add(water := WaterNinja(self))
-        self.grid[0, 0] = water
+        water = WaterNinja(self, x=0, y=0)
         water.place_object()
 
-        self.objects.add(snow := SnowNinja(self))
-        self.grid[0, 2] = snow
+        snow = SnowNinja(self, x=0, y=2)
         snow.place_object()
 
-        self.objects.add(fire := FireNinja(self))
-        self.grid[0, 4] = fire
+        fire = FireNinja(self, x=0, y=4)
         fire.place_object()
 
     def create_enemies(self) -> None:
@@ -276,12 +273,11 @@ class Game:
 
         for _ in range(amount_enemies):
             enemy_class = random.choice(enemy_classes)
-            self.objects.add(enemy := enemy_class(self))
+            enemy = enemy_class(self)
             enemy.place_object()
 
     def create_background(self) -> None:
         for background in self.backgrounds:
-            self.objects.add(background)
             background.place_object()
 
     def spawn_ninjas(self) -> None:

@@ -44,8 +44,8 @@ class WaterNinja(GameObject):
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
-        super().__init__(game, 'Water', x, y, id, WaterNinja.assets, WaterNinja.sounds)
+    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
+        super().__init__(game, 'Water', x, y, WaterNinja.assets, WaterNinja.sounds)
         self.hp = 100
 
 class SnowNinja(GameObject):
@@ -84,8 +84,8 @@ class SnowNinja(GameObject):
        Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
-        super().__init__(game, 'Snow', x, y, id, SnowNinja.assets, SnowNinja.sounds)
+    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
+        super().__init__(game, 'Snow', x, y, SnowNinja.assets, SnowNinja.sounds)
         self.hp = 100
 
 class FireNinja(GameObject):
@@ -129,6 +129,6 @@ class FireNinja(GameObject):
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
-        super().__init__(game, 'Fire', x, y, id, FireNinja.assets, FireNinja.sounds)
+    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
+        super().__init__(game, 'Fire', x, y, FireNinja.assets, FireNinja.sounds)
         self.hp = 100

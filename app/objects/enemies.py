@@ -35,8 +35,8 @@ class Sly(GameObject):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
-        super().__init__(game, 'Sly', x, y, id, Sly.assets, Sly.sounds)
+    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
+        super().__init__(game, 'Sly', x, y, Sly.assets, Sly.sounds)
         self.hp = 30
 
 class Scrap(GameObject):
@@ -66,8 +66,8 @@ class Scrap(GameObject):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
-        super().__init__(game, 'Scrap', x, y, id, Scrap.assets, Scrap.sounds)
+    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
+        super().__init__(game, 'Scrap', x, y, Scrap.assets, Scrap.sounds)
         self.hp = 45
 
 class Tank(GameObject):
@@ -93,6 +93,6 @@ class Tank(GameObject):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0, id: int = -1) -> None:
-        super().__init__(game, 'Tank', x, y, id, Tank.assets, Tank.sounds)
+    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
+        super().__init__(game, 'Tank', x, y, Tank.assets, Tank.sounds)
         self.hp = 60

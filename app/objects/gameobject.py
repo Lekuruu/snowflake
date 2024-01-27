@@ -1,5 +1,5 @@
 
-from typing import TYPE_CHECKING, Set, Callable
+from typing import TYPE_CHECKING, Callable
 
 from .collections import SoundCollection, AssetCollection
 from .asset import Asset
@@ -15,7 +15,6 @@ class GameObject:
         name: str,
         x: int = 0,
         y: int = 0,
-        id: int = -1,
         assets=AssetCollection(),
         sounds=SoundCollection()
     ) -> None:
@@ -23,9 +22,13 @@ class GameObject:
         self.name = name
         self.x = x
         self.y = y
-        self.id = id
+        self.id = -1
         self.assets = assets
         self.sounds = sounds
+        self.game.objects.add(self)
+
+        if isinstance(x, int) and isinstance(y, int):
+            self.game.grid[x, y] = self
 
     def __eq__(self, other: object) -> bool:
         if not getattr(other, 'id', None):
@@ -49,7 +52,6 @@ class GameObject:
             name,
             x,
             y,
-            -1,
             AssetCollection([asset])
         )
 
@@ -71,9 +73,6 @@ class GameObject:
             1,      # TODO
             0       # TODO
         )
-
-    def move_object(self) -> None:
-        ...
 
     def remove_object(self) -> None:
         self.game.send_tag(
