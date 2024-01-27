@@ -105,22 +105,22 @@ class Game:
             player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')
             player_select.close()
 
+        # Register "/use" event
+        self.register_input(
+            command='/use',
+            input_id='/use',
+            script_id='4375706:1',
+            target=KeyTarget.GOB,
+            event=KeyInput.MOUSE_CLICK,
+            key_modifier=KeyModifier.NONE
+        )
+
         # This will trigger the loading transition
         self.send_tag(
             'W_PLACE',
             '1:10001', # PlaceId
             8,         # PlaceObjectId
             1          # PlaceInstanceId
-        )
-
-        # Register "/use" event
-        self.register_input(
-            command='/use',
-            input_id='/use',
-            script_id='4375706:1',
-            target=KeyTarget.TILE,
-            event=KeyInput.MOUSE_UP,
-            key_modifier=KeyModifier.NONE
         )
 
         # Scale screen up to 100
