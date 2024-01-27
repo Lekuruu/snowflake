@@ -43,6 +43,11 @@ class Grid:
         x, y = self.coordinates(obj)
         self[x, y] = None
 
+    def move(self, obj: GameObject, x: int, y: int) -> None:
+        """Move a game object to a new location"""
+        self.remove(obj)
+        self[x, y] = obj
+
     def coordinates(self, obj: GameObject) -> Tuple[int, int]:
         """Get the coordinates of an object"""
         for x in range(9):
