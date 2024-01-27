@@ -20,9 +20,9 @@ class GameObject:
     ) -> None:
         self.game = game
         self.name = name
+        self.id = -1
         self.x = x
         self.y = y
-        self.id = -1
         self.assets = assets
         self.sounds = sounds
         self.game.objects.add(self)
@@ -75,10 +75,9 @@ class GameObject:
         )
 
     def remove_object(self) -> None:
-        self.game.send_tag(
-            'O_GONE',
-            self.id
-        )
+        self.game.send_tag('O_GONE', self.id)
+        self.game.objects.remove(self)
+        self.game.grid.remove(self)
 
     def animate_object(
         self,

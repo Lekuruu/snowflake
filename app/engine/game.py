@@ -328,18 +328,13 @@ class Game:
 
             # TODO: Health bar
 
-    def remove_object(self, obj: GameObject) -> None:
-        obj.remove_object()
-        self.grid.remove(obj)
-        self.objects.remove(obj)
-
     def remove_enemies(self) -> None:
         for enemy in self.enemies:
-            self.remove_object(enemy)
+            enemy.remove_object()
 
     def remove_ninjas(self) -> None:
         for ninja in self.ninjas:
-            self.remove_object(ninja)
+            ninja.remove_object()
 
     def show_background(self) -> None:
         for background in self.backgrounds:
