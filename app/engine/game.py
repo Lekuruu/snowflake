@@ -412,12 +412,12 @@ class Game:
             )
 
     def send_tip(self, phase: Phase, client: "Penguin" | None = None) -> None:
-        if phase in client.displayed_tips:
-            return
-
         clients = [client] if client else self.clients
 
         for client in clients:
+            if phase in client.displayed_tips:
+                return
+
             if not client.tip_mode:
                 continue
 
