@@ -11,7 +11,7 @@ def use_handler(client: Penguin, object_id: int, x: int, y: int, local_x: float,
     if object.on_click is None:
         return
 
-    object.on_click(client, x, y, local_x, local_y)
+    object.on_click(client, object, x, y, local_x, local_y)
 
 @Instance.events.register('/anim_done')
 def on_animation_done(client: Penguin, param_1: int, param_2: int):
