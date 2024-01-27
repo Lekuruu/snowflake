@@ -212,6 +212,7 @@ class Game:
             self.wait_for_timer()
             self.hide_ghosts()
             self.remove_confirm()
+            time.sleep(1.5)
 
             for ninja in self.ninjas:
                 self.move_ninja(
