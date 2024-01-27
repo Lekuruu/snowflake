@@ -85,7 +85,7 @@ class Game:
     def bonus_cirteria_met(self) -> bool:
         return {
             'no_ko': all(not player.was_ko for player in self.clients),
-            'full_health': all(ninja.hp == 100 for ninja in self.ninjas),
+            'full_health': all(ninja.hp == ninja.max_hp for ninja in self.ninjas),
             'under_time': (time.time() < self.game_start + 300)
         }[self.bonus_cirteria]
 
