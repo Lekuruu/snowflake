@@ -2,6 +2,7 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from app.engine.penguin import Penguin
     from app.engine.game import Game
 
 from app.objects import (
@@ -36,6 +37,7 @@ class Ninja(GameObject):
         self.max_hp = self.__class__.max_hp
         self.hp = self.__class__.max_hp
 
+        self.client: "Penguin" = getattr(game, f'{self.name.lower()}')
         self.initialize_objects()
 
     def initialize_objects(self) -> None:
@@ -65,6 +67,9 @@ class Ninja(GameObject):
         )
 
     def place_ghost(self, x: int, y: int) -> None:
+        if self.client.is_ready:
+            return
+
         if (self.ghost.x == x) and (self.ghost.y == y):
             self.hide_ghost()
             return
@@ -86,6 +91,9 @@ class Ninja(GameObject):
 
     def on_ghost_click(self, client, object: GameObject, *args) -> None:
         if client.ninja != self:
+            return
+
+        if self.client.is_ready:
             return
 
         self.hide_ghost()
