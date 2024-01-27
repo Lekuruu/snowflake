@@ -221,7 +221,7 @@ class Game:
             # Enemies have been defeated
             return True
 
-        if all(ninja.is_ko for ninja in self.clients):
+        if all(ninja.hp <= 0 for ninja in self.ninjas):
             # All ninjas have been defeated
             return True
 
