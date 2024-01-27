@@ -207,6 +207,7 @@ class Game:
     def run_until_next_round(self) -> None:
         while True:
             self.wait_for_timer()
+            self.hide_ghosts()
             time.sleep(1)
 
             # TODO: Round Loop
@@ -349,6 +350,10 @@ class Game:
     def remove_ninjas(self) -> None:
         for ninja in self.ninjas:
             ninja.remove_object()
+
+    def hide_ghosts(self) -> None:
+        for ninja in self.ninjas:
+            ninja.ghost.hide()
 
     def show_background(self) -> None:
         for background in self.backgrounds:
