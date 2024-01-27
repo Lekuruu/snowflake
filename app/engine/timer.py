@@ -22,19 +22,29 @@ class Timer:
         self.running = True
 
         while self.tick > 0:
-            time.sleep(1)
-            self.tick -= 1
-            self.update()
-
-            if self.game.server.shutting_down:
-                break
-
-            if all(client.disconnected for client in self.game.clients):
-                break
+            self.update_tick()
 
         self.hide()
         self.tick = 10
         self.running = False
+
+    def update_tick(self, seconds: int = 1, interval: int = 0.1) -> None:
+        while seconds > 0:
+            time.sleep(interval)
+            seconds -= interval
+
+            if self.game.server.shutting_down:
+                return
+
+            if all(client.disconnected for client in self.game.clients):
+                return
+
+            if all(client.is_ready for client in self.game.clients):
+                self.tick = 0
+                return
+
+        self.tick -= 1
+        self.update()
 
     def load(self) -> None:
         for client in self.game.clients:
