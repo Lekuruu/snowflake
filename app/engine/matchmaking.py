@@ -4,6 +4,7 @@ from __future__ import annotations
 from twisted.internet import threads
 from typing import Tuple
 
+from ..data.repositories import penguins
 from ..objects.collections import Players
 from .penguin import Penguin
 
@@ -40,8 +41,11 @@ class MatchmakingQueue:
 
         for element in elements:
             if (matches := self.players.with_element(element)):
-                # TODO: Sort players by different criteria
+                self.logger.debug(f'{element} matches: {matches}')
                 players.append(matches[0])
+                # TODO: Sort players by different criteria
+
+        self.logger.debug(f'Found players: {players}')
 
         if len(players) != 3:
             return
