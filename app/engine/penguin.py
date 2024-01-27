@@ -74,7 +74,6 @@ class Penguin(Receiver):
         window.load(type=EventType.IMMEDIATE.value)
 
     def send_error(self, message: str) -> None:
-        # This will load a window, that sends the player back to the room
         window = self.window_manager.get_window('cardjitsu_snowerrorhandler.swf')
         window.send_payload(
             'error',
