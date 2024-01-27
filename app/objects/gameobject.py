@@ -235,6 +235,6 @@ class GameObject:
             )
         )
 
-    def play_sound(self, sound_name: str, client: "Penguin" | None = None) -> None:
+    def play_sound(self, sound_name: str, target: "Penguin" | None = None) -> None:
         sound = self.sounds.by_name(sound_name)
-        sound.play(client or self.game)
+        sound.play(target or self.game)
