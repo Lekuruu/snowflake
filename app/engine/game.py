@@ -11,7 +11,7 @@ from app.data.repositories import stamps
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
 from app.objects.collections import ObjectCollection, AssetCollection
-from app.objects.enemies import Sly, Scrap, Tank
+from app.objects.enemies import Sly, Scrap, Tank, Enemy
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
 
@@ -58,7 +58,7 @@ class Game:
         ]
 
     @property
-    def enemies(self) -> List[GameObject]:
+    def enemies(self) -> List[Enemy]:
         return [
             *self.objects.with_name('Sly'),
             *self.objects.with_name('Scrap'),
@@ -326,8 +326,6 @@ class Game:
         fire.place_object()
         fire.idle_animation()
 
-        # TODO: Health bar
-
     def spawn_enemies(self) -> None:
         """Spawn enemies for the current round"""
         for enemy in self.enemies:
@@ -338,14 +336,7 @@ class Game:
             enemy.place_object()
 
             # Play spawn animation
-            enemy.animate_object('snowman_spawn_anim', play_style='play_once')
-            enemy.play_sound('sfx_mg_2013_cjsnow_snowmenappear')
-
-            # Play idle animation
-            enemy.animate_object(
-                f'{enemy.name.lower()}_idle_anim',
-                play_style='loop'
-            )
+            enemy.spawn()
 
             # TODO: Health bar
 

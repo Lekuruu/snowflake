@@ -12,7 +12,50 @@ from app.objects import (
     Asset
 )
 
-class Sly(GameObject):
+class Enemy(GameObject):
+    name: str = 'Enemy'
+    max_hp: int = 0
+    range: int = 0
+    attack: int = 0
+    move: int = 0
+
+    assets = AssetCollection()
+    sounds = SoundCollection()
+
+    def __init__(
+        self,
+        game: "Game",
+        x: int = 0,
+        y: int = 0
+    ) -> None:
+        super().__init__(game, self.__class__.name, x, y)
+        self.assets = self.__class__.assets
+        self.sounds = self.__class__.sounds
+        self.attack = self.__class__.attack
+        self.range = self.__class__.range
+        self.max_hp = self.__class__.max_hp
+        self.hp = self.max_hp
+
+    def spawn(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_snowmenappear')
+        self.spawn_animation()
+        self.idle_animation()
+
+    def spawn_animation(self) -> None:
+        self.animate_object(
+            'snowman_spawn_anim',
+            play_style='play_once'
+        )
+
+    def idle_animation(self) -> None:
+        self.animate_object(
+            f'{self.name.lower()}_idle_anim',
+            play_style='loop'
+        )
+
+class Sly(Enemy):
+    name: str = 'Sly'
+    max_hp: int = 30
     range: int = 3
     attack: int = 4
     move: int = 3
@@ -35,11 +78,9 @@ class Sly(GameObject):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Sly', x, y, Sly.assets, Sly.sounds)
-        self.hp = 30
-
-class Scrap(GameObject):
+class Scrap(Enemy):
+    name: str = 'Scrap'
+    max_hp: int = 45
     range: int = 2
     attack: int = 5
     move: int = 2
@@ -66,11 +107,9 @@ class Scrap(GameObject):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Scrap', x, y, Scrap.assets, Scrap.sounds)
-        self.hp = 45
-
-class Tank(GameObject):
+class Tank(Enemy):
+    name: str = 'Tank'
+    max_hp: int = 60
     range: int = 1
     attack: int = 10
     move: int = 1
@@ -92,7 +131,3 @@ class Tank(GameObject):
         Sound.from_name('sfx_mg_2013_cjsnow_attacktank'),
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
     })
-
-    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Tank', x, y, Tank.assets, Tank.sounds)
-        self.hp = 60
