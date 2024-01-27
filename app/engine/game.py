@@ -289,11 +289,11 @@ class Game:
         water = WaterNinja(self, x=0, y=0)
         water.place_object()
 
-        snow = SnowNinja(self, x=0, y=2)
-        snow.place_object()
-
-        fire = FireNinja(self, x=0, y=4)
+        fire = FireNinja(self, x=0, y=2)
         fire.place_object()
+
+        snow = SnowNinja(self, x=0, y=4)
+        snow.place_object()
 
     def create_enemies(self) -> None:
         max_enemies = {
