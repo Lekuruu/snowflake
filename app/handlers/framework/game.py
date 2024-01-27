@@ -33,3 +33,6 @@ def on_confirm_clicked(client: Penguin, data: dict):
     confirm.place_object()
     confirm.place_sprite(confirm.name)
     client.is_ready = True
+
+    confirm.add_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8')
+    confirm.play_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8', client)
