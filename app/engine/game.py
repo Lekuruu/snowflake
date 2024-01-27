@@ -373,6 +373,11 @@ class Game:
         ninja.move_animation()
         ninja.idle_animation()
         ninja.move_object(x, y)
+        ninja.play_sound(
+            'sfx_mg_2013_cjsnow_footsteppenguin' \
+                if ninja.name != 'Fire'
+                else 'sfx_mg_2013_cjsnow_footsteppenguinfire'
+        )
 
     def show_background(self) -> None:
         for background in self.backgrounds:
