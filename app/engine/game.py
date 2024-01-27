@@ -177,9 +177,6 @@ class Game:
 
     def run_game_loop(self) -> None:
         while True:
-            for client in self.clients:
-                client.is_ready = False
-
             self.run_until_next_round()
             self.round += 1
 
@@ -209,6 +206,9 @@ class Game:
 
     def run_until_next_round(self) -> None:
         while True:
+            for client in self.clients:
+                client.is_ready = False
+
             self.wait_for_timer()
             self.hide_ghosts()
             self.remove_confirm()
