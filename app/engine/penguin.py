@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, List
 
 if TYPE_CHECKING:
+    from app.objects.ninjas import Ninja
     from .game import Game
 
 from twisted.internet.address import IPv4Address, IPv6Address
@@ -24,6 +25,7 @@ class Penguin(Receiver):
         self.logged_in: bool = False
 
         self.object: PenguinObject | None = None
+        self.ninja: "Ninja" | None = None
         self.game: "Game" | None = None
 
         self.element: str = ""
