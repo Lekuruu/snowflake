@@ -13,6 +13,7 @@ from app.objects import (
 )
 
 class Ninja(GameObject):
+    name: str = 'Ninja'
     range: int = 0
     attack: int = 0
     move: int = 0
@@ -23,11 +24,10 @@ class Ninja(GameObject):
     def __init__(
         self,
         game: "Game",
-        name: str,
         x: int = 0,
         y: int = 0
     ) -> None:
-        super().__init__(game, name, x, y)
+        super().__init__(game, self.__class__.name, x, y)
         self.assets = self.__class__.assets
         self.sounds = self.__class__.sounds
         self.attack = self.__class__.attack
@@ -42,6 +42,7 @@ class Ninja(GameObject):
         )
 
 class WaterNinja(Ninja):
+    name: str = 'Water'
     range: int = 1
     attack: int = 6
     move: int = 3
@@ -73,10 +74,8 @@ class WaterNinja(Ninja):
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Water', x, y)
-
 class SnowNinja(Ninja):
+    name: str = 'Snow'
     range: int = 1
     attack: int = 10
     move: int = 2
@@ -112,10 +111,8 @@ class SnowNinja(Ninja):
        Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
 
-    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Snow', x, y)
-
 class FireNinja(Ninja):
+    name: str = 'Fire'
     range: int = 2
     attack: int = 8
     move: int = 2
@@ -155,6 +152,3 @@ class FireNinja(Ninja):
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
-
-    def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Fire', x, y)
