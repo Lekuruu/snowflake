@@ -166,7 +166,14 @@ class Game:
         # Run game loop until game ends
         self.run_game_loop()
 
-        # TODO: Handle payout
+        self.display_payout()
+        self.wait_for_players(lambda player: player.disconnected)
+        self.close()
+
+    def close(self) -> None:
+        self.logger.info('Game finished.')
+        # TODO: Cleanup
+        exit()
 
     def run_game_loop(self) -> None:
         while True:
@@ -202,7 +209,7 @@ class Game:
     def wait_for_players(self, condition: Callable) -> None:
         """Wait for all players to finish loading the game"""
         for player in self.clients:
-            while not condition(player):
+            while not condition(player) and not self.server.shutting_down:
                 pass
 
     def wait_for_timer(self) -> None:
@@ -219,7 +226,6 @@ class Game:
 
         for client in self.clients:
             client.send_to_room()
-            client.close_connection()
 
     def register_input(
         self,
@@ -401,4 +407,28 @@ class Game:
                 },
                 loadDescription="",
                 assetPath=""
+            )
+
+    def display_payout(self) -> None:
+        for client in self.clients:
+            payout = client.window_manager.get_window('cardjitsu_snowpayout.swf')
+            payout.layer = 'bottomLayer'
+            payout.load(
+                {
+                    "coinsEarned": 0,
+                    "damage": 0,
+                    "doubleCoins": False,
+                    "isBoss": 0,
+                    "rank": client.object.snow_ninja_rank,
+                    "round": self.round,
+                    "showItems": 0,
+                    "stampList": [], # TODO
+                    "stamps": [], # TODO
+                    "xpEnd": client.object.snow_ninja_progress, # TODO
+                    "xpStart": client.object.snow_ninja_progress,
+                },
+                loadDescription="",
+                assetPath="",
+                xPercent=0.08,
+                yPercent=0.05
             )
