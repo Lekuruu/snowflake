@@ -107,7 +107,8 @@ class ObjectCollection(Set["GameObject"]):
         super().update(objects)
 
     def remove(self, object: "GameObject") -> None:
-        return super().remove(object)
+        if object in self:
+            return super().remove(object)
 
     def by_id(self, id: int) -> "GameObject" | Ninja | None:
         return next((object for object in self if object.id == id), None)
