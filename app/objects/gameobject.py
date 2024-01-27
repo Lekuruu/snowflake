@@ -96,6 +96,24 @@ class GameObject:
             0       # TODO
         )
 
+    def move_object(self, x: int, y: int, duration: int = 600) -> None:
+        self.x = x
+        self.y = y
+
+        if self.grid:
+            self.game.grid.move(self, x, y)
+            x = x + self.game.grid.x_offset
+            y = y + self.game.grid.y_offset
+
+        self.game.send_tag(
+            'O_SLIDE',
+            self.id,
+            x,
+            y,
+            128, # Z Coordinate
+            duration
+        )
+
     def remove_object(self) -> None:
         self.game.send_tag('O_GONE', self.id)
         self.game.objects.remove(self)
