@@ -75,10 +75,16 @@ class Receiver(LineOnlyReceiver):
         self.disconnected = True
 
     def close_connection(self):
+        if not self.transport:
+            return
+
         self.transport.loseConnection()
         self.connectionLost()
 
     def send_tag(self, tag: str, *args):
+        if not self.transport:
+            return
+
         self.logger.debug(f'<- "{tag}": {args}')
         self.sendLine(
             (f'[{tag}]|' + '|'.join(str(a) for a in args) + '|').encode()
