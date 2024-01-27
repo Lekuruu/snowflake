@@ -1,4 +1,6 @@
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Callable
 
 from .collections import SoundCollection, AssetCollection
@@ -6,6 +8,7 @@ from .asset import Asset
 from .sound import Sound
 
 if TYPE_CHECKING:
+    from app.engine.penguin import Penguin
     from app.engine.game import Game
 
 class GameObject:
@@ -16,7 +19,8 @@ class GameObject:
         x: int = 0,
         y: int = 0,
         assets=AssetCollection(),
-        sounds=SoundCollection()
+        sounds=SoundCollection(),
+        grid: bool = False
     ) -> None:
         self.game = game
         self.name = name
@@ -26,9 +30,10 @@ class GameObject:
         self.assets = assets
         self.sounds = sounds
         self.game.objects.add(self)
+        self.grid = grid
 
-        if isinstance(x, int) and isinstance(y, int):
-            self.game.grid[x, y] = self
+        # Place object in grid
+        if grid: self.game.grid[x, y] = self
 
     def __eq__(self, other: object) -> bool:
         if not getattr(other, 'id', None):
@@ -56,12 +61,19 @@ class GameObject:
         )
 
     def place_object(self) -> None:
+        x = self.x
+        y = self.y
+
+        if self.grid:
+            x = self.x + self.game.grid.x_offset
+            y = self.y + self.game.grid.y_offset
+
         self.game.send_tag(
             'O_HERE',
             self.id,
             '0:1',  # TODO
-            self.x,
-            self.y,
+            x,
+            y,
             0,      # TODO
             1,      # TODO
             0,      # TODO
@@ -103,9 +115,13 @@ class GameObject:
 
         # TODO: Implement callbacks
 
-    def place_sprite(self, name: str) -> None:
+    def place_sprite(self, name: str, target: "Penguin" | None = None) -> None:
         asset = self.assets.by_name(name)
-        self.game.send_tag(
+
+        if target is None:
+            target = self.game
+
+        target.send_tag(
             'O_SPRITE',
             self.id,
             f'0:{asset.index}',

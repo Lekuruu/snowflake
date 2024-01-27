@@ -41,7 +41,7 @@ class Game:
 
         self.objects = ObjectCollection()
         self.timer = Timer(self)
-        self.grid = Grid()
+        self.grid = Grid(self)
 
         self.logger = logging.getLogger('game')
 
@@ -241,8 +241,10 @@ class Game:
 
     def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
+        self.grid.show_tiles()
         self.enable_cards()
         self.timer.run()
+        self.grid.hide_tiles()
         self.disable_cards()
 
     def error_callback(self, failure: Failure) -> None:
@@ -275,9 +277,10 @@ class Game:
 
     def initialize_objects(self) -> None:
         """Initialize all game objects"""
-        self.create_ninjas()
-        self.create_enemies()
+        self.grid.initialize_tiles()
         self.create_background()
+        self.create_enemies()
+        self.create_ninjas()
 
         # Load sprites
         for object in self.objects:
