@@ -179,8 +179,12 @@ class Game:
 
     def run_game_loop(self) -> None:
         while True:
-            self.wait_for_timer()
+            self.run_until_next_round()
             self.round += 1
+
+            if all(ninja.hp <= 0 for ninja in self.ninjas):
+                # All ninjas have been defeated
+                break
 
             if (self.round > 2) and (not self.bonus_cirteria_met):
                 break
@@ -200,9 +204,26 @@ class Game:
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
-
             time.sleep(1)
-            # TODO: Show grid
+
+    def run_until_next_round(self) -> None:
+        while True:
+            self.wait_for_timer()
+            time.sleep(1)
+
+            # TODO: Round Loop
+
+            if self.check_round_completion():
+                break
+
+    def check_round_completion(self) -> bool:
+        if not self.enemies:
+            # Enemies have been defeated
+            return True
+
+        if all(ninja.is_ko for ninja in self.clients):
+            # All ninjas have been defeated
+            return True
 
     def send_tag(self, tag: str, *args) -> None:
         for player in self.clients:
