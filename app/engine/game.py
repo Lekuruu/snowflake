@@ -407,6 +407,9 @@ class Game:
             )
 
     def send_tip(self, phase: Phase, client: "Penguin" | None = None) -> None:
+        if phase in client.displayed_tips:
+            return
+
         clients = [client] if client else self.clients
 
         for client in clients:
@@ -425,8 +428,6 @@ class Game:
                 xPercent=0.1,
                 yPercent=0
             )
-
-            reactor.callLater(10, infotip.send_payload, 'disable')
 
     def enable_cards(self) -> None:
         for client in self.clients:

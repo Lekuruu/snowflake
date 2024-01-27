@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Tuple, Iterator
 from app.objects import GameObject, Asset
 from app.objects.ninjas import Ninja
+from app.data.constants import Phase
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
@@ -147,3 +148,11 @@ class Grid:
 
         ninja = self.game.objects.by_name(client.element.capitalize())
         ninja.place_ghost(x, y)
+
+        if client.tip_mode:
+            if Phase.MOVE in client.displayed_tips:
+                return
+
+            infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
+            infotip.send_payload('disable')
+            client.displayed_tips.append(Phase.MOVE)
