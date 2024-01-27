@@ -41,11 +41,8 @@ class MatchmakingQueue:
 
         for element in elements:
             if (matches := self.players.with_element(element)):
-                self.logger.debug(f'{element} matches: {matches}')
                 players.append(matches[0])
                 # TODO: Sort players by different criteria
-
-        self.logger.debug(f'Found players: {players}')
 
         if len(players) != 3:
             return
