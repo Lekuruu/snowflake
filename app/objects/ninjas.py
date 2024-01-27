@@ -12,7 +12,30 @@ from app.objects import (
     Asset
 )
 
-class WaterNinja(GameObject):
+class Ninja(GameObject):
+    range: int = 0
+    attack: int = 0
+    move: int = 0
+
+    assets = AssetCollection()
+    sounds = SoundCollection()
+
+    def __init__(
+        self,
+        game: "Game",
+        name: str,
+        x: int = 0,
+        y: int = 0
+    ) -> None:
+        super().__init__(game, name, x, y)
+        self.assets = self.__class__.assets
+        self.sounds = self.__class__.sounds
+        self.attack = self.__class__.attack
+        self.range = self.__class__.range
+        self.max_hp = 100
+        self.hp = 100
+
+class WaterNinja(Ninja):
     range: int = 1
     attack: int = 6
     move: int = 3
@@ -45,10 +68,9 @@ class WaterNinja(GameObject):
     })
 
     def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Water', x, y, WaterNinja.assets, WaterNinja.sounds)
-        self.hp = 100
+        super().__init__(game, 'Water', x, y)
 
-class SnowNinja(GameObject):
+class SnowNinja(Ninja):
     range: int = 1
     attack: int = 10
     move: int = 2
@@ -85,10 +107,9 @@ class SnowNinja(GameObject):
     })
 
     def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Snow', x, y, SnowNinja.assets, SnowNinja.sounds)
-        self.hp = 100
+        super().__init__(game, 'Snow', x, y)
 
-class FireNinja(GameObject):
+class FireNinja(Ninja):
     range: int = 2
     attack: int = 8
     move: int = 2
@@ -130,5 +151,4 @@ class FireNinja(GameObject):
     })
 
     def __init__(self, game: "Game", x: int = 0, y: int = 0) -> None:
-        super().__init__(game, 'Fire', x, y, FireNinja.assets, FireNinja.sounds)
-        self.hp = 100
+        super().__init__(game, 'Fire', x, y)

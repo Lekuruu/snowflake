@@ -9,12 +9,11 @@ if TYPE_CHECKING:
 from app.data.constants import KeyModifier, KeyTarget, KeyInput, Phase
 from app.data.repositories import stamps
 
+from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
 from app.objects.collections import ObjectCollection, AssetCollection
-from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja
 from app.objects.enemies import Sly, Scrap, Tank
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
-from app.objects.asset import Asset
 
 from twisted.python.failure import Failure
 from twisted.internet import reactor
@@ -51,7 +50,7 @@ class Game:
         return [self.fire, self.snow, self.water]
 
     @property
-    def ninjas(self) -> List[GameObject]:
+    def ninjas(self) -> List[Ninja]:
         return [
             self.objects.by_name('Water'),
             self.objects.by_name('Snow'),
