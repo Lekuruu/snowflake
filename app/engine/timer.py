@@ -11,6 +11,7 @@ class Timer:
         self.game = game
         self.tick = 10
         self.loaded = False
+        self.running = False
 
     def run(self) -> None:
         if not self.loaded:
@@ -18,6 +19,8 @@ class Timer:
             self.loaded = True
 
         self.show()
+        self.running = True
+
         while self.tick > 0:
             time.sleep(1)
             self.tick -= 1
@@ -31,6 +34,7 @@ class Timer:
 
         self.hide()
         self.tick = 10
+        self.running = False
 
     def load(self) -> None:
         for client in self.game.clients:
