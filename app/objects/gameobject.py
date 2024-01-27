@@ -35,11 +35,6 @@ class GameObject:
         self.on_click = on_click
         self.grid = grid
 
-        self._scale_x = 1
-        self._scale_y = 1
-        self._mirror_mode = MirrorMode.NONE
-        self._origin_mode = OriginMode.NONE
-
         # Place object in grid
         if grid: self.game.grid[x, y] = self
 
@@ -50,42 +45,6 @@ class GameObject:
 
     def __hash__(self) -> int:
         return hash(self.id)
-
-    @property
-    def scale_x(self) -> int:
-        return self._scale_x
-
-    @scale_x.setter
-    def scale_x(self, value: int) -> None:
-        self._scale_x = value
-        self.sprite_settings()
-
-    @property
-    def scale_y(self) -> int:
-        return self._scale_y
-
-    @scale_y.setter
-    def scale_y(self, value: int) -> None:
-        self._scale_y = value
-        self.sprite_settings()
-
-    @property
-    def mirror_mode(self) -> MirrorMode:
-        return self._mirror_mode
-
-    @mirror_mode.setter
-    def mirror_mode(self, value: MirrorMode) -> None:
-        self._mirror_mode = value
-        self.sprite_settings()
-
-    @property
-    def origin_mode(self) -> OriginMode:
-        return self._origin_mode
-
-    @origin_mode.setter
-    def origin_mode(self, value: OriginMode) -> None:
-        self._origin_mode = value
-        self.sprite_settings()
 
     @classmethod
     def from_asset(
@@ -231,19 +190,25 @@ class GameObject:
             duration
         )
 
-    def sprite_settings(self) -> None:
+    def sprite_settings(
+        self,
+        scale_x: int = 1,
+        scale_y: int = 1,
+        origin_mode: OriginMode = OriginMode.NONE,
+        mirror_mode: MirrorMode = MirrorMode.NONE
+    ) -> None:
         """This will update the sprite settings"""
         self.game.send_tag(
             'O_SPRITESETTINGS',
             self.id,
             'none', # Sprite layers
-            self._scale_x,
-            self._scale_y,
+            scale_x,
+            scale_y,
             '',
             '',
             '',
-            self._origin_mode.value,
-            self._mirror_mode.value
+            origin_mode.value,
+            mirror_mode.value
         )
 
     def hide(self) -> None:
