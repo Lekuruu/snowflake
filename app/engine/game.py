@@ -18,7 +18,7 @@ from app.objects.sound import Sound
 from twisted.python.failure import Failure
 from twisted.internet import reactor
 
-from .animations import AnimationCallbacks
+from .callbacks import CallbackHandler
 from .timer import Timer
 from .grid import Grid
 
@@ -40,7 +40,7 @@ class Game:
         self.map = random.randrange(1, 3)
         self.round = 0
 
-        self.callbacks = AnimationCallbacks(self)
+        self.callbacks = CallbackHandler(self)
         self.objects = ObjectCollection()
         self.timer = Timer(self)
         self.grid = Grid(self)
@@ -253,7 +253,7 @@ class Game:
 
     def wait_for_animations(self) -> None:
         """Wait for all animations to finish"""
-        while self.callbacks.pending:
+        while self.callbacks.pending_animations:
             pass
 
     def wait_for_timer(self) -> None:

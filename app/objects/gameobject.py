@@ -130,7 +130,7 @@ class GameObject:
         callback: Callable | None = None
     ) -> None:
         asset = self.assets.by_name(name)
-        id = self.game.callbacks.register(callback)
+        id = self.game.callbacks.register_animation(callback)
 
         self.game.send_tag(
             'O_ANIM',
