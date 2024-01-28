@@ -208,8 +208,11 @@ class Game:
             for client in self.clients:
                 client.is_ready = False
 
+            self.show_targets()
             self.wait_for_timer()
+
             self.hide_ghosts()
+            self.remove_targets()
             self.remove_confirm()
             time.sleep(1.25)
 
@@ -403,6 +406,14 @@ class Game:
 
         # Wait for move animations
         self.wait_for_animations()
+
+    def show_targets(self) -> None:
+        for ninja in self.ninjas:
+            ninja.show_targets()
+
+    def remove_targets(self) -> None:
+        for ninja in self.ninjas:
+            ninja.remove_targets()
 
     def show_background(self) -> None:
         for background in self.backgrounds:

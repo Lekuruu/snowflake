@@ -1,10 +1,13 @@
 
-from typing import TYPE_CHECKING
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
+from app.objects.target import Target
 from app.objects import (
     SoundCollection,
     AssetCollection,
@@ -39,7 +42,16 @@ class Ninja(GameObject):
         self.hp = self.__class__.max_hp
 
         self.client: "Penguin" = getattr(game, f'{self.name.lower()}')
+        self.targets: List["Target"] = []
         self.initialize_objects()
+
+    @property
+    def selected_target(self) -> "Target" | None:
+        return next((target for target in self.targets if target.selected), None)
+
+    @property
+    def placed_ghost(self) -> bool:
+        return self.ghost.x != -1 and self.ghost.y != -1
 
     def initialize_objects(self) -> None:
         self.ghost = GameObject.from_asset(
@@ -165,6 +177,7 @@ class Ninja(GameObject):
 
         if (self.ghost.x == x) and (self.ghost.y == y):
             self.hide_ghost()
+            self.show_targets()
             return
 
         if not self.game.grid.can_move(x, y):
@@ -174,6 +187,7 @@ class Ninja(GameObject):
         self.ghost.place_object()
         self.ghost.place_sprite(self.ghost.name)
         self.ghost.play_sound('sfx_mg_2013_cjsnow_uiselecttile')
+        self.show_targets()
 
     def hide_ghost(self, reset_positions: bool = True) -> None:
         self.game.grid.remove(self.ghost)
@@ -191,6 +205,42 @@ class Ninja(GameObject):
             return
 
         self.hide_ghost()
+        self.show_targets()
+
+    def show_targets(self) -> None:
+        self.remove_targets()
+
+        healable_tiles = self.game.grid.healable_tiles(
+            self.x if not self.placed_ghost else self.ghost.x,
+            self.y if not self.placed_ghost else self.ghost.y,
+            self
+        )
+
+        for tile in healable_tiles:
+            tile_x = int(tile.x - 0.5)
+            tile_y = int(tile.y - 0.9998)
+
+            self.targets.append(target := Target(self, tile_x, tile_y))
+            target.show_heal()
+
+        attackable_tiles = self.game.grid.attackable_tiles(
+            self.x if not self.placed_ghost else self.ghost.x,
+            self.y if not self.placed_ghost else self.ghost.y,
+            self
+        )
+
+        for tile in attackable_tiles:
+            tile_x = int(tile.x - 0.5)
+            tile_y = int(tile.y - 0.9998)
+
+            self.targets.append(target := Target(self, tile_x, tile_y))
+            target.show_attack()
+
+    def remove_targets(self) -> None:
+        for target in self.targets:
+            target.remove_object()
+
+        self.targets = []
 
 class WaterNinja(Ninja):
     name: str = 'Water'
