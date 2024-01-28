@@ -154,6 +154,9 @@ class Grid:
             if not isinstance(target_object, Ninja):
                 continue
 
+            if target_object.hp == target_object.max_hp:
+                continue
+
             distance = abs(tile_x - target_x) + abs(tile_y - target_y)
 
             if distance <= ninja.range:
