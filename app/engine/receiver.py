@@ -67,7 +67,7 @@ class Receiver(LineOnlyReceiver):
         self.command_received(command, args)
 
     def connectionLost(self, reason: Failure | None = None) -> None:
-        if (reason is not None) and (reason.type != ConnectionDone):
+        if reason is not None and not self.disconnected:
             self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
 
         self.server.players.remove(self)
