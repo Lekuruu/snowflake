@@ -153,6 +153,7 @@ class Ninja(GameObject):
 
         if self.hp <= 0:
             self.ko_animation()
+            self.client.was_ko = True
 
     def place_ghost(self, x: int, y: int) -> None:
         if self.client.is_ready:
