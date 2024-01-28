@@ -81,6 +81,40 @@ class Ninja(GameObject):
             play_style='play_once'
         )
 
+    def ko_animation(self) -> None:
+        self.animate_object(
+            f'{self.name.lower()}ninja_kostart_anim',
+            play_style='play_once'
+        )
+        self.animate_object(
+            f'{self.name.lower()}ninja_koloop_anim',
+            play_style='loop'
+        )
+
+    def revive_animation(self) -> None:
+        # NOTE: The revive animation seems to have a slight offset from
+        #       all the other animations, so we need to adjust the x and y here.
+        #       Not sure if there is a better way to do this.
+
+        # Change offset
+        self.x = self.x - 0.2
+        self.y = self.y - 0.15
+        self.place_object()
+
+        # Reset offset after animation is done
+        def reset_offset(*args):
+            self.x = self.x + 0.2
+            self.y = self.y + 0.15
+            self.place_object()
+            self.idle_animation()
+
+        self.animate_object(
+            f'{self.name.lower()}ninja_revived_anim',
+            play_style='play_once',
+            reset=True,
+            callback=reset_offset
+        )
+
     def place_healthbar(self) -> None:
         self.health_bar.place_object()
         self.health_bar.place_sprite(self.health_bar.name)
@@ -110,9 +144,15 @@ class Ninja(GameObject):
         self.health_bar.animate_sprite()
 
     def set_health(self, hp: int) -> None:
+        if self.hp <= 0 and hp > 0:
+            self.revive_animation()
+
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
         self.hp = hp
+
+        if self.hp <= 0:
+            self.ko_animation()
 
     def place_ghost(self, x: int, y: int) -> None:
         if self.client.is_ready:
@@ -162,8 +202,8 @@ class WaterNinja(Ninja):
         Asset.from_name('waterninja_idle_anim'),
         Asset.from_name('waterninja_move_anim'),
         Asset.from_name('waterninja_hit_anim'),
-        Asset.from_name('waterninja_knockout_intro_anim'),
-        Asset.from_name('waterninja_knockout_loop_anim'),
+        Asset.from_name('waterninja_kostart_anim'),
+        Asset.from_name('waterninja_koloop_anim'),
         Asset.from_name('waterninja_celebrate_anim'),
         Asset.from_name('waterninja_powercard_fishdrop_anim'),
         Asset.from_name('waterninja_powercard_summon_anim'),
@@ -196,7 +236,7 @@ class SnowNinja(Ninja):
         Asset.from_name('snowninja_attack_anim'),
         Asset.from_name('snowninja_heal_anim'),
         Asset.from_name('snowninja_hit_anim'),
-        Asset.from_name('snowninja_kointro_anim'),
+        Asset.from_name('snowninja_kostart_anim'),
         Asset.from_name('snowninja_koloop_anim'),
         Asset.from_name('snowninja_move_anim'),
         Asset.from_name('snowninja_hit_anim'),
