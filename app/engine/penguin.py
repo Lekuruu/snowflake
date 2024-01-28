@@ -69,6 +69,11 @@ class Penguin(Receiver):
             self.send_to_room()
         return super().close_connection()
 
+    def connectionLost(self, reason: Failure | None = None) -> None:
+        super().connectionLost(reason)
+        if self.in_game:
+            self.ninja.set_health(0)
+
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room
         window = self.window_manager.get_window('cardjitsu_snowexternalinterfaceconnector.swf')
