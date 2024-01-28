@@ -1,12 +1,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
+from app.engine.callbacks import CallbackHandler
 import app.engine as Engine
 from .asset import Asset
 
@@ -72,17 +73,20 @@ class Sound(Asset):
             response_object_id
         )
 
-    def play(self, target: "Game" | "Penguin") -> None:
+    def play(self, target: "Game" | "Penguin", callback: Callable | None = None) -> None:
+        callbacks: CallbackHandler = getattr(target, 'callbacks', None)
+        handle_id: int = -1
+
+        if callbacks:
+            handle_id = callbacks.register_sound(callback)
+
         target.send_tag(
             'FX_PLAYSOUND',
             f'0:{self.index}',
-            0, # "handleId"
+            handle_id,
             int(self.looping),
             self.volume,
             self.game_object_id,
             self.radius,
             self.response_object_id
         )
-
-        # TODO: Add callback handler for sound completion
-        #       This can be done through the "handleId" parameter

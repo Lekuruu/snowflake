@@ -53,4 +53,4 @@ class CallbackHandler:
             self.callbacks.pop(id)
 
     def next_id(self) -> int:
-        return max(self.callbacks.keys() or [0]) + 1
+        return max(self.pending_animations + self.pending_sounds, default=0) + 1
