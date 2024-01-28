@@ -1,12 +1,16 @@
 
+from __future__ import annotations
+
 from .collections import SoundCollection, AssetCollection
 from .gameobject import GameObject
 from .asset import Asset
+from .sound import Sound
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ninjas import Ninja
+    from app.objects.ninjas import Ninja
+    from app.engine import Penguin
 
 class Target(GameObject):
     assets = AssetCollection({
@@ -20,8 +24,8 @@ class Target(GameObject):
         Asset.from_name('ui_target_green_heal_selected_idle_anim')
     })
     sounds = SoundCollection({
-        'sfx_mg_2013_cjsnow_uitargetred',
-        'sfx_mg_2013_cjsnow_uiselecttile'
+       Sound.from_name('sfx_mg_2013_cjsnow_uitargetred'),
+       Sound.from_name('sfx_mg_2013_cjsnow_uiselecttile')
     })
 
     def __init__(
@@ -30,7 +34,7 @@ class Target(GameObject):
         x: int = -1,
         y: int = -1
     ) -> None:
-        super().__init__(ninja.game, 'Target', x, y, grid=False)
+        super().__init__(ninja.game, 'Target', x, y, grid=False, on_click=self.on_click)
         self.assets = self.__class__.assets
         self.sounds = self.__class__.sounds
         self.x += 0.5
@@ -38,22 +42,29 @@ class Target(GameObject):
         self.selected = False
         self.type = 'attack'
         self.ninja = ninja
-        self.on_click = self.select
 
     def show_attack(self) -> None:
+        if self.selected:
+            return
+
         self.type = 'attack'
         self.place_object()
         self.animate_object('ui_target_red_attack_intro_anim', reset=True)
         self.animate_object('ui_target_red_attack_idle_anim', play_style='loop')
+        self.play_sound('sfx_mg_2013_cjsnow_uitargetred')
 
     def show_heal(self) -> None:
+        if self.selected:
+            return
+
         self.type = 'heal'
         self.place_object()
         self.animate_object('ui_target_white_heal_intro_anim', reset=True)
         self.animate_object('ui_target_white_heal_idle_anim', play_style='loop')
+        self.play_sound('sfx_mg_2013_cjsnow_uitargetred')
 
-    def select(self, *args) -> None:
-        if self == self.ninja.selected_target:
+    def select(self) -> None:
+        if self.selected:
             self.deselect()
             return
 
@@ -65,8 +76,10 @@ class Target(GameObject):
             self.animate_object('ui_target_green_attack_selected_intro_anim', reset=True)
             self.animate_object('ui_target_green_attack_selected_idle_anim', play_style='loop')
         elif self.type == 'heal':
-            self.animate_object('ui_target_green_heal_selected_intro_anim')
+            self.animate_object('ui_target_green_heal_selected_intro_anim', reset=True)
             self.animate_object('ui_target_green_heal_selected_idle_anim', play_style='loop')
+
+        self.play_sound('sfx_mg_2013_cjsnow_uiselecttile')
 
     def deselect(self) -> None:
         self.selected = False
@@ -74,5 +87,11 @@ class Target(GameObject):
             self.animate_object('ui_target_red_attack_intro_anim', reset=True)
             self.animate_object('ui_target_red_attack_idle_anim', play_style='loop')
         elif self.type == 'heal':
-            self.animate_object('ui_target_white_heal_intro_anim')
+            self.animate_object('ui_target_white_heal_intro_anim', reset=True)
             self.animate_object('ui_target_white_heal_idle_anim', play_style='loop')
+
+    def on_click(self, client: "Penguin", object: GameObject, *args) -> None:
+        if client.is_ready:
+            return
+
+        self.select()
