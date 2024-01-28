@@ -112,12 +112,11 @@ class Enemy(GameObject):
         self.animate_healthbar(self.hp, hp, duration=500)
         self.hp = hp
 
-    def kill(self) -> None:
-        self.set_health(0)
-        self.ko_animation()
-        self.play_sound('sfx_mg_2013_cjsnow_snowmandeathexplode')
-        self.game.wait_for_animations()
-        self.remove_object()
+        if self.hp <= 0:
+            self.ko_animation()
+            self.play_sound('sfx_mg_2013_cjsnow_snowmandeathexplode')
+            self.game.wait_for_animations()
+            self.remove_object()
 
 class Sly(Enemy):
     name: str = 'Sly'

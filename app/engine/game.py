@@ -167,6 +167,17 @@ class Game:
         # Run game loop until game ends
         self.run_game_loop()
 
+        time.sleep(2)
+        for ninja in self.ninjas:
+            if ninja.hp <= 0:
+                continue
+
+            ninja.win_animation()
+
+        time.sleep(4)
+        for ninja in self.ninjas:
+            ninja.remove_object()
+
         self.display_payout()
         self.wait_for_players(lambda player: player.disconnected)
         self.close()
@@ -222,7 +233,7 @@ class Game:
             # TODO: Enemy attacks
 
             # NOTE: Only for testing
-            self.enemies[0].kill()
+            self.enemies[0].set_health(0)
 
             # Wait for any animations to finish
             self.wait_for_animations()

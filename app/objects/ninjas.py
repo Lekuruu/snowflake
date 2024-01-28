@@ -104,6 +104,25 @@ class Ninja(GameObject):
             play_style='loop'
         )
 
+    def win_animation(self) -> None:
+        if self.name != 'Fire':
+            self.animate_object(
+                f'{self.name.lower()}ninja_celebrate_anim',
+                play_style='loop',
+                reset=True
+            )
+            return
+
+        self.animate_object(
+            f'{self.name.lower()}ninja_celebratestart_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_object(
+            f'{self.name.lower()}ninja_celebrateloop_anim',
+            play_style='loop'
+        )
+
     def revive_animation(self) -> None:
         # NOTE: The revive animation seems to have a slight offset from
         #       all the other animations, so we need to adjust the x and y here.
