@@ -46,6 +46,10 @@ class Enemy(GameObject):
             y=self.y + 1
         )
 
+    def remove_object(self) -> None:
+        self.health_bar.remove_object()
+        super().remove_object()
+
     def spawn(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmenappear')
         self.spawn_animation()
@@ -61,6 +65,12 @@ class Enemy(GameObject):
         self.animate_object(
             f'{self.name.lower()}_idle_anim',
             play_style='loop'
+        )
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            f'{self.name.lower()}_ko_anim',
+            play_style='play_once'
         )
 
     def move_object(self, x: int, y: int) -> None:
@@ -102,6 +112,11 @@ class Enemy(GameObject):
         self.animate_healthbar(self.hp, hp, duration=500)
         self.hp = hp
 
+    def kill(self) -> None:
+        self.set_health(0)
+        self.ko_animation()
+        self.play_sound('sfx_mg_2013_cjsnow_snowmandeathexplode')
+
 class Sly(Enemy):
     name: str = 'Sly'
     max_hp: int = 30
@@ -125,7 +140,8 @@ class Sly(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_attacksly'),
         Sound.from_name('sfx_mg_2013_cjsnow_impactsly'),
         Sound.from_name('sfx_mg_2013_cjsnow_snowmanslyhit'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
 
 class Scrap(Enemy):
@@ -155,7 +171,8 @@ class Scrap(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_impactscrap'),
         Sound.from_name('sfx_mg_2013_cjsnow_footstepscrap_loop'),
         Sound.from_name('sfx_mg_2013_cjsnow_attackscrap'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
 
 class Tank(Enemy):
@@ -181,5 +198,6 @@ class Tank(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmantankhit'),
         Sound.from_name('sfx_mg_2013_cjsnow_footsteptank'),
         Sound.from_name('sfx_mg_2013_cjsnow_attacktank'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear')
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
+        Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
