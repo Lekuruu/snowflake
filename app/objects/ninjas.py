@@ -19,6 +19,7 @@ class Ninja(GameObject):
     range: int = 0
     attack: int = 0
     move: int = 0
+    move_duration: int = 600
 
     assets = AssetCollection()
     sounds = SoundCollection()
@@ -57,9 +58,9 @@ class Ninja(GameObject):
             y=self.y + 1
         )
 
-    def move_object(self, x: int, y: int, duration: int = 600) -> None:
-        self.health_bar.move_object(x + 0.5, y + 1, duration)
-        super().move_object(x, y, duration)
+    def move_object(self, x: int, y: int) -> None:
+        self.health_bar.move_object(x + 0.5, y + 1, self.move_duration)
+        super().move_object(x, y, self.move_duration)
         self.ghost.x = x
         self.ghost.y = y
 
