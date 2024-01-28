@@ -18,6 +18,7 @@ class Enemy(GameObject):
     range: int = 0
     attack: int = 0
     move: int = 0
+    move_duration: int = 600
 
     assets = AssetCollection()
     sounds = SoundCollection()
@@ -35,6 +36,15 @@ class Enemy(GameObject):
         self.range = self.__class__.range
         self.max_hp = self.__class__.max_hp
         self.hp = self.max_hp
+        self.initialize_objects()
+
+    def initialize_objects(self) -> None:
+        self.health_bar = GameObject.from_asset(
+            'reghealthbar_animation',
+            self.game,
+            x=self.x + 0.5,
+            y=self.y + 1
+        )
 
     def spawn(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmenappear')
@@ -53,12 +63,52 @@ class Enemy(GameObject):
             play_style='loop'
         )
 
+    def move_object(self, x: int, y: int) -> None:
+        self.health_bar.move_object(x + 0.5, y + 1, self.move_duration)
+        super().move_object(x, y, self.move_duration)
+
+    def place_healthbar(self) -> None:
+        self.health_bar.x = self.x + 0.5
+        self.health_bar.y = self.y + 1
+        self.health_bar.place_object()
+        self.health_bar.place_sprite(self.health_bar.name)
+        self.reset_healthbar()
+
+    def animate_healthbar(self, start_hp: int, end_hp: int, duration: int = 500) -> None:
+        backwards = False
+
+        if end_hp > start_hp:
+            # Health increased, playing backwards
+            backwards = True
+
+            # Swap start and end hp
+            start_hp, end_hp = end_hp, start_hp
+
+        start_frame = 60 - int((start_hp / self.max_hp) * 60)
+        end_frame = 60 - int((end_hp / self.max_hp) * 60)
+
+        self.health_bar.animate_sprite(
+            start_frame-1,
+            end_frame-1,
+            backwards=backwards,
+            duration=duration
+        )
+
+    def reset_healthbar(self) -> None:
+        self.health_bar.animate_sprite()
+
+    def set_health(self, hp: int) -> None:
+        hp = max(0, min(hp, self.max_hp))
+        self.animate_healthbar(self.hp, hp, duration=500)
+        self.hp = hp
+
 class Sly(Enemy):
     name: str = 'Sly'
     max_hp: int = 30
     range: int = 3
     attack: int = 4
     move: int = 3
+    move_duration: int = 1200
 
     assets = AssetCollection({
         Asset.from_name('sly_idle_anim'),
@@ -84,6 +134,7 @@ class Scrap(Enemy):
     range: int = 2
     attack: int = 5
     move: int = 2
+    move_duration: int = 1200
 
     assets = AssetCollection({
        Asset.from_name('scrap_idle_anim'),
@@ -113,6 +164,7 @@ class Tank(Enemy):
     range: int = 1
     attack: int = 10
     move: int = 1
+    move_duration: int = 1100
 
     assets = AssetCollection({
         Asset.from_name('tank_swipe_horiz_anim'),
