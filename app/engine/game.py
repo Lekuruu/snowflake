@@ -361,8 +361,7 @@ class Game:
 
             # Play spawn animation
             enemy.spawn()
-
-            # TODO: Health bar
+            enemy.place_healthbar()
 
     def remove_enemies(self) -> None:
         for enemy in self.enemies:
