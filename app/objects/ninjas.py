@@ -81,10 +81,24 @@ class Ninja(GameObject):
         self.reset_healthbar()
 
     def animate_healthbar(self, start_hp: int, end_hp: int, duration: int = 500) -> None:
+        backwards = False
+
+        if end_hp > start_hp:
+            # Health increased, playing backwards
+            backwards = True
+
+            # Swap start and end hp
+            start_hp, end_hp = end_hp, start_hp
+
         start_frame = 60 - int((start_hp / self.max_hp) * 60)
         end_frame = 60 - int((end_hp / self.max_hp) * 60)
 
-        self.health_bar.animate_sprite(start_frame-1, end_frame-1, duration=duration)
+        self.health_bar.animate_sprite(
+            start_frame-1,
+            end_frame-1,
+            backwards=backwards,
+            duration=duration
+        )
 
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
