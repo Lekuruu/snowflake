@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from .collections import SoundCollection, AssetCollection
-from .gameobject import GameObject
+from .gameobject import LocalGameObject, GameObject
 from .asset import Asset
 from .sound import Sound
 
@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine import Penguin
 
-class Target(GameObject):
+class Target(LocalGameObject):
     assets = AssetCollection({
         Asset.from_name('ui_target_red_attack_intro_anim'),
         Asset.from_name('ui_target_red_attack_idle_anim'),
@@ -34,7 +34,7 @@ class Target(GameObject):
         x: int = -1,
         y: int = -1
     ) -> None:
-        super().__init__(ninja.game, 'Target', x, y, grid=False, on_click=self.on_click)
+        super().__init__(ninja.game, ninja.client, 'Target', x, y, on_click=self.on_click)
         self.assets = self.__class__.assets
         self.sounds = self.__class__.sounds
         self.x += 0.5
