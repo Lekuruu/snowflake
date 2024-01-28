@@ -69,6 +69,20 @@ class Ninja(GameObject):
             play_style='loop'
         )
 
+    def move_animation(self) -> None:
+        self.animate_object(
+            f'{self.name.lower()}ninja_move_anim',
+            play_style='play_once'
+        )
+
+    def place_healthbar(self) -> None:
+        self.health_bar.place_object()
+        self.health_bar.place_sprite(self.health_bar.name)
+        self.reset_healthbar()
+
+    def reset_healthbar(self) -> None:
+        self.health_bar.animate_sprite()
+
     def place_ghost(self, x: int, y: int) -> None:
         if self.client.is_ready:
             return
@@ -103,12 +117,6 @@ class Ninja(GameObject):
             return
 
         self.hide_ghost()
-
-    def move_animation(self) -> None:
-        self.animate_object(
-            f'{self.name.lower()}ninja_move_anim',
-            play_style='play_once'
-        )
 
 class WaterNinja(Ninja):
     name: str = 'Water'
