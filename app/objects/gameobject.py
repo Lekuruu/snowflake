@@ -130,6 +130,8 @@ class GameObject:
         callback: Callable | None = None
     ) -> None:
         asset = self.assets.by_name(name)
+        id = self.game.callbacks.register(callback)
+
         self.game.send_tag(
             'O_ANIM',
             self.id,
@@ -139,10 +141,8 @@ class GameObject:
             time_scale,
             int(not reset),
             self.id, # response object id
-            0        # handle id
+            id       # handle id
         )
-
-        # TODO: Implement callbacks
 
     def place_sprite(self, name: str, target: "Penguin" | None = None) -> None:
         asset = self.assets.by_name(name)
