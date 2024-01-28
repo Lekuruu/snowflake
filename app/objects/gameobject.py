@@ -120,6 +120,11 @@ class GameObject:
         self.game.objects.remove(self)
         self.game.grid.remove(self)
 
+        try:
+            self.game.callbacks.pending_animations.pop(self.id)
+        except KeyError:
+            pass
+
     def animate_object(
         self,
         name: str,
