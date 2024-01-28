@@ -393,6 +393,17 @@ class Game:
                 else 'sfx_mg_2013_cjsnow_footsteppenguinfire'
         )
 
+    def move_ninjas(self) -> None:
+        for ninja in self.ninjas:
+            self.move_ninja(
+                ninja,
+                ninja.ghost.x,
+                ninja.ghost.y
+            )
+
+        # Wait for move animations
+        self.wait_for_animations()
+
     def show_background(self) -> None:
         for background in self.backgrounds:
             obj = self.objects.by_name(background.name)
