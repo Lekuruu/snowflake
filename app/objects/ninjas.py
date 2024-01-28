@@ -80,6 +80,19 @@ class Ninja(GameObject):
         self.health_bar.place_sprite(self.health_bar.name)
         self.reset_healthbar()
 
+    def animate_healthbar(self, start_hp: int, end_hp: int, duration: int = 500) -> None:
+        """Animate the healthbar from start to end (60 frames)"""
+        max_frames = 60
+
+        start_frame = int((end_hp / self.max_hp) * max_frames)
+        end_frame = int((start_hp / self.max_hp) * max_frames)
+
+        self.health_bar.animate_sprite(start_frame-1, end_frame-1, duration=duration)
+
+    def set_health(self, hp: int) -> None:
+        self.animate_healthbar(self.hp, hp)
+        self.hp = hp
+
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
 
