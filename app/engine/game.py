@@ -96,10 +96,6 @@ class Game:
         self.snow.game = self
         self.water.game = self
 
-        self.fire.in_game = True
-        self.snow.in_game = True
-        self.water.in_game = True
-
         # Wait for "prepare to battle" screen to end
         time.sleep(3)
 

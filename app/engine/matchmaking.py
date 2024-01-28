@@ -22,7 +22,6 @@ class MatchmakingQueue:
         player.in_queue = True
 
         if (match := self.find_match(player)):
-            player.is_host = True
             self.logger.info(f'Found match: {match}')
             self.create_game(*match)
 
