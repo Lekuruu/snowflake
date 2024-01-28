@@ -397,6 +397,10 @@ class Game:
                 else 'sfx_mg_2013_cjsnow_footsteppenguinfire'
         )
 
+        # Reset ghost position
+        ninja.ghost.x = -1
+        ninja.ghost.y = -1
+
     def move_ninjas(self) -> None:
         for ninja in self.ninjas:
             self.move_ninja(
