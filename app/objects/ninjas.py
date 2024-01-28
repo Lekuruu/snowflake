@@ -50,6 +50,7 @@ class Ninja(GameObject):
             y=-1,
             on_click=self.on_ghost_click
         )
+        self.ghost.add_sound('sfx_mg_2013_cjsnow_uiselecttile')
 
         self.health_bar = GameObject.from_asset(
             'reghealthbar_animation',
@@ -172,6 +173,7 @@ class Ninja(GameObject):
         self.game.grid.move(self.ghost, x, y)
         self.ghost.place_object()
         self.ghost.place_sprite(self.ghost.name)
+        self.ghost.play_sound('sfx_mg_2013_cjsnow_uiselecttile')
 
     def hide_ghost(self, reset_positions: bool = True) -> None:
         self.game.grid.remove(self.ghost)
