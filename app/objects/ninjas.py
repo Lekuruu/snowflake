@@ -58,6 +58,11 @@ class Ninja(GameObject):
             y=self.y + 1
         )
 
+    def remove_object(self) -> None:
+        self.health_bar.remove_object()
+        self.ghost.remove_object()
+        super().remove_object()
+
     def move_object(self, x: int, y: int) -> None:
         self.health_bar.move_object(x + 0.5, y + 1, self.move_duration)
         super().move_object(x, y, self.move_duration)
