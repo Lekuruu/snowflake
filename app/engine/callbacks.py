@@ -41,7 +41,7 @@ class CallbackHandler:
             self.pending_animations.remove(id)
 
         if id in self.callbacks:
-            reactor.deferToThread(self.callbacks[id], self.game)
+            reactor.callInThread(self.callbacks[id], self.game)
             self.callbacks.pop(id)
 
     def sound_done(self, id: int):
@@ -49,7 +49,7 @@ class CallbackHandler:
             self.pending_sounds.remove(id)
 
         if id in self.callbacks:
-            reactor.deferToThread(self.callbacks[id], self.game)
+            reactor.callInThread(self.callbacks[id], self.game)
             self.callbacks.pop(id)
 
     def next_id(self) -> int:
