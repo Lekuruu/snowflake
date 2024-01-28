@@ -485,6 +485,8 @@ class Game:
             )
 
     def display_payout(self) -> None:
+        snow_stamps = stamps.fetch_all_by_group(60)
+
         for client in self.clients:
             payout = client.window_manager.get_window('cardjitsu_snowpayout.swf')
             payout.layer = 'bottomLayer'
@@ -506,7 +508,7 @@ class Game:
                             "rank": stamp.rank,
                             "is_member": stamp.member,
                         }
-                        for stamp in stamps.fetch_all_by_group(60)
+                        for stamp in snow_stamps
                     ],
                     "stamps": [], # TODO
                     "xpEnd": client.object.snow_ninja_progress, # TODO
