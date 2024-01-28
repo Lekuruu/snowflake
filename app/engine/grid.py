@@ -127,6 +127,9 @@ class Grid:
                 yield tile
 
     def attackable_tiles(self, target_x: int, target_y: int, ninja: Ninja) -> Iterator[Enemy]:
+        if ninja.hp <= 0:
+            return []
+
         for tile in self.tiles:
             tile_x = int(tile.x - 0.5)
             tile_y = int(tile.y - 0.9998)
@@ -142,7 +145,7 @@ class Grid:
                 yield tile
 
     def healable_tiles(self, target_x: int, target_y: int, ninja: Ninja) -> Iterator[Ninja]:
-        if ninja.name != 'Snow':
+        if ninja.hp <= 0:
             return []
 
         for tile in self.tiles:
@@ -152,6 +155,15 @@ class Grid:
             target_object = self[tile_x, tile_y]
 
             if not isinstance(target_object, Ninja):
+                continue
+
+            if target_object == ninja:
+                continue
+
+            if target_object.client.disconnected:
+                continue
+
+            if target_object.hp != 0 and ninja.name != 'Snow':
                 continue
 
             if target_object.hp == target_object.max_hp:
