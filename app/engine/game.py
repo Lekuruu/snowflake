@@ -99,6 +99,7 @@ class Game:
         # Wait for "prepare to battle" screen to end
         time.sleep(3)
 
+        # Close player select window
         for client in self.clients:
             player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')
             player_select.close()
