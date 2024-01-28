@@ -90,6 +90,7 @@ class Ninja(GameObject):
         self.health_bar.animate_sprite(start_frame-1, end_frame-1, duration=duration)
 
     def set_health(self, hp: int) -> None:
+        hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp)
         self.hp = hp
 
