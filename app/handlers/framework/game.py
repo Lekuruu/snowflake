@@ -36,3 +36,6 @@ def on_confirm_clicked(client: Penguin, data: dict):
 
     confirm.add_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8')
     confirm.play_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8')
+
+    snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
+    snow_ui.send_payload('disableCards')
