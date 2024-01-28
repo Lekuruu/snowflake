@@ -116,6 +116,8 @@ class Enemy(GameObject):
         self.set_health(0)
         self.ko_animation()
         self.play_sound('sfx_mg_2013_cjsnow_snowmandeathexplode')
+        self.game.wait_for_animations()
+        self.remove_object()
 
 class Sly(Enemy):
     name: str = 'Sly'
@@ -190,7 +192,7 @@ class Tank(Enemy):
         Asset.from_name('tank_attack_anim'),
         Asset.from_name('tank_hit_anim'),
         Asset.from_name('tank_move_anim'),
-        Asset.from_name('tank_knockout_anim'),
+        Asset.from_name('tank_ko_anim'),
         Asset.from_name('tank_daze_anim'),
         Asset.from_name('snowman_spawn_anim')
     })

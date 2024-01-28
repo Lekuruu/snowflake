@@ -152,6 +152,7 @@ class Game:
                 yPercent=0
             )
 
+        # Wait for windows
         time.sleep(1)
 
         # Reset game time
@@ -204,7 +205,7 @@ class Game:
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
-            time.sleep(1)
+            self.wait_for_animations()
 
     def run_until_next_round(self) -> None:
         while True:
@@ -214,21 +215,17 @@ class Game:
             self.wait_for_timer()
             self.hide_ghosts()
             self.remove_confirm()
-            time.sleep(1.5)
+            time.sleep(1.25)
 
-            for ninja in self.ninjas:
-                self.move_ninja(
-                    ninja,
-                    ninja.ghost.x,
-                    ninja.ghost.y
-                )
-
-            time.sleep(1)
+            self.move_ninjas()
             # TODO: Ninja attacks
             # TODO: Enemy attacks
 
             # NOTE: Only for testing
-            self.enemies[0].remove_object()
+            self.enemies[0].kill()
+
+            # Wait for any animations to finish
+            self.wait_for_animations()
 
             if self.check_round_completion():
                 break
@@ -253,6 +250,11 @@ class Game:
         for player in self.clients:
             while not condition(player) and not self.server.shutting_down:
                 pass
+
+    def wait_for_animations(self) -> None:
+        """Wait for all animations to finish"""
+        while self.callbacks.pending:
+            pass
 
     def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""

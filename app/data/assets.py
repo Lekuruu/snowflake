@@ -46,7 +46,7 @@ Instance.assets.update([
     Asset(100300, "ui_tile_frame", f"{asset_url}/hud/ui_tile_frame_large.tpk"),
     Asset(100302, "tank_hit_anim", f"{asset_url}/snowman_tank_char_anim/tank_hit_anim_large.tpk"),
     Asset(100303, "tank_move_anim", f"{asset_url}/snowman_tank_char_anim/tank_move_anim_large.tpk"),
-    Asset(100304, "tank_knockout_anim", f"{asset_url}/snowman_tank_char_anim/tank_knockout_anim_large.tpk"),
+    Asset(100304, "tank_ko_anim", f"{asset_url}/snowman_tank_char_anim/tank_knockout_anim_large.tpk"),
     Asset(100305, "sly_idle_anim", f"{asset_url}/snowman_sly_char_anim/sly_idle_anim_large.tpk"),
     Asset(100306, "sly_attack_anim", f"{asset_url}/snowman_sly_char_anim/sly_attack_anim_large.tpk"),
     Asset(100307, "sly_move_anim", f"{asset_url}/snowman_sly_char_anim/sly_move_anim_large.tpk"),
