@@ -336,14 +336,20 @@ class Game:
         water = self.objects.by_name('Water')
         water.place_object()
         water.idle_animation()
+        water.health_bar.place_object()
+        water.health_bar.place_sprite(water.health_bar.name)
 
         snow = self.objects.by_name('Snow')
         snow.place_object()
         snow.idle_animation()
+        snow.health_bar.place_object()
+        snow.health_bar.place_sprite(snow.health_bar.name)
 
         fire = self.objects.by_name('Fire')
         fire.place_object()
         fire.idle_animation()
+        fire.health_bar.place_object()
+        fire.health_bar.place_sprite(fire.health_bar.name)
 
     def spawn_enemies(self) -> None:
         """Spawn enemies for the current round"""

@@ -50,7 +50,15 @@ class Ninja(GameObject):
             on_click=self.on_ghost_click
         )
 
+        self.health_bar = GameObject.from_asset(
+            'reghealthbar_animation',
+            self.game,
+            x=self.x + 0.5,
+            y=self.y + 1
+        )
+
     def move_object(self, x: int, y: int, duration: int = 600) -> None:
+        self.health_bar.move_object(x + 0.5, y + 1, duration)
         super().move_object(x, y, duration)
         self.ghost.x = x
         self.ghost.y = y
@@ -93,7 +101,6 @@ class Ninja(GameObject):
 
         if self.client.is_ready:
             return
-
 
         self.hide_ghost()
 
