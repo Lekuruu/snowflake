@@ -166,7 +166,10 @@ class Ninja(GameObject):
 
         if self.hp <= 0:
             self.ko_animation()
-            self.client.was_ko = True
+
+            if not self.client.disconnected:
+                self.client.was_ko = True
+                self.play_sound('sfx_mg_2013_cjsnow_penguinground')
 
     def place_ghost(self, x: int, y: int) -> None:
         if self.client.is_ready:
