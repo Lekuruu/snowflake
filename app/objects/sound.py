@@ -73,17 +73,11 @@ class Sound(Asset):
             response_object_id
         )
 
-    def play(self, target: "Game" | "Penguin", callback: Callable | None = None) -> None:
-        callbacks: CallbackHandler = getattr(target, 'callbacks', None)
-        handle_id: int = -1
-
-        if callbacks:
-            handle_id = callbacks.register_sound(callback)
-
+    def play(self, target: "Game" | "Penguin") -> None:
         target.send_tag(
             'FX_PLAYSOUND',
             f'0:{self.index}',
-            handle_id,
+            0, # handleId
             int(self.looping),
             self.volume,
             self.game_object_id,

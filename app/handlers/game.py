@@ -19,7 +19,7 @@ def on_animation_done(client: Penguin, object_id: int, handle_id: int):
 
 @Instance.events.register('/sound_done')
 def on_sound_done(client: Penguin, object_id: int, handle_id: int):
-    client.game.callbacks.sound_done(handle_id)
+    ... # TODO
 
 @Instance.events.register('/intro_anim_done')
 def on_intro_done(client: Penguin):
