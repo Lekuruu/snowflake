@@ -205,7 +205,7 @@ class Game:
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
-            self.wait_for_animations()
+            time.sleep(1)
 
     def run_until_next_round(self) -> None:
         while True:
