@@ -90,7 +90,7 @@ class GameObject:
             0,      # TODO
             0,      # TODO
             0,      # TODO
-            '',     # TODO
+            self.name,
             '0:1',  # TODO
             0,      # TODO
             1,      # TODO
