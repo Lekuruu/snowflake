@@ -10,6 +10,11 @@ def on_window_manager_ready(client: Penguin, data: dict):
     client.logger.debug('Loaded window manager')
     client.window_manager.ready = True
 
+    if client.battle_mode != 0:
+        client.send_error('Tusk battles are not supported yet.')
+        client.send_to_room()
+        return
+
     loading_screen = client.window_manager.get_window(
         url=f'http://{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows/../assets/cjsnow_loadingscreenassets.swf',
         name='cjsnow_loadingscreenassets.swf'

@@ -12,7 +12,21 @@ def version_handler(client: Penguin):
 
 @Instance.events.register("/place_context", login_required=False)
 def context_handler(client: Penguin, location: str, param_string: str):
-    ...
+    if location != 'snow_lobby':
+        client.close_connection()
+        return
+
+    params = urllib.parse.parse_qs(param_string)
+
+    if not (battle_mode := params.get('battleMode')):
+        client.close_connection()
+        return
+
+    if not (asset_url := params.get('base_asset_url')):
+        client.close_connection()
+        return
+
+    client.battle_mode = int(battle_mode[0])
 
 @Instance.events.register('/login', login_required=False)
 def login_handler(client: Penguin, server_type: str, pid: int, token: str):
