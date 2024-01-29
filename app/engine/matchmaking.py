@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from twisted.internet import threads
+from twisted.internet import threads, reactor
 from typing import Tuple
 
 from ..data.repositories import penguins
@@ -9,6 +9,7 @@ from ..objects.collections import Players
 from .penguin import Penguin
 
 import logging
+import config
 
 class MatchmakingQueue:
     def __init__(self) -> None:
@@ -44,7 +45,27 @@ class MatchmakingQueue:
                 # TODO: Sort players by different criteria
 
         if len(players) != 3:
-            return
+            if not config.ENABLE_DEBUG_PLAYERS:
+                return
+
+            for player in players:
+                if player.element not in elements:
+                    continue
+
+                elements.remove(player.element)
+
+            # Add debug players
+            for element in elements:
+                debug_player = Penguin(player.server, player.address)
+                debug_player.pid = -1
+                debug_player.name = f'Debug {element.title()} Player'
+                debug_player.element = element
+                debug_player.in_queue = True
+                debug_player.is_ready = True
+                debug_player.logged_in = True
+                debug_player.disconnected = True
+                debug_player.object = player.object
+                players.append(debug_player)
 
         players.sort(key=lambda x: x.element)
         return players
