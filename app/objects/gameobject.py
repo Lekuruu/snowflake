@@ -38,6 +38,9 @@ class GameObject:
         # Place object in grid
         if grid: self.game.grid[x, y] = self
 
+        self._origin_mode = OriginMode.NONE
+        self._mirror_mode = MirrorMode.NONE
+
     def __eq__(self, other: object) -> bool:
         if not getattr(other, 'id', None):
             return False
@@ -45,6 +48,30 @@ class GameObject:
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    @property
+    def origin_mode(self) -> OriginMode:
+        return self._origin_mode
+
+    @origin_mode.setter
+    def origin_mode(self, value: OriginMode) -> None:
+        self._origin_mode = value
+        self.sprite_settings(
+            origin_mode=self._origin_mode,
+            mirror_mode=self._mirror_mode
+        )
+
+    @property
+    def mirror_mode(self) -> MirrorMode:
+        return self._mirror_mode
+
+    @mirror_mode.setter
+    def mirror_mode(self, value: MirrorMode) -> None:
+        self._mirror_mode = value
+        self.sprite_settings(
+            origin_mode=self._origin_mode,
+            mirror_mode=self._mirror_mode
+        )
 
     @classmethod
     def from_asset(
@@ -219,6 +246,19 @@ class GameObject:
             mirror_mode.value
         )
 
+        self._mirror_mode = mirror_mode
+        self._origin_mode = origin_mode
+
+    def reset_sprite_settings(self, *args) -> None:
+        self.sprite_settings(
+            scale_x=1,
+            scale_y=1,
+            origin_mode=OriginMode.NONE,
+            mirror_mode=MirrorMode.NONE
+        )
+        self._mirror_mode = MirrorMode.NONE
+        self._origin_mode = OriginMode.NONE
+
     def hide(self) -> None:
         if not self.assets.by_name('blank_png'):
             self.assets.add(Asset.from_name('blank_png'))
@@ -270,6 +310,33 @@ class LocalGameObject(GameObject):
         self.sounds = sounds
         self.game.objects.add(self)
         self.on_click = on_click
+
+        self._origin_mode = OriginMode.NONE
+        self._mirror_mode = MirrorMode.NONE
+
+    @property
+    def origin_mode(self) -> OriginMode:
+        return self._origin_mode
+
+    @origin_mode.setter
+    def origin_mode(self, value: OriginMode) -> None:
+        self._origin_mode = value
+        self.sprite_settings(
+            origin_mode=self._origin_mode,
+            mirror_mode=self._mirror_mode
+        )
+
+    @property
+    def mirror_mode(self) -> MirrorMode:
+        return self._mirror_mode
+
+    @mirror_mode.setter
+    def mirror_mode(self, value: MirrorMode) -> None:
+        self._mirror_mode = value
+        self.sprite_settings(
+            origin_mode=self._origin_mode,
+            mirror_mode=self._mirror_mode
+        )
 
     @classmethod
     def from_asset(
@@ -422,29 +489,8 @@ class LocalGameObject(GameObject):
             mirror_mode.value
         )
 
-    def hide(self) -> None:
-        if not self.assets.by_name('blank_png'):
-            self.assets.add(Asset.from_name('blank_png'))
-
-        self.place_sprite('blank_png')
-
-    def add_sound(
-        self,
-        name: str,
-        looping: bool = False,
-        volume: int = 100,
-        radius: int = 0
-    ) -> None:
-        self.sounds.add(
-            Sound.from_name(
-                name,
-                looping,
-                volume,
-                radius,
-                self.id,
-                self.id # TODO: Different id for response object?
-            )
-        )
+        self._mirror_mode = mirror_mode
+        self._origin_mode = origin_mode
 
     def play_sound(self, sound_name: str) -> None:
         sound = self.sounds.by_name(sound_name)
