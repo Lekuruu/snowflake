@@ -13,8 +13,7 @@ def on_room_to_room_complete(client: Penguin, data: dict):
 @Instance.triggers.register('roomToRoomScreenClosed')
 def on_room_to_room_screen_closed(client: Penguin, data: dict):
     if client.last_tip in (Phase.MEMBER_CARD, Phase.CARD):
-        infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
-        infotip.send_payload('disable')
+        client.game.hide_tip(client)
 
 @Instance.triggers.register('roomToRoomMemberReviveTip')
 def on_room_to_room_member_revive_tip(client: Penguin, data: dict):

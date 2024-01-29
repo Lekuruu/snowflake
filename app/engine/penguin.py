@@ -96,6 +96,27 @@ class Penguin(Receiver):
             }
         )
 
+    def send_tip(self, phase: Phase) -> None:
+        infotip = self.window_manager.get_window('cardjitsu_snowinfotip.swf')
+        infotip.layer = 'topLayer'
+        infotip.load(
+            {
+                'element': self.element,
+                'phase': phase.value,
+            },
+            loadDescription="",
+            assetPath="",
+            xPercent=0.1,
+            yPercent=0
+        )
+        self.displayed_tips.append(phase)
+        self.last_tip = phase
+
+        def on_close(client: "Penguin"):
+            client.last_tip = None
+
+        infotip.on_close = on_close
+
     def initialize_game(self) -> None:
         self.send_tag('P_MAPBLOCK', 't', 1, 1, 'iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAAAAACyOJm3AAAADklEQVQImWNghgEGIlkADWEAiDEh28IAAAAASUVORK5CYII=')
         self.send_tag('P_MAPBLOCK', 'h', 1, 1, 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAAAAADfm1AaAAAADklEQVQImWOohwMG8pgA1rMdxRJRFewAAAAASUVORK5CYII=')

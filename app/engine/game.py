@@ -480,21 +480,20 @@ class Game:
             if not client.tip_mode:
                 continue
 
-            infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
-            infotip.layer = 'topLayer'
-            infotip.load(
-                {
-                    'element': client.element,
-                    'phase': phase.value,
-                },
-                loadDescription="",
-                assetPath="",
-                xPercent=0.1,
-                yPercent=0
-            )
+            def after_close(client: "Penguin"):
+                client.send_tip(phase)
 
-            client.displayed_tips.append(phase)
-            client.last_tip = phase
+            if client.last_tip != None:
+                # Wait for infotip to close
+                infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
+                infotip.on_close = after_close
+                return
+
+            client.send_tip(phase)
+
+    def hide_tip(self, client: "Penguin") -> None:
+        infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
+        infotip.send_payload('disable')
 
     def enable_cards(self) -> None:
         for client in self.clients:

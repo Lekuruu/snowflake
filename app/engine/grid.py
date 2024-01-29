@@ -199,5 +199,4 @@ class Grid:
         ninja.place_ghost(x, y)
 
         if client.tip_mode and client.last_tip == Phase.MOVE:
-            infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
-            infotip.send_payload('disable')
+            client.game.hide_tip(client)
