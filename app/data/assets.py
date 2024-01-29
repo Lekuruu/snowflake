@@ -3,8 +3,8 @@ from app.objects.asset import Asset
 from app.engine import Instance
 import config
 
-asset_url = f"http://{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/png/large"
-sound_url = f"http://{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/sound/gameplay"
+asset_url = f"{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/png/large"
+sound_url = f"{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/sound/gameplay"
 
 Instance.assets.update([
     Asset(1, "blank_png", f"{asset_url}/env/pixel.png"),
