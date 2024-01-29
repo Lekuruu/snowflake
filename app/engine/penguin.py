@@ -25,6 +25,7 @@ class Penguin(Receiver):
         self.name: str = ""
         self.token: str = ""
         self.logged_in: bool = False
+        self.battle_mode: int = 0
 
         self.object: PenguinObject | None = None
         self.ninja: "Ninja" | None = None

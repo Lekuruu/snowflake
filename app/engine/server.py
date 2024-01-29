@@ -5,7 +5,7 @@ from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 
-from app.events import EventHandler, ActionHandler, TriggerHandler
+from app.events import EventHandler, FunnelHandler, TriggerHandler
 from app.data import ServerType, BuildType, Postgres
 from app.objects import Players, AssetCollection
 
@@ -32,7 +32,7 @@ class SnowflakeEngine(Factory):
         self.logger = logging.getLogger("snowflake")
 
         self.events = EventHandler()
-        self.actions = ActionHandler()
+        self.actions = FunnelHandler()
         self.triggers = TriggerHandler()
         self.matchmaking = MatchmakingQueue()
 

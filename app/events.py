@@ -50,20 +50,10 @@ class TriggerHandler(EventHandler):
             return handler
         return wrapper
 
-class ActionHandler(EventHandler):
+class FunnelHandler:
     def __init__(self) -> None:
-        self.handlers: Dict[str, Callable] = {}
-        self.logger = logging.getLogger("actions")
+        self.logger = logging.getLogger("funnel")
 
     def call(self, action: str, client: "Penguin", json: dict) -> None:
-        if not client.window_manager.loaded:
-            return
         # TODO: Add datadog logging for funnel analysis
         self.logger.debug(f"{action}: {json}")
-
-    def register(self, action: str):
-        def wrapper(handler: Callable):
-            self.handlers[action] = handler
-            self.logger.info(f"Registered action: {action}")
-            return handler
-        return wrapper
