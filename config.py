@@ -18,3 +18,4 @@ POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'postgres')
 PORT = int(os.environ.get('PORT', 7002))
 VERSION = os.environ.get('VERSION', 'FY15-20150206 (4954)r')
 MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION', 'http://media.localhost')
+ENABLE_DEBUG_LOGGING = os.environ.get('ENABLE_DEBUG_LOGGING', 'False').lower() == 'true'
