@@ -1,14 +1,9 @@
 
 from __future__ import annotations
+from typing import Dict, Callable
 
+from app.data import ClientAction, MessageType, EventType
 from app import engine
-from app.data import (
-    ClientAction,
-    MessageType,
-    EventType
-)
-
-from typing import Dict
 
 import config
 import json
@@ -36,6 +31,9 @@ class SWFWindow:
         self.client = client
         self.layer = layer # TODO: topLayer, bottomLayer, toolLayer
         self.asset_path = '' # TODO
+
+        self.on_load: Callable | None = None
+        self.on_close: Callable | None = None
 
     def __repr__(self) -> str:
         return f"<SWF ({self.name})>"
