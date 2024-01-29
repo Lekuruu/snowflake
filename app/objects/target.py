@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 
+from ..data import Phase
 from .collections import SoundCollection, AssetCollection
 from .gameobject import LocalGameObject, GameObject
 from .asset import Asset
@@ -52,6 +53,7 @@ class Target(LocalGameObject):
         self.animate_object('ui_target_red_attack_intro_anim', reset=True)
         self.animate_object('ui_target_red_attack_idle_anim', play_style='loop')
         self.play_sound('sfx_mg_2013_cjsnow_uitargetred')
+        self.game.send_tip(Phase.ATTACK, self.client)
 
     def show_heal(self) -> None:
         if self.selected:
@@ -62,6 +64,7 @@ class Target(LocalGameObject):
         self.animate_object('ui_target_white_heal_intro_anim', reset=True)
         self.animate_object('ui_target_white_heal_idle_anim', play_style='loop')
         self.play_sound('sfx_mg_2013_cjsnow_uitargetred')
+        self.game.send_tip(Phase.HEAL, self.client)
 
     def select(self) -> None:
         if self.selected:
@@ -71,14 +74,18 @@ class Target(LocalGameObject):
         if self.ninja.selected_target:
             self.ninja.selected_target.deselect()
 
-        self.selected = True
         if self.type == 'attack':
             self.animate_object('ui_target_green_attack_selected_intro_anim', reset=True)
             self.animate_object('ui_target_green_attack_selected_idle_anim', play_style='loop')
+
         elif self.type == 'heal':
             self.animate_object('ui_target_green_heal_selected_intro_anim', reset=True)
             self.animate_object('ui_target_green_heal_selected_idle_anim', play_style='loop')
 
+        if self.client.last_tip in (Phase.ATTACK, Phase.HEAL):
+            self.game.hide_tip(self.client)
+
+        self.selected = True
         self.play_sound('sfx_mg_2013_cjsnow_uiselecttile')
 
     def deselect(self) -> None:
