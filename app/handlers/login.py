@@ -77,7 +77,7 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
 
     client.send_tag(
         'W_BASEASSETURL',
-        config.MEDIA_LOCATION
+        config.MEDIA_LOCATION.replace('http://', '').replace('https://', '')
     )
 
     client.send_tag('W_DISPLAYSTATE') # Is probably used for mobile
