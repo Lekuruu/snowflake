@@ -17,8 +17,9 @@ def on_room_to_room_screen_closed(client: Penguin, data: dict):
 
 @Instance.triggers.register('roomToRoomMemberReviveTip')
 def on_room_to_room_member_revive_tip(client: Penguin, data: dict):
-    client.game.send_tip(Phase.MEMBER_CARD, client)
+    client.send_tip(Phase.MEMBER_CARD, client)
 
 @Instance.triggers.register('roomToRoomMemberBuyCardsTip')
 def on_room_to_room_member_buy_cards_tip(client: Penguin, data: dict):
-    client.game.send_tip(Phase.CARD, client)
+    client.send_tip(Phase.CARD, client)
+    # TODO: Is this the right phase?
