@@ -236,16 +236,14 @@ class Game:
             self.wait_for_timer()
 
             self.hide_ghosts()
-            self.remove_targets()
             self.remove_confirm()
+            self.hide_targets()
             time.sleep(1.25)
 
             self.move_ninjas()
             # TODO: Ninja attacks
             # TODO: Enemy attacks
 
-            # NOTE: Only for testing
-            self.enemies[0].set_health(0)
 
             # Wait for any animations to finish
             self.wait_for_animations()
@@ -444,6 +442,10 @@ class Game:
     def show_targets(self) -> None:
         for ninja in self.ninjas:
             ninja.show_targets()
+
+    def hide_targets(self) -> None:
+        for ninja in self.ninjas:
+            ninja.hide_targets()
 
     def remove_targets(self) -> None:
         for ninja in self.ninjas:

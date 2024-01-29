@@ -258,6 +258,10 @@ class Ninja(GameObject):
             self.targets.append(target := Target(self, tile_x, tile_y))
             target.show_attack()
 
+    def hide_targets(self) -> None:
+        for target in self.targets:
+            target.hide()
+
     def remove_targets(self) -> None:
         for target in self.targets:
             target.remove_object()
