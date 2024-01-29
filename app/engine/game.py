@@ -52,6 +52,10 @@ class Game:
         return [self.fire, self.snow, self.water]
 
     @property
+    def disconnected_clients(self) -> List["Penguin"]:
+        return [client for client in self.clients if client.disconnected]
+
+    @property
     def ninjas(self) -> List[Ninja]:
         return [
             self.objects.by_name('Water'),
@@ -92,10 +96,6 @@ class Game:
         }[self.bonus_cirteria]
 
     def start(self) -> None:
-        self.fire.game = self
-        self.snow.game = self
-        self.water.game = self
-
         # Wait for "prepare to battle" screen to end
         time.sleep(3)
 
@@ -149,6 +149,8 @@ class Game:
                 yPercent=0
             )
 
+            client.game = self
+
         # Wait for windows
         time.sleep(1)
 
@@ -163,6 +165,9 @@ class Game:
 
         self.show_ui()
         self.send_tip(Phase.MOVE)
+
+        for client in self.disconnected_clients:
+            client.ninja.set_health(0)
 
         # Run game loop until game ends
         self.run_game_loop()
@@ -191,14 +196,20 @@ class Game:
             self.run_until_next_round()
             self.round += 1
 
+            if all(client.disconnected for client in self.clients):
+                # All players have disconnected
+                break
+
             if all(ninja.hp <= 0 for ninja in self.ninjas):
                 # All ninjas have been defeated
                 break
 
             if (self.round > 2) and (not self.bonus_cirteria_met):
+                # Bonus criteria not met on round 3
                 break
 
             if (self.round > 3):
+                # Bonus round completed
                 break
 
             # Remove any existing enemies
@@ -248,6 +259,10 @@ class Game:
 
         if all(ninja.hp <= 0 for ninja in self.ninjas):
             # All ninjas have been defeated
+            return True
+
+        if all(client.disconnected for client in self.clients):
+            # All players have disconnected
             return True
 
         return False
