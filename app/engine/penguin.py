@@ -43,7 +43,6 @@ class Penguin(Receiver):
         self.in_queue: bool = False
         self.is_ready: bool = False
         self.was_ko: bool = False
-        self.loaded: bool = False
 
         self.window_manager = WindowManager(self)
 
