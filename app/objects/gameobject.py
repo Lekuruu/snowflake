@@ -119,7 +119,9 @@ class GameObject:
         self.game.send_tag('O_GONE', self.id)
         self.game.objects.remove(self)
         self.game.grid.remove(self)
+        self.remove_pending_animations()
 
+    def remove_pending_animations(self) -> None:
         try:
             self.game.callbacks.pending_animations.pop(self.id)
         except KeyError:
@@ -134,8 +136,8 @@ class GameObject:
         reset: bool = False,
         callback: Callable | None = None
     ) -> None:
-        asset = self.assets.by_name(name)
         handle_id = self.game.callbacks.register_animation(self.id, callback)
+        asset = self.assets.by_name(name)
 
         self.game.send_tag(
             'O_ANIM',
@@ -165,6 +167,7 @@ class GameObject:
 
     def load_sprite(self, name: str) -> None:
         asset = self.assets.by_name(name)
+
         self.game.send_tag(
             'S_LOADSPRITE',
             f'0:{asset.index}'
@@ -221,6 +224,7 @@ class GameObject:
             self.assets.add(Asset.from_name('blank_png'))
 
         self.place_sprite('blank_png')
+        self.remove_pending_animations()
 
     def add_sound(
         self,
@@ -327,11 +331,7 @@ class LocalGameObject(GameObject):
     def remove_object(self) -> None:
         self.client.send_tag('O_GONE', self.id)
         self.game.objects.remove(self)
-
-        try:
-            self.game.callbacks.pending_animations.pop(self.id)
-        except KeyError:
-            pass
+        self.remove_pending_animations()
 
     def animate_object(
         self,
@@ -342,8 +342,8 @@ class LocalGameObject(GameObject):
         reset: bool = False,
         callback: Callable | None = None
     ) -> None:
-        asset = self.assets.by_name(name)
         handle_id = self.game.callbacks.register_animation(self.id, callback)
+        asset = self.assets.by_name(name)
 
         self.client.send_tag(
             'O_ANIM',
@@ -370,6 +370,7 @@ class LocalGameObject(GameObject):
 
     def load_sprite(self, name: str) -> None:
         asset = self.assets.by_name(name)
+
         self.client.send_tag(
             'S_LOADSPRITE',
             f'0:{asset.index}'
