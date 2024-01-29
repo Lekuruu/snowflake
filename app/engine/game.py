@@ -241,9 +241,8 @@ class Game:
             time.sleep(1.25)
 
             self.move_ninjas()
-            # TODO: Ninja attacks
-            # TODO: Enemy attacks
-
+            self.do_ninja_attacks()
+            self.do_enemy_attacks()
 
             # Wait for any animations to finish
             self.wait_for_animations()
@@ -455,6 +454,21 @@ class Game:
         for background in self.backgrounds:
             obj = self.objects.by_name(background.name)
             obj.place_sprite(background.name)
+
+    def do_ninja_attacks(self) -> None:
+        for ninja in self.ninjas:
+            if not ninja.selected_target:
+                continue
+
+            enemy = ninja.selected_target.object
+
+            if not isinstance(enemy, Enemy):
+                continue
+
+            ninja.attack_target(enemy)
+
+    def do_enemy_attacks(self) -> None:
+        ...
 
     def show_ui(self) -> None:
         for client in self.clients:

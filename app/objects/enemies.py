@@ -49,29 +49,11 @@ class Enemy(GameObject):
     def remove_object(self) -> None:
         self.health_bar.remove_object()
         super().remove_object()
+        print(self.game.grid[8, 4])
 
     def spawn(self) -> None:
-        self.play_sound('sfx_mg_2013_cjsnow_snowmenappear')
         self.spawn_animation()
         self.idle_animation()
-
-    def spawn_animation(self) -> None:
-        self.animate_object(
-            'snowman_spawn_anim',
-            play_style='play_once'
-        )
-
-    def idle_animation(self) -> None:
-        self.animate_object(
-            f'{self.name.lower()}_idle_anim',
-            play_style='loop'
-        )
-
-    def ko_animation(self) -> None:
-        self.animate_object(
-            f'{self.name.lower()}_ko_anim',
-            play_style='play_once'
-        )
 
     def move_object(self, x: int, y: int) -> None:
         self.health_bar.move_object(x + 0.5, y + 1, self.move_duration)
@@ -114,9 +96,36 @@ class Enemy(GameObject):
 
         if self.hp <= 0:
             self.ko_animation()
-            self.play_sound('sfx_mg_2013_cjsnow_snowmandeathexplode')
             self.game.wait_for_animations()
             self.remove_object()
+        else:
+            self.hit_animation()
+
+    def spawn_animation(self) -> None:
+        self.animate_object(
+            f'snowman_spawn_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.spawn_sound()
+
+    def idle_animation(self) -> None:
+        ...
+
+    def ko_animation(self) -> None:
+        ...
+
+    def hit_animation(self) -> None:
+        ...
+
+    def spawn_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_snowmenappear')
+
+    def ko_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_snowmandeathexplode')
+
+    def hit_sound(self) -> None:
+        ...
 
 class Sly(Enemy):
     name: str = 'Sly'
@@ -144,6 +153,33 @@ class Sly(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
         Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
+
+    def idle_animation(self) -> None:
+        self.animate_object(
+            f'sly_idle_anim',
+            play_style='loop',
+            register=False
+        )
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            f'sly_ko_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.ko_sound()
+
+    def hit_animation(self) -> None:
+        self.animate_object(
+            f'sly_hit_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+        self.hit_sound()
+
+    def hit_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_snowmanslyhit')
 
 class Scrap(Enemy):
     name: str = 'Scrap'
@@ -176,6 +212,32 @@ class Scrap(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
 
+    def idle_animation(self) -> None:
+        self.animate_object(
+            f'scrap_idle_anim',
+            play_style='loop',
+            register=False
+        )
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            f'scrap_ko_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.ko_sound()
+
+    def hit_animation(self) -> None:
+        self.animate_object(
+            f'scrap_hit_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+
+    def hit_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_snowmanscraphit')
+
 class Tank(Enemy):
     name: str = 'Tank'
     max_hp: int = 60
@@ -202,3 +264,29 @@ class Tank(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
         Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
+
+    def idle_animation(self) -> None:
+        self.animate_object(
+            f'tank_idle_anim',
+            play_style='loop',
+            register=False
+        )
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            f'tank_ko_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.ko_sound()
+
+    def hit_animation(self) -> None:
+        self.animate_object(
+            f'tank_hit_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+
+    def hit_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_snowmantankhit')

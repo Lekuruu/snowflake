@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
+    from app.objects.enemies import Enemy
     from app.engine.game import Game
 
 from app.data import MirrorMode, OriginMode
@@ -16,6 +17,8 @@ from app.objects import (
     Sound,
     Asset
 )
+
+import time
 
 class Ninja(GameObject):
     name: str = 'Ninja'
@@ -83,74 +86,6 @@ class Ninja(GameObject):
         self.ghost.x = x
         self.ghost.y = y
 
-    def idle_animation(self) -> None:
-        self.animate_object(
-            f'{self.name.lower()}ninja_idle_anim',
-            play_style='loop'
-        )
-
-    def move_animation(self) -> None:
-        self.animate_object(
-            f'{self.name.lower()}ninja_move_anim',
-            play_style='play_once'
-        )
-
-    def ko_animation(self) -> None:
-        self.animate_object(
-            f'{self.name.lower()}ninja_kostart_anim',
-            play_style='play_once'
-        )
-        self.animate_object(
-            f'{self.name.lower()}ninja_koloop_anim',
-            play_style='loop'
-        )
-
-    def attack_animation(self, x: int, y: int) -> None:
-        ...
-
-    def win_animation(self) -> None:
-        if self.name != 'Fire':
-            self.animate_object(
-                f'{self.name.lower()}ninja_celebrate_anim',
-                play_style='loop',
-                reset=True
-            )
-            return
-
-        self.animate_object(
-            f'{self.name.lower()}ninja_celebratestart_anim',
-            play_style='play_once',
-            reset=True
-        )
-        self.animate_object(
-            f'{self.name.lower()}ninja_celebrateloop_anim',
-            play_style='loop'
-        )
-
-    def revive_animation(self) -> None:
-        # NOTE: The revive animation seems to have a slight offset from
-        #       all the other animations, so we need to adjust the x and y here.
-        #       Not sure if there is a better way to do this.
-
-        # Change offset
-        self.x = self.x - 0.2
-        self.y = self.y - 0.15
-        self.place_object()
-
-        # Reset offset after animation is done
-        def reset_offset(*args):
-            self.x = self.x + 0.2
-            self.y = self.y + 0.15
-            self.place_object()
-            self.idle_animation()
-
-        self.animate_object(
-            f'{self.name.lower()}ninja_revived_anim',
-            play_style='play_once',
-            reset=True,
-            callback=reset_offset
-        )
-
     def place_healthbar(self) -> None:
         self.health_bar.place_object()
         self.health_bar.place_sprite(self.health_bar.name)
@@ -192,7 +127,7 @@ class Ninja(GameObject):
 
             if not self.client.disconnected:
                 self.client.was_ko = True
-                self.play_sound('sfx_mg_2013_cjsnow_penguinground')
+                self.ko_sound()
 
     def place_ghost(self, x: int, y: int) -> None:
         if self.client.is_ready:
@@ -272,6 +207,34 @@ class Ninja(GameObject):
 
         self.targets = []
 
+    def attack_target(self, target: "Enemy"):
+        self.attack_animation(target.x, target.y)
+        target.set_health(target.hp - self.attack)
+
+    def idle_animation(self) -> None:
+        ...
+
+    def move_animation(self) -> None:
+        ...
+
+    def ko_animation(self) -> None:
+        ...
+
+    def attack_animation(self, x: int, y: int) -> None:
+        ...
+
+    def win_animation(self) -> None:
+        ...
+
+    def revive_animation(self) -> None:
+        ...
+
+    def ko_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_penguinground')
+
+    def attack_sound(self) -> None:
+        ...
+
 class WaterNinja(Ninja):
     name: str = 'Water'
     max_hp: int = 40
@@ -306,6 +269,28 @@ class WaterNinja(Ninja):
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
 
+    def idle_animation(self) -> None:
+        self.animate_object(
+            'waterninja_idle_anim',
+            play_style='loop'
+        )
+
+    def move_animation(self) -> None:
+        self.animate_object(
+            'waterninja_move_anim',
+            play_style='play_once'
+        )
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            'waterninja_kostart_anim',
+            play_style='play_once'
+        )
+        self.animate_object(
+            'waterninja_koloop_anim',
+            play_style='loop'
+        )
+
     def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
             self.mirror_mode = MirrorMode.X
@@ -317,6 +302,46 @@ class WaterNinja(Ninja):
             callback=self.reset_sprite_settings
         )
         self.idle_animation()
+        time.sleep(0.55)
+        self.attack_sound()
+
+    def win_animation(self) -> None:
+        self.animate_object(
+            'waterninja_celebratestart_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_object(
+            'waterninja_celebrateloop_anim',
+            play_style='loop'
+        )
+
+    def revive_animation(self) -> None:
+        # NOTE: The revive animation seems to have a slight offset from
+        #       all the other animations, so we need to adjust the x and y here.
+        #       Not sure if there is a better way to do this.
+
+        # Change offset
+        self.x = self.x - 0.2
+        self.y = self.y - 0.15
+        self.place_object()
+
+        # Reset offset after animation is done
+        def reset_offset(*args):
+            self.x = self.x + 0.2
+            self.y = self.y + 0.15
+            self.place_object()
+            self.idle_animation()
+
+        self.animate_object(
+            f'waterninja_revived_anim',
+            play_style='play_once',
+            reset=True,
+            callback=reset_offset
+        )
+
+    def attack_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attackwater')
 
 class SnowNinja(Ninja):
     name: str = 'Snow'
@@ -355,6 +380,69 @@ class SnowNinja(Ninja):
        Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
        Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
+
+    def idle_animation(self) -> None:
+        self.animate_object(
+            'snowninja_idle_anim',
+            play_style='loop'
+        )
+
+    def move_animation(self) -> None:
+        self.animate_object(
+            'snowninja_move_anim',
+            play_style='play_once'
+        )
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            'snowninja_kostart_anim',
+            play_style='play_once'
+        )
+        self.animate_object(
+            'snowninja_koloop_anim',
+            play_style='loop'
+        )
+
+    def attack_animation(self, x: int, y: int) -> None:
+        ...
+
+    def win_animation(self) -> None:
+        self.animate_object(
+            'snowninja_celebratestart_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_object(
+            'snowninja_celebrateloop_anim',
+            play_style='loop'
+        )
+
+    def revive_animation(self) -> None:
+        # NOTE: The revive animation seems to have a slight offset from
+        #       all the other animations, so we need to adjust the x and y here.
+        #       Not sure if there is a better way to do this.
+
+        # Change offset
+        self.x = self.x - 0.2
+        self.y = self.y - 0.15
+        self.place_object()
+
+        # Reset offset after animation is done
+        def reset_offset(*args):
+            self.x = self.x + 0.2
+            self.y = self.y + 0.15
+            self.place_object()
+            self.idle_animation()
+
+        self.animate_object(
+            'snowninja_revived_anim',
+            play_style='play_once',
+            reset=True,
+            callback=reset_offset
+        )
+
+    def attack_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacksnow')
 
 class FireNinja(Ninja):
     name: str = 'Fire'
@@ -398,3 +486,66 @@ class FireNinja(Ninja):
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
+
+    def idle_animation(self) -> None:
+        self.animate_object(
+            'fireninja_idle_anim',
+            play_style='loop'
+        )
+
+    def move_animation(self) -> None:
+        self.animate_object(
+            'fireninja_move_anim',
+            play_style='play_once'
+        )
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            'fireninja_kostart_anim',
+            play_style='play_once'
+        )
+        self.animate_object(
+            'fireninja_koloop_anim',
+            play_style='loop'
+        )
+
+    def attack_animation(self, x: int, y: int) -> None:
+        ...
+
+    def win_animation(self) -> None:
+        self.animate_object(
+            'fireninja_celebratestart_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_object(
+            'fireninja_celebrateloop_anim',
+            play_style='loop'
+        )
+
+    def revive_animation(self) -> None:
+        # NOTE: The revive animation seems to have a slight offset from
+        #       all the other animations, so we need to adjust the x and y here.
+        #       Not sure if there is a better way to do this.
+
+        # Change offset
+        self.x = self.x - 0.2
+        self.y = self.y - 0.15
+        self.place_object()
+
+        # Reset offset after animation is done
+        def reset_offset(*args):
+            self.x = self.x + 0.2
+            self.y = self.y + 0.15
+            self.place_object()
+            self.idle_animation()
+
+        self.animate_object(
+            'fireninja_revived_anim',
+            play_style='play_once',
+            reset=True,
+            callback=reset_offset
+        )
+
+    def attack_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attackfire')
