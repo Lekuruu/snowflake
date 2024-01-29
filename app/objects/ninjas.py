@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
+from app.data import MirrorMode, OriginMode
 from app.objects.target import Target
 from app.objects import (
     SoundCollection,
@@ -103,6 +104,9 @@ class Ninja(GameObject):
             f'{self.name.lower()}ninja_koloop_anim',
             play_style='loop'
         )
+
+    def attack_animation(self, x: int, y: int) -> None:
+        ...
 
     def win_animation(self) -> None:
         if self.name != 'Fire':
@@ -301,6 +305,18 @@ class WaterNinja(Ninja):
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
         Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
+
+    def attack_animation(self, x: int, y: int) -> None:
+        if self.x > x:
+            self.mirror_mode = MirrorMode.X
+
+        self.animate_object(
+            'waterninja_attack_anim',
+            play_style='play_once',
+            reset=True,
+            callback=self.reset_sprite_settings
+        )
+        self.idle_animation()
 
 class SnowNinja(Ninja):
     name: str = 'Snow'
