@@ -47,7 +47,7 @@ class SnowflakeEngine(Factory):
         )
 
     def buildProtocol(self, address: IPv4Address | IPv6Address):
-        self.logger.info(f'-> "{address.host}:{address.port}"')
+        self.logger.debug(f'-> "{address.host}:{address.port}"')
         self.players.add(player := self.protocol(self, address))
         return player
 
