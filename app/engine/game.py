@@ -118,8 +118,8 @@ class Game:
         self.send_tag(
             'W_PLACE',
             '1:10001', # PlaceId
-            8,         # PlaceObjectId
-            1          # PlaceInstanceId
+            0,         # PlaceObjectId
+            0          # PlaceInstanceId
         )
 
         # Scale screen up to 100
@@ -463,7 +463,7 @@ class Game:
                 continue
 
             infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
-            infotip.layer = 'bottomLayer'
+            infotip.layer = 'topLayer'
             infotip.load(
                 {
                     'element': client.element,
@@ -474,6 +474,9 @@ class Game:
                 xPercent=0.1,
                 yPercent=0
             )
+
+            client.displayed_tips.append(phase)
+            client.last_tip = phase
 
     def enable_cards(self) -> None:
         for client in self.clients:

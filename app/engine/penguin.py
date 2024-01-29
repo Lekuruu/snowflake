@@ -13,7 +13,7 @@ from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 
 from app.data.objects import Penguin as PenguinObject
-from app.data import BuildType, EventType
+from app.data import BuildType, EventType, Phase
 from .windows import WindowManager
 from .receiver import Receiver
 
@@ -33,17 +33,19 @@ class Penguin(Receiver):
         self.object: PenguinObject | None = None
         self.ninja: "Ninja" | None = None
         self.game: "Game" | None = None
-
         self.element: str = ""
+
         self.tip_mode: bool = True
+        self.last_tip: Phase | None = None
+        self.displayed_tips: List[Phase] = []
 
         self.disconnected: bool = False
         self.in_queue: bool = False
         self.is_ready: bool = False
         self.was_ko: bool = False
+        self.loaded: bool = False
 
         self.window_manager = WindowManager(self)
-        self.displayed_tips = []
 
     def __repr__(self) -> str:
         return f"<{self.name} ({self.pid})>"
