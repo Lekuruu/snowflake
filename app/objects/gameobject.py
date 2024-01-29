@@ -161,10 +161,17 @@ class GameObject:
         duration: int | None = None,
         time_scale: int = 1,
         reset: bool = False,
+        register: bool = True,
         callback: Callable | None = None
     ) -> None:
-        handle_id = self.game.callbacks.register_animation(self.id, callback)
         asset = self.assets.by_name(name)
+        handle_id = -1
+
+        if register:
+            handle_id = self.game.callbacks.register_animation(
+                self.id,
+                callback
+            )
 
         self.game.send_tag(
             'O_ANIM',
