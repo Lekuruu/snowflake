@@ -59,7 +59,7 @@ class ActionHandler(EventHandler):
         if not client.window_manager.loaded:
             return
         # TODO: Add datadog logging for funnel analysis
-        return super().call(client, action, [json])
+        self.logger.debug(f"{action}: {json}")
 
     def register(self, action: str):
         def wrapper(handler: Callable):
