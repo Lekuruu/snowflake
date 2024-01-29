@@ -44,6 +44,10 @@ class Target(LocalGameObject):
         self.type = 'attack'
         self.ninja = ninja
 
+    @property
+    def object(self) -> GameObject:
+        return self.game.grid[int(self.x - 0.5), int(self.y - 1)]
+
     def show_attack(self) -> None:
         if self.selected:
             return
