@@ -40,7 +40,7 @@ class Timer:
             if all(client.disconnected for client in self.game.clients):
                 return
 
-            if all(client.is_ready for client in self.game.clients if not client.ninja.hp <= 0):
+            if all(client.is_ready for client in self.game.clients if not client.disconnected):
                 self.tick = 0
                 return
 
