@@ -25,7 +25,10 @@ class Penguin(Receiver):
         self.name: str = ""
         self.token: str = ""
         self.logged_in: bool = False
+
         self.battle_mode: int = 0
+        self.screen_size: str = ''
+        self.asset_url: str = ''
 
         self.object: PenguinObject | None = None
         self.ninja: "Ninja" | None = None

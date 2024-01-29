@@ -27,6 +27,7 @@ def context_handler(client: Penguin, location: str, param_string: str):
         return
 
     client.battle_mode = int(battle_mode[0])
+    client.asset_url = asset_url[0]
 
 @Instance.events.register('/login', login_required=False)
 def login_handler(client: Penguin, server_type: str, pid: int, token: str):
@@ -103,3 +104,6 @@ def on_place_ready(client: Penguin):
     # Set player target id
     client.send_tag('O_PLAYER', 1)
 
+@Instance.triggers.register('screenSize')
+def screen_size_handler(client: Penguin, data: dict):
+    client.screen_size = data['smallViewEnabled']
