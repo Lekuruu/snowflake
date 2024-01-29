@@ -4,6 +4,8 @@ from __future__ import annotations
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
+from typing import List, Callable
+from threading import Thread
 
 from app.events import EventHandler, FunnelHandler, TriggerHandler
 from app.data import ServerType, BuildType, Postgres
@@ -46,6 +48,13 @@ class SnowflakeEngine(Factory):
             config.POSTGRES_PORT
         )
 
+        self.threads: List[Thread] = []
+
+    def runThread(self, func: Callable, *args, **kwargs):
+        thread = Thread(target=func, args=args, kwargs=kwargs)
+        thread.start()
+        self.threads.append(thread)
+
     def buildProtocol(self, address: IPv4Address | IPv6Address):
         self.logger.debug(f'-> "{address.host}:{address.port}"')
         self.players.add(player := self.protocol(self, address))
@@ -60,6 +69,9 @@ class SnowflakeEngine(Factory):
             os._exit(0)
 
         signal.signal(signal.SIGINT, force_exit)
+
+        for thread in self.threads:
+            thread.join()
 
     def run(self):
         self.logger.info(f"Starting engine: {self} ({config.PORT})")

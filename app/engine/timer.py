@@ -34,6 +34,7 @@ class Timer:
             seconds -= interval
 
             if self.game.server.shutting_down:
+                self.game.close()
                 return
 
             if all(client.disconnected for client in self.game.clients):

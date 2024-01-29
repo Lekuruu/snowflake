@@ -190,6 +190,7 @@ class Game:
     def close(self) -> None:
         self.logger.info('Game finished.')
         # TODO: Cleanup
+        exit()
 
     def run_game_loop(self) -> None:
         while True:
@@ -198,7 +199,7 @@ class Game:
 
             if all(client.disconnected for client in self.clients):
                 # All players have disconnected
-                break
+                self.close()
 
             if all(ninja.hp <= 0 for ninja in self.ninjas):
                 # All ninjas have been defeated
@@ -253,16 +254,18 @@ class Game:
                 break
 
     def check_round_completion(self) -> bool:
+        if self.server.shutting_down:
+            self.close()
+
+        if all(client.disconnected for client in self.clients):
+            self.close()
+
         if not self.enemies:
             # Enemies have been defeated
             return True
 
         if all(ninja.hp <= 0 for ninja in self.ninjas):
             # All ninjas have been defeated
-            return True
-
-        if all(client.disconnected for client in self.clients):
-            # All players have disconnected
             return True
 
         return False

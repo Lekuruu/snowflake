@@ -1,10 +1,8 @@
 
 from __future__ import annotations
 
-from twisted.internet import threads, reactor
 from typing import Tuple
 
-from ..data.repositories import penguins
 from ..objects.collections import Players
 from .penguin import Penguin
 
@@ -96,5 +94,4 @@ class MatchmakingQueue:
             self.remove(client)
 
         # Start game loop
-        threads.deferToThread(game.start) \
-               .addErrback(game.error_callback)
+        game.server.runThread(game.start)
