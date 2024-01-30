@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Callable, List
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
@@ -404,6 +404,17 @@ class SnowNinja(Ninja):
         )
 
     def attack_animation(self, x: int, y: int) -> None:
+        self.attack_sound()
+        self.animate_object(
+            'snowninja_attack_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+        time.sleep(0.5)
+        self.projectile_animation(x, y)
+
+    def projectile_animation(self, x: int, y: int) -> None:
         ...
 
     def win_animation(self) -> None:
@@ -455,14 +466,6 @@ class FireNinja(Ninja):
         Asset.from_name('fireninja_attack_anim'),
         Asset.from_name('fireninja_powerbottle_anim'),
         Asset.from_name('fireninja_powerskyfire_anim'),
-        Asset.from_name('fireninja_projectile_angleup_anim'),
-        Asset.from_name('fireninja_projectile_angledown_anim'),
-        Asset.from_name('fireninja_projectile_down_anim'),
-        Asset.from_name('fireninja_projectile_downfar_anim'),
-        Asset.from_name('fireninja_projectile_right_anim'),
-        Asset.from_name('fireninja_projectile_rightfar_anim'),
-        Asset.from_name('fireninja_projectile_up_anim'),
-        Asset.from_name('fireninja_projectile_upfar_anim'),
         Asset.from_name('fireninja_celebratestart_anim'),
         Asset.from_name('fireninja_celebrateloop_anim'),
         Asset.from_name('fireninja_kostart_anim'),
@@ -506,6 +509,17 @@ class FireNinja(Ninja):
         )
 
     def attack_animation(self, x: int, y: int) -> None:
+        self.attack_sound()
+        self.animate_object(
+            'fireninja_attack_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+        time.sleep(1.45)
+        self.projectile_animation(x, y)
+
+    def projectile_animation(self, x: int, y: int) -> None:
         ...
 
     def win_animation(self) -> None:
