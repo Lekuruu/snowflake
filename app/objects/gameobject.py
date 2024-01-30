@@ -24,7 +24,9 @@ class GameObject:
         on_click: Callable | None = None,
         grid: bool = False,
         x_offset: int = 0,
-        y_offset: int = 0
+        y_offset: int = 0,
+        origin_mode: OriginMode = OriginMode.NONE,
+        mirror_mode: MirrorMode = MirrorMode.NONE
     ) -> None:
         self.game = game
         self.name = name
@@ -45,8 +47,8 @@ class GameObject:
         # Place object in grid
         if grid: self.game.grid[x, y] = self
 
-        self._origin_mode = OriginMode.NONE
-        self._mirror_mode = MirrorMode.NONE
+        self._origin_mode = origin_mode
+        self._mirror_mode = mirror_mode
 
     def __eq__(self, other: object) -> bool:
         if not getattr(other, 'id', None):
@@ -90,7 +92,9 @@ class GameObject:
         grid: bool = False,
         on_click: Callable | None = None,
         x_offset: int = 0,
-        y_offset: int = 0
+        y_offset: int = 0,
+        origin_mode: OriginMode = OriginMode.NONE,
+        mirror_mode: MirrorMode = MirrorMode.NONE
     ) -> "GameObject":
         if isinstance(name, list):
             assets = AssetCollection([Asset.from_name(n) for n in name])
@@ -106,7 +110,9 @@ class GameObject:
             grid=grid,
             on_click=on_click,
             x_offset=x_offset,
-            y_offset=y_offset
+            y_offset=y_offset,
+            origin_mode=origin_mode,
+            mirror_mode=mirror_mode
         )
 
     def place_object(self) -> None:
@@ -130,6 +136,12 @@ class GameObject:
             1,      # TODO
             0       # TODO
         )
+
+        if self.origin_mode != OriginMode.NONE or self.mirror_mode != MirrorMode.NONE:
+            self.sprite_settings(
+                origin_mode=self.origin_mode,
+                mirror_mode=self.mirror_mode
+            )
 
     def move_object(self, x: int, y: int, duration: int = 600) -> None:
         self.x = x
@@ -310,7 +322,9 @@ class LocalGameObject(GameObject):
         sounds=SoundCollection(),
         on_click: Callable | None = None,
         x_offset: int = 0,
-        y_offset: int = 0
+        y_offset: int = 0,
+        origin_mode: OriginMode = OriginMode.NONE,
+        mirror_mode: MirrorMode = MirrorMode.NONE
     ) -> None:
         super().__init__(
             game,
@@ -322,7 +336,9 @@ class LocalGameObject(GameObject):
             on_click,
             grid=False,
             x_offset=x_offset,
-            y_offset=y_offset
+            y_offset=y_offset,
+            origin_mode=origin_mode,
+            mirror_mode=mirror_mode
         )
         self.target = client
         self.client = client
