@@ -23,7 +23,7 @@ This is still a work in progress, and is not ready for general use yet.
     - [x] Water Attacks
     - [ ] Snow Attacks
     - [ ] Fire Attacks
-- [ ] Healing
+- [x] Healing
 - [ ] Reviving
 - [ ] Powercards
 - [ ] Powercard Combos
