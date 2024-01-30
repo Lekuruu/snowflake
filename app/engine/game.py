@@ -173,16 +173,8 @@ class Game:
         # Run game loop until game ends
         self.run_game_loop()
 
-        time.sleep(2)
-        for ninja in self.ninjas:
-            if ninja.hp <= 0:
-                continue
-
-            ninja.win_animation()
-
-        time.sleep(4)
-        for ninja in self.ninjas:
-            ninja.remove_object()
+        self.display_win_sequence()
+        self.remove_objects()
 
         self.display_payout()
         self.wait_for_players(lambda player: player.disconnected)
@@ -344,11 +336,14 @@ class Game:
         self.snow.ninja = snow
 
     def create_enemies(self) -> None:
+        if self.round > 3:
+            return
+
         max_enemies = {
             0: range(1, 4),
             1: range(1, 4),
             2: range(1, 4),
-            3: range(4, 5),
+            3: range(4, 5)
         }[self.round]
 
         amount_enemies = random.choice(max_enemies)
@@ -456,6 +451,16 @@ class Game:
             obj = self.objects.by_name(background.name)
             obj.place_sprite(background.name)
 
+    def remove_objects(self) -> None:
+        self.remove_targets()
+        self.remove_confirm()
+
+        for ninja in self.ninjas:
+            ninja.remove_object()
+
+        for enemy in self.enemies:
+            enemy.remove_object()
+
     def do_ninja_attacks(self) -> None:
         for ninja in self.ninjas:
             if not ninja.selected_target:
@@ -549,7 +554,7 @@ class Game:
                     "doubleCoins": False, # TODO
                     "isBoss": 0,
                     "rank": client.object.snow_ninja_rank,
-                    "round": self.round,
+                    "round": self.round + 1,
                     "showItems": 0,       # TODO
                     "stampList": [
                         {
@@ -571,3 +576,12 @@ class Game:
                 xPercent=0.08,
                 yPercent=0.05
             )
+
+    def display_win_sequence(self) -> None:
+        time.sleep(2)
+        for ninja in self.ninjas:
+            if ninja.hp <= 0:
+                continue
+
+            ninja.win_animation()
+        time.sleep(2.5)
