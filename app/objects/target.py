@@ -35,18 +35,24 @@ class Target(LocalGameObject):
         x: int = -1,
         y: int = -1
     ) -> None:
-        super().__init__(ninja.game, ninja.client, 'Target', x, y, on_click=self.on_click)
+        super().__init__(
+            ninja.game,
+            ninja.client,
+            'Target',
+            x, y,
+            on_click=self.on_click,
+            x_offset=0.5,
+            y_offset=1.05
+        )
         self.assets = self.__class__.assets
         self.sounds = self.__class__.sounds
-        self.x += 0.5
-        self.y += 1.05
         self.selected = False
         self.type = 'attack'
         self.ninja = ninja
 
     @property
     def object(self) -> GameObject:
-        return self.game.grid[int(self.x - 0.5), int(self.y - 1)]
+        return self.game.grid[self.x, self.y]
 
     def show_attack(self) -> None:
         if self.selected:

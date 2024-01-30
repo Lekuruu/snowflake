@@ -29,7 +29,7 @@ class Enemy(GameObject):
         x: int = -1,
         y: int = -1
     ) -> None:
-        super().__init__(game, self.__class__.name, x, y, grid=True)
+        super().__init__(game, self.__class__.name, x, y, grid=True, x_offset=0.5, y_offset=1)
         self.assets = self.__class__.assets
         self.sounds = self.__class__.sounds
         self.attack = self.__class__.attack
@@ -42,8 +42,10 @@ class Enemy(GameObject):
         self.health_bar = GameObject.from_asset(
             'reghealthbar_animation',
             self.game,
-            x=self.x + 0.5,
-            y=self.y + 1
+            x=self.x,
+            y=self.y,
+            x_offset=0.5,
+            y_offset=1
         )
 
     def remove_object(self) -> None:
@@ -55,12 +57,12 @@ class Enemy(GameObject):
         self.idle_animation()
 
     def move_object(self, x: int, y: int) -> None:
-        self.health_bar.move_object(x + 0.5, y + 1, self.move_duration)
+        self.health_bar.move_object(x, y, self.move_duration)
         super().move_object(x, y, self.move_duration)
 
     def place_healthbar(self) -> None:
-        self.health_bar.x = self.x + 0.5
-        self.health_bar.y = self.y + 1
+        self.health_bar.x = self.x
+        self.health_bar.y = self.y
         self.health_bar.place_object()
         self.health_bar.place_sprite(self.health_bar.name)
         self.reset_healthbar()

@@ -10,11 +10,13 @@ def on_confirm_clicked(client: Penguin, data: dict):
 
     confirm = GameObject.from_asset(
         'confirm',
-        client.game
+        client.game,
+        x_offset=0.5,
+        y_offset=1.05
     )
 
-    confirm.x = client.ninja.x + 0.5
-    confirm.y = client.ninja.y + 1.05
+    confirm.x = client.ninja.x
+    confirm.y = client.ninja.y
     confirm.place_object()
     confirm.place_sprite(confirm.name)
     client.is_ready = True

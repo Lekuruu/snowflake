@@ -97,9 +97,11 @@ class Grid:
                 tile = GameObject(
                     self.game,
                     f'{x}-{y}',
-                    x + 0.5,
-                    y + 0.9998,
+                    x,
+                    y,
                     on_click=self.on_tile_click,
+                    x_offset=0.5,
+                    y_offset=0.9998
                 )
                 tile.assets.add(Asset.from_name('ui_tile_move'))
                 tile.assets.add(Asset.from_name('ui_tile_attack'))
@@ -111,13 +113,10 @@ class Grid:
 
     def movable_tiles(self, ninja: Ninja) -> Iterator[GameObject]:
         for tile in self.tiles:
-            x = int(tile.x - 0.5)
-            y = int(tile.y - 0.9998)
-
-            if not self.can_move(x, y):
+            if not self.can_move(tile.x, tile.y):
                 continue
 
-            distance = abs(x - ninja.x) + abs(y - ninja.y)
+            distance = abs(tile.x - ninja.x) + abs(tile.y - ninja.y)
 
             if distance <= ninja.move:
                 yield tile
@@ -127,15 +126,12 @@ class Grid:
             return []
 
         for tile in self.tiles:
-            tile_x = int(tile.x - 0.5)
-            tile_y = int(tile.y - 0.9998)
-
-            target_object = self[tile_x, tile_y]
+            target_object = self[tile.x, tile.y]
 
             if not isinstance(target_object, Enemy):
                 continue
 
-            distance = abs(tile_x - target_x) + abs(tile_y - target_y)
+            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
 
             if distance <= ninja.range:
                 yield tile
@@ -145,10 +141,7 @@ class Grid:
             return []
 
         for tile in self.tiles:
-            tile_x = int(tile.x - 0.5)
-            tile_y = int(tile.y - 0.9998)
-
-            target_object = self[tile_x, tile_y]
+            target_object = self[tile.x, tile.y]
 
             if not isinstance(target_object, Ninja):
                 continue
@@ -165,7 +158,7 @@ class Grid:
             if target_object.hp == target_object.max_hp:
                 continue
 
-            distance = abs(tile_x - target_x) + abs(tile_y - target_y)
+            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
 
             if distance <= ninja.range:
                 yield tile
@@ -188,11 +181,8 @@ class Grid:
             tile.hide()
 
     def on_tile_click(self, client: "Penguin", tile: GameObject, *args) -> None:
-        x = int(tile.x - 0.5)
-        y = int(tile.y - 0.9998)
-
         ninja = self.game.objects.by_name(client.element.capitalize())
-        ninja.place_ghost(x, y)
+        ninja.place_ghost(tile.x, tile.y)
 
         if client.tip_mode and client.last_tip == Phase.MOVE:
             client.game.hide_tip(client)

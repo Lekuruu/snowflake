@@ -22,13 +22,17 @@ class GameObject:
         assets=AssetCollection(),
         sounds=SoundCollection(),
         on_click: Callable | None = None,
-        grid: bool = False
+        grid: bool = False,
+        x_offset: int = 0,
+        y_offset: int = 0
     ) -> None:
         self.game = game
         self.name = name
         self.id = -1
         self.x = x
         self.y = y
+        self.x_offset = x_offset
+        self.y_offset = y_offset
         self.assets = assets
         self.sounds = sounds
         self.game.objects.add(self)
@@ -84,7 +88,9 @@ class GameObject:
         x: int = 0,
         y: int = 0,
         grid: bool = False,
-        on_click: Callable | None = None
+        on_click: Callable | None = None,
+        x_offset: int = 0,
+        y_offset: int = 0
     ) -> "GameObject":
         if isinstance(name, list):
             assets = AssetCollection([Asset.from_name(n) for n in name])
@@ -98,23 +104,21 @@ class GameObject:
             y,
             assets,
             grid=grid,
-            on_click=on_click
+            on_click=on_click,
+            x_offset=x_offset,
+            y_offset=y_offset
         )
 
     def place_object(self) -> None:
         x = self.x
         y = self.y
 
-        if self.grid:
-            x = self.x + 0.5
-            y = self.y + 1
-
         self.target.send_tag(
             'O_HERE',
             self.id,
             '0:1',  # TODO
-            x,
-            y,
+            x + self.x_offset,
+            y + self.y_offset,
             0,      # TODO
             1,      # TODO
             0,      # TODO
@@ -133,14 +137,12 @@ class GameObject:
 
         if self.grid:
             self.game.grid.move(self, x, y)
-            x = x + 0.5
-            y = y + 1
 
         self.target.send_tag(
             'O_SLIDE',
             self.id,
-            x,
-            y,
+            x + self.x_offset,
+            y + self.y_offset,
             128, # Z Coordinate
             duration
         )
@@ -306,7 +308,9 @@ class LocalGameObject(GameObject):
         y: int = 0,
         assets=AssetCollection(),
         sounds=SoundCollection(),
-        on_click: Callable | None = None
+        on_click: Callable | None = None,
+        x_offset: int = 0,
+        y_offset: int = 0
     ) -> None:
         super().__init__(
             game,
@@ -315,7 +319,10 @@ class LocalGameObject(GameObject):
             y,
             assets,
             sounds,
-            on_click
+            on_click,
+            grid=False,
+            x_offset=x_offset,
+            y_offset=y_offset
         )
         self.target = client
         self.client = client

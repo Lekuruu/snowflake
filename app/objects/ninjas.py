@@ -37,7 +37,7 @@ class Ninja(GameObject):
         x: int = -1,
         y: int = -1
     ) -> None:
-        super().__init__(client.game, self.__class__.name, x, y, grid=True)
+        super().__init__(client.game, self.__class__.name, x, y, grid=True, x_offset=0.5, y_offset=1)
         self.assets = self.__class__.assets
         self.sounds = self.__class__.sounds
         self.attack = self.__class__.attack
@@ -64,15 +64,19 @@ class Ninja(GameObject):
             grid=True,
             x=-1,
             y=-1,
-            on_click=self.on_ghost_click
+            on_click=self.on_ghost_click,
+            x_offset=0.5,
+            y_offset=1
         )
         self.ghost.add_sound('sfx_mg_2013_cjsnow_uiselecttile')
 
         self.health_bar = GameObject.from_asset(
             'reghealthbar_animation',
             self.game,
-            x=self.x + 0.5,
-            y=self.y + 1
+            x=self.x,
+            y=self.y,
+            x_offset=0.5,
+            y_offset=1
         )
 
     def remove_object(self) -> None:
@@ -81,7 +85,7 @@ class Ninja(GameObject):
         super().remove_object()
 
     def move_object(self, x: int, y: int) -> None:
-        self.health_bar.move_object(x + 0.5, y + 1, self.move_duration)
+        self.health_bar.move_object(x, y, self.move_duration)
         super().move_object(x, y, self.move_duration)
         self.ghost.x = x
         self.ghost.y = y
@@ -178,10 +182,7 @@ class Ninja(GameObject):
         )
 
         for tile in healable_tiles:
-            tile_x = int(tile.x - 0.5)
-            tile_y = int(tile.y - 0.9998)
-
-            self.targets.append(target := Target(self, tile_x, tile_y))
+            self.targets.append(target := Target(self, tile.x, tile.y))
             target.show_heal()
 
         attackable_tiles = self.game.grid.attackable_tiles(
@@ -191,10 +192,7 @@ class Ninja(GameObject):
         )
 
         for tile in attackable_tiles:
-            tile_x = int(tile.x - 0.5)
-            tile_y = int(tile.y - 0.9998)
-
-            self.targets.append(target := Target(self, tile_x, tile_y))
+            self.targets.append(target := Target(self, tile.x, tile.y))
             target.show_attack()
 
     def hide_targets(self) -> None:
@@ -317,14 +315,14 @@ class WaterNinja(Ninja):
         #       Not sure if there is a better way to do this.
 
         # Change offset
-        self.x = self.x - 0.2
-        self.y = self.y - 0.15
+        self.x_offset += 0.02
+        self.y_offset += 0.08
         self.place_object()
 
         # Reset offset after animation is done
         def reset_offset(*args):
-            self.x = self.x + 0.2
-            self.y = self.y + 0.15
+            self.x_offset -= 0.02
+            self.y_offset -= 0.08
             self.place_object()
             self.idle_animation()
 
@@ -414,14 +412,14 @@ class SnowNinja(Ninja):
         #       Not sure if there is a better way to do this.
 
         # Change offset
-        self.x = self.x - 0.2
-        self.y = self.y - 0.15
+        self.x_offset += 0.02
+        self.y_offset += 0.08
         self.place_object()
 
         # Reset offset after animation is done
         def reset_offset(*args):
-            self.x = self.x + 0.2
-            self.y = self.y + 0.15
+            self.x_offset -= 0.02
+            self.y_offset -= 0.08
             self.place_object()
             self.idle_animation()
 
@@ -520,14 +518,14 @@ class FireNinja(Ninja):
         #       Not sure if there is a better way to do this.
 
         # Change offset
-        self.x = self.x - 0.2
-        self.y = self.y - 0.15
+        self.x_offset += 0.02
+        self.y_offset += 0.08
         self.place_object()
 
         # Reset offset after animation is done
         def reset_offset(*args):
-            self.x = self.x + 0.2
-            self.y = self.y + 0.15
+            self.x_offset -= 0.02
+            self.y_offset -= 0.08
             self.place_object()
             self.idle_animation()
 
