@@ -307,12 +307,7 @@ class WaterNinja(Ninja):
 
     def win_animation(self) -> None:
         self.animate_object(
-            'waterninja_celebratestart_anim',
-            play_style='play_once',
-            reset=True
-        )
-        self.animate_object(
-            'waterninja_celebrateloop_anim',
+            'waterninja_celebrate_anim',
             play_style='loop'
         )
 
@@ -408,13 +403,9 @@ class SnowNinja(Ninja):
 
     def win_animation(self) -> None:
         self.animate_object(
-            'snowninja_celebratestart_anim',
+            'snowninja_celebrate_anim',
             play_style='play_once',
             reset=True
-        )
-        self.animate_object(
-            'snowninja_celebrateloop_anim',
-            play_style='loop'
         )
 
     def revive_animation(self) -> None:
