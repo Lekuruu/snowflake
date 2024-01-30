@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from app.objects.enemies import Enemy
     from app.engine.game import Game
 
-from app.data import MirrorMode, OriginMode
+from app.data import MirrorMode, Phase
 from app.objects.target import Target
 from app.objects import (
     SoundCollection,
@@ -126,10 +126,13 @@ class Ninja(GameObject):
         self.health_bar.animate_sprite()
 
     def set_health(self, hp: int) -> None:
-        if self.hp <= 0 and hp > 0:
+        hp = max(0, min(hp, self.max_hp))
+
+        if hp < self.hp:
+            self.hit_animation()
+        else:
             self.revive_animation()
 
-        hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
         self.hp = hp
 
@@ -216,6 +219,21 @@ class Ninja(GameObject):
         self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
 
+    def heal_target(self, target: "Ninja"):
+        if self.client.last_tip == Phase.HEAL:
+            self.game.hide_tip(self.client)
+
+        if target.hp <= 0:
+            self.revive_other_animation()
+            return
+
+        if self.name != 'Snow':
+            return
+
+        self.heal_animation()
+        time.sleep(0.4)
+        target.set_health(target.hp + self.attack)
+
     def idle_animation(self) -> None:
         ...
 
@@ -231,7 +249,16 @@ class Ninja(GameObject):
     def win_animation(self) -> None:
         ...
 
+    def hit_animation(self) -> None:
+        ...
+
+    def heal_animation(self) -> None:
+        ...
+
     def revive_animation(self) -> None:
+        ...
+
+    def revive_other_animation(self) -> None:
         ...
 
     def ko_sound(self) -> None:
@@ -277,7 +304,8 @@ class WaterNinja(Ninja):
     def idle_animation(self) -> None:
         self.animate_object(
             'waterninja_idle_anim',
-            play_style='loop'
+            play_style='loop',
+            register=False
         )
 
     def move_animation(self) -> None:
@@ -295,6 +323,14 @@ class WaterNinja(Ninja):
             'waterninja_koloop_anim',
             play_style='loop'
         )
+
+    def hit_animation(self) -> None:
+        self.animate_object(
+            'waterninja_hit_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
 
     def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
@@ -317,28 +353,14 @@ class WaterNinja(Ninja):
         )
 
     def revive_animation(self) -> None:
-        # NOTE: The revive animation seems to have a slight offset from
-        #       all the other animations, so we need to adjust the x and y here.
-        #       Not sure if there is a better way to do this.
-
-        # Change offset
-        self.x_offset += 0.02
-        self.y_offset += 0.08
-        self.place_object()
-
-        # Reset offset after animation is done
-        def reset_offset(*args):
-            self.x_offset -= 0.02
-            self.y_offset -= 0.08
-            self.place_object()
-            self.idle_animation()
-
         self.animate_object(
             f'waterninja_revived_anim',
             play_style='play_once',
-            reset=True,
-            callback=reset_offset
+            reset=True
         )
+        self.idle_animation()
+
+        # TODO: Heal Particles
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackwater')
@@ -384,7 +406,8 @@ class SnowNinja(Ninja):
     def idle_animation(self) -> None:
         self.animate_object(
             'snowninja_idle_anim',
-            play_style='loop'
+            play_style='loop',
+            register=False
         )
 
     def move_animation(self) -> None:
@@ -403,7 +426,18 @@ class SnowNinja(Ninja):
             play_style='loop'
         )
 
+    def hit_animation(self) -> None:
+        self.animate_object(
+            'snowninja_hit_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+
     def attack_animation(self, x: int, y: int) -> None:
+        if self.x > x:
+            self.mirror_mode = MirrorMode.X
+
         self.attack_sound()
         self.animate_object(
             'snowninja_attack_anim',
@@ -413,6 +447,14 @@ class SnowNinja(Ninja):
         self.idle_animation()
         time.sleep(0.5)
         self.projectile_animation(x, y)
+
+    def heal_animation(self) -> None:
+        self.animate_object(
+            'snowninja_heal_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
 
     def projectile_animation(self, x: int, y: int) -> None:
         ...
@@ -425,28 +467,14 @@ class SnowNinja(Ninja):
         )
 
     def revive_animation(self) -> None:
-        # NOTE: The revive animation seems to have a slight offset from
-        #       all the other animations, so we need to adjust the x and y here.
-        #       Not sure if there is a better way to do this.
-
-        # Change offset
-        self.x_offset += 0.02
-        self.y_offset += 0.08
-        self.place_object()
-
-        # Reset offset after animation is done
-        def reset_offset(*args):
-            self.x_offset -= 0.02
-            self.y_offset -= 0.08
-            self.place_object()
-            self.idle_animation()
-
         self.animate_object(
             'snowninja_revived_anim',
             play_style='play_once',
-            reset=True,
-            callback=reset_offset
+            reset=True
         )
+        self.idle_animation()
+
+        # TODO: Heal Particles
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attacksnow')
@@ -489,7 +517,8 @@ class FireNinja(Ninja):
     def idle_animation(self) -> None:
         self.animate_object(
             'fireninja_idle_anim',
-            play_style='loop'
+            play_style='loop',
+            register=False
         )
 
     def move_animation(self) -> None:
@@ -508,7 +537,18 @@ class FireNinja(Ninja):
             play_style='loop'
         )
 
+    def hit_animation(self) -> None:
+        self.animate_object(
+            'fireninja_hit_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+
     def attack_animation(self, x: int, y: int) -> None:
+        if self.x > x:
+            self.mirror_mode = MirrorMode.X
+
         self.attack_sound()
         self.animate_object(
             'fireninja_attack_anim',
@@ -534,28 +574,14 @@ class FireNinja(Ninja):
         )
 
     def revive_animation(self) -> None:
-        # NOTE: The revive animation seems to have a slight offset from
-        #       all the other animations, so we need to adjust the x and y here.
-        #       Not sure if there is a better way to do this.
-
-        # Change offset
-        self.x_offset += 0.02
-        self.y_offset += 0.08
-        self.place_object()
-
-        # Reset offset after animation is done
-        def reset_offset(*args):
-            self.x_offset -= 0.02
-            self.y_offset -= 0.08
-            self.place_object()
-            self.idle_animation()
-
         self.animate_object(
             'fireninja_revived_anim',
             play_style='play_once',
-            reset=True,
-            callback=reset_offset
+            reset=True
         )
+        self.idle_animation()
+
+        # TODO: Heal Particles
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackfire')
