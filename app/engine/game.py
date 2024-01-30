@@ -96,6 +96,9 @@ class Game:
         }[self.bonus_cirteria]
 
     def start(self) -> None:
+        for client in self.clients:
+            client.game = self
+
         # Wait for "prepare to battle" screen to end
         time.sleep(3)
 
@@ -148,8 +151,6 @@ class Game:
                 xPercent=1,
                 yPercent=0
             )
-
-            client.game = self
 
         # Wait for windows
         time.sleep(1)
@@ -330,15 +331,15 @@ class Game:
             object.load_sprites()
 
     def create_ninjas(self) -> None:
-        water = WaterNinja(self, x=0, y=0)
+        water = WaterNinja(self.water, x=0, y=0)
         water.place_object()
         self.water.ninja = water
 
-        fire = FireNinja(self, x=0, y=2)
+        fire = FireNinja(self.fire, x=0, y=2)
         fire.place_object()
         self.fire.ninja = fire
 
-        snow = SnowNinja(self, x=0, y=4)
+        snow = SnowNinja(self.snow, x=0, y=4)
         snow.place_object()
         self.snow.ninja = snow
 

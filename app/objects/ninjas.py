@@ -33,19 +33,19 @@ class Ninja(GameObject):
 
     def __init__(
         self,
-        game: "Game",
+        client: "Penguin",
         x: int = -1,
         y: int = -1
     ) -> None:
-        super().__init__(game, self.__class__.name, x, y, grid=True)
+        super().__init__(client.game, self.__class__.name, x, y, grid=True)
         self.assets = self.__class__.assets
         self.sounds = self.__class__.sounds
         self.attack = self.__class__.attack
         self.range = self.__class__.range
         self.max_hp = self.__class__.max_hp
         self.hp = self.__class__.max_hp
+        self.client = client
 
-        self.client: "Penguin" = getattr(game, f'{self.name.lower()}')
         self.targets: List["Target"] = []
         self.initialize_objects()
 
