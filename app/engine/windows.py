@@ -31,6 +31,7 @@ class SWFWindow:
         self.client = client
         self.layer = layer # TODO: topLayer, bottomLayer, toolLayer
         self.asset_path = '' # TODO
+        self.loaded = False
 
         self.on_load: Callable | None = None
         self.on_close: Callable | None = None

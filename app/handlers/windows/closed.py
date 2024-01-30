@@ -7,6 +7,7 @@ def on_window_closed(client: Penguin, data: dict):
     client.logger.debug(f'Closed window: "{window_name}"')
 
     window = client.window_manager.get_window(window_name)
+    window.loaded = False
 
     if window.on_close:
         window.on_close(client)
