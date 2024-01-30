@@ -3,6 +3,40 @@
 A card-jitsu snow server emulator, made for houdini.
 This is still a work in progress, and is not ready for general use yet.
 
+## What works?
+
+- [x] Player Select
+- [x] Matchmaking
+- [x] Base Game Engine
+    - [x] Creating, moving & animating game objects
+    - [x] SWF Windows
+    - [x] Sounds
+    - [x] Assets
+- [x] Basic round loop
+    - [x] Timer
+    - [x] User Interface
+    - [x] Round Title
+    - [x] Spawning Ninjas
+    - [x] Spawning Enemies
+- [x] Moving Ninjas
+- [ ] Attacking
+    - [x] Water Attacks
+    - [ ] Snow Attacks
+    - [ ] Fire Attacks
+- [ ] Healing
+- [ ] Reviving
+- [ ] Powercards
+- [ ] Powercard Combos
+- [ ] Member Cards
+- [ ] Enemy AI
+- [ ] EXP/Coins System
+- [x] Payout
+- [ ] Stamps
+- [ ] Tusk Battle
+- [ ] Custom Features
+    - [ ] Singleplayer Mode
+    - [ ] Ninja AI
+
 ## Setup
 
 1. Get a working installation of [wand](https://github.com/solero/wand)
