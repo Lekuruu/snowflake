@@ -20,10 +20,6 @@ class Grid:
         self.enemy_spawns = [range(6, 9), range(5)]
         self.game = game
 
-        # X, Y offset for ninjas & enemies
-        self.x_offset = 0.5
-        self.y_offset = 1
-
     def __repr__(self) -> str:
         return f"<Grid ({self.array})>"
 
