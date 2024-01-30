@@ -35,6 +35,9 @@ class GameObject:
         self.on_click = on_click
         self.grid = grid
 
+        # Set default target
+        self.target = self.game
+
         # Place object in grid
         if grid: self.game.grid[x, y] = self
 
@@ -103,10 +106,10 @@ class GameObject:
         y = self.y
 
         if self.grid:
-            x = self.x + self.game.grid.x_offset
-            y = self.y + self.game.grid.y_offset
+            x = self.x + 0.5
+            y = self.y + 1
 
-        self.game.send_tag(
+        self.target.send_tag(
             'O_HERE',
             self.id,
             '0:1',  # TODO
@@ -130,10 +133,10 @@ class GameObject:
 
         if self.grid:
             self.game.grid.move(self, x, y)
-            x = x + self.game.grid.x_offset
-            y = y + self.game.grid.y_offset
+            x = x + 0.5
+            y = y + 1
 
-        self.game.send_tag(
+        self.target.send_tag(
             'O_SLIDE',
             self.id,
             x,
@@ -143,7 +146,7 @@ class GameObject:
         )
 
     def remove_object(self) -> None:
-        self.game.send_tag('O_GONE', self.id)
+        self.target.send_tag('O_GONE', self.id)
         self.game.objects.remove(self)
         self.game.grid.remove(self)
         self.remove_pending_animations()
@@ -173,7 +176,7 @@ class GameObject:
                 callback
             )
 
-        self.game.send_tag(
+        self.target.send_tag(
             'O_ANIM',
             self.id,
             f'0:{asset.index}',
@@ -187,9 +190,7 @@ class GameObject:
 
     def place_sprite(self, name: str, target: "Penguin" | None = None) -> None:
         asset = self.assets.by_name(name)
-
-        if target is None:
-            target = self.game
+        target = target or self.target
 
         target.send_tag(
             'O_SPRITE',
@@ -202,14 +203,14 @@ class GameObject:
     def load_sprite(self, name: str) -> None:
         asset = self.assets.by_name(name)
 
-        self.game.send_tag(
+        self.target.send_tag(
             'S_LOADSPRITE',
             f'0:{asset.index}'
         )
 
     def load_sprites(self) -> None:
         for asset in self.assets:
-            self.game.send_tag(
+            self.target.send_tag(
                 'S_LOADSPRITE',
                 f'0:{asset.index}'
             )
@@ -222,7 +223,7 @@ class GameObject:
         play_style = 'play_once',
         duration: int = 50,
     ) -> None:
-        self.game.send_tag(
+        self.target.send_tag(
             'O_SPRITEANIM',
             self.id,
             start_frame + 1,
@@ -240,7 +241,7 @@ class GameObject:
         mirror_mode: MirrorMode = MirrorMode.NONE
     ) -> None:
         """This will update the sprite settings"""
-        self.game.send_tag(
+        self.target.send_tag(
             'O_SPRITESETTINGS',
             self.id,
             'none', # Sprite layers
@@ -307,198 +308,14 @@ class LocalGameObject(GameObject):
         sounds=SoundCollection(),
         on_click: Callable | None = None
     ) -> None:
-        self.game = game
-        self.client = client
-        self.name = name
-        self.id = -1
-        self.x = x
-        self.y = y
-        self.assets = assets
-        self.sounds = sounds
-        self.game.objects.add(self)
-        self.on_click = on_click
-
-        self._origin_mode = OriginMode.NONE
-        self._mirror_mode = MirrorMode.NONE
-
-    @property
-    def origin_mode(self) -> OriginMode:
-        return self._origin_mode
-
-    @origin_mode.setter
-    def origin_mode(self, value: OriginMode) -> None:
-        self._origin_mode = value
-        self.sprite_settings(
-            origin_mode=self._origin_mode,
-            mirror_mode=self._mirror_mode
-        )
-
-    @property
-    def mirror_mode(self) -> MirrorMode:
-        return self._mirror_mode
-
-    @mirror_mode.setter
-    def mirror_mode(self, value: MirrorMode) -> None:
-        self._mirror_mode = value
-        self.sprite_settings(
-            origin_mode=self._origin_mode,
-            mirror_mode=self._mirror_mode
-        )
-
-    @classmethod
-    def from_asset(
-        cls,
-        name: str | list,
-        game: "Game",
-        client: "Penguin",
-        x: int = 0,
-        y: int = 0,
-        on_click: Callable | None = None
-    ) -> "GameObject":
-        if isinstance(name, list):
-            assets = AssetCollection([Asset.from_name(n) for n in name])
-        else:
-            assets = AssetCollection([Asset.from_name(name)])
-
-        return LocalGameObject(
+        super().__init__(
             game,
-            client,
             name,
             x,
             y,
             assets,
-            on_click=on_click
+            sounds,
+            on_click
         )
-
-    def place_object(self) -> None:
-        self.client.send_tag(
-            'O_HERE',
-            self.id,
-            '0:1',  # TODO
-            self.x,
-            self.y,
-            0,      # TODO
-            1,      # TODO
-            0,      # TODO
-            0,      # TODO
-            0,      # TODO
-            self.name,
-            '0:1',  # TODO
-            0,      # TODO
-            1,      # TODO
-            0       # TODO
-        )
-
-    def move_object(self, x: int, y: int, duration: int = 600) -> None:
-        self.x = x
-        self.y = y
-
-        self.client.send_tag(
-            'O_SLIDE',
-            self.id,
-            x,
-            y,
-            128, # Z Coordinate
-            duration
-        )
-
-    def remove_object(self) -> None:
-        self.client.send_tag('O_GONE', self.id)
-        self.game.objects.remove(self)
-        self.remove_pending_animations()
-
-    def animate_object(
-        self,
-        name: str,
-        play_style: str = 'play_once',
-        duration: int | None = None,
-        time_scale: int = 1,
-        reset: bool = False,
-        callback: Callable | None = None
-    ) -> None:
-        handle_id = self.game.callbacks.register_animation(self.id, callback)
-        asset = self.assets.by_name(name)
-
-        self.client.send_tag(
-            'O_ANIM',
-            self.id,
-            f'0:{asset.index}',
-            play_style,
-            duration or '',
-            time_scale,
-            int(not reset),
-            self.id,
-            handle_id
-        )
-
-    def place_sprite(self, name: str) -> None:
-        asset = self.assets.by_name(name)
-
-        self.client.send_tag(
-            'O_SPRITE',
-            self.id,
-            f'0:{asset.index}',
-            0, # TODO
-            '' # TODO
-        )
-
-    def load_sprite(self, name: str) -> None:
-        asset = self.assets.by_name(name)
-
-        self.client.send_tag(
-            'S_LOADSPRITE',
-            f'0:{asset.index}'
-        )
-
-    def load_sprites(self) -> None:
-        for asset in self.assets:
-            self.client.send_tag(
-                'S_LOADSPRITE',
-                f'0:{asset.index}'
-            )
-
-    def animate_sprite(
-        self,
-        start_frame: int = 0,
-        end_frame: int = 0,
-        backwards: bool = False,
-        play_style = 'play_once',
-        duration: int = 50,
-    ) -> None:
-        self.client.send_tag(
-            'O_SPRITEANIM',
-            self.id,
-            start_frame + 1,
-            end_frame + 1,
-            int(backwards),
-            play_style,
-            duration
-        )
-
-    def sprite_settings(
-        self,
-        scale_x: int = 1,
-        scale_y: int = 1,
-        origin_mode: OriginMode = OriginMode.NONE,
-        mirror_mode: MirrorMode = MirrorMode.NONE
-    ) -> None:
-        """This will update the sprite settings"""
-        self.client.send_tag(
-            'O_SPRITESETTINGS',
-            self.id,
-            'none', # Sprite layers
-            scale_x,
-            scale_y,
-            '',
-            '',
-            '',
-            origin_mode.value,
-            mirror_mode.value
-        )
-
-        self._mirror_mode = mirror_mode
-        self._origin_mode = origin_mode
-
-    def play_sound(self, sound_name: str) -> None:
-        sound = self.sounds.by_name(sound_name)
-        sound.play(self.client)
+        self.target = client
+        self.client = client
