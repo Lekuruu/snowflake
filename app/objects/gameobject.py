@@ -26,7 +26,9 @@ class GameObject:
         x_offset: int = 0,
         y_offset: int = 0,
         origin_mode: OriginMode = OriginMode.NONE,
-        mirror_mode: MirrorMode = MirrorMode.NONE
+        mirror_mode: MirrorMode = MirrorMode.NONE,
+        x_scale: int = 1,
+        y_scale: int = 1
     ) -> None:
         self.game = game
         self.name = name
@@ -49,6 +51,8 @@ class GameObject:
 
         self._origin_mode = origin_mode
         self._mirror_mode = mirror_mode
+        self._x_scale = x_scale
+        self._y_scale = y_scale
 
     def __eq__(self, other: object) -> bool:
         if not getattr(other, 'id', None):
@@ -64,9 +68,10 @@ class GameObject:
 
     @origin_mode.setter
     def origin_mode(self, value: OriginMode) -> None:
-        self._origin_mode = value
         self.sprite_settings(
-            origin_mode=self._origin_mode,
+            self._x_scale,
+            self._y_scale,
+            origin_mode=value,
             mirror_mode=self._mirror_mode
         )
 
@@ -76,8 +81,35 @@ class GameObject:
 
     @mirror_mode.setter
     def mirror_mode(self, value: MirrorMode) -> None:
-        self._mirror_mode = value
         self.sprite_settings(
+            self._x_scale,
+            self._y_scale,
+            origin_mode=self._origin_mode,
+            mirror_mode=value
+        )
+
+    @property
+    def x_scale(self) -> int:
+        return self._x_scale
+
+    @x_scale.setter
+    def x_scale(self, value: int) -> None:
+        self.sprite_settings(
+            value,
+            self._y_scale,
+            origin_mode=self._origin_mode,
+            mirror_mode=self._mirror_mode
+        )
+
+    @property
+    def y_scale(self) -> int:
+        return self._y_scale
+
+    @y_scale.setter
+    def y_scale(self, value: int) -> None:
+        self.sprite_settings(
+            self._x_scale,
+            value,
             origin_mode=self._origin_mode,
             mirror_mode=self._mirror_mode
         )
@@ -137,10 +169,17 @@ class GameObject:
             0       # TODO
         )
 
-        if self.origin_mode != OriginMode.NONE or self.mirror_mode != MirrorMode.NONE:
+        if (
+            self.origin_mode != OriginMode.NONE or
+            self.mirror_mode != MirrorMode.NONE or
+            self.x_scale != 1 or
+            self.y_scale != 1
+        ):
             self.sprite_settings(
                 origin_mode=self.origin_mode,
-                mirror_mode=self.mirror_mode
+                mirror_mode=self.mirror_mode,
+                scale_x=self.x_scale,
+                scale_y=self.y_scale
             )
 
     def move_object(self, x: int, y: int, duration: int = 600) -> None:
@@ -270,6 +309,8 @@ class GameObject:
 
         self._mirror_mode = mirror_mode
         self._origin_mode = origin_mode
+        self._x_scale = scale_x
+        self._y_scale = scale_y
 
     def reset_sprite_settings(self, *args) -> None:
         self.sprite_settings(
@@ -324,7 +365,9 @@ class LocalGameObject(GameObject):
         x_offset: int = 0,
         y_offset: int = 0,
         origin_mode: OriginMode = OriginMode.NONE,
-        mirror_mode: MirrorMode = MirrorMode.NONE
+        mirror_mode: MirrorMode = MirrorMode.NONE,
+        x_scale: int = 1,
+        y_scale: int = 1
     ) -> None:
         super().__init__(
             game,
@@ -338,7 +381,9 @@ class LocalGameObject(GameObject):
             x_offset=x_offset,
             y_offset=y_offset,
             origin_mode=origin_mode,
-            mirror_mode=mirror_mode
+            mirror_mode=mirror_mode,
+            x_scale=x_scale,
+            y_scale=y_scale
         )
         self.target = client
         self.client = client
