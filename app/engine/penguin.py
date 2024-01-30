@@ -138,6 +138,7 @@ class Penguin(Receiver):
         self.send_tag('P_LOCKOBJECTS', 0)
         self.send_tag('P_HEIGHTMAPSCALE', 0.5, 0)
         self.send_tag('P_HEIGHTMAPDIVISION', 1)
+        self.send_tag('P_CAMERA3D', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 864397819904.000000, 0, 0, 0, 0, 0, 0, 0)
         self.send_tag('P_DRAG', 0)
         self.send_tag('P_CAMLIMITS', 0, 0, 0, 0)
         self.send_tag('P_LOCKRENDERSIZE', 0, 1024, 768)

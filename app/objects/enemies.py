@@ -29,7 +29,14 @@ class Enemy(GameObject):
         x: int = -1,
         y: int = -1
     ) -> None:
-        super().__init__(game, self.__class__.name, x, y, grid=True, x_offset=0.5, y_offset=1)
+        super().__init__(
+            game,
+            self.__class__.name,
+            x, y,
+            grid=True,
+            x_offset=0.5,
+            y_offset=1
+        )
         self.assets = self.__class__.assets
         self.sounds = self.__class__.sounds
         self.attack = self.__class__.attack
