@@ -234,8 +234,8 @@ class Game:
             time.sleep(1.25)
 
             self.move_ninjas()
-            self.do_ninja_attacks()
-            self.do_enemy_attacks()
+            self.do_ninja_actions()
+            self.do_enemy_actions()
 
             # Wait for any animations to finish
             self.wait_for_animations()
@@ -404,6 +404,9 @@ class Game:
             ninja.hide_ghost(reset_positions=False)
 
     def move_ninja(self, ninja: Ninja, x: int, y: int) -> None:
+        if ninja.hp <= 0 or ninja.client.disconnected:
+            return
+
         if ninja.x == x and ninja.y == y:
             return
 
@@ -461,19 +464,19 @@ class Game:
         for enemy in self.enemies:
             enemy.remove_object()
 
-    def do_ninja_attacks(self) -> None:
+    def do_ninja_actions(self) -> None:
         for ninja in self.ninjas:
             if not ninja.selected_target:
                 continue
 
-            enemy = ninja.selected_target.object
+            target = ninja.selected_target.object
 
-            if not isinstance(enemy, Enemy):
-                continue
+            if isinstance(target, Enemy):
+                ninja.attack_target(target)
+            else:
+                ninja.heal_target(target)
 
-            ninja.attack_target(enemy)
-
-    def do_enemy_attacks(self) -> None:
+    def do_enemy_actions(self) -> None:
         ...
 
     def show_ui(self) -> None:
