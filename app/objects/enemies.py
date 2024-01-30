@@ -49,7 +49,6 @@ class Enemy(GameObject):
     def remove_object(self) -> None:
         self.health_bar.remove_object()
         super().remove_object()
-        print(self.game.grid[8, 4])
 
     def spawn(self) -> None:
         self.spawn_animation()
