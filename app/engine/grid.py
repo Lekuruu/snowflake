@@ -146,16 +146,19 @@ class Grid:
             if not isinstance(target_object, Ninja):
                 continue
 
-            if target_object == ninja:
-                continue
-
             if target_object.client.disconnected:
                 continue
 
+            if target_object == ninja:
+                # Ninja cannot heal itself
+                continue
+
             if target_object.hp != 0 and ninja.name != 'Snow':
+                # Only snow can heal ninjas that are not dead
                 continue
 
             if target_object.hp == target_object.max_hp:
+                # Ninja is already at full health
                 continue
 
             distance = abs(tile.x - target_x) + abs(tile.y - target_y)
