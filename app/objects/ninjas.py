@@ -127,21 +127,23 @@ class Ninja(GameObject):
 
     def set_health(self, hp: int) -> None:
         hp = max(0, min(hp, self.max_hp))
+        self.animate_healthbar(self.hp, hp, duration=500)
+
+        if hp <= 0:
+            self.ko_animation()
+            self.hp = hp
+
+            if not self.client.disconnected:
+                self.client.was_ko = True
+                self.ko_sound()
+            return
 
         if hp < self.hp:
             self.hit_animation()
         else:
             self.revive_animation()
 
-        self.animate_healthbar(self.hp, hp, duration=500)
         self.hp = hp
-
-        if self.hp <= 0:
-            self.ko_animation()
-
-            if not self.client.disconnected:
-                self.client.was_ko = True
-                self.ko_sound()
 
     def place_ghost(self, x: int, y: int) -> None:
         if self.client.is_ready:
