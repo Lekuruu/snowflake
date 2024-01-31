@@ -24,7 +24,7 @@ This is still a work in progress, and is not ready for general use yet.
     - [ ] Snow Attacks
     - [ ] Fire Attacks
 - [x] Healing
-- [ ] Reviving
+- [x] Reviving
 - [ ] Powercards
 - [ ] Powercard Combos
 - [ ] Member Cards

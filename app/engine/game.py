@@ -237,6 +237,18 @@ class Game:
             self.do_ninja_actions()
             self.do_enemy_actions()
 
+            # Check if any ninja is getting revived
+            for ninja in self.ninjas:
+                if not isinstance(ninja.selected_object, Ninja):
+                    continue
+
+                if ninja.selected_object.hp > 0:
+                    continue
+
+                self.wait_for_animations()
+                ninja.selected_object.set_health(1)
+                ninja.idle_animation()
+
             # Wait for any animations to finish
             self.wait_for_animations()
 
