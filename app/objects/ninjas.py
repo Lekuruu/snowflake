@@ -485,7 +485,7 @@ class SnowNinja(Ninja):
 
     def revive_animation(self) -> None:
         self.animate_object(
-            'snowninja_revived_anim',
+            'snowninja_revive_anim_',
             play_style='play_once',
             reset=True
         )
