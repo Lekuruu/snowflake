@@ -9,6 +9,12 @@ import config
 import json
 
 class SWFWindow:
+    """
+    This class represents an swf window inside the game. The window can be loaded, using the WindowManager class.
+    The server can send various payloads to the window, which can do different things, depending on the swf file.
+    For example: `cardjitsu_snowtimer.swf` will receive a "tick" update every second, which will update the timer.
+    """
+
     def __init__(
         self,
         client: engine.Penguin,
@@ -97,6 +103,11 @@ class SWFWindow:
         )
 
 class WindowManager(Dict[str, SWFWindow]):
+    """
+    This class represents the window manager, which is responsible for loading and closing swf files/windows.
+    It will get loaded after the clients sends the /ready command to the server.
+    """
+
     def __init__(
         self,
         client: engine.Penguin,
