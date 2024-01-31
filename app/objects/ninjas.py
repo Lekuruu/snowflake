@@ -61,6 +61,10 @@ class Ninja(GameObject):
         return next((target for target in self.targets if target.selected), None)
 
     @property
+    def selected_object(self) -> GameObject | None:
+        return self.selected_target.object if self.selected_target else None
+
+    @property
     def placed_ghost(self) -> bool:
         return self.ghost.x != -1 and self.ghost.y != -1
 
