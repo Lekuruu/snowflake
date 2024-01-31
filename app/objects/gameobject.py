@@ -13,6 +13,11 @@ if TYPE_CHECKING:
     from app.engine.game import Game
 
 class GameObject:
+    """
+    This class represents a game object. It is the base class for all objects in the game, such as ninjas and enemies.
+    The protocol allows for placing, moving and animating the object, as well as playing sounds.
+    """
+
     def __init__(
         self,
         game: "Game",
@@ -293,7 +298,6 @@ class GameObject:
         origin_mode: OriginMode = OriginMode.NONE,
         mirror_mode: MirrorMode = MirrorMode.NONE
     ) -> None:
-        """This will update the sprite settings"""
         self.target.send_tag(
             'O_SPRITESETTINGS',
             self.id,
@@ -352,6 +356,10 @@ class GameObject:
         sound.play(target or self.game)
 
 class LocalGameObject(GameObject):
+    """
+    This class is the same as `GameObject`, but is only visible to a single client.
+    """
+
     def __init__(
         self,
         game: "Game",
