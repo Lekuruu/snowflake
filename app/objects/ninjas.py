@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from app.objects.enemies import Enemy
     from app.engine.game import Game
 
+from app.objects.effects import HealParticles
 from app.data import MirrorMode, Phase
 from app.objects.target import Target
 from app.objects import (
@@ -361,12 +362,10 @@ class WaterNinja(Ninja):
     def revive_animation(self) -> None:
         self.animate_object(
             f'waterninja_revived_anim',
-            play_style='play_once',
-            reset=True
+            play_style='play_once'
         )
         self.idle_animation()
-
-        # TODO: Heal Particles
+        HealParticles(self.game, self.x, self.y).play()
 
     def revive_other_animation(self) -> None:
         self.animate_object(
@@ -486,12 +485,10 @@ class SnowNinja(Ninja):
     def revive_animation(self) -> None:
         self.animate_object(
             'snowninja_revive_anim_',
-            play_style='play_once',
-            reset=True
+            play_style='play_once'
         )
         self.idle_animation()
-
-        # TODO: Heal Particles
+        HealParticles(self.game, self.x, self.y).play()
 
     def revive_other_animation(self) -> None:
         self.animate_object(
@@ -604,12 +601,10 @@ class FireNinja(Ninja):
     def revive_animation(self) -> None:
         self.animate_object(
             'fireninja_revived_anim',
-            play_style='play_once',
-            reset=True
+            play_style='play_once'
         )
         self.idle_animation()
-
-        # TODO: Heal Particles
+        HealParticles(self.game, self.x, self.y).play()
 
     def revive_other_animation(self) -> None:
         self.animate_object(
