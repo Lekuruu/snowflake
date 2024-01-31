@@ -368,6 +368,17 @@ class WaterNinja(Ninja):
 
         # TODO: Heal Particles
 
+    def revive_other_animation(self) -> None:
+        self.animate_object(
+            'waterninja_revive_other_intro_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_object(
+            'waterninja_revive_other_loop_anim',
+            play_style='loop'
+        )
+
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackwater')
 
@@ -482,6 +493,17 @@ class SnowNinja(Ninja):
 
         # TODO: Heal Particles
 
+    def revive_other_animation(self) -> None:
+        self.animate_object(
+            'snowninja_reviveothersintro_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_object(
+            'snowninja_reviveothersloop_anim',
+            play_style='loop'
+        )
+
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attacksnow')
 
@@ -588,6 +610,17 @@ class FireNinja(Ninja):
         self.idle_animation()
 
         # TODO: Heal Particles
+
+    def revive_other_animation(self) -> None:
+        self.animate_object(
+            'fireninja_reviveother_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_object(
+            'fireninja_reviveotherloop_anim',
+            play_style='loop'
+        )
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackfire')
