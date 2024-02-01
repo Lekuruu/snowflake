@@ -62,7 +62,7 @@ class Target(LocalGameObject):
         self.place_object()
         self.animate_object('ui_target_red_attack_intro_anim', reset=True)
         self.animate_object('ui_target_red_attack_idle_anim', play_style='loop')
-        self.play_sound('sfx_mg_2013_cjsnow_uitargetred')
+        self.play_sound('sfx_mg_2013_cjsnow_uitargetred', self.client)
         self.game.send_tip(Phase.ATTACK, self.client)
 
     def show_heal(self) -> None:
@@ -73,7 +73,7 @@ class Target(LocalGameObject):
         self.place_object()
         self.animate_object('ui_target_white_heal_intro_anim', reset=True)
         self.animate_object('ui_target_white_heal_idle_anim', play_style='loop')
-        self.play_sound('sfx_mg_2013_cjsnow_uitargetred')
+        self.play_sound('sfx_mg_2013_cjsnow_uitargetred', self.client)
         self.game.send_tip(Phase.HEAL, self.client)
 
     def select(self) -> None:
@@ -96,7 +96,7 @@ class Target(LocalGameObject):
             self.game.hide_tip(self.client)
 
         self.selected = True
-        self.play_sound('sfx_mg_2013_cjsnow_uiselecttile')
+        self.play_sound('sfx_mg_2013_cjsnow_uiselecttile', self.client)
 
     def deselect(self) -> None:
         self.selected = False
