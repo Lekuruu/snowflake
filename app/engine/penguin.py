@@ -76,8 +76,10 @@ class Penguin(Receiver):
 
     def connectionLost(self, reason: Failure | None = None) -> None:
         super().connectionLost(reason)
-        if self.in_game:
-            self.ninja.set_health(0)
+        if not self.in_game and not self.ninja:
+            return
+
+        self.ninja.set_health(0)
 
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room
