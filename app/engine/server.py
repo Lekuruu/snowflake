@@ -6,6 +6,7 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 from typing import List, Callable
 from threading import Thread
+from redis import Redis
 
 from app.events import EventHandler, FunnelHandler, TriggerHandler
 from app.objects import Players, AssetCollection, Games
@@ -47,6 +48,13 @@ class SnowflakeEngine(Factory):
             config.POSTGRES_PASSWORD,
             config.POSTGRES_HOST,
             config.POSTGRES_PORT
+        )
+
+        self.redis = Redis(
+            config.REDIS_HOST,
+            config.REDIS_PORT,
+            config.REDIS_DB,
+            config.REDIS_PASSWORD
         )
 
         self.threads: List[Thread] = []
