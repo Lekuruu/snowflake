@@ -1,7 +1,6 @@
 
 from __future__ import annotations
-
-from typing import Tuple
+from typing import List
 
 from ..objects.collections import Players
 from .penguin import Penguin
@@ -31,7 +30,7 @@ class MatchmakingQueue:
             player.logger.info('Left matchmaking queue')
             player.in_queue = False
 
-    def find_match(self, player: Penguin) -> Tuple[Penguin] | None:
+    def find_match(self, player: Penguin) -> List[Penguin] | None:
         elements = ['snow', 'water', 'fire']
         elements.remove(player.element)
 
@@ -39,31 +38,14 @@ class MatchmakingQueue:
 
         for element in elements:
             if (matches := self.players.with_element(element)):
-                players.append(matches[0])
                 # TODO: Sort players by different criteria
+                players.append(matches[0])
 
         if len(players) != 3:
             if not config.ENABLE_DEBUG_PLAYERS:
                 return
 
-            for player in players:
-                if player.element not in elements:
-                    continue
-
-                elements.remove(player.element)
-
-            # Add debug players
-            for element in elements:
-                debug_player = Penguin(player.server, player.address)
-                debug_player.pid = -1
-                debug_player.name = f'Debug {element.title()} Player'
-                debug_player.element = element
-                debug_player.in_queue = True
-                debug_player.is_ready = True
-                debug_player.logged_in = True
-                debug_player.disconnected = True
-                debug_player.object = player.object
-                players.append(debug_player)
+            players = self.get_debug_players(players)
 
         players.sort(key=lambda x: x.element)
         return players
@@ -72,10 +54,6 @@ class MatchmakingQueue:
         from .game import Game
 
         self.logger.info('Creating game...')
-
-        fire.in_queue = False
-        snow.in_queue = False
-        water.in_queue = False
 
         game = Game(fire, snow, water)
 
@@ -95,3 +73,23 @@ class MatchmakingQueue:
 
         # Start game loop
         game.server.runThread(game.start)
+
+    def get_debug_players(self, players: List[Penguin]) -> List[Penguin]:
+        elements = ['snow', 'water', 'fire']
+
+        for player in players:
+            elements.remove(player.element)
+
+        for element in elements:
+            debug_player = Penguin(player.server, player.address)
+            debug_player.pid = -1
+            debug_player.name = f'Debug {element.title()} Player'
+            debug_player.element = element
+            debug_player.in_queue = True
+            debug_player.is_ready = True
+            debug_player.logged_in = True
+            debug_player.disconnected = True
+            debug_player.object = player.object
+            players.append(debug_player)
+
+        return players
