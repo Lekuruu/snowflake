@@ -295,15 +295,6 @@ class Game:
         self.grid.hide_tiles()
         self.disable_cards()
 
-    def error_callback(self, failure: Failure) -> None:
-        self.logger.error(
-            f'Failed to execute game thread: {failure.getBriefTraceback()}',
-            exc_info=failure.tb
-        )
-
-        for client in self.clients:
-            client.send_to_room()
-
     def register_input(
         self,
         input_id: str,
