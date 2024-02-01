@@ -228,6 +228,9 @@ class GameObject:
         asset = self.assets.by_name(name)
         handle_id = -1
 
+        if reset:
+            self.remove_pending_animations()
+
         if register:
             handle_id = self.game.callbacks.register_animation(
                 self.id,
@@ -317,14 +320,22 @@ class GameObject:
         self._y_scale = scale_y
 
     def reset_sprite_settings(self, *args) -> None:
-        self.sprite_settings(
-            scale_x=1,
-            scale_y=1,
-            origin_mode=OriginMode.NONE,
-            mirror_mode=MirrorMode.NONE
-        )
-        self._mirror_mode = MirrorMode.NONE
-        self._origin_mode = OriginMode.NONE
+        if any([
+            self._mirror_mode != MirrorMode.NONE,
+            self._origin_mode != OriginMode.NONE,
+            self._x_scale != 1,
+            self._y_scale != 1
+        ]):
+            self.sprite_settings(
+                scale_x=1,
+                scale_y=1,
+                origin_mode=OriginMode.NONE,
+                mirror_mode=MirrorMode.NONE
+            )
+            self._mirror_mode = MirrorMode.NONE
+            self._origin_mode = OriginMode.NONE
+            self._x_scale = 1
+            self._y_scale = 1
 
     def hide(self) -> None:
         if not self.assets.by_name('blank_png'):
