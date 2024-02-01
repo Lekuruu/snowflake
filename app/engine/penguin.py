@@ -76,7 +76,7 @@ class Penguin(Receiver):
 
     def connectionLost(self, reason: Failure | None = None) -> None:
         super().connectionLost(reason)
-        if not self.in_game and not self.ninja:
+        if not self.in_game or not self.ninja:
             return
 
         self.ninja.set_health(0)
