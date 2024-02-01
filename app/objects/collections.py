@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from ..engine.game import Game
     from ..engine.penguin import Penguin
     from .gameobject import GameObject
     from .ninjas import Ninja
@@ -12,6 +13,8 @@ if TYPE_CHECKING:
 
 from typing import Set, List, Iterator, Iterable
 from threading import Lock
+
+import logging
 
 class Players(Set["Penguin"]):
     def __init__(self):
@@ -64,6 +67,48 @@ class Players(Set["Penguin"]):
 
     def with_element(self, element: str) -> List["Penguin"]:
         return [player for player in self if player.element == element]
+
+class Games(Set["Game"]):
+    def __init__(self):
+        self.lock = Lock()
+        super().__init__()
+
+    def __iter__(self) -> Iterator["Game"]:
+        with self.lock:
+            games = iter(list(super().__iter__()))
+        return games
+
+    def __len__(self) -> int:
+        with self.lock:
+            return len(list(super().__iter__()))
+
+    def __contains__(self, game: "Game") -> bool:
+        with self.lock:
+            return super().__contains__(game)
+
+    def __repr__(self) -> str:
+        with self.lock:
+            return f'<Games ({len(self)})>'
+
+    def add(self, game: "Game") -> None:
+        game.id = self.next_id()
+        game.logger = logging.getLogger(f'game-{game.id}')
+        return super().add(game)
+
+    def remove(self, game: "Game") -> None:
+        try:
+            return super().remove(game)
+        except (ValueError, KeyError):
+            pass
+
+    def by_id(self, id: int) -> "Game" | None:
+        return next((game for game in self if game.id == id), None)
+
+    def with_player(self, player: "Penguin") -> "Game" | None:
+        return next([game for game in self if player in game.clients], None)
+
+    def next_id(self) -> int:
+        return max([game.id for game in self] or [0]) + 1
 
 class AssetCollection(Set["Asset"]):
     def __init__(self, initial_data: Iterable = {}) -> None:

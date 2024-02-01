@@ -8,8 +8,8 @@ from typing import List, Callable
 from threading import Thread
 
 from app.events import EventHandler, FunnelHandler, TriggerHandler
+from app.objects import Players, AssetCollection, Games
 from app.data import ServerType, BuildType, Postgres
-from app.objects import Players, AssetCollection
 
 from .matchmaking import MatchmakingQueue
 from .penguin import Penguin
@@ -33,6 +33,7 @@ class SnowflakeEngine(Factory):
 
         self.logger = logging.getLogger("snowflake")
 
+        self.games = Games()
         self.events = EventHandler()
         self.funnel = FunnelHandler()
         self.triggers = TriggerHandler()
