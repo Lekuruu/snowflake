@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, List
+from typing import TYPE_CHECKING, List
 from twisted.internet import reactor
 
 if TYPE_CHECKING:
@@ -325,9 +325,9 @@ class WaterNinja(Ninja):
     def move_animation(self) -> None:
         self.animate_object(
             'waterninja_move_anim',
-            play_style='play_once',
-            callback=self.idle_animation
+            play_style='play_once'
         )
+        self.idle_animation()
 
     def ko_animation(self) -> None:
         self.animate_object(
@@ -570,9 +570,9 @@ class FireNinja(Ninja):
     def move_animation(self) -> None:
         self.animate_object(
             'fireninja_move_anim',
-            play_style='play_once',
-            callback=self.idle_animation
+            play_style='play_once'
         )
+        self.idle_animation()
 
     def ko_animation(self) -> None:
         self.animate_object(
