@@ -11,7 +11,7 @@ import config
 class MatchmakingQueue:
     def __init__(self) -> None:
         self.players = Players()
-        self.logger = logging.getLogger('matchmaking')
+        self.logger = logging.getLogger('Matchmaking')
 
     def add(self, player: Penguin) -> None:
         self.players.add(player)

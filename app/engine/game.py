@@ -46,7 +46,7 @@ class Game:
         self.timer = Timer(self)
         self.grid = Grid(self)
 
-        self.logger = logging.getLogger('game')
+        self.logger = logging.getLogger('Game')
 
     @property
     def clients(self) -> List["Penguin"]:
@@ -182,6 +182,7 @@ class Game:
 
     def close(self) -> None:
         self.logger.info('Game closed')
+        self.server.games.remove(self)
         self.wait_for_players(lambda player: player.disconnected)
         exit()
 

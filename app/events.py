@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 class EventHandler:
     def __init__(self) -> None:
         self.handlers: Dict[str, Callable] = {}
-        self.logger = logging.getLogger("events")
+        self.logger = logging.getLogger("Events")
 
     def call(self, client: "Penguin", type: str, args: List[str]) -> None:
         if type in self.handlers:
@@ -36,7 +36,7 @@ class EventHandler:
 class TriggerHandler(EventHandler):
     def __init__(self) -> None:
         self.handlers: Dict[str, Callable] = {}
-        self.logger = logging.getLogger("triggers")
+        self.logger = logging.getLogger("Triggers")
 
     def call(self, trigger: str, client: "Penguin", json: dict) -> None:
         if not client.window_manager.loaded:
@@ -52,7 +52,7 @@ class TriggerHandler(EventHandler):
 
 class FunnelHandler:
     def __init__(self) -> None:
-        self.logger = logging.getLogger("funnel")
+        self.logger = logging.getLogger("Funnel")
 
     def call(self, action: str, client: "Penguin", json: dict) -> None:
         # TODO: Add datadog logging for funnel analysis

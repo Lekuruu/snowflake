@@ -92,7 +92,7 @@ class Games(Set["Game"]):
 
     def add(self, game: "Game") -> None:
         game.id = self.next_id()
-        game.logger = logging.getLogger(f'game-{game.id}')
+        game.logger = logging.getLogger(f'Game ({game.id})')
         return super().add(game)
 
     def remove(self, game: "Game") -> None:

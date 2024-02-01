@@ -31,7 +31,7 @@ class SnowflakeEngine(Factory):
         self.world_id = 101
         self.world_name = "clubpenguin_town_en_3"
 
-        self.logger = logging.getLogger("snowflake")
+        self.logger = logging.getLogger("Snowflake")
 
         self.games = Games()
         self.events = EventHandler()

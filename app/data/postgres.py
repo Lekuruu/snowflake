@@ -28,7 +28,7 @@ class Postgres:
             expire_on_commit=False
         )
 
-        self.logger = logging.getLogger('postgres')
+        self.logger = logging.getLogger('Postgres')
 
     @property
     def session(self) -> Session:
