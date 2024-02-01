@@ -9,9 +9,13 @@ if TYPE_CHECKING:
     from app.objects.enemies import Enemy
     from app.engine.game import Game
 
-from app.objects.effects import HealParticles, SnowProjectile
 from app.data import MirrorMode, Phase
 from app.objects.target import Target
+from app.objects.effects import (
+    SnowProjectile,
+    FireProjectile,
+    HealParticles
+)
 from app.objects import (
     SoundCollection,
     AssetCollection,
@@ -609,7 +613,9 @@ class FireNinja(Ninja):
         self.projectile_animation(x, y)
 
     def projectile_animation(self, x: int, y: int) -> None:
-        ...
+        projectile = FireProjectile(self.game, self.x, self.y)
+        projectile.play(x, y)
+        reactor.callLater(0.25, projectile.remove_object)
 
     def win_animation(self) -> None:
         self.animate_object(
