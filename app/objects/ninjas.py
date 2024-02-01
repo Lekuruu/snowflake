@@ -363,7 +363,7 @@ class WaterNinja(Ninja):
         )
         self.idle_animation()
 
-        time.sleep(0.55)
+        time.sleep(0.45)
         self.attack_sound()
 
     def win_animation(self) -> None:
