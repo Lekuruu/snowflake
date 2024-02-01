@@ -30,7 +30,7 @@ class SnowflakeEngine(Factory):
         self.build_type = BuildType.RELEASE
 
         self.world_id = 101
-        self.world_name = "clubpenguin_town_en_3"
+        self.world_name = "cjsnow_0"
 
         self.logger = logging.getLogger("Snowflake")
 
