@@ -426,13 +426,8 @@ class Game:
             return
 
         ninja.move_animation()
-        ninja.idle_animation()
         ninja.move_object(x, y)
-        ninja.play_sound(
-            'sfx_mg_2013_cjsnow_footsteppenguin' \
-                if ninja.name != 'Fire'
-                else 'sfx_mg_2013_cjsnow_footsteppenguinfire'
-        )
+        ninja.move_sound()
 
         # Reset ghost position
         ninja.ghost.x = -1

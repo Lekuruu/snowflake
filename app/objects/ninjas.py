@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable, List
+from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.objects.enemies import Enemy
     from app.engine.game import Game
 
-from app.objects.effects import HealParticles
+from app.objects.effects import HealParticles, SnowProjectile
 from app.data import MirrorMode, Phase
 from app.objects.target import Target
 from app.objects import (
@@ -223,6 +224,9 @@ class Ninja(GameObject):
         self.targets = []
 
     def attack_target(self, target: "Enemy"):
+        # This delay seems to fix the mirror mode?
+        time.sleep(0.25)
+
         self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
 
@@ -271,6 +275,9 @@ class Ninja(GameObject):
     def ko_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_penguinground')
 
+    def move_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_footsteppenguin')
+
     def attack_sound(self) -> None:
         ...
 
@@ -318,7 +325,8 @@ class WaterNinja(Ninja):
     def move_animation(self) -> None:
         self.animate_object(
             'waterninja_move_anim',
-            play_style='play_once'
+            play_style='play_once',
+            callback=self.idle_animation
         )
 
     def ko_animation(self) -> None:
@@ -346,10 +354,11 @@ class WaterNinja(Ninja):
         self.animate_object(
             'waterninja_attack_anim',
             play_style='play_once',
-            reset=True,
-            callback=self.reset_sprite_settings
+            callback=self.reset_sprite_settings,
+            reset=True
         )
         self.idle_animation()
+
         time.sleep(0.55)
         self.attack_sound()
 
@@ -429,8 +438,10 @@ class SnowNinja(Ninja):
     def move_animation(self) -> None:
         self.animate_object(
             'snowninja_move_anim',
-            play_style='play_once'
+            play_style='play_once',
+            reset=True
         )
+        self.idle_animation()
 
     def ko_animation(self) -> None:
         self.animate_object(
@@ -458,11 +469,24 @@ class SnowNinja(Ninja):
         self.animate_object(
             'snowninja_attack_anim',
             play_style='play_once',
+            callback=self.reset_sprite_settings,
             reset=True
         )
         self.idle_animation()
-        time.sleep(0.5)
+
+        time.sleep(0.3)
         self.projectile_animation(x, y)
+
+    def projectile_animation(self, x: int, y: int) -> None:
+        # This is kinda jank lol
+        projectile = SnowProjectile(self.game, self.x, self.y)
+        projectile.play(x, y)
+        time.sleep(0.2)
+        projectile.remove_object()
+
+        projectile = SnowProjectile(self.game, self.x, self.y)
+        projectile.play(x, y)
+        reactor.callLater(0.2, projectile.remove_object)
 
     def heal_animation(self) -> None:
         self.animate_object(
@@ -471,9 +495,6 @@ class SnowNinja(Ninja):
             reset=True
         )
         self.idle_animation()
-
-    def projectile_animation(self, x: int, y: int) -> None:
-        ...
 
     def win_animation(self) -> None:
         self.animate_object(
@@ -549,7 +570,8 @@ class FireNinja(Ninja):
     def move_animation(self) -> None:
         self.animate_object(
             'fireninja_move_anim',
-            play_style='play_once'
+            play_style='play_once',
+            callback=self.idle_animation
         )
 
     def ko_animation(self) -> None:
@@ -578,9 +600,11 @@ class FireNinja(Ninja):
         self.animate_object(
             'fireninja_attack_anim',
             play_style='play_once',
+            callback=self.reset_sprite_settings,
             reset=True
         )
         self.idle_animation()
+
         time.sleep(1.45)
         self.projectile_animation(x, y)
 
@@ -616,6 +640,9 @@ class FireNinja(Ninja):
             'fireninja_reviveotherloop_anim',
             play_style='loop'
         )
+
+    def move_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_footsteppenguinfire')
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackfire')
