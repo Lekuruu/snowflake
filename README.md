@@ -21,7 +21,7 @@ This is still a work in progress, and is not ready for general use yet.
 - [x] Moving Ninjas
 - [ ] Attacking
     - [x] Water Attacks
-    - [ ] Snow Attacks
+    - [x] Snow Attacks
     - [ ] Fire Attacks
 - [x] Healing
 - [x] Reviving
