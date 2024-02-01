@@ -34,7 +34,7 @@ class SnowflakeEngine(Factory):
         self.logger = logging.getLogger("snowflake")
 
         self.events = EventHandler()
-        self.actions = FunnelHandler()
+        self.funnel = FunnelHandler()
         self.triggers = TriggerHandler()
         self.matchmaking = MatchmakingQueue()
 

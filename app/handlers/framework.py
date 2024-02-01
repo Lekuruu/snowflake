@@ -7,4 +7,4 @@ def framework(client: Penguin, json: dict):
 
 @Instance.triggers.register('payloadBILogAction')
 def action(client: Penguin, json: dict):
-    Instance.actions.call(json['action'], client, json)
+    Instance.funnel.call(json['action'], client, json)
