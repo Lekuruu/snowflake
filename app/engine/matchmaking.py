@@ -56,6 +56,7 @@ class MatchmakingQueue:
         self.logger.info('Creating game...')
 
         game = Game(fire, snow, water)
+        game.server.games.add(game)
 
         for client in game.clients:
             player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')

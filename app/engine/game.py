@@ -33,6 +33,7 @@ class Game:
         self.water = water
         self.fire = fire
         self.snow = snow
+        self.id = -1
 
         self.bonus_cirteria = random.choice(['no_ko', 'under_time', 'full_health'])
         self.game_start = time.time()
@@ -177,16 +178,20 @@ class Game:
         self.remove_objects()
 
         self.display_payout()
-        self.wait_for_players(lambda player: player.disconnected)
         self.close()
 
     def close(self) -> None:
-        self.logger.info('Game finished.')
-        # TODO: Cleanup
+        self.logger.info('Game closed')
+        self.wait_for_players(lambda player: player.disconnected)
         exit()
 
     def run_game_loop(self) -> None:
         while True:
+            self.logger.info(
+                f'Starting round {self.round + 1} '
+                f'({len(self.enemies)} {"enemies" if len(self.enemies) > 1 else "enemy"})'
+            )
+
             self.run_until_next_round()
             self.round += 1
 
