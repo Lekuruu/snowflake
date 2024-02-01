@@ -53,3 +53,9 @@ This is still a work in progress, and is not ready for general use yet.
 7. Install the requirements: `pip install -r requirements.txt`
 
 7. Run the server: `python main.py`
+
+## Screenshots
+
+![image](https://github.com/Lekuruu/snowflake/assets/84310095/107a05aa-79ed-45ec-9b9e-182ec1e686fc)
+
+![image](https://github.com/Lekuruu/snowflake/assets/84310095/61c741a2-b4a4-4133-b596-e0ece93c6e31)
