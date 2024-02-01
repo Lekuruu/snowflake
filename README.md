@@ -18,14 +18,18 @@ This is still a work in progress, and is not ready for general use yet.
     - [x] Round Title
     - [x] Spawning Ninjas
     - [x] Spawning Enemies
-- [x] Moving Ninjas
-- [x] Attacking
-- [x] Healing
-- [x] Reviving
+- [x] Ninjas
+    - [x] Movement
+    - [x] Attacks
+    - [x] Healing
+    - [x] Reviving
+- [ ] Enemyies
+    - [ ] Movement
+    - [ ] Attacks
+    - [ ] AI
 - [ ] Powercards
 - [ ] Powercard Combos
 - [ ] Member Cards
-- [ ] Enemy AI
 - [ ] EXP/Coins System
 - [x] Payout
 - [ ] Stamps
