@@ -28,8 +28,11 @@ This is still a work in progress, and is not ready for general use yet.
     - [ ] Attacks
     - [ ] AI
 - [ ] Powercards
-- [ ] Powercard Combos
-- [ ] Member Cards
+    - [ ] Progressbar
+    - [ ] Animations
+    - [ ] Effects
+    - [ ] Combos
+- [ ] Member Card
 - [ ] EXP/Coins System
 - [x] Payout
 - [ ] Stamps
