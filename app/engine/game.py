@@ -478,10 +478,16 @@ class Game:
 
             target = ninja.selected_target.object
 
+            if target is None:
+                # Target has been removed/defeated
+                continue
+
             if isinstance(target, Enemy):
                 ninja.attack_target(target)
             else:
                 ninja.heal_target(target)
+
+            time.sleep(1)
 
     def do_enemy_actions(self) -> None:
         ...
