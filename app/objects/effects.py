@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.data import MirrorMode, OriginMode
+
 if TYPE_CHECKING:
     from app.engine.game import Game
 
@@ -125,3 +127,62 @@ class SnowProjectile(Effect):
             return "snowninja_projectilevert_anim"
 
         return "snowninja_projectileangle_anim"
+
+class FireProjectile(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "fire_projectile",
+            x,
+            y,
+            AssetCollection({
+                Asset.from_name("fireninja_projectile_angleup_anim"),
+                Asset.from_name("fireninja_projectile_angledown_anim"),
+                Asset.from_name("fireninja_projectile_down_anim"),
+                Asset.from_name("fireninja_projectile_downfar_anim"),
+                Asset.from_name("fireninja_projectile_up_anim"),
+                Asset.from_name("fireninja_projectile_upfar_anim"),
+                Asset.from_name("fireninja_projectile_right_anim"),
+                Asset.from_name("fireninja_projectile_rightfar_anim")
+            }),
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self, target_x: int, target_y: int):
+        self.set_offset(target_x, target_y)
+        self.place_object()
+        self.set_mirror_mode(target_x, target_y)
+        name = self.get_animation_name(target_x, target_y)
+        self.place_sprite(name)
+
+    def set_mirror_mode(self, target_x: int, target_y: int):
+        if (target_x - self.x) < 0:
+            self.mirror_mode = MirrorMode.X
+
+    def set_offset(self, target_x: int, target_y: int):
+        if (target_x - self.x) < 0:
+            self.x_offset = -1
+
+    def get_animation_name(self, target_x: int, target_y: int) -> str:
+        x_diff = target_x - self.x
+        y_diff = target_y - self.y
+
+        distance = abs(self.x - target_x) + abs(self.y - target_y)
+
+        if x_diff == 0 and y_diff < 0:
+            return "fireninja_projectile_up_anim" if distance == 1 else "fireninja_projectile_upfar_anim"
+
+        elif x_diff == 0 and y_diff > 0:
+            return "fireninja_projectile_down_anim" if distance == 1 else "fireninja_projectile_downfar_anim"
+
+        elif y_diff == 0:
+            return "fireninja_projectile_right_anim" if distance == 1 else "fireninja_projectile_rightfar_anim"
+
+        elif y_diff > 0:
+            return "fireninja_projectile_angledown_anim"
+
+        elif y_diff < 0:
+            return "fireninja_projectile_angleup_anim"
+
+        return "fireninja_projectile_right_anim"
