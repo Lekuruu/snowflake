@@ -19,10 +19,7 @@ This is still a work in progress, and is not ready for general use yet.
     - [x] Spawning Ninjas
     - [x] Spawning Enemies
 - [x] Moving Ninjas
-- [ ] Attacking
-    - [x] Water Attacks
-    - [x] Snow Attacks
-    - [ ] Fire Attacks
+- [x] Attacking
 - [x] Healing
 - [x] Reviving
 - [ ] Powercards
