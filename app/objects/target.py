@@ -111,4 +111,7 @@ class Target(LocalGameObject):
         if client.is_ready:
             return
 
+        if not self.game.timer.running:
+            return
+
         self.select()
