@@ -174,9 +174,11 @@ class Game:
         # Run game loop until game ends
         self.run_game_loop()
 
+        self.remove_confirm()
+        self.remove_targets()
         self.display_win_sequence()
-        self.remove_objects()
 
+        self.remove_objects()
         self.display_payout()
         self.close()
 
@@ -238,6 +240,10 @@ class Game:
             self.remove_confirm()
             self.hide_targets()
             time.sleep(1.25)
+
+            # Sometimes the targets are still visible?
+            self.hide_targets()
+            self.remove_confirm()
 
             self.move_ninjas()
             self.do_ninja_actions()
