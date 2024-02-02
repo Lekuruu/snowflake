@@ -486,7 +486,6 @@ class Game:
                 continue
 
             enemy.move_enemy(next_move.x, next_move.y)
-            time.sleep(enemy.move_duration / 1000) # only for testing
             self.wait_for_animations()
 
             if target is None:
@@ -498,7 +497,6 @@ class Game:
                 continue
 
             enemy.attack_target(target_object)
-            time.sleep(enemy.move_duration / 1000) # only for testing
             self.wait_for_animations()
 
     def show_ui(self) -> None:
