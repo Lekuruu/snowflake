@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.data import MirrorMode, OriginMode
-
 if TYPE_CHECKING:
     from app.engine.game import Game
 
@@ -12,6 +10,8 @@ from ..data import MirrorMode, OriginMode
 from .collections import AssetCollection
 from .gameobject import GameObject
 from .asset import Asset
+
+import time
 
 class Effect(GameObject):
     def __init__(
@@ -58,6 +58,8 @@ class HealParticles(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 10, duration=737)
+        time.sleep(0.737)
+        self.remove_object()
 
 class SnowProjectile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -159,6 +161,7 @@ class FireProjectile(Effect):
         self.set_offset(target_x, target_y)
         self.place_object()
         self.set_mirror_mode(target_x, target_y)
+
         name = self.get_animation_name(target_x, target_y)
         self.place_sprite(name)
 
