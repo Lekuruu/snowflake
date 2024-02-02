@@ -108,6 +108,31 @@ class Ninja(GameObject):
         self.ghost.x = x
         self.ghost.y = y
 
+    def move_ninja(self, x: int, y: int) -> None:
+        if self.hp <= 0 or self.client.disconnected:
+            return
+
+        if self.x == x and self.y == y:
+            return
+
+        if x == -1 or y == -1:
+            return
+
+        for ninja in self.game.ninjas:
+            if not ninja.selected_object:
+                continue
+
+            if ninja.selected_target.object == self:
+                ninja.selected_target.move_object(x, y)
+
+        self.move_animation()
+        self.move_object(x, y)
+        self.move_sound()
+
+        # Reset ghost position
+        self.ghost.x = -1
+        self.ghost.y = -1
+
     def place_healthbar(self) -> None:
         self.health_bar.place_object()
         self.health_bar.place_sprite(self.health_bar.name)
@@ -141,18 +166,20 @@ class Ninja(GameObject):
         self.animate_healthbar(self.hp, hp, duration=500)
 
         if hp <= 0:
+            if self.hp <= 0:
+                return
+
             self.ko_animation()
-            self.hp = hp
+            self.targets = []
 
             if not self.client.disconnected:
                 self.client.was_ko = True
                 self.ko_sound()
-            return
-
-        if hp < self.hp:
-            self.hit_animation()
         else:
-            self.revive_animation()
+            if hp < self.hp:
+                self.hit_animation()
+            else:
+                self.revive_animation()
 
         self.hp = hp
 

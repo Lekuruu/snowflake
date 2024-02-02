@@ -412,28 +412,9 @@ class Game:
         for ninja in self.ninjas:
             ninja.hide_ghost(reset_positions=False)
 
-    def move_ninja(self, ninja: Ninja, x: int, y: int) -> None:
-        if ninja.hp <= 0 or ninja.client.disconnected:
-            return
-
-        if ninja.x == x and ninja.y == y:
-            return
-
-        if x == -1 or y == -1:
-            return
-
-        ninja.move_animation()
-        ninja.move_object(x, y)
-        ninja.move_sound()
-
-        # Reset ghost position
-        ninja.ghost.x = -1
-        ninja.ghost.y = -1
-
     def move_ninjas(self) -> None:
         for ninja in self.ninjas:
-            self.move_ninja(
-                ninja,
+            ninja.move_ninja(
                 ninja.ghost.x,
                 ninja.ghost.y
             )
