@@ -1,7 +1,8 @@
 
 from __future__ import annotations
 
-from typing import Callable, Dict, List, TYPE_CHECKING
+from typing import Callable, Dict, List, Set, TYPE_CHECKING
+from app.objects.collections import LockedSet
 from twisted.internet import reactor
 from collections import defaultdict
 from dataclasses import dataclass
@@ -22,11 +23,17 @@ class Action:
     type: ActionType
     callback: Callable | None = None
 
+    def __eq__(self, action: "Action") -> bool:
+        return self.handle_id == action.handle_id
+
+    def __hash__(self) -> int:
+        return hash(self.handle_id)
+
 class CallbackHandler:
     """This class manages callbacks for animations and sounds"""
 
     def __init__(self, game: "Game"):
-        self.pending: Dict[int, List[Action]] = defaultdict(list)
+        self.pending: Dict[int, Set[Action]] = defaultdict(LockedSet)
         self.game = game
 
     @property
@@ -89,7 +96,7 @@ class CallbackHandler:
             callback
         )
 
-        self.pending[object_id].append(action)
+        self.pending[object_id].add(action)
         return action.handle_id
 
     def action_done(self, id: int, object_id: int):
