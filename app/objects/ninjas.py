@@ -410,7 +410,8 @@ class WaterNinja(Ninja):
     def move_animation(self) -> None:
         self.animate_object(
             'waterninja_move_anim',
-            play_style='play_once'
+            play_style='play_once',
+            reset=True
         )
         self.idle_animation()
 
@@ -655,7 +656,8 @@ class FireNinja(Ninja):
     def move_animation(self) -> None:
         self.animate_object(
             'fireninja_move_anim',
-            play_style='play_once'
+            play_style='play_once',
+            reset=True
         )
         self.idle_animation()
 
