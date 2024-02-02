@@ -1,7 +1,10 @@
 
-from typing import TYPE_CHECKING
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Iterator, Tuple
 
 if TYPE_CHECKING:
+    from app.objects.ninjas import Ninja
     from app.engine.game import Game
 
 from app.objects import (
@@ -11,6 +14,9 @@ from app.objects import (
     Sound,
     Asset
 )
+
+import random
+import time
 
 class Enemy(GameObject):
     name: str = 'Enemy'
@@ -67,6 +73,17 @@ class Enemy(GameObject):
         self.health_bar.move_object(x, y, self.move_duration)
         super().move_object(x, y, self.move_duration)
 
+    def move_enemy(self, x: int, y: int) -> None:
+        if self.hp <= 0:
+            return
+
+        if self.x == x and self.y == y:
+            return
+
+        self.move_animation()
+        self.move_object(x, y)
+        self.move_sound()
+
     def place_healthbar(self) -> None:
         self.health_bar.x = self.x
         self.health_bar.y = self.y
@@ -109,6 +126,106 @@ class Enemy(GameObject):
         else:
             self.hit_animation()
 
+    def attack_target(self, target: "Ninja") -> None:
+        if target.hp <= 0:
+            return
+
+        self.attack_animation()
+        self.attack_sound()
+        target.set_health(target.hp - self.attack)
+
+    def movable_tiles(self) -> Iterator[GameObject]:
+        for tile in self.game.grid.tiles:
+            if not self.game.grid.can_move(tile.x, tile.y):
+                continue
+
+            distance = abs(tile.x - self.x) + abs(tile.y - self.y)
+
+            if distance <= self.move:
+                yield tile
+
+    def attackable_tiles(self, target_x: int, target_y: int, range: int | None = None) -> Iterator[GameObject]:
+        for tile in self.game.grid.tiles:
+            target_object = self.game.grid[tile.x, tile.y]
+
+            if not target_object:
+                continue
+
+            if isinstance(target_object, Enemy):
+                continue
+
+            if target_object.hp <= 0:
+                continue
+
+            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
+
+            if distance <= (range or self.range):
+                yield tile
+
+    def next_target(self) -> Tuple[GameObject, GameObject | None]:
+        available_moves = list(self.movable_tiles()) + [self.game.grid[self.x, self.y]]
+
+        # Get move with most available targets
+        moves = {
+            move: list(self.attackable_tiles(move.x, move.y))
+            for move in available_moves
+        }
+
+        if not any(moves.values()):
+            # No targets in range
+            return self.closest_target(), None
+
+        for move, targets in list(moves.items()):
+            if not targets:
+                moves.pop(move)
+                continue
+
+            # Sort targets by most damage
+            moves[move].sort(
+                key=lambda target: self.simulate_damage(
+                    move.x,
+                    move.y,
+                    target
+                ),
+                reverse=True
+            )
+
+        # Sort moves by most damage
+        next_move, targets = sorted(
+            moves.items(),
+            key=lambda m: self.simulate_damage(
+                m[0].x,
+                m[0].y,
+                m[1][0]
+            ),
+            reverse=True
+        )[0]
+
+        return next_move, targets[0]
+
+    def closest_target(self) -> GameObject | None:
+        # Get all enemy tiles
+        tiles = [
+            min(
+                self.movable_tiles(),
+                key=lambda tile: abs(tile.x - ninja.x) + abs(tile.y - ninja.y)
+            )
+            for ninja in self.game.ninjas
+            if ninja.hp > 0
+        ]
+
+        if not tiles:
+            return
+
+        # Return tile that is closest to enemy
+        return min(
+            tiles,
+            key=lambda tile: abs(tile.x - self.x) + abs(tile.y - self.y)
+        )
+
+    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+        ...
+
     def spawn_animation(self) -> None:
         self.animate_object(
             f'snowman_spawn_anim',
@@ -118,6 +235,12 @@ class Enemy(GameObject):
         self.spawn_sound()
 
     def idle_animation(self) -> None:
+        ...
+
+    def move_animation(self) -> None:
+        ...
+
+    def attack_animation(self) -> None:
         ...
 
     def ko_animation(self) -> None:
@@ -131,6 +254,12 @@ class Enemy(GameObject):
 
     def ko_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmandeathexplode')
+
+    def move_sound(self) -> None:
+        ...
+
+    def attack_sound(self) -> None:
+        ...
 
     def hit_sound(self) -> None:
         ...
@@ -161,6 +290,23 @@ class Sly(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
         Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
+
+    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+        distance = abs(x_position - target.x) + abs(y_position - target.y)
+
+        # NOTE: Sly hits harder from a distance. I don't know how much
+        #       damage he does, so I'm just making up a formula.
+        return round(self.attack * max(1, distance * 0.45))
+
+    def attack_target(self, target: "Ninja") -> None:
+        if target.hp <= 0:
+            return
+
+        self.attack_animation()
+        self.attack_sound()
+        target.set_health(
+            target.hp - self.simulate_damage(self.x, self.y, target)
+        )
 
     def idle_animation(self) -> None:
         self.animate_object(
@@ -220,6 +366,30 @@ class Scrap(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
 
+    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+        sorrounding_targets = list(self.attackable_tiles(target.x, target.y, range=1))
+        sorrounding_targets.remove(target)
+
+        return self.attack + (self.attack / 2) * len(sorrounding_targets)
+
+    def attack_target(self, target: "Ninja") -> None:
+        if target.hp <= 0:
+            return
+
+        self.attack_animation()
+        self.attack_sound()
+        target.set_health(target.hp - self.attack)
+
+        tile = self.game.grid.get_tile(target.x, target.y)
+
+        sorrounding_targets = list(self.attackable_tiles(target.x, target.y, range=1))
+        sorrounding_targets.remove(tile)
+
+        time.sleep(0.25)
+        for sorrounding_target in sorrounding_targets:
+            object = self.game.grid[sorrounding_target.x, sorrounding_target.y]
+            object.set_health(object.hp - self.attack / 2)
+
     def idle_animation(self) -> None:
         self.animate_object(
             f'scrap_idle_anim',
@@ -272,6 +442,68 @@ class Tank(Enemy):
         Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
         Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
     })
+
+    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+        # Horizontal swipe
+        if x_position == target.x:
+            total_damage = self.attack
+
+            left = self.game.grid[x_position-1, y_position]
+            right = self.game.grid[x_position+1, y_position]
+
+            if left is not None and not isinstance(left, Enemy):
+                total_damage += self.attack / 2
+
+            if right is not None and not isinstance(right, Enemy):
+                total_damage += self.attack / 2
+
+            return total_damage
+
+        # Vertical swipe
+        elif y_position == target.y:
+            total_damage = self.attack
+
+            above = self.game.grid[x_position, y_position-1]
+            below = self.game.grid[x_position, y_position+1]
+
+            if above is not None and not isinstance(above, Enemy):
+                total_damage += self.attack / 2
+
+            if below is not None and not isinstance(below, Enemy):
+                total_damage += self.attack / 2
+
+            return total_damage
+
+        # This should never happen, unless range is greater than 1
+        return self.attack
+
+    def attack_target(self, target: "Ninja") -> None:
+        if target.hp <= 0:
+            return
+
+        self.attack_animation()
+        self.attack_sound()
+        target.set_health(target.hp - self.attack)
+
+        if self.x == target.x:
+            left = self.game.grid[target.x-1, target.y]
+            right = self.game.grid[target.x+1, target.y]
+
+            if left is not None and not isinstance(left, Enemy):
+                left.set_health(left.hp - self.attack / 2)
+
+            if right is not None and not isinstance(right, Enemy):
+                right.set_health(right.hp - self.attack / 2)
+
+        elif self.y == target.y:
+            above = self.game.grid[target.x, target.y-1]
+            below = self.game.grid[target.x, target.y+1]
+
+            if above is not None and not isinstance(above, Enemy):
+                above.set_health(above.hp - self.attack / 2)
+
+            if below is not None and not isinstance(below, Enemy):
+                below.set_health(below.hp - self.attack / 2)
 
     def idle_animation(self) -> None:
         self.animate_object(

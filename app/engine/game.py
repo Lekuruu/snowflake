@@ -474,7 +474,32 @@ class Game:
             time.sleep(1)
 
     def do_enemy_actions(self) -> None:
-        ...
+        self.wait_for_animations()
+
+        for enemy in self.enemies:
+            if enemy.hp <= 0:
+                continue
+
+            next_move, target = enemy.next_target()
+
+            if not next_move:
+                continue
+
+            enemy.move_enemy(next_move.x, next_move.y)
+            time.sleep(enemy.move_duration / 1000) # only for testing
+            self.wait_for_animations()
+
+            if target is None:
+                continue
+
+            target_object = self.grid[target.x, target.y]
+
+            if target_object is None:
+                continue
+
+            enemy.attack_target(target_object)
+            time.sleep(enemy.move_duration / 1000) # only for testing
+            self.wait_for_animations()
 
     def show_ui(self) -> None:
         for client in self.clients:

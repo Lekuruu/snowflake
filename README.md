@@ -24,9 +24,9 @@ This is still a work in progress, and is not ready for general use yet.
     - [x] Healing
     - [x] Reviving
 - [ ] Enemies
+    - [x] AI
     - [ ] Movement
     - [ ] Attacks
-    - [ ] AI
 - [ ] Powercards
     - [ ] Progressbar
     - [ ] Animations
