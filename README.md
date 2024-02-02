@@ -25,7 +25,7 @@ This is still a work in progress, and is not ready for general use yet.
     - [x] Reviving
 - [ ] Enemies
     - [x] AI
-    - [ ] Movement
+    - [x] Movement
     - [ ] Attacks
 - [ ] Powercards
     - [ ] Progressbar
