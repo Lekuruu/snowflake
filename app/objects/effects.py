@@ -70,7 +70,9 @@ class SnowProjectile(Effect):
                 Asset.from_name("snowninja_projectileangle_anim"),
                 Asset.from_name("snowninja_projectilehoriz_anim"),
                 Asset.from_name("snowninja_projectilevert_anim")
-            })
+            }),
+            x_offset=0.5,
+            y_offset=1
         )
 
     def play(self, target_x: int, target_y: int):
@@ -105,16 +107,20 @@ class SnowProjectile(Effect):
         y_diff = target_y - self.y
 
         if y_diff <= 0:
-            self.y_offset = 2.25
+            # Player is below the target
+            self.y_offset = 2.2
 
         else:
-            self.y_offset = 1
+            # Player is above the target
+            self.y_offset = 1.5
 
-        if x_diff == 0:
+        if x_diff < 0:
+            # Player is behind the target
+            self.x_offset = 1
+
+        else:
+            # Player is in front of the target
             self.x_offset = 0.5
-
-        elif x_diff < 0:
-            self.x_offset = 1.5
 
     def get_animation_name(self, target_x: int, target_y: int) -> str:
         x_diff = abs(target_x - self.x)
