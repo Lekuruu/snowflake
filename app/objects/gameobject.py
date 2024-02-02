@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
+from app.engine.callbacks import ActionType
 from app.data.constants import OriginMode, MirrorMode
 from .collections import SoundCollection, AssetCollection
 from .asset import Asset
@@ -207,13 +208,10 @@ class GameObject:
         self.target.send_tag('O_GONE', self.id)
         self.game.objects.remove(self)
         self.game.grid.remove(self)
-        self.remove_pending_animations()
+        self.remove_pending_actions()
 
-    def remove_pending_animations(self) -> None:
-        try:
-            self.game.callbacks.pending_animations.pop(self.id)
-        except KeyError:
-            pass
+    def remove_pending_actions(self) -> None:
+        self.game.callbacks.remove(self.id)
 
     def animate_object(
         self,
@@ -229,12 +227,14 @@ class GameObject:
         handle_id = -1
 
         if reset:
-            self.remove_pending_animations()
+            self.remove_pending_actions()
 
         if register:
-            handle_id = self.game.callbacks.register_animation(
-                self.id,
-                callback
+            handle_id = self.game.callbacks.register_action(
+                name=name,
+                type=ActionType.Animation,
+                object_id=self.id,
+                callback=callback
             )
 
         self.target.send_tag(
@@ -342,7 +342,7 @@ class GameObject:
             self.assets.add(Asset.from_name('blank_png'))
 
         self.place_sprite('blank_png')
-        self.remove_pending_animations()
+        self.remove_pending_actions()
 
     def add_sound(
         self,

@@ -290,7 +290,7 @@ class Game:
 
     def wait_for_animations(self) -> None:
         """Wait for all animations to finish"""
-        while self.callbacks.pending_animation_ids:
+        while self.callbacks.pending_animations:
             pass
 
     def wait_for_timer(self) -> None:

@@ -4,42 +4,106 @@ from __future__ import annotations
 from typing import Callable, Dict, List, TYPE_CHECKING
 from twisted.internet import reactor
 from collections import defaultdict
+from dataclasses import dataclass
+from enum import IntEnum
 
 if TYPE_CHECKING:
     from app.engine.game import Game
 
+class ActionType(IntEnum):
+    Animation = 0
+    Sound = 1
+
+@dataclass
+class Action:
+    name: str
+    handle_id: int
+    object_id: int
+    type: ActionType
+    callback: Callable | None = None
+
 class CallbackHandler:
+    """This class manages callbacks for animations and sounds"""
+
     def __init__(self, game: "Game"):
-        self.pending_animations: Dict[int, List[int]] = defaultdict(list)
-        self.callbacks: Dict[int, Callable] = {}
+        self.pending: Dict[int, List[Action]] = defaultdict(list)
         self.game = game
 
     @property
-    def pending_animation_ids(self) -> List[int]:
-        return [id for ids in self.pending_animations.values() for id in ids]
+    def ids(self) -> List[int]:
+        return [
+            action.handle_id
+            for actions in self.pending.values()
+            for action in actions
+        ]
 
-    def register_animation(self, object_id: int, callback: Callable | None = None) -> int:
-        id = self.next_id()
+    @property
+    def actions(self) -> List[Action]:
+        return [
+            action
+            for actions in self.pending.values()
+            for action in actions
+        ]
 
-        if id not in self.pending_animations[object_id]:
-            self.pending_animations[object_id].append(id)
+    @property
+    def pending_animations(self) -> List[Action]:
+        return [
+            action
+            for action in self.actions
+            if action.type == ActionType.Animation
+        ]
 
-        if callback is not None:
-            self.callbacks[id] = callback
+    @property
+    def pending_sounds(self) -> List[Action]:
+        return [
+            action
+            for action in self.actions
+            if action.type == ActionType.Sound
+        ]
 
-        return id
+    def by_id(self, id: int) -> Action | None:
+        return next([action for action in self.actions if action.handle_id == id], None)
 
-    def animation_done(self, id: int):
-        for object_id, ids in self.pending_animations.items():
-            if id not in ids:
-                continue
+    def by_name(self, name: str) -> Action | None:
+        return next([action for action in self.actions if action.name == name], None)
 
-            self.pending_animations[object_id].remove(id)
-            break
-
-        if id in self.callbacks:
-            reactor.callInThread(self.callbacks[id], self.game.objects.by_id(object_id))
-            self.callbacks.pop(id)
+    def remove(self, object_id: int) -> None:
+        if object_id in self.pending:
+            self.pending.pop(object_id, None)
 
     def next_id(self) -> int:
-        return max(self.pending_animation_ids, default=0) + 1
+        return max(self.ids or [0]) + 1
+
+    def register_action(
+        self,
+        name: str,
+        type: ActionType,
+        object_id: int,
+        callback: Callable | None = None
+    ) -> int:
+        action = Action(
+            name,
+            self.next_id(),
+            object_id,
+            type,
+            callback
+        )
+
+        self.pending[object_id].append(action)
+        return action.handle_id
+
+    def action_done(self, id: int, object_id: int):
+        target_object = self.game.objects.by_id(object_id)
+
+        for action in self.pending[object_id]:
+            if action.handle_id != id:
+                continue
+
+            if action.callback is not None:
+                reactor.callInThread(
+                    action.callback,
+                    target_object
+                )
+
+            self.pending[object_id].remove(action)
+            break
