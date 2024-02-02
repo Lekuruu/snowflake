@@ -16,7 +16,7 @@ def on_window_manager_ready(client: Penguin, data: dict):
         return
 
     loading_screen = client.window_manager.get_window(
-        url=f'{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows/../assets/cjsnow_loadingscreenassets.swf',
+        url=f'{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/assets/cjsnow_loadingscreenassets.swf',
         name='cjsnow_loadingscreenassets.swf'
     )
 
