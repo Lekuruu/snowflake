@@ -33,14 +33,14 @@ class CallbackHandler:
     """This class manages callbacks for animations and sounds"""
 
     def __init__(self, game: "Game"):
-        self.pending: Dict[int, Set[Action]] = defaultdict(LockedSet)
+        self.pending: Dict[int, List[Action]] = defaultdict(list)
         self.game = game
 
     @property
     def ids(self) -> List[int]:
         return [
             action.handle_id
-            for actions in self.pending.values()
+            for actions in list(self.pending.values())
             for action in actions
         ]
 
@@ -48,7 +48,7 @@ class CallbackHandler:
     def actions(self) -> List[Action]:
         return [
             action
-            for actions in self.pending.values()
+            for actions in list(self.pending.values())
             for action in actions
         ]
 
@@ -96,7 +96,7 @@ class CallbackHandler:
             callback
         )
 
-        self.pending[object_id].add(action)
+        self.pending[object_id].append(action)
         return action.handle_id
 
     def action_done(self, id: int, object_id: int):
