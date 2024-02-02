@@ -11,42 +11,42 @@ if TYPE_CHECKING:
     from .sound import Sound
     from .asset import Asset
 
-from typing import Set, List, Iterator, Iterable
+from typing import Any, Set, List, Iterator, Iterable
 from threading import Lock
 
 import logging
 
-class Players(Set["Penguin"]):
+class LockedSet(Set):
     def __init__(self):
         self.lock = Lock()
         super().__init__()
 
-    def __iter__(self) -> Iterator["Penguin"]:
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__} ({len(self)})>'
+
+    def __iter__(self) -> Iterator[Any]:
         with self.lock:
-            players = iter(list(super().__iter__()))
-        return players
+            items = iter(list(super().__iter__()))
+        return items
 
     def __len__(self) -> int:
         with self.lock:
             return len(list(super().__iter__()))
 
-    def __contains__(self, player: "Penguin") -> bool:
+    def __contains__(self, item: Any) -> bool:
         with self.lock:
-            return super().__contains__(player)
+            return super().__contains__(item)
 
-    def __repr__(self) -> str:
-        with self.lock:
-            return f'<Players ({len(self)})>'
+    def add(self, item: Any) -> None:
+        return super().add(item)
 
-    def add(self, player: "Penguin") -> None:
-        return super().add(player)
-
-    def remove(self, player: "Penguin") -> None:
+    def remove(self, item: Any) -> None:
         try:
-            return super().remove(player)
+            return super().remove(item)
         except (ValueError, KeyError):
             pass
 
+class Players(LockedSet):
     def by_id(self, id: int) -> "Penguin" | None:
         return next((player for player in self if player.pid == id), None)
 
@@ -68,38 +68,11 @@ class Players(Set["Penguin"]):
     def with_element(self, element: str) -> List["Penguin"]:
         return [player for player in self if player.element == element]
 
-class Games(Set["Game"]):
-    def __init__(self):
-        self.lock = Lock()
-        super().__init__()
-
-    def __iter__(self) -> Iterator["Game"]:
-        with self.lock:
-            games = iter(list(super().__iter__()))
-        return games
-
-    def __len__(self) -> int:
-        with self.lock:
-            return len(list(super().__iter__()))
-
-    def __contains__(self, game: "Game") -> bool:
-        with self.lock:
-            return super().__contains__(game)
-
-    def __repr__(self) -> str:
-        with self.lock:
-            return f'<Games ({len(self)})>'
-
+class Games(LockedSet):
     def add(self, game: "Game") -> None:
         game.id = self.next_id()
         game.logger = logging.getLogger(f'Game ({game.id})')
         return super().add(game)
-
-    def remove(self, game: "Game") -> None:
-        try:
-            return super().remove(game)
-        except (ValueError, KeyError):
-            pass
 
     def by_id(self, id: int) -> "Game" | None:
         return next((game for game in self if game.id == id), None)
