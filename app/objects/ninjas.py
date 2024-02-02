@@ -1,12 +1,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Iterator
 from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
-    from app.objects.enemies import Enemy
     from app.engine.game import Game
 
 from app.data import MirrorMode, Phase
@@ -16,6 +15,8 @@ from app.objects.effects import (
     FireProjectile,
     HealParticles
 )
+
+from app.objects.enemies import Enemy
 from app.objects import (
     SoundCollection,
     AssetCollection,
@@ -197,20 +198,18 @@ class Ninja(GameObject):
     def show_targets(self) -> None:
         self.remove_targets()
 
-        healable_tiles = self.game.grid.healable_tiles(
+        healable_tiles = self.healable_tiles(
             self.x if not self.placed_ghost else self.ghost.x,
-            self.y if not self.placed_ghost else self.ghost.y,
-            self
+            self.y if not self.placed_ghost else self.ghost.y
         )
 
         for tile in healable_tiles:
             self.targets.append(target := Target(self, tile.x, tile.y))
             target.show_heal()
 
-        attackable_tiles = self.game.grid.attackable_tiles(
+        attackable_tiles = self.attackable_tiles(
             self.x if not self.placed_ghost else self.ghost.x,
-            self.y if not self.placed_ghost else self.ghost.y,
-            self
+            self.y if not self.placed_ghost else self.ghost.y
         )
 
         for tile in attackable_tiles:
@@ -227,7 +226,7 @@ class Ninja(GameObject):
 
         self.targets = []
 
-    def attack_target(self, target: "Enemy"):
+    def attack_target(self, target: Enemy):
         # This delay seems to fix the mirror mode?
         time.sleep(0.25)
 
@@ -248,6 +247,61 @@ class Ninja(GameObject):
         self.heal_animation()
         time.sleep(0.4)
         target.set_health(target.hp + self.attack)
+
+    def movable_tiles(self) -> Iterator[GameObject]:
+        for tile in self.game.grid.tiles:
+            if not self.game.grid.can_move(tile.x, tile.y):
+                continue
+
+            distance = abs(tile.x - self.x) + abs(tile.y - self.y)
+
+            if distance <= self.move:
+                yield tile
+
+    def attackable_tiles(self, target_x: int, target_y: int) -> Iterator[Enemy]:
+        if self.hp <= 0:
+            return []
+
+        for tile in self.game.grid.tiles:
+            target_object = self.game.grid[tile.x, tile.y]
+
+            if not isinstance(target_object, Enemy):
+                continue
+
+            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
+
+            if distance <= self.range:
+                yield tile
+
+    def healable_tiles(self, target_x: int, target_y: int) -> Iterator["Ninja"]:
+        if self.hp <= 0:
+            return []
+
+        for tile in self.game.grid.tiles:
+            target_object = self.game.grid[tile.x, tile.y]
+
+            if not isinstance(target_object, Ninja):
+                continue
+
+            if target_object.client.disconnected:
+                continue
+
+            if target_object == self:
+                # Ninja cannot heal itself
+                continue
+
+            if target_object.hp != 0 and self.name != 'Snow':
+                # Only snow can heal ninjas that are not dead
+                continue
+
+            if target_object.hp == target_object.max_hp:
+                # Ninja is already at full health
+                continue
+
+            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
+
+            if distance <= self.range:
+                yield tile
 
     def idle_animation(self) -> None:
         ...

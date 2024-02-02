@@ -1,9 +1,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Tuple, Iterator
+from typing import TYPE_CHECKING, List, Tuple
 from app.objects import GameObject, Asset
-from app.objects.enemies import Enemy
 from app.objects.ninjas import Ninja
 from app.data.constants import Phase
 
@@ -111,69 +110,12 @@ class Grid:
                 self.tiles.append(tile)
                 tile.place_object()
 
-    def movable_tiles(self, ninja: Ninja) -> Iterator[GameObject]:
-        for tile in self.tiles:
-            if not self.can_move(tile.x, tile.y):
-                continue
-
-            distance = abs(tile.x - ninja.x) + abs(tile.y - ninja.y)
-
-            if distance <= ninja.move:
-                yield tile
-
-    def attackable_tiles(self, target_x: int, target_y: int, ninja: Ninja) -> Iterator[Enemy]:
-        if ninja.hp <= 0:
-            return []
-
-        for tile in self.tiles:
-            target_object = self[tile.x, tile.y]
-
-            if not isinstance(target_object, Enemy):
-                continue
-
-            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
-
-            if distance <= ninja.range:
-                yield tile
-
-    def healable_tiles(self, target_x: int, target_y: int, ninja: Ninja) -> Iterator[Ninja]:
-        if ninja.hp <= 0:
-            return []
-
-        for tile in self.tiles:
-            target_object = self[tile.x, tile.y]
-
-            if not isinstance(target_object, Ninja):
-                continue
-
-            if target_object.client.disconnected:
-                continue
-
-            if target_object == ninja:
-                # Ninja cannot heal itself
-                continue
-
-            if target_object.hp != 0 and ninja.name != 'Snow':
-                # Only snow can heal ninjas that are not dead
-                continue
-
-            if target_object.hp == target_object.max_hp:
-                # Ninja is already at full health
-                continue
-
-            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
-
-            if distance <= ninja.range:
-                yield tile
-
     def show_tiles(self) -> None:
         tile_frame = self.game.objects.by_name('ui_tile_frame')
         tile_frame.place_sprite('ui_tile_frame')
 
         for client in self.game.clients:
-            ninja = self.game.objects.by_name(client.element.capitalize())
-
-            for tile in self.movable_tiles(ninja):
+            for tile in client.ninja.movable_tiles():
                 tile.place_sprite('ui_tile_move', client)
 
     def hide_tiles(self) -> None:
