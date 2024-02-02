@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine.game import Game
 
+from app.data import MirrorMode
 from app.objects import (
     SoundCollection,
     AssetCollection,
@@ -130,8 +131,10 @@ class Enemy(GameObject):
         if target.hp <= 0:
             return
 
+        # This seems to fix the mirror mode?
+        time.sleep(0.25)
+
         self.attack_animation()
-        self.attack_sound()
         target.set_health(target.hp - self.attack)
 
     def movable_tiles(self) -> Iterator[GameObject]:
@@ -264,6 +267,9 @@ class Enemy(GameObject):
     def hit_sound(self) -> None:
         ...
 
+    def impact_sound(self) -> None:
+        ...
+
 class Sly(Enemy):
     name: str = 'Sly'
     max_hp: int = 30
@@ -302,8 +308,10 @@ class Sly(Enemy):
         if target.hp <= 0:
             return
 
-        self.attack_animation()
-        self.attack_sound()
+        # This seems to fix the mirror mode?
+        time.sleep(0.25)
+
+        self.attack_animation(target.x, target.y)
         target.set_health(
             target.hp - self.simulate_damage(self.x, self.y, target)
         )
@@ -314,6 +322,33 @@ class Sly(Enemy):
             play_style='loop',
             register=False
         )
+
+    def move_animation(self) -> None:
+        self.animate_object(
+            f'sly_move_anim',
+            play_style='loop',
+            reset=True
+        )
+        self.idle_animation()
+
+    def attack_animation(self, x: int, y: int) -> None:
+        if self.x < x:
+            self.mirror_mode = MirrorMode.X
+
+        time.sleep(0.25)
+        self.animate_object(
+            f'sly_attack_anim',
+            play_style='play_once',
+            callback=self.reset_sprite_settings,
+            reset=True
+        )
+        self.attack_sound()
+        self.idle_animation()
+
+        time.sleep(1.85)
+        self.impact_sound()
+
+        # TODO: Snowball particle
 
     def ko_animation(self) -> None:
         self.animate_object(
@@ -334,6 +369,12 @@ class Sly(Enemy):
 
     def hit_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmanslyhit')
+
+    def attack_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacksly')
+
+    def impact_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_impactsly')
 
 class Scrap(Enemy):
     name: str = 'Scrap'
@@ -376,8 +417,10 @@ class Scrap(Enemy):
         if target.hp <= 0:
             return
 
-        self.attack_animation()
-        self.attack_sound()
+        # This seems to fix the mirror mode?
+        time.sleep(0.25)
+
+        self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
 
         tile = self.game.grid.get_tile(target.x, target.y)
@@ -397,6 +440,33 @@ class Scrap(Enemy):
             register=False
         )
 
+    def move_animation(self) -> None:
+        self.animate_object(
+            f'scrap_move_anim',
+            play_style='loop',
+            reset=True
+        )
+        self.idle_animation()
+
+    def attack_animation(self, x: int, y: int) -> None:
+        if self.x < x:
+            self.mirror_mode = MirrorMode.X
+
+        self.animate_object(
+            f'scrap_attack_anim',
+            play_style='play_once',
+            callback=self.reset_sprite_settings,
+            reset=True
+        )
+        self.idle_animation()
+
+        time.sleep(0.7)
+        self.attack_sound()
+        time.sleep(1.1)
+        self.impact_sound()
+
+        # TODO: Snowball particle
+
     def ko_animation(self) -> None:
         self.animate_object(
             f'scrap_ko_anim',
@@ -415,6 +485,12 @@ class Scrap(Enemy):
 
     def hit_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmanscraphit')
+
+    def attack_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attackscrap')
+
+    def impact_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_impactscrap')
 
 class Tank(Enemy):
     name: str = 'Tank'
@@ -481,8 +557,10 @@ class Tank(Enemy):
         if target.hp <= 0:
             return
 
-        self.attack_animation()
-        self.attack_sound()
+        # This seems to fix the mirror mode?
+        time.sleep(0.25)
+
+        self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
 
         if self.x == target.x:
@@ -512,6 +590,30 @@ class Tank(Enemy):
             register=False
         )
 
+    def move_animation(self) -> None:
+        self.animate_object(
+            f'tank_move_anim',
+            play_style='loop',
+            reset=True
+        )
+        self.idle_animation()
+
+    def attack_animation(self, x: int, y: int) -> None:
+        if self.x < x:
+            self.mirror_mode = MirrorMode.X
+
+        self.attack_sound()
+        self.animate_object(
+            f'tank_attack_anim',
+            play_style='play_once',
+            callback=self.reset_sprite_settings,
+            reset=True
+        )
+        self.idle_animation()
+        time.sleep(0.15)
+
+        # TODO: Swipe effect
+
     def ko_animation(self) -> None:
         self.animate_object(
             f'tank_ko_anim',
@@ -530,3 +632,6 @@ class Tank(Enemy):
 
     def hit_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmantankhit')
+
+    def attack_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacktank')
