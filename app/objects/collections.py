@@ -11,12 +11,14 @@ if TYPE_CHECKING:
     from .sound import Sound
     from .asset import Asset
 
-from typing import Any, Set, List, Iterator, Iterable
+from typing import Set, List, TypeVar, Iterator, Iterable, Generic
 from threading import Lock
 
 import logging
 
-class LockedSet(Set):
+T = TypeVar('T')
+
+class LockedSet(Set, Generic[T]):
     def __init__(self):
         self.lock = Lock()
         super().__init__()
@@ -24,7 +26,7 @@ class LockedSet(Set):
     def __repr__(self) -> str:
         return f'<{self.__class__.__name__} ({len(self)})>'
 
-    def __iter__(self) -> Iterator[Any]:
+    def __iter__(self) -> Iterator[T]:
         with self.lock:
             items = iter(list(super().__iter__()))
         return items
@@ -33,20 +35,20 @@ class LockedSet(Set):
         with self.lock:
             return len(list(super().__iter__()))
 
-    def __contains__(self, item: Any) -> bool:
+    def __contains__(self, item: T) -> bool:
         with self.lock:
             return super().__contains__(item)
 
-    def add(self, item: Any) -> None:
+    def add(self, item: T) -> None:
         return super().add(item)
 
-    def remove(self, item: Any) -> None:
+    def remove(self, item: T) -> None:
         try:
             return super().remove(item)
         except (ValueError, KeyError):
             pass
 
-class Players(LockedSet):
+class Players(LockedSet["Penguin"]):
     def by_id(self, id: int) -> "Penguin" | None:
         return next((player for player in self if player.pid == id), None)
 
@@ -68,7 +70,7 @@ class Players(LockedSet):
     def with_element(self, element: str) -> List["Penguin"]:
         return [player for player in self if player.element == element]
 
-class Games(LockedSet):
+class Games(LockedSet["Game"]):
     def add(self, game: "Game") -> None:
         game.id = self.next_id()
         game.logger = logging.getLogger(f'Game ({game.id})')
