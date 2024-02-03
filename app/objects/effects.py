@@ -108,7 +108,7 @@ class Explosion(Effect):
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
-        reactor.callLater(0.35, self.remove_object)
+        reactor.callLater(0.4, self.remove_object)
 
 class SnowProjectile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
