@@ -23,10 +23,10 @@ This is still a work in progress, and is not ready for general use yet.
     - [x] Attacks
     - [x] Healing
     - [x] Reviving
-- [ ] Enemies
-    - [x] AI
+- [x] Enemies
     - [x] Movement
-    - [ ] Attacks
+    - [x] Attacks
+    - [x] AI
 - [ ] Powercards
     - [ ] Progressbar
     - [ ] Animations
