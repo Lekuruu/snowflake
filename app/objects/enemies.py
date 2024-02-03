@@ -10,9 +10,13 @@ if TYPE_CHECKING:
 from app.data import MirrorMode
 
 from app.objects.effects import (
+    ScrapImpactSurroundings,
+    ScrapProjectileImpact,
     TankSwipeHorizontal,
     TankSwipeVertical,
+    ScrapImpact,
     AttackTile,
+    Explosion,
     Effect
 )
 
@@ -419,10 +423,10 @@ class Scrap(Enemy):
     })
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
-        sorrounding_targets = list(self.attackable_tiles(target.x, target.y, range=1))
-        sorrounding_targets.remove(target)
+        surrounding_targets = list(self.attackable_tiles(target.x, target.y, range=1))
+        surrounding_targets.remove(target)
 
-        return self.attack + (self.attack / 2) * len(sorrounding_targets)
+        return self.attack + (self.attack / 2) * len(surrounding_targets)
 
     def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
@@ -434,15 +438,35 @@ class Scrap(Enemy):
         self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
 
-        tile = self.game.grid.get_tile(target.x, target.y)
+        ScrapProjectileImpact(
+            self.game,
+            target.x,
+            target.y
+        ).play()
 
-        sorrounding_targets = list(self.attackable_tiles(target.x, target.y, range=1))
-        sorrounding_targets.remove(tile)
+        surrounding_targets = [
+            object for object in self.game.grid.surrounding_objects(target.x, target.y)
+            if object.name in ('Water', 'Fire', 'Snow') and object.hp > 0
+        ]
 
-        time.sleep(0.25)
-        for sorrounding_target in sorrounding_targets:
-            object = self.game.grid[sorrounding_target.x, sorrounding_target.y]
+        if surrounding_targets:
+            self.impact_sound()
+
+        for surrounding_target in surrounding_targets:
+            object = self.game.grid[surrounding_target.x, surrounding_target.y]
             object.set_health(object.hp - self.attack / 2)
+
+            Explosion(
+                self.game,
+                surrounding_target.x,
+                surrounding_target.y
+            ).play()
+
+        ScrapImpactSurroundings(
+            self.game,
+            target.x,
+            target.y
+        ).play()
 
     def idle_animation(self) -> None:
         self.animate_object(
@@ -477,7 +501,7 @@ class Scrap(Enemy):
         time.sleep(1.1)
         self.impact_sound()
 
-        # TODO: Snowball particle
+        ScrapImpact(self.game, x, y).play()
 
     def ko_animation(self) -> None:
         self.animate_object(
