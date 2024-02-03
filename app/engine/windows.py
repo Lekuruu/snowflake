@@ -55,7 +55,6 @@ class SWFWindow:
         )
 
     def load(self, initial_payload: dict = None, **kwargs):
-        self.client.logger.debug(f'Loading window {self}')
         self.send(
             {
                 'windowUrl': self.url,
@@ -69,7 +68,6 @@ class SWFWindow:
         )
 
     def close(self, **kwargs):
-        self.client.logger.debug(f'Closing window: {self}')
         self.send(
             {
                 'targetWindow': self.url,
@@ -80,7 +78,6 @@ class SWFWindow:
         )
 
     def send_payload(self, trigger_name: str, payload: dict = {}, type = EventType.IMMEDIATE, **kwargs):
-        self.client.logger.debug(f'Sending payload to window: \n{json.dumps(payload, indent=4)}')
         self.send(
             {
                 'jsonPayload': payload,
@@ -93,7 +90,6 @@ class SWFWindow:
         )
 
     def send_action(self, action: str, type = EventType.IMMEDIATE, **kwargs):
-        self.client.logger.debug(f'Sending action to window: {action}')
         self.send(
             {
                 'action': action,
@@ -129,7 +125,6 @@ class WindowManager(Dict[str, SWFWindow]):
         self.ready = False
 
     def __setitem__(self, name: str, window: SWFWindow) -> None:
-        self.client.logger.debug(f'Loading new window: {window}')
         return super().__setitem__(name, window)
     
     def get_window(self, name: str | None = None, url: str | None = None):
@@ -149,7 +144,6 @@ class WindowManager(Dict[str, SWFWindow]):
         return self[name]
 
     def load(self):
-        self.client.logger.debug(f'Loading window manager...')
         self.client.send_tag(
             'UI_CROSSWORLDSWFREF',
             self.element_id,

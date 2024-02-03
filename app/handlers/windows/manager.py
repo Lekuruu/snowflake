@@ -7,7 +7,6 @@ import time
 
 @Instance.triggers.register('windowManagerReady')
 def on_window_manager_ready(client: Penguin, data: dict):
-    client.logger.debug('Loaded window manager')
     client.window_manager.ready = True
 
     if client.battle_mode != 0:
