@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING, List, Tuple, Iterator
 from app.objects import GameObject, Asset
 from app.objects.ninjas import Ninja
 from app.data.constants import Phase
@@ -140,3 +140,24 @@ class Grid:
 
         if client.tip_mode and client.last_tip == Phase.MOVE:
             client.game.hide_tip(client)
+
+    def surrounding_tiles(self, center_x: int, center_y: int, distance: int = 1) -> Iterator[GameObject]:
+        x_range = range(center_x - distance, center_x + distance + 1)
+        y_range = range(center_y - distance, center_y + distance + 1)
+
+        for x in x_range:
+            for y in y_range:
+                if not self.is_valid(x, y):
+                    continue
+
+                if x == center_x and y == center_y:
+                    continue
+
+                yield self.get_tile(x, y)
+
+    def surrounding_objects(self, x: int, y: int, distance: int = 1) -> Iterator[GameObject]:
+        tiles = self.surrounding_tiles(x, y, distance)
+
+        for tile in tiles:
+            if (object := self[tile.x, tile.y]) is not None:
+                yield object
