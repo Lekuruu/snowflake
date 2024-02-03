@@ -477,6 +477,8 @@ class Game:
         self.wait_for_animations()
 
         for enemy in self.enemies:
+            time.sleep(0.5)
+
             if enemy.hp <= 0:
                 continue
 
