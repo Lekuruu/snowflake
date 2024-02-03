@@ -94,6 +94,22 @@ class HealParticles(Effect):
         time.sleep(0.737)
         self.remove_object()
 
+class Explosion(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "effect_explosion_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+        reactor.callLater(0.35, self.remove_object)
+
 class SnowProjectile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
         super().__init__(
