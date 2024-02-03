@@ -1,7 +1,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
+from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.engine.game import Game
@@ -41,7 +42,39 @@ class Effect(GameObject):
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
-        self.animate_sprite()
+
+class AttackTile(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "ui_tile_attack",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=0.9998
+        )
+
+    def play(self):
+        if not self.game.grid.is_valid(self.x, self.y):
+            return
+
+        self.place_object()
+        self.place_sprite(self.name)
+
+class HealTile(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "ui_tile_heal",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=0.9998
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
 
 class HealParticles(Effect):
     def __init__(self, game: "Game", x: int, y: int):
