@@ -372,22 +372,22 @@ class ScrapProjectileImpact:
         projectile.play_east(self.center_x - 1, self.center_y)
 
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
-        projectile.play_north(self.center_x, self.center_y - 0.5)
+        projectile.play_north(self.center_x, self.center_y - 0.8)
 
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
-        projectile.play_north(self.center_x, self.center_y + 0.5)
+        projectile.play_north(self.center_x, self.center_y + 0.8)
 
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
-        projectile.play_northeast(self.center_x + 1, self.center_y - 0.5)
+        projectile.play_northeast(self.center_x + 1, self.center_y - 0.8)
 
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
-        projectile.play_northeast(self.center_x - 1, self.center_y - 0.5)
+        projectile.play_northeast(self.center_x - 1, self.center_y - 0.8)
 
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
-        projectile.play_northeast(self.center_x + 1, self.center_y + 0.5)
+        projectile.play_northeast(self.center_x + 1, self.center_y + 0.8)
 
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
-        projectile.play_northeast(self.center_x - 1, self.center_y + 0.5)
+        projectile.play_northeast(self.center_x - 1, self.center_y + 0.8)
 
         time.sleep(0.4)
         for effect in self.effects:
