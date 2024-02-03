@@ -38,6 +38,7 @@ class Timer:
                 return
 
             if all(client.disconnected for client in self.game.clients):
+                self.game.close()
                 return
 
             if all(client.is_ready for client in self.game.clients if not client.disconnected):
