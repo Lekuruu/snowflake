@@ -14,6 +14,7 @@ from app.objects.effects import (
     ScrapProjectileImpact,
     TankSwipeHorizontal,
     TankSwipeVertical,
+    SlyProjectile,
     ScrapImpact,
     AttackTile,
     Explosion,
@@ -354,13 +355,22 @@ class Sly(Enemy):
             callback=self.reset_sprite_settings,
             reset=True
         )
-        self.attack_sound()
         self.idle_animation()
+        self.attack_sound()
 
-        time.sleep(1.85)
+        time.sleep(1.4)
+        projectile = SlyProjectile(self.game, self.x, self.y)
+        projectile.play(x, y)
+
+        time.sleep(0.5)
         self.impact_sound()
+        projectile.remove_object()
 
-        # TODO: Snowball particle
+        Explosion(
+            self.game,
+            x,
+            y
+        ).play()
 
     def ko_animation(self) -> None:
         self.animate_object(
