@@ -496,6 +496,9 @@ class Game:
             if target_object is None:
                 continue
 
+            if target_object.hp <= 0:
+                continue
+
             enemy.attack_target(target_object)
             self.wait_for_animations()
 
