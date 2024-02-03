@@ -418,7 +418,8 @@ class WaterNinja(Ninja):
     def ko_animation(self) -> None:
         self.animate_object(
             'waterninja_kostart_anim',
-            play_style='play_once'
+            play_style='play_once',
+            reset=True
         )
         self.animate_object(
             'waterninja_koloop_anim',
@@ -451,7 +452,8 @@ class WaterNinja(Ninja):
     def win_animation(self) -> None:
         self.animate_object(
             'waterninja_celebrate_anim',
-            play_style='loop'
+            play_style='loop',
+            reset=True
         )
 
     def revive_animation(self) -> None:
@@ -532,7 +534,8 @@ class SnowNinja(Ninja):
     def ko_animation(self) -> None:
         self.animate_object(
             'snowninja_kostart_anim',
-            play_style='play_once'
+            play_style='play_once',
+            reset=True
         )
         self.animate_object(
             'snowninja_koloop_anim',
@@ -664,7 +667,8 @@ class FireNinja(Ninja):
     def ko_animation(self) -> None:
         self.animate_object(
             'fireninja_kostart_anim',
-            play_style='play_once'
+            play_style='play_once',
+            reset=True
         )
         self.animate_object(
             'fireninja_koloop_anim',
