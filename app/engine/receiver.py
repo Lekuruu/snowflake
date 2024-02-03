@@ -11,7 +11,6 @@ from app.data import POLICY_FILE
 from app import engine
 
 import logging
-import shlex
 import time
 import json
 import ast
@@ -43,7 +42,7 @@ class Receiver(LineOnlyReceiver):
             return
 
         try:
-            parsed = shlex.split(data)
+            parsed = data.split(' ')
             command, args = parsed[0], parsed[1:]
         except (ValueError, UnicodeDecodeError):
             self.logger.warning(f'Invalid request: "{data}"')
@@ -51,22 +50,17 @@ class Receiver(LineOnlyReceiver):
             return
 
         for index, argument in enumerate(args):
-            if argument.startswith('{'):
-                # Try to convert the argument to a JSON object
-                # TODO: Refactor this mess
-                try:
-                    args = [json.loads(' '.join(data.split(' ')[1:]))]
-                    break
-                except json.JSONDecodeError:
-                    pass
-
             try:
+                if argument.startswith('{'):
+                    # We received a json string
+                    args = [json.loads(' '.join(args))]
+                    break
+
                 # Try to convert the argument to a Python object
                 args[index] = ast.literal_eval(argument)
-            except (ValueError, SyntaxError):
+            except (ValueError, SyntaxError, json.JSONDecodeError):
                 pass
 
-        self.logger.debug(f'-> "{command}": {args}')
         self.command_received(command, args)
 
     def connectionLost(self, reason: Failure | None = None) -> None:
