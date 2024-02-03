@@ -476,6 +476,9 @@ class Game:
     def do_enemy_actions(self) -> None:
         self.wait_for_animations()
 
+        if config.DISABLE_ENEMY_AI:
+            return
+
         for enemy in self.enemies:
             time.sleep(0.5)
 

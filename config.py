@@ -19,3 +19,4 @@ VERSION = os.environ.get('VERSION', 'FY15-20150206 (4954)r')
 MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION', 'http://media.localhost')
 ENABLE_DEBUG_PLAYERS = os.environ.get('ENABLE_DEBUG_PLAYERS', 'False').lower() == 'true'
 ENABLE_DEBUG_LOGGING = os.environ.get('ENABLE_DEBUG_LOGGING', 'False').lower() == 'true'
+DISABLE_ENEMY_AI = os.environ.get('DISABLE_ENEMY_AI', 'False').lower() == 'true'
