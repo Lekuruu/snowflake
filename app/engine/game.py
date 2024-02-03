@@ -47,6 +47,8 @@ class Game:
         self.grid = Grid(self)
 
         self.logger = logging.getLogger('Game')
+        self.backgrounds = []
+        self.rocks = []
 
     @property
     def clients(self) -> List["Penguin"]:
@@ -71,22 +73,6 @@ class Game:
             *self.objects.with_name('Scrap'),
             *self.objects.with_name('Tank')
         ]
-
-    @property
-    def backgrounds(self) -> List[GameObject]:
-        return {
-            1: [
-                GameObject.from_asset('env_mountaintop_bg', self, x=4.5, y=-1.1)
-            ],
-            2: [
-                GameObject.from_asset('forest_bg', self, x=4.5, y=-1.1),
-                GameObject.from_asset('forest_fg', self, x=4.5, y=6.1)
-            ],
-            3: [
-                GameObject.from_asset('cragvalley_bg', self, x=4.5, y=-1.1),
-                GameObject.from_asset('cragvalley_fg', self, x=4.5, y=6)
-            ]
-        }[self.map]
 
     @property
     def bonus_cirteria_met(self) -> bool:
@@ -135,7 +121,7 @@ class Game:
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
 
-        self.show_background()
+        self.show_environment()
         self.spawn_ninjas()
 
         for client in self.clients:
@@ -329,7 +315,7 @@ class Game:
     def initialize_objects(self) -> None:
         """Initialize all game objects"""
         self.grid.initialize_tiles()
-        self.create_background()
+        self.create_environment()
         self.create_enemies()
         self.create_ninjas()
 
@@ -369,9 +355,41 @@ class Game:
             enemy = enemy_class(self)
             enemy.place_object()
 
-    def create_background(self) -> None:
+    def create_environment(self) -> None:
+        self.backgrounds = {
+            1: [
+                GameObject.from_asset('env_mountaintop_bg', self, x=4.5, y=-1.1)
+            ],
+            2: [
+                GameObject.from_asset('forest_bg', self, x=4.5, y=-1.1),
+                GameObject.from_asset('forest_fg', self, x=4.5, y=6.1)
+            ],
+            3: [
+                GameObject.from_asset('cragvalley_bg', self, x=4.5, y=-1.1),
+                GameObject.from_asset('cragvalley_fg', self, x=4.5, y=6)
+            ]
+        }[self.map]
+
         for background in self.backgrounds:
             background.place_object()
+
+        rock_name = 'crag_rock' if self.map == 3 else 'rock_mountaintop'
+        rock_positions = [(2, 0), (6, 0), (2, 4), (6, 4)]
+
+        self.rocks = [
+            GameObject.from_asset(
+                rock_name,
+                self,
+                x, y,
+                x_offset=0.5,
+                y_offset=1,
+                grid=True
+            )
+            for x, y in rock_positions
+        ]
+
+        for rock in self.rocks:
+            rock.place_object()
 
     def spawn_ninjas(self) -> None:
         water = self.objects.by_name('Water')
@@ -440,10 +458,14 @@ class Game:
         for ninja in self.ninjas:
             ninja.remove_targets()
 
-    def show_background(self) -> None:
+    def show_environment(self) -> None:
         for background in self.backgrounds:
-            obj = self.objects.by_name(background.name)
+            obj = self.objects.by_id(background.id)
             obj.place_sprite(background.name)
+
+        for rock in self.rocks:
+            obj = self.objects.by_id(rock.id)
+            obj.place_sprite(rock.name)
 
     def remove_objects(self) -> None:
         self.remove_targets()
@@ -454,6 +476,9 @@ class Game:
 
         for enemy in self.enemies:
             enemy.remove_object()
+
+        for rock in self.rocks:
+            rock.remove_object()
 
     def do_ninja_actions(self) -> None:
         for ninja in self.ninjas:
