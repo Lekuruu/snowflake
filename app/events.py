@@ -11,6 +11,9 @@ class EventHandler:
         self.logger = logging.getLogger("Events")
 
     def call(self, client: "Penguin", type: str, args: List[str]) -> None:
+        if type != '/framework':
+            self.logger.debug(f'{type}: {args}')
+
         if type in self.handlers:
             self.handlers[type](client, *args)
             return
@@ -19,7 +22,7 @@ class EventHandler:
 
     def register(self, type: str, login_required: bool = True) -> Callable:
         def wrapper(handler: Callable) -> Callable:
-            def login_wrapper(client, *args):
+            def login_wrapper(client: "Penguin", *args):
                 if not client.logged_in: return
                 handler(client, *args)
 
@@ -33,15 +36,22 @@ class EventHandler:
             return self.handlers[type]
         return wrapper
 
-class TriggerHandler(EventHandler):
+class FrameworkHandler:
     def __init__(self) -> None:
         self.handlers: Dict[str, Callable] = {}
-        self.logger = logging.getLogger("Triggers")
+        self.logger = logging.getLogger("Framework")
 
-    def call(self, trigger: str, client: "Penguin", json: dict) -> None:
+    def call(self, trigger: str, client: "Penguin", data: dict) -> None:
         if not client.window_manager.loaded:
             return
-        return super().call(client, trigger, [json])
+
+        self.logger.debug(f"{trigger}: {data}")
+
+        if trigger in self.handlers:
+            self.handlers[trigger](client, data)
+            return
+
+        self.logger.warning(f'Unknown event: "{trigger}"')
 
     def register(self, trigger: str):
         def wrapper(handler: Callable):
