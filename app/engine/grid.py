@@ -23,7 +23,8 @@ class Grid:
         return f"<Grid ({self.array})>"
 
     def __getitem__(self, index: Tuple[int, int]) -> GameObject | None:
-        return self.array[index[0]][index[1]]
+        if self.is_valid(*index):
+            return self.array[index[0]][index[1]]
 
     def __setitem__(self, index: Tuple[int, int], value: GameObject | None) -> None:
         self.array[index[0]][index[1]] = value
@@ -64,6 +65,10 @@ class Grid:
                 return (x, y)
 
         return (-1, -1)
+
+    def is_valid(self, x: int, y: int) -> bool:
+        """Check if a tile is valid"""
+        return x in range(9) and y in range(5)
 
     def can_move(self, x: int, y: int) -> bool:
         """Check if a tile is empty"""
