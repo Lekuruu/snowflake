@@ -245,6 +245,29 @@ class FireProjectile(Effect):
 
         return "fireninja_projectile_right_anim"
 
+class SlyProjectile(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "sly_projectile_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self, target_x: int, target_y: int):
+        if self.x > target_x:
+            self.x_offset = 1
+            self.y_offset = 0.8
+
+        self.place_object()
+        self.place_sprite(self.name)
+
+        self.x_offset = 0.5
+        self.y_offset = 1
+        self.move_object(target_x, target_y, duration=500)
+
 class ScrapImpact(Effect):
     def __init__(self, game: "Game", x: int, y: int):
         super().__init__(
