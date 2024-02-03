@@ -38,7 +38,7 @@ class Game:
         self.bonus_cirteria = random.choice(['no_ko', 'under_time', 'full_health'])
         self.game_start = time.time()
 
-        self.map = random.randrange(1, 3)
+        self.map = random.randint(1, 3)
         self.round = 0
 
         self.callbacks = CallbackHandler(self)
