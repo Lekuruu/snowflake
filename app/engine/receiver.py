@@ -12,6 +12,7 @@ from app import engine
 
 import logging
 import shlex
+import time
 import json
 import ast
 
@@ -20,6 +21,7 @@ class Receiver(LineOnlyReceiver):
         self.address = address
         self.server = server
         self.logger = logging.getLogger(address.host)
+        self.last_action = time.time()
         self.disconnected = False
 
     def dataReceived(self, data: bytes):
@@ -29,6 +31,7 @@ class Receiver(LineOnlyReceiver):
             self.close_connection()
             return
 
+        self.last_action = time.time()
         return super().dataReceived(data)
 
     def lineReceived(self, line: bytes):
