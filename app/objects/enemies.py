@@ -167,7 +167,7 @@ class Enemy(GameObject):
             if not target_object:
                 continue
 
-            if isinstance(target_object, Enemy):
+            if not target_object.name in ('Water', 'Fire', 'Snow'):
                 continue
 
             if target_object.hp <= 0:
