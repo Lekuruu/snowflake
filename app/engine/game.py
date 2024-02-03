@@ -539,11 +539,11 @@ class Game:
                 infotip.on_close = after_close
                 return
 
+            client.displayed_tips.append(phase)
             client.send_tip(phase)
 
     def hide_tip(self, client: "Penguin") -> None:
-        infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
-        infotip.send_payload('disable')
+        client.hide_tip()
 
     def enable_cards(self) -> None:
         for client in self.clients:

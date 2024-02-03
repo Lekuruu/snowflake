@@ -111,13 +111,16 @@ class Penguin(Receiver):
             xPercent=0.1,
             yPercent=0
         )
-        self.displayed_tips.append(phase)
         self.last_tip = phase
 
         def on_close(client: "Penguin"):
             client.last_tip = None
 
         infotip.on_close = on_close
+
+    def hide_tip(self) -> None:
+        infotip = self.window_manager.get_window('cardjitsu_snowinfotip.swf')
+        infotip.send_payload('disable')
 
     def initialize_game(self) -> None:
         self.send_tag('P_MAPBLOCK', 't', 1, 1, 'iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAAAAACyOJm3AAAADklEQVQImWNghgEGIlkADWEAiDEh28IAAAAASUVORK5CYII=')
