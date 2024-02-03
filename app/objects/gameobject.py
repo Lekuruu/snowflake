@@ -362,9 +362,10 @@ class GameObject:
             )
         )
 
-    def play_sound(self, sound_name: str, target: "Penguin" | None = None) -> None:
+    def play_sound(self, sound_name: str, target: "Penguin" | None = None) -> Sound:
         sound = self.sounds.by_name(sound_name)
-        sound.play(target or self.game)
+        sound.play(target or self.game, self.id)
+        return sound
 
 class LocalGameObject(GameObject):
     """

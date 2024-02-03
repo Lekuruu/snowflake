@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
-from app.engine.callbacks import CallbackHandler
+from app.engine.callbacks import CallbackHandler, ActionType
+from app.objects.asset import Asset
 import app.engine as Engine
-from .asset import Asset
 
 from dataclasses import dataclass
 
@@ -73,7 +73,17 @@ class Sound(Asset):
             response_object_id
         )
 
-    def play(self, target: "Game" | "Penguin") -> None:
+    def play(self, target: "Game" | "Penguin", object_id: int = -1, callback: Callable | None = None) -> None:
+        try:
+            target.callbacks.register_action(
+                self.name,
+                ActionType.Sound,
+                object_id,
+                callback
+            )
+        except AttributeError:
+            pass
+
         target.send_tag(
             'FX_PLAYSOUND',
             f'0:{self.index}',
@@ -83,4 +93,13 @@ class Sound(Asset):
             self.game_object_id,
             self.radius,
             self.response_object_id
+        )
+
+    def stop(self, target: "Game") -> None:
+        if not (action := target.callbacks.by_name(self.name)):
+            return
+
+        target.send_tag(
+            'FX_STOPSOUND',
+            f'0:{action.handle_id}'
         )
