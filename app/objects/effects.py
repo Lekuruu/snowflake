@@ -245,6 +245,154 @@ class FireProjectile(Effect):
 
         return "fireninja_projectile_right_anim"
 
+class ScrapImpact(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "scrap_attackeffect_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+        reactor.callLater(0.4, self.remove_object)
+
+class ScrapImpactLittle(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "scrap_attacklittleeffect_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+
+class ScrapImpactSurroundings:
+    def __init__(self, game: "Game", center_x: int, center_y: int):
+        self.game = game
+        self.center_x = center_x
+        self.center_y = center_y
+        self.effects: List[Effect] = []
+
+    def play(self):
+        x_offsets = range(-1, 2)
+        y_offsets = range(-1, 2)
+
+        for x_offset in x_offsets:
+            for y_offset in y_offsets:
+                x = self.center_x + x_offset
+                y = self.center_y + y_offset
+
+                if not self.game.grid.is_valid(x, y):
+                    continue
+
+                self.effects.append(tile := AttackTile(self.game, x, y))
+                self.effects.append(impact := ScrapImpactLittle(self.game, x, y))
+                impact.play()
+                tile.play()
+
+        time.sleep(0.35)
+        self.remove()
+
+    def remove(self):
+        for effect in self.effects:
+            effect.remove_object()
+
+class ScrapProjectile(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "scrap_projectile",
+            x,
+            y,
+            AssetCollection({
+                Asset.from_name("scrap_projectileeast_anim"),
+                Asset.from_name("scrap_projectilenorth_anim"),
+                Asset.from_name("scrap_projectilenortheast_anim")
+            }),
+            x_offset=-0.25,
+            y_offset=1.5
+        )
+
+    def play_east(self, target_x: int, target_y: int):
+        if target_x < 0 or target_x > 8:
+            return
+
+        if target_y < 0 or target_y > 4:
+            return
+
+        self.place_object()
+        self.place_sprite("scrap_projectileeast_anim")
+        self.move_object(target_x, target_y, duration=180)
+
+    def play_north(self, target_x: int, target_y: int):
+        if target_x < 0 or target_x > 8:
+            return
+
+        if target_y < 0 or target_y > 4:
+            return
+
+        self.place_object()
+        self.place_sprite("scrap_projectilenorth_anim")
+        self.move_object(target_x, target_y, duration=180)
+
+    def play_northeast(self, target_x: int, target_y: int):
+        if target_x < 0 or target_x > 8:
+            return
+
+        if target_y < 0 or target_y > 4:
+            return
+
+        self.place_object()
+        self.place_sprite("scrap_projectilenortheast_anim")
+        self.move_object(target_x, target_y, duration=180)
+
+class ScrapProjectileImpact:
+    def __init__(self, game: "Game", center_x: int, center_y: int):
+        self.game = game
+        self.center_x = center_x
+        self.center_y = center_y
+
+    def play(self):
+        self.effects: List[ScrapProjectile] = []
+
+        self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
+        projectile.play_east(self.center_x + 1, self.center_y)
+
+        self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
+        projectile.play_east(self.center_x - 1, self.center_y)
+
+        self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
+        projectile.play_north(self.center_x, self.center_y - 0.5)
+
+        self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
+        projectile.play_north(self.center_x, self.center_y + 0.5)
+
+        self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
+        projectile.play_northeast(self.center_x + 1, self.center_y - 0.5)
+
+        self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
+        projectile.play_northeast(self.center_x - 1, self.center_y - 0.5)
+
+        self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
+        projectile.play_northeast(self.center_x + 1, self.center_y + 0.5)
+
+        self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
+        projectile.play_northeast(self.center_x - 1, self.center_y + 0.5)
+
+        time.sleep(0.4)
+        for effect in self.effects:
+            effect.remove_object()
+
 class TankSwipeHorizontal(Effect):
     def __init__(self, game: "Game", x: int, y: int):
         super().__init__(
