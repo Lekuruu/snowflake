@@ -1,13 +1,21 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterator, Tuple
+from typing import TYPE_CHECKING, Iterator, Tuple, List
 
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine.game import Game
 
 from app.data import MirrorMode
+
+from app.objects.effects import (
+    TankSwipeHorizontal,
+    TankSwipeVertical,
+    AttackTile,
+    Effect
+)
+
 from app.objects import (
     SoundCollection,
     AssetCollection,
@@ -563,6 +571,8 @@ class Tank(Enemy):
         self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
 
+        effects: List[Effect] = []
+
         if self.x == target.x:
             left = self.game.grid[target.x-1, target.y]
             right = self.game.grid[target.x+1, target.y]
@@ -573,6 +583,13 @@ class Tank(Enemy):
             if right is not None and not isinstance(right, Enemy):
                 right.set_health(right.hp - self.attack / 2)
 
+            effects = [
+                TankSwipeHorizontal(self.game, target.x, target.y+1),
+                AttackTile(self.game, target.x-1, target.y),
+                AttackTile(self.game, target.x+1, target.y),
+                AttackTile(self.game, target.x, target.y)
+            ]
+
         elif self.y == target.y:
             above = self.game.grid[target.x, target.y-1]
             below = self.game.grid[target.x, target.y+1]
@@ -582,6 +599,21 @@ class Tank(Enemy):
 
             if below is not None and not isinstance(below, Enemy):
                 below.set_health(below.hp - self.attack / 2)
+
+            effects = [
+                TankSwipeVertical(self.game, target.x, target.y),
+                AttackTile(self.game, target.x, target.y-1),
+                AttackTile(self.game, target.x, target.y+1),
+                AttackTile(self.game, target.x, target.y)
+            ]
+
+        for attack_tile in effects:
+            attack_tile.play()
+
+        time.sleep(0.25)
+
+        for attack_tile in effects:
+            attack_tile.remove_object()
 
     def idle_animation(self) -> None:
         self.animate_object(
