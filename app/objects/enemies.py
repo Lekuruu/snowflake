@@ -375,6 +375,9 @@ class Sly(Enemy):
         self.idle_animation()
         self.hit_sound()
 
+    def move_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_footstepsly_loop')
+
     def hit_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmanslyhit')
 
@@ -455,6 +458,7 @@ class Scrap(Enemy):
             reset=True
         )
         self.idle_animation()
+        self.move_sound()
 
     def attack_animation(self, x: int, y: int) -> None:
         if self.x < x:
@@ -490,6 +494,9 @@ class Scrap(Enemy):
             reset=True
         )
         self.idle_animation()
+
+    def move_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_footstepscrap_loop')
 
     def hit_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmanscraphit')
@@ -629,6 +636,7 @@ class Tank(Enemy):
             reset=True
         )
         self.idle_animation()
+        self.move_sound()
 
     def attack_animation(self, x: int, y: int) -> None:
         if self.x < x:
@@ -661,6 +669,9 @@ class Tank(Enemy):
             reset=True
         )
         self.idle_animation()
+
+    def move_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_footsteptank')
 
     def hit_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmantankhit')
