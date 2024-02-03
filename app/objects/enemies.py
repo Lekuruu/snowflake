@@ -207,7 +207,7 @@ class Enemy(GameObject):
             )
 
         # Sort moves by most damage
-        next_move, targets = sorted(
+        sorted_moves = sorted(
             moves.items(),
             key=lambda m: self.simulate_damage(
                 m[0].x,
@@ -215,7 +215,19 @@ class Enemy(GameObject):
                 m[1][0]
             ),
             reverse=True
-        )[0]
+        )
+
+        highest_damage = self.simulate_damage(
+            sorted_moves[0][0].x,
+            sorted_moves[0][0].y,
+            sorted_moves[0][1][0]
+        )
+
+        # If multiple moves have the same damage, pick a random one
+        next_move, targets = random.choice([
+            (move, targets) for move, targets in sorted_moves
+            if self.simulate_damage(move.x, move.y, targets[0]) == highest_damage
+        ])
 
         return next_move, targets[0]
 
