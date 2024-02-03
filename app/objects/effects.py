@@ -228,3 +228,33 @@ class FireProjectile(Effect):
             return "fireninja_projectile_angleup_anim"
 
         return "fireninja_projectile_right_anim"
+
+class TankSwipeHorizontal(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "tank_swipe_horiz_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+
+class TankSwipeVertical(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "tank_swipe_vert_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
