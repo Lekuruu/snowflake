@@ -576,10 +576,10 @@ class Tank(Enemy):
             left = self.game.grid[x_position-1, y_position]
             right = self.game.grid[x_position+1, y_position]
 
-            if left is not None and not isinstance(left, Enemy):
+            if left is not None and left.name in ('Water', 'Fire', 'Snow'):
                 total_damage += self.attack / 2
 
-            if right is not None and not isinstance(right, Enemy):
+            if right is not None and right.name in ('Water', 'Fire', 'Snow'):
                 total_damage += self.attack / 2
 
             return total_damage
@@ -591,10 +591,10 @@ class Tank(Enemy):
             above = self.game.grid[x_position, y_position-1]
             below = self.game.grid[x_position, y_position+1]
 
-            if above is not None and not isinstance(above, Enemy):
+            if above is not None and above.name in ('Water', 'Fire', 'Snow'):
                 total_damage += self.attack / 2
 
-            if below is not None and not isinstance(below, Enemy):
+            if below is not None and below.name in ('Water', 'Fire', 'Snow'):
                 total_damage += self.attack / 2
 
             return total_damage
@@ -618,10 +618,10 @@ class Tank(Enemy):
             left = self.game.grid[target.x-1, target.y]
             right = self.game.grid[target.x+1, target.y]
 
-            if left is not None and not isinstance(left, Enemy):
+            if left is not None and left.name in ('Water', 'Fire', 'Snow'):
                 left.set_health(left.hp - self.attack / 2)
 
-            if right is not None and not isinstance(right, Enemy):
+            if right is not None and right.name in ('Water', 'Fire', 'Snow'):
                 right.set_health(right.hp - self.attack / 2)
 
             effects = [
@@ -635,10 +635,10 @@ class Tank(Enemy):
             above = self.game.grid[target.x, target.y-1]
             below = self.game.grid[target.x, target.y+1]
 
-            if above is not None and not isinstance(above, Enemy):
+            if above is not None and above.name in ('Water', 'Fire', 'Snow'):
                 above.set_health(above.hp - self.attack / 2)
 
-            if below is not None and not isinstance(below, Enemy):
+            if below is not None and below.name in ('Water', 'Fire', 'Snow'):
                 below.set_health(below.hp - self.attack / 2)
 
             effects = [
