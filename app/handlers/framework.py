@@ -6,5 +6,6 @@ def framework(client: Penguin, json: dict):
     Instance.triggers.call(json['triggerName'], client, json)
 
 @Instance.triggers.register('payloadBILogAction')
-def action(client: Penguin, json: dict):
-    Instance.funnel.call(json['action'], client, json)
+def funnel(client: Penguin, json: dict):
+    # TODO: Implement funnel analysis
+    pass

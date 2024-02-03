@@ -8,9 +8,9 @@ from typing import List, Callable
 from threading import Thread
 from redis import Redis
 
-from app.events import EventHandler, FunnelHandler, TriggerHandler
 from app.objects import Players, AssetCollection, Games
 from app.data import ServerType, BuildType, Postgres
+from app.events import EventHandler, FrameworkHandler
 
 from .matchmaking import MatchmakingQueue
 from .penguin import Penguin
@@ -36,8 +36,7 @@ class SnowflakeEngine(Factory):
 
         self.games = Games()
         self.events = EventHandler()
-        self.funnel = FunnelHandler()
-        self.triggers = TriggerHandler()
+        self.triggers = FrameworkHandler()
         self.matchmaking = MatchmakingQueue()
 
         self.assets = AssetCollection()

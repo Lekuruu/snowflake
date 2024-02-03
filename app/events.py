@@ -49,11 +49,3 @@ class TriggerHandler(EventHandler):
             self.logger.info(f"Registered trigger: {trigger}")
             return handler
         return wrapper
-
-class FunnelHandler:
-    def __init__(self) -> None:
-        self.logger = logging.getLogger("Funnel")
-
-    def call(self, action: str, client: "Penguin", json: dict) -> None:
-        # TODO: Add datadog logging for funnel analysis
-        self.logger.debug(f"{action}: {json}")
