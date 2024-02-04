@@ -506,8 +506,7 @@ class WaterNinja(Ninja):
     def revive_other_animation_loop(self) -> None:
         self.animate_object(
             'waterninja_revive_other_loop_anim',
-            play_style='loop',
-            reset=True
+            play_style='loop'
         )
 
     def attack_sound(self) -> None:
@@ -662,8 +661,7 @@ class SnowNinja(Ninja):
     def revive_other_animation_loop(self) -> None:
         self.animate_object(
             'snowninja_reviveothersloop_anim',
-            play_style='loop',
-            reset=True
+            play_style='loop'
         )
 
     def attack_sound(self) -> None:
