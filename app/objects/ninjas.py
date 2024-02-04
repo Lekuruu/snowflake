@@ -409,9 +409,6 @@ class WaterNinja(Ninja):
     })
 
     def idle_animation(self) -> None:
-        if isinstance(self.selected_object, Ninja) and not self.game.timer.running:
-            return self.revive_other_animation()
-
         self.animate_object(
             'waterninja_idle_anim',
             play_style='loop',
@@ -531,9 +528,6 @@ class SnowNinja(Ninja):
     })
 
     def idle_animation(self) -> None:
-        if isinstance(self.selected_object, Ninja) and not self.game.timer.running:
-            return self.revive_other_animation()
-
         self.animate_object(
             'snowninja_idle_anim',
             play_style='loop',
@@ -670,9 +664,6 @@ class FireNinja(Ninja):
     })
 
     def idle_animation(self) -> None:
-        if isinstance(self.selected_object, Ninja) and not self.game.timer.running:
-            return self.revive_other_animation()
-
         self.animate_object(
             'fireninja_idle_anim',
             play_style='loop',
