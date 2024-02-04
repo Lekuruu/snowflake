@@ -447,6 +447,11 @@ class WaterNinja(Ninja):
             play_style='play_once',
             reset=True
         )
+
+        if self.is_reviving:
+            self.revive_other_animation_loop()
+            return
+
         self.idle_animation()
 
         # TODO: Ninjas face the direction of the attack
@@ -573,6 +578,11 @@ class SnowNinja(Ninja):
             play_style='play_once',
             reset=True
         )
+
+        if self.is_reviving:
+            self.revive_other_animation_loop()
+            return
+
         self.idle_animation()
 
         # TODO: Ninjas face the direction of the attack
@@ -716,6 +726,11 @@ class FireNinja(Ninja):
             play_style='play_once',
             reset=True
         )
+
+        if self.is_reviving:
+            self.revive_other_animation_loop()
+            return
+
         self.idle_animation()
 
         # TODO: Ninjas face the direction of the attack
