@@ -73,7 +73,7 @@ class SnowflakeEngine(Factory):
         self.shutting_down = True
 
         def force_exit(signal, frame):
-            logging.warning("Force exiting...")
+            self.logger.warning("Force exiting...")
             os._exit(0)
 
         signal.signal(signal.SIGINT, force_exit)
