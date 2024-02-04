@@ -1,7 +1,6 @@
 # Snowflake
 
-A card-jitsu snow server emulator, made for houdini.
-This is still a work in progress, and is not ready for general use yet.
+A work-in-progress card-jitsu snow server emulator, made for houdini.
 
 ## What works?
 
@@ -77,7 +76,7 @@ Dash will tell the card-jitsu snow client where the game server is located, and 
 
 ### Setting up snowflake
 
-Here are some basic steps to get started with snowflake.
+And now, we need to set up the actual repository.
 
 1. Clone this repository: `git clone https://github.com/Lekuruu/snowflake.git`
 
