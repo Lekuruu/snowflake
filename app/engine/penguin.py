@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 
+from app.data.objects import Card
 from app.data.objects import Penguin as PenguinObject
 from app.data import BuildType, EventType, Phase
 from .windows import WindowManager
@@ -45,6 +46,7 @@ class Penguin(Receiver):
         self.was_ko: bool = False
 
         self.window_manager = WindowManager(self)
+        self.power_cards: List[Card] = []
 
     def __repr__(self) -> str:
         return f"<{self.name} ({self.pid})>"
@@ -56,6 +58,18 @@ class Penguin(Receiver):
     @property
     def in_game(self) -> bool:
         return self.game is not None
+
+    @property
+    def power_cards_water(self) -> List[Card]:
+        return [c for c in self.power_cards if c.element == 'w']
+
+    @property
+    def power_cards_fire(self) -> List[Card]:
+        return [c for c in self.power_cards if c.element == 'f']
+
+    @property
+    def power_cards_snow(self) -> List[Card]:
+        return [c for c in self.power_cards if c.element == 's']
 
     def command_received(self, command: str, args: List[Any]):
         try:
