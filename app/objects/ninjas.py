@@ -324,7 +324,7 @@ class Ninja(GameObject):
                 # Ninja is already at full health
                 continue
 
-            if ninja.hp > 0 and self.name != 'Snow':
+            if ninja.hp > 0 and self.name == 'Snow':
                 # Only snow can heal ninjas that are not dead
                 distance = abs(ninja.x - target_x) + abs(ninja.y - target_y)
 
