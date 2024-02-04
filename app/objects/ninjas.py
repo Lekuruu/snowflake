@@ -190,6 +190,10 @@ class Ninja(GameObject):
         if not self.game.timer.running:
             return
 
+        if self.hp <= 0:
+            self.hide_ghost()
+            return
+
         if (self.ghost.x == x) and (self.ghost.y == y):
             self.hide_ghost()
             self.show_targets()
