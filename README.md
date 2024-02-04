@@ -43,23 +43,66 @@ This is still a work in progress, and is not ready for general use yet.
 
 ## Setup
 
-1. Get a working installation of [wand](https://github.com/solero/wand)
+This setup requires you to have a working installation of houdini with dash, as well as a copy of [python](https://python.org) (3.9 is recommended).
+There is some necessary configuration to get this working, which I will cover in the following sections.
 
-2. Install a copy of [python](https://python.org) with pip
+### Changing the WNS url
 
-2. Open the `templates/vanilla-media/play/index.html.template` file in your editor of choice
+The card-jitsu snow engine needs a special "wns url", to be able to connect to the right server.
+You can find this url inside your `index.html` file, and searching for "wns".
 
-3. Search for a line with "wns" in it, and change it from `"wns":"n7vcp1clubpwns.clubpenguin.com"` to `"wns":"{{ (parseUrl .Env.WEB_VANILLA_PLAY).Host }}"`
+If you have houdini set up with [wand](https://github.com/solero/wand), it would look something like this:
 
-4. Restart nginx: `sudo docker-compose restart web`
+1. Open the `templates/vanilla-media/play/index.html.template` file in your editor of choice
 
-5. Clone this repository: `git clone https://github.com/Lekuruu/snowflake.git`
+2. Change the line with `"wns":"n7vcp1clubpwns.clubpenguin.com"` to `"wns":"{{ (parseUrl .Env.WEB_VANILLA_PLAY).Host }}"`
 
-6. Rename the `.env_example` file to `.env` and **edit it**, to match your setup
+3. Restart nginx: `sudo docker-compose restart web`
 
-7. Install the requirements: `pip install -r requirements.txt`
+This may be different for your setup of course. The important part is that the wns url is set to your vanilla play url, i.e. "play.localhost", or "localhost/play/".
 
-7. Run the server: `python main.py`
+### Configuring dash
+
+**This step is not required if you run this project locally!**
+
+Dash will tell the card-jitsu snow client where the game server is located, and thus needs to have the right configuration as well.
+
+1. Open the `settings.py` file inside the `dash` folder
+
+2. Search for a line with `CJS_HOST`
+
+3. Change the content of the `CJS_HOST` to your **public ip address**
+
+4. Restart dash
+
+### Setting up snowflake
+
+Here are some basic steps to get started with snowflake.
+
+1. Clone this repository: `git clone https://github.com/Lekuruu/snowflake.git`
+
+2. Rename the `.env_example` file to `.env` and **edit it**, to match your setup
+
+3. Install the requirements: `pip install -r requirements.txt`
+
+4. Run the server: `python main.py`
+
+## Troubleshooting
+
+If something went wrong, you will most likely see this screen pop up:
+
+![image](https://github.com/Lekuruu/snowflake/assets/84310095/6d4f5c0e-b6da-4eae-82e3-a83ea1d25fa2)
+
+There are many reasons why this could be happening.
+Here are some things to check:
+
+1. Ensure that port 7002 is accessible from the outside
+
+2. Check if your `crossdomain.xml` is accessible under `<your_play_url>/crossdomain.xml`
+
+3. Ensure you set the right media url in the `.env`
+
+If all of that didn't work, check if your server is `https` only, i.e. only allowing secure ssl connections. If that is the case, you need to replace the `flash_client_base_fp11.swf` inside `/game/mpassets/playclients/r3662/` with [this file](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/flash_client_base_fp11.swf).
 
 ## Screenshots
 
