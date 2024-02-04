@@ -320,8 +320,11 @@ class Game:
         self.create_ninjas()
 
         # Load sprites
-        for object in self.objects:
-            object.load_sprites()
+        for asset in self.server.assets:
+            self.send_tag(
+                'S_LOADSPRITE',
+                f'0:{asset.index}'
+            )
 
     def create_ninjas(self) -> None:
         water = WaterNinja(self.water, x=0, y=0)
