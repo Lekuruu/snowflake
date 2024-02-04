@@ -316,7 +316,7 @@ class Ninja(GameObject):
                 # Ninja is already at full health
                 continue
 
-            if ninja.hp != 0 and self.name != 'Snow':
+            if ninja.hp > 0 and self.name != 'Snow':
                 # Only snow can heal ninjas that are not dead
                 distance = abs(ninja.x - target_x) + abs(ninja.y - target_y)
 
@@ -324,6 +324,9 @@ class Ninja(GameObject):
                     yield self.game.grid.get_tile(ninja.x, ninja.y)
 
             else:
+                if ninja.hp > 0:
+                    continue
+
                 # Ninja is dead, limit range to sorrounding tiles
                 tiles = self.game.grid.surrounding_tiles(ninja.x, ninja.y)
                 current_tile = self.game.grid.get_tile(target_x, target_y)
