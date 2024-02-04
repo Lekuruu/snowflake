@@ -109,7 +109,7 @@ There seems to be a bug in the `windowmanager.swf` file, where the screens get i
 
 ![image](https://raw.githubusercontent.com/Lekuruu/snowflake/main/.github/screenshots/what.png)
 
-You can fix this by using this patched `windowmanager.swf` file [here](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/windowmanager.swf).
+You can fix this by using a patched `windowmanager.swf` file from [here](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/windowmanager.swf).
 
 ## Screenshots
 
