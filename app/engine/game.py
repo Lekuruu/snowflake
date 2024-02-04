@@ -638,9 +638,14 @@ class Game:
 
     def display_win_sequence(self) -> None:
         time.sleep(2)
+
+        if all(ninja.hp <= 0 for ninja in self.ninjas):
+            return
+
         for ninja in self.ninjas:
             if ninja.hp <= 0:
-                continue
+                ninja.set_health(1)
 
             ninja.win_animation()
+
         time.sleep(2.5)
