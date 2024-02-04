@@ -409,6 +409,9 @@ class WaterNinja(Ninja):
     })
 
     def idle_animation(self) -> None:
+        if isinstance(self.selected_object, Ninja) and not self.game.timer.running:
+            return self.revive_other_animation()
+
         self.animate_object(
             'waterninja_idle_anim',
             play_style='loop',
@@ -518,16 +521,19 @@ class SnowNinja(Ninja):
         Asset.from_name('snowninja_member_revive')
     })
     sounds = SoundCollection({
-       Sound.from_name('sfx_mg_2013_cjsnow_attacksnow'),
-       Sound.from_name('sfx_mg_2013_cjsnow_attackpowercardsnow'),
-       Sound.from_name('sfx_mg_2013_cjsnow_footsteppenguin'),
-       Sound.from_name('sfx_mg_2013_cjsnow_penguinground'),
-       Sound.from_name('sfx_mg_2013_cjsnow_penguinhitsuccess'),
-       Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
-       Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
+        Sound.from_name('sfx_mg_2013_cjsnow_attacksnow'),
+        Sound.from_name('sfx_mg_2013_cjsnow_attackpowercardsnow'),
+        Sound.from_name('sfx_mg_2013_cjsnow_footsteppenguin'),
+        Sound.from_name('sfx_mg_2013_cjsnow_penguinground'),
+        Sound.from_name('sfx_mg_2013_cjsnow_penguinhitsuccess'),
+        Sound.from_name('SFX_MG_CJSnow_PowercardReviveStart'),
+        Sound.from_name('SFX_MG_CJSnow_PowercardReviveEnd'),
     })
 
     def idle_animation(self) -> None:
+        if isinstance(self.selected_object, Ninja) and not self.game.timer.running:
+            return self.revive_other_animation()
+
         self.animate_object(
             'snowninja_idle_anim',
             play_style='loop',
@@ -664,6 +670,9 @@ class FireNinja(Ninja):
     })
 
     def idle_animation(self) -> None:
+        if isinstance(self.selected_object, Ninja) and not self.game.timer.running:
+            return self.revive_other_animation()
+
         self.animate_object(
             'fireninja_idle_anim',
             play_style='loop',
