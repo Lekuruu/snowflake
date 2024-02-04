@@ -304,31 +304,32 @@ class Ninja(GameObject):
         if self.hp <= 0:
             return []
 
-        for tile in self.game.grid.tiles:
-            target_object = self.game.grid[tile.x, tile.y]
-
-            if not isinstance(target_object, Ninja):
+        for ninja in self.game.ninjas:
+            if ninja.client.disconnected:
                 continue
 
-            if target_object.client.disconnected:
-                continue
-
-            if target_object == self:
+            if ninja == self:
                 # Ninja cannot heal itself
                 continue
 
-            if target_object.hp != 0 and self.name != 'Snow':
-                # Only snow can heal ninjas that are not dead
-                continue
-
-            if target_object.hp == target_object.max_hp:
+            if ninja.hp == ninja.max_hp:
                 # Ninja is already at full health
                 continue
 
-            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
+            if ninja.hp != 0 and self.name != 'Snow':
+                # Only snow can heal ninjas that are not dead
+                distance = abs(ninja.x - target_x) + abs(ninja.y - target_y)
 
-            if distance <= self.range:
-                yield tile
+                if distance <= self.range:
+                    yield self.game.grid.get_tile(ninja.x, ninja.y)
+
+            else:
+                # Ninja is dead, limit range to sorrounding tiles
+                tiles = self.game.grid.surrounding_tiles(ninja.x, ninja.y)
+                current_tile = self.game.grid.get_tile(target_x, target_y)
+
+                if current_tile in tiles:
+                    yield self.game.grid.get_tile(ninja.x, ninja.y)
 
     def idle_animation(self) -> None:
         ...
