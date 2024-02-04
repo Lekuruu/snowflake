@@ -86,6 +86,8 @@ class Penguin(Receiver):
     def close_connection(self):
         if self.logged_in:
             self.send_to_room()
+
+        self.is_ready = True
         return super().close_connection()
 
     def connectionLost(self, reason: Failure | None = None) -> None:
