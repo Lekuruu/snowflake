@@ -134,6 +134,25 @@ class CardStarterDeck(Base):
         server_default=text("1")
     )
 
+class PenguinCard(Base):
+    __tablename__ = 'penguin_card'
+
+    penguin_id = Column(
+        ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True,
+        nullable=False,
+        index=True
+    )
+
+    card_id = Column(
+        ForeignKey('card.id', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True,
+        nullable=False
+    )
+
+    quantity = Column(SmallInteger, nullable=False, server_default=text("1"))
+    member_quantity = Column(SmallInteger, nullable=False, server_default=text("0"))
+
 class Stamp(Base):
     __tablename__ = 'stamp'
 
