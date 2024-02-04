@@ -120,7 +120,7 @@ class Grid:
         tile_frame.place_sprite('ui_tile_frame')
 
         for client in self.game.clients:
-            if client.hp <= 0:
+            if client.ninja.hp <= 0:
                 continue
 
             for tile in client.ninja.movable_tiles():
