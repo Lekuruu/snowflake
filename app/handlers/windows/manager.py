@@ -42,9 +42,9 @@ def on_window_manager_ready(client: Penguin, data: dict):
         {
             'game': 'snow',
             'name': client.name,
-            'powerCardsFire': 2,
-            'powerCardsWater': 3,
-            'powerCardsSnow': 4
+            'powerCardsFire': len(client.power_cards_fire),
+            'powerCardsWater': len(client.power_cards_water),
+            'powerCardsSnow': len(client.power_cards_snow)
         },
         loadDescription="",
         xPercent=0,
