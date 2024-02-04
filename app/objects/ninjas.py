@@ -790,8 +790,7 @@ class FireNinja(Ninja):
     def revive_other_animation_loop(self) -> None:
         self.animate_object(
             'fireninja_reviveotherloop_anim',
-            play_style='loop',
-            reset=True
+            play_style='loop'
         )
 
     def move_sound(self) -> None:
