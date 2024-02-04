@@ -45,7 +45,7 @@ A work-in-progress card-jitsu snow server emulator, made for houdini.
 This setup requires you to have a working installation of houdini with dash, as well as a copy of [python](https://python.org) (3.9 is recommended).
 There is some necessary configuration to get this working, which I will cover in the following sections.
 
-### Changing the WNS url
+### Changing the wns url
 
 The card-jitsu snow engine needs a special "wns url", to be able to connect to the right server.
 You can find this url inside your `index.html` file, and searching for "wns".
