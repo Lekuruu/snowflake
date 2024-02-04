@@ -91,7 +91,7 @@ Here are some basic steps to get started with snowflake.
 
 If something went wrong, you will most likely see this screen pop up:
 
-![image](https://github.com/Lekuruu/snowflake/assets/84310095/6d4f5c0e-b6da-4eae-82e3-a83ea1d25fa2)
+![image](https://raw.githubusercontent.com/Lekuruu/snowflake/main/.github/screenshots/troubleshooting.png)
 
 There are many reasons why this could be happening.
 Here are some things to check:
@@ -106,6 +106,6 @@ If all of that didn't work, check if your server is `https` only, i.e. only allo
 
 ## Screenshots
 
-![image](https://github.com/Lekuruu/snowflake/assets/84310095/107a05aa-79ed-45ec-9b9e-182ec1e686fc)
+![image](https://raw.githubusercontent.com/Lekuruu/snowflake/main/.github/screenshots/gameplay1.png)
 
-![image](https://github.com/Lekuruu/snowflake/assets/84310095/61c741a2-b4a4-4133-b596-e0ece93c6e31)
+![image](https://raw.githubusercontent.com/Lekuruu/snowflake/main/.github/screenshots/gameplay2.png)
