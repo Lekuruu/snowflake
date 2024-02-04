@@ -75,6 +75,10 @@ class Ninja(GameObject):
     def placed_ghost(self) -> bool:
         return self.ghost.x != -1 and self.ghost.y != -1
 
+    @property
+    def is_reviving(self) -> bool:
+        return isinstance(self.selected_object, Ninja) and self.selected_object.hp <= 0
+
     def initialize_objects(self) -> None:
         self.ghost = GameObject.from_asset(
             f'{self.name.lower()}ninja_move_ghost',
