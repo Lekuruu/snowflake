@@ -484,8 +484,13 @@ class WaterNinja(Ninja):
             f'waterninja_revived_anim',
             play_style='play_once'
         )
-        self.idle_animation()
         HealParticles(self.game, self.x, self.y).play()
+
+        if self.is_reviving:
+            self.revive_other_animation_loop()
+            return
+
+        self.idle_animation()
 
     def revive_other_animation(self) -> None:
         self.animate_object(
@@ -635,8 +640,13 @@ class SnowNinja(Ninja):
             'snowninja_revive_anim_',
             play_style='play_once'
         )
-        self.idle_animation()
         HealParticles(self.game, self.x, self.y).play()
+
+        if self.is_reviving:
+            self.revive_other_animation_loop()
+            return
+
+        self.idle_animation()
 
     def revive_other_animation(self) -> None:
         self.animate_object(
@@ -773,8 +783,13 @@ class FireNinja(Ninja):
             'fireninja_revived_anim',
             play_style='play_once'
         )
-        self.idle_animation()
         HealParticles(self.game, self.x, self.y).play()
+
+        if self.is_reviving:
+            self.revive_other_animation_loop()
+            return
+
+        self.idle_animation()
 
     def revive_other_animation(self) -> None:
         self.animate_object(
