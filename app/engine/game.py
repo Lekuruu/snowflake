@@ -241,6 +241,8 @@ class Game:
                     continue
 
                 if ninja.selected_object.hp > 0:
+                    # Ninja was already revived
+                    ninja.idle_animation()
                     continue
 
                 self.wait_for_animations()
