@@ -247,10 +247,12 @@ class Game:
 
                 if ninja.client.disconnected:
                     # Ninja disconnected
+                    ninja.idle_animation()
                     continue
 
                 self.wait_for_animations()
                 ninja.selected_object.set_health(1)
+                ninja.targets = []
                 ninja.idle_animation()
 
             # Wait for any animations to finish
