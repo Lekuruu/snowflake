@@ -369,6 +369,9 @@ class Ninja(GameObject):
     def revive_other_animation(self) -> None:
         ...
 
+    def revive_other_animation_loop(self) -> None:
+        ...
+
     def ko_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_penguinground')
 
@@ -488,6 +491,13 @@ class WaterNinja(Ninja):
         self.animate_object(
             'waterninja_revive_other_loop_anim',
             play_style='loop'
+        )
+
+    def revive_other_animation_loop(self) -> None:
+        self.animate_object(
+            'waterninja_revive_other_loop_anim',
+            play_style='loop',
+            reset=True
         )
 
     def attack_sound(self) -> None:
@@ -629,6 +639,13 @@ class SnowNinja(Ninja):
             play_style='loop'
         )
 
+    def revive_other_animation_loop(self) -> None:
+        self.animate_object(
+            'snowninja_reviveothersloop_anim',
+            play_style='loop',
+            reset=True
+        )
+
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attacksnow')
 
@@ -753,6 +770,13 @@ class FireNinja(Ninja):
         self.animate_object(
             'fireninja_reviveotherloop_anim',
             play_style='loop'
+        )
+
+    def revive_other_animation_loop(self) -> None:
+        self.animate_object(
+            'fireninja_reviveotherloop_anim',
+            play_style='loop',
+            reset=True
         )
 
     def move_sound(self) -> None:
