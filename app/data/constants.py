@@ -1,7 +1,7 @@
 
 from enum import Enum, IntEnum
 
-class KeyInput(Enum):
+class KeyInput(IntEnum):
     UP                 = 1
     DOWN               = 2
     MOUSE_CLICK        = 3
@@ -9,21 +9,21 @@ class KeyInput(Enum):
     MOUSE_DOUBLE_CLICK = 5
     MOUSE_UP           = 6
 
-class KeyModifier(Enum):
+class KeyModifier(IntEnum):
     NONE  = 0
     SHIFT = 1
     CTRL  = 2
     ALT   = 3
 
-class KeyTarget(Enum):
+class KeyTarget(IntEnum):
     TILE = 1
     GOB  = 2
 
-class ServerType(Enum):
+class ServerType(IntEnum):
     LIVE = 0
     DEV  = 1
 
-class BuildType(Enum):
+class BuildType(IntEnum):
     DEBUG   = 0
     RELEASE = 1
     PROFILE = 2
@@ -48,6 +48,38 @@ class OriginMode(IntEnum):
     CENTER = 1
     BOTTOM_MIDDLE = 2
     TOP_LEFT = 3
+
+class ViewMode(IntEnum):
+    VIEW_MODE_OVERHEAD = 0
+    VIEW_MODE_OVERHEAD_ROTATED = 1
+    VIEW_MODE_ISO_STEPPED = 2
+    VIEW_MODE_ISO_SLOPED = 3
+    VIEW_MODE_ISO = 4
+    VIEW_MODE_SIDE = 5
+    VIEW_MODE_3D = 6
+    VIEW_MODE_FREE = 7
+
+class MapblockType(str, Enum):
+    HEIGHTMAP = "h"
+    TILEMAP = "t"
+    MAP = "ht"
+
+class ScaleMode(str, Enum):
+    WIDTH = "scale_width"
+    HEIGHT = "scale_height"
+    BOTH = "scale_both"
+    NONE = "scale_none"
+
+class AlignMode(str, Enum):
+    TOP_LEFT = "top_left"
+    TOP = "top"
+    TOP_RIGHT = "top_right"
+    RIGHT = "right"
+    BOTTOM_RIGHT = "bottom_right"
+    BOTTOM = "bottom"
+    BOTTOM_LEFT = "bottom_left"
+    LEFT = "left"
+    CENTER = "center"
 
 class MessageType(str, Enum):
     CONFIGURE_CALLBACK               = "configureCallBack"
