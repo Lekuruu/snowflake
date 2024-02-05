@@ -14,8 +14,11 @@ from twisted.python.failure import Failure
 from app.protocols import MetaplaceProtocol
 from app.data import (
     Penguin as PenguinObject,
-    BuildType,
+    MapblockType,
+    AlignMode,
+    ScaleMode,
     EventType,
+    ViewMode,
     Phase,
     Card
 )
@@ -141,71 +144,17 @@ class Penguin(MetaplaceProtocol):
         infotip.send_payload('disable')
 
     def initialize_game(self) -> None:
-        self.send_tag('P_MAPBLOCK', 't', 1, 1, 'iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAAAAACyOJm3AAAADklEQVQImWNghgEGIlkADWEAiDEh28IAAAAASUVORK5CYII=')
-        self.send_tag('P_MAPBLOCK', 'h', 1, 1, 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAAAAADfm1AaAAAADklEQVQImWOohwMG8pgA1rMdxRJRFewAAAAASUVORK5CYII=')
+        self.align_ui(0, 0, AlignMode.CENTER, ScaleMode.NONE)
+        self.set_background_color(34, 164, 243)
+        self.set_place(0, 1, 0)
 
-        self.send_tag('UI_ALIGN', self.server.world_id, 0, 0, 'center', 'scale_none')
-        self.send_tag('UI_BGCOLOR', 34, 164, 243)
-        self.send_tag('W_PLACE', 0, 1, 0)
+        self.set_mapblock(MapblockType.TILEMAP, 'iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAAAAACyOJm3AAAADklEQVQImWNghgEGIlkADWEAiDEh28IAAAAASUVORK5CYII=')
+        self.set_mapblock(MapblockType.HEIGHTMAP, 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAAAAADfm1AaAAAADklEQVQImWOohwMG8pgA1rMdxRJRFewAAAAASUVORK5CYII=')
+        self.set_heighmap_division(1)
 
-        self.send_tag('P_ZOOMLIMIT', -1.000000, -1.000000)
-        self.send_tag('P_RENDERFLAGS', 0, 48)
-        self.send_tag('P_SIZE', 9, 5)
-        self.send_tag('P_VIEW', 5)
-        self.send_tag('P_START', 5, 2.5, 0)
-        self.send_tag('P_LOCKVIEW', 0)
-        self.send_tag('P_TITLESIZE', 100)
-        self.send_tag('P_ELEVSCALE', 0.031250)
-        self.send_tag('P_RELIEF', 1)
-        self.send_tag('P_LOCKSCROLL', 1, 0, 0, 0)
-        self.send_tag('P_LOCKOBJECTS', 0)
-        self.send_tag('P_HEIGHTMAPSCALE', 0.5, 0)
-        self.send_tag('P_HEIGHTMAPDIVISION', 1)
-        self.send_tag('P_CAMERA3D', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 864397819904.000000, 0, 0, 0, 0, 0, 0, 0)
-        self.send_tag('P_DRAG', 0)
-        self.send_tag('P_CAMLIMITS', 0, 0, 0, 0)
-        self.send_tag('P_LOCKRENDERSIZE', 0, 1024, 768)
+        self.set_view_mode(ViewMode.VIEW_MODE_SIDE)
+        self.set_tilesize(100)
+
+        self.set_renderflags(False, 48)
+        self.lock_rendersize(1024, 768)
         self.send_tag('P_ASSETSCOMPLETE')
-
-        # TODO: Find out what all of the tags do
-
-    def send_login_reply(self):
-        self.send_tag(
-            'S_LOGIN',
-            self.pid
-        )
-
-    def send_login_message(self, message: str):
-        self.send_tag(
-            'S_LOGINDEBUG',
-            message
-        )
-
-    def send_login_error(self, code: int = 900):
-        self.send_tag(
-            'S_LOGINDEBUG',
-            f'user code {code}'
-        )
-
-    def send_world_type(self):
-        self.send_tag(
-            'S_WORLDTYPE',
-            self.server.server_type.value,
-            self.server.build_type.value
-        )
-
-    def send_world(self):
-        self.send_tag(
-            'S_WORLD',
-            self.server.world_id,                                  # World ID
-            self.server.world_name,                                # World Name
-            '0:113140001',                                         # start_placeUniqueId ???
-            1 if self.server.build_type == BuildType.DEBUG else 0, # devMode
-            'none',                                                # ?
-            0,                                                     # ?
-            'crowdcontrol',                                        # ?
-            self.server.world_name,                                # clean_name
-            0,                                                     # ?
-            self.server.stylesheet_id,                             # STYLESHEET_ID ?
-            0                                                      # ?
-        )

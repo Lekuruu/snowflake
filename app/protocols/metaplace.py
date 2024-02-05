@@ -9,8 +9,15 @@ from twisted.internet import reactor
 from typing import List, Any
 
 from app.engine.windows import WindowManager
-from app.data import ServerType, BuildType
 from app.objects import Players
+from app.data import (
+    MapblockType,
+    ServerType,
+    BuildType,
+    AlignMode,
+    ScaleMode,
+    ViewMode
+)
 
 import logging
 import time
@@ -97,6 +104,61 @@ class MetaplaceProtocol(LineOnlyReceiver):
 
         encoded_arguments = '|'.join(str(a) for a in args)
         self.sendLine((f'[{tag}]|{encoded_arguments}|').encode())
+
+    def send_login_reply(self):
+        self.send_tag('S_LOGIN', self.pid)
+
+    def send_login_message(self, message: str):
+        self.send_tag('S_LOGINDEBUG', message)
+
+    def send_login_error(self, code: int = 900):
+        self.send_tag('S_LOGINDEBUG', f'user code {code}')
+
+    def align_ui(self, x: int, y: int, align: AlignMode, scale: ScaleMode):
+        self.send_tag('UI_ALIGN', self.server.world_id, x, y, align.value, scale.value)
+
+    def set_background_color(self, r: int, g: int, b: int):
+        self.send_tag('UI_BGCOLOR', r, g, b)
+
+    def set_place(self, place_id: int, object_id: int, instance_id: int):
+        self.send_tag('W_PLACE', place_id, object_id, instance_id)
+
+    def set_view_mode(self, mode: ViewMode):
+        self.send_tag('P_VIEW', mode.value)
+
+    def set_mapblock(self, type: MapblockType, data: str, index: int = 1, size: int = 1):
+        self.send_tag('P_MAPBLOCK', type.value, index, size, data)
+
+    def set_heighmap_division(self, division: float):
+        self.send_tag('P_HEIGHTMAPDIVISIONS', division)
+
+    def set_tilesize(self, size: int):
+        self.send_tag('P_TILESIZE', size)
+
+    def lock_rendersize(self, width: int, height: int, size: int = 0):
+        self.send_tag('P_LOCKRENDERSIZE', size, width, height)
+
+    def set_renderflags(self, allow_tile_occ: bool, alpha_cutoff: int):
+        self.send_tag('P_RENDERFLAGS', int(allow_tile_occ), alpha_cutoff)
+
+    def send_world_type(self):
+        self.send_tag('S_WORLDTYPE', self.server.server_type.value, self.server.build_type.value)
+
+    def send_world(self):
+        self.send_tag(
+            'S_WORLD',
+            self.server.world_id,
+            self.server.world_name,
+            '0:113140001',                                         # start_placeUniqueId ???
+            1 if self.server.build_type == BuildType.DEBUG else 0, # devMode
+            'none',                                                # ?
+            0,                                                     # ?
+            'crowdcontrol',                                        # ?
+            self.server.world_name,                                # clean_name
+            0,                                                     # ?
+            self.server.stylesheet_id,                             # STYLESHEET_ID ?
+            0                                                      # ?
+        )
 
     def command_received(self, command: str, args: List[Any]):
         """This method should be overridden by the protocol implementation."""
