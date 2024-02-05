@@ -12,7 +12,6 @@ from twisted.internet.protocol import Factory
 from twisted.python.failure import Failure
 
 from app.protocols.metaplace import MetaplaceProtocol
-from app.engine.windows import WindowManager
 from app.data import (
     Penguin as PenguinObject,
     BuildType,
@@ -44,14 +43,12 @@ class Penguin(MetaplaceProtocol):
         self.tip_mode: bool = True
         self.last_tip: Phase | None = None
         self.displayed_tips: List[Phase] = []
+        self.power_cards: List[Card] = []
 
         self.disconnected: bool = False
         self.in_queue: bool = False
         self.is_ready: bool = False
         self.was_ko: bool = False
-
-        self.window_manager = WindowManager(self)
-        self.power_cards: List[Card] = []
 
     def __repr__(self) -> str:
         return f"<{self.name} ({self.pid})>"

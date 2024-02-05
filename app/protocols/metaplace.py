@@ -8,6 +8,7 @@ from twisted.python.failure import Failure
 from twisted.internet import reactor
 from typing import List, Any
 
+from app.engine.windows import WindowManager
 from app.data import ServerType, BuildType
 from app.objects import Players
 
@@ -20,9 +21,11 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def __init__(self, server: "MetaplaceWorldServer", address: IPv4Address | IPv6Address):
         self.address = address
         self.server = server
-        self.logger = logging.getLogger(address.host)
-        self.last_action = time.time()
         self.disconnected = False
+        self.window_manager = WindowManager(self)
+
+        self.last_action = time.time()
+        self.logger = logging.getLogger(address.host)
 
     def lineReceived(self, line: bytes):
         self.last_action = time.time()
