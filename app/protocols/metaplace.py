@@ -33,7 +33,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
         self.window_manager = WindowManager(self)
 
     def dataReceived(self, data: bytes):
-        # NOTE: The policy file request usually gets requested on a seperate server
+        # NOTE: The socket policy file usually gets requested on a seperate server
         #       This is just used as a fallback, in case the policy file server is down
         if data.startswith(b'<policy-file-request/>'):
             self.logger.debug(f'-> "{data.decode()}"')
