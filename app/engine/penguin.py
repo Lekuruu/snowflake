@@ -23,7 +23,7 @@ from app.data import (
 
 import app.session
 
-class Penguin(Receiver):
+class Penguin(MetaplaceProtocol):
     def __init__(self, server: Factory, address: IPv4Address | IPv6Address):
         super().__init__(server, address)
 
@@ -211,6 +211,6 @@ class Penguin(Receiver):
             'crowdcontrol',                                        # ?
             self.server.world_name,                                # clean_name
             0,                                                     # ?
-            '200.5991',                                            # STYLESHEET_ID ?
+            self.server.stylesheet_id,                             # STYLESHEET_ID ?
             0                                                      # ?
         )

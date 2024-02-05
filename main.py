@@ -1,7 +1,7 @@
 
 from twisted.internet import reactor
-from app.engine import Instance as Server
 from app.protocols import SocketPolicyServer
+from app.engine import SnowflakeWorld
 from app.logging import Console
 
 import logging
@@ -14,10 +14,13 @@ logging.basicConfig(
 
 if __name__ == "__main__":
     try:
-        if not config.DISABLE_POLICY_SERVER:
-            reactor.listenTCP(843, SocketPolicyServer())
+        policy_server = SocketPolicyServer()
+        world_server = SnowflakeWorld()
+        world_server.listen(config.PORT)
 
-        reactor.listenTCP(config.PORT, Server)
+        if not config.DISABLE_POLICY_SERVER:
+            policy_server.listenTCP(843)
+
         reactor.run()
     except Exception as e:
         logging.error(f"Failed to start server: {e}")
