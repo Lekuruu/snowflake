@@ -1,7 +1,7 @@
 
 from twisted.internet import reactor
-from app.engine import SocketPolicyServer
 from app.engine import Instance as Server
+from app.protocols import SocketPolicyServer
 from app.logging import Console
 
 import logging
@@ -20,5 +20,5 @@ if __name__ == "__main__":
         reactor.listenTCP(config.PORT, Server)
         reactor.run()
     except Exception as e:
-        Server.logger.error(f"Failed to start server: {e}")
+        logging.error(f"Failed to start server: {e}")
         exit(1)
