@@ -603,7 +603,9 @@ class Game:
                     'roundNumber': self.round
                 },
                 loadDescription="",
-                assetPath=""
+                assetPath="",
+                xPercent=0.15,
+                yPercent=0.15
             )
 
     def display_payout(self) -> None:
