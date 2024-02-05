@@ -116,3 +116,5 @@ You can fix this by using a patched `windowmanager.swf` file from [here](https:/
 ![image](https://raw.githubusercontent.com/Lekuruu/snowflake/main/.github/screenshots/gameplay1.png)
 
 ![image](https://raw.githubusercontent.com/Lekuruu/snowflake/main/.github/screenshots/gameplay2.png)
+
+![image](https://raw.githubusercontent.com/Lekuruu/snowflake/main/.github/screenshots/gameplay3.png)
