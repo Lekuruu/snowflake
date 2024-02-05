@@ -1,5 +1,6 @@
 
-from app.engine import Penguin
+from app.protocols import MetaplaceProtocol
+from app.engine.penguin import Penguin
 from app.data import penguins, cards
 from app import session
 
@@ -84,6 +85,9 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
 
     client.send_tag('W_DISPLAYSTATE') # Is probably used for mobile
     client.send_tag('W_ASSETSCOMPLETE') # This will send the /ready command
+
+    # Server doesn't need to check for policy file requests anymore
+    client.dataReceived = super(MetaplaceProtocol, client).dataReceived
 
 @session.events.register('/ready')
 def ready_handler(client: Penguin):
