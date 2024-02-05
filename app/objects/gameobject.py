@@ -13,6 +13,8 @@ from .collections import SoundCollection, AssetCollection
 from .asset import Asset
 from .sound import Sound
 
+import app.session
+
 class GameObject:
     """
     This class represents a game object. It is the base class for all objects in the game, such as ninjas and enemies.
@@ -338,33 +340,31 @@ class GameObject:
             self._y_scale = 1
 
     def hide(self) -> None:
-        if not self.assets.by_name('blank_png'):
-            self.assets.add(Asset.from_name('blank_png'))
-
         self.place_sprite('blank_png')
         self.remove_pending_actions()
 
-    def add_sound(
+    def play_sound(
         self,
-        name: str,
+        sound_name: str,
+        target: "Penguin" | None = None,
         looping: bool = False,
         volume: int = 100,
-        radius: int = 0
-    ) -> None:
-        self.sounds.add(
-            Sound.from_name(
-                name,
-                looping,
-                volume,
-                radius,
-                self.id,
-                self.id # TODO: Different id for response object?
-            )
+        radius: int = 0,
+        callback: Callable | None = None
+    ) -> Sound:
+        asset = app.session.sound_assets.by_name(sound_name)
+        sound = Sound.from_index(
+            asset.index,
+            looping,
+            volume,
+            radius,
+            self.id,
+            self.id  # TODO: Different id for response object?
+        ).play(
+            target or self.game,
+            self.id,
+            callback
         )
-
-    def play_sound(self, sound_name: str, target: "Penguin" | None = None) -> Sound:
-        sound = self.sounds.by_name(sound_name)
-        sound.play(target or self.game, self.id)
         return sound
 
 class LocalGameObject(GameObject):

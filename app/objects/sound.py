@@ -38,7 +38,7 @@ class Sound(Asset):
     ) -> "Sound":
         asset = session.sound_assets.by_index(index)
 
-        return Sound(
+        return cls(
             asset.index,
             asset.name,
             asset.url,
@@ -61,7 +61,7 @@ class Sound(Asset):
     ) -> "Sound":
         asset = session.sound_assets.by_name(name)
 
-        return Sound(
+        return cls(
             asset.index,
             asset.name,
             asset.url,
