@@ -1,15 +1,6 @@
 
 from enum import Enum, IntEnum
 
-class MessageType(str, Enum):
-    CONFIGURE_CALLBACK               = "configureCallBack"
-    RECEIVED_JSON                    = "receivedJson"
-    CONFIGURE_TRACK_OBJECT_INFO      = "configureTrackObjectInfo"
-    CONFIGURE_STOP_TRACK_OBJECT_INFO = "configureStopTrackObjectInfo"
-    SEND_STRING                      = "sendString"
-    USING_FULL_SCREEN_CHANGED        = "usingFullScreenChanged"
-    SCREEN_SIZE                      = "screenSize"
-
 class KeyInput(Enum):
     UP                 = 1
     DOWN               = 2
@@ -37,6 +28,35 @@ class BuildType(Enum):
     RELEASE = 1
     PROFILE = 2
     MEMORY  = 3
+
+class Phase(str, Enum):
+    MOVE = "Move"
+    ATTACK = "Attack"
+    CARD = "Card"
+    HEAL = "Heal"
+    CONFIRM = "Confirm"
+    MEMBER_CARD = "MemberCard"
+
+class MirrorMode(IntEnum):
+    NONE = 0
+    X = 1
+    Y = 2
+    XY = 3
+
+class OriginMode(IntEnum):
+    NONE = 0
+    CENTER = 1
+    BOTTOM_MIDDLE = 2
+    TOP_LEFT = 3
+
+class MessageType(str, Enum):
+    CONFIGURE_CALLBACK               = "configureCallBack"
+    RECEIVED_JSON                    = "receivedJson"
+    CONFIGURE_TRACK_OBJECT_INFO      = "configureTrackObjectInfo"
+    CONFIGURE_STOP_TRACK_OBJECT_INFO = "configureStopTrackObjectInfo"
+    SEND_STRING                      = "sendString"
+    USING_FULL_SCREEN_CHANGED        = "usingFullScreenChanged"
+    SCREEN_SIZE                      = "screenSize"
 
 class WindowAction(str, Enum):
     ADD_LAYER = "addLayer"
@@ -82,23 +102,3 @@ class EventType(str, Enum):
     IMMEDIATE    = "immediateAction"
     SIMULTANEOUS = "playSimultaneousActions"
     CLEAR        = "clearActionQueue"
-
-class Phase(str, Enum):
-    MOVE = "Move"
-    ATTACK = "Attack"
-    CARD = "Card"
-    HEAL = "Heal"
-    CONFIRM = "Confirm"
-    MEMBER_CARD = "MemberCard"
-
-class MirrorMode(IntEnum):
-    NONE = 0
-    X = 1
-    Y = 2
-    XY = 3
-
-class OriginMode(IntEnum):
-    NONE = 0
-    CENTER = 1
-    BOTTOM_MIDDLE = 2
-    TOP_LEFT = 3
