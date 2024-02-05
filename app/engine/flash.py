@@ -7,8 +7,9 @@ from twisted.internet.protocol import Factory
 
 import logging
 
-# Read more at: http://www.adobe.com/devnet/flashplayer/articles/socket_policy_files.html
-#               https://clients.sisrv.net/knowledgebase/80/How-to-setup-Flash-Socket-Policy-File.html
+# Read more about policy servers here:
+#    https://clients.sisrv.net/knowledgebase/80/How-to-setup-Flash-Socket-Policy-File.html
+#    http://www.adobe.com/devnet/flashplayer/articles/socket_policy_files.html
 
 class SocketPolicyHandler(LineOnlyReceiver):
 
