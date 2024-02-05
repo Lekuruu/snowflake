@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
-from twisted.internet import reactor
 from typing import List, Callable
 from threading import Thread
 from redis import Redis
@@ -68,6 +67,9 @@ class SnowflakeEngine(Factory):
         self.players.add(player := self.protocol(self, address))
         return player
 
+    def startFactory(self):
+        self.logger.info(f"Starting engine: {self} ({config.PORT})")
+
     def stopFactory(self):
         self.logger.warning("Shutting down...")
         self.shutting_down = True
@@ -80,10 +82,5 @@ class SnowflakeEngine(Factory):
 
         for thread in self.threads:
             thread.join()
-
-    def run(self):
-        self.logger.info(f"Starting engine: {self} ({config.PORT})")
-        reactor.listenTCP(config.PORT, self)
-        reactor.run()
 
 Instance = SnowflakeEngine()

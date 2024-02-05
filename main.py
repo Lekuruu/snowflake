@@ -1,4 +1,5 @@
 
+from twisted.internet import reactor
 from app.engine import Instance as Server
 from app.logging import Console
 
@@ -11,4 +12,9 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
-    Server.run()
+    try:
+        reactor.listenTCP(config.PORT, Server)
+        reactor.run()
+    except Exception as e:
+        Server.logger.error(f"Failed to start server: {e}")
+        exit(1)
