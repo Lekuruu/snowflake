@@ -1,17 +1,17 @@
 
 from __future__ import annotations
 
-from ..data import Phase
-from .collections import SoundCollection, AssetCollection
-from .gameobject import LocalGameObject, GameObject
-from .asset import Asset
-from .sound import Sound
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine import Penguin
+
+from ..data import Phase
+from .collections import SoundCollection, AssetCollection
+from .gameobject import LocalGameObject, GameObject
+from .asset import Asset
+from .sound import Sound
 
 class Target(LocalGameObject):
     assets = AssetCollection({

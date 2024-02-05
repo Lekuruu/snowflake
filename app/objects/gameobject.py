@@ -3,15 +3,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
+if TYPE_CHECKING:
+    from app.engine.penguin import Penguin
+    from app.engine.game import Game
+
 from app.engine.callbacks import ActionType
 from app.data.constants import OriginMode, MirrorMode
 from .collections import SoundCollection, AssetCollection
 from .asset import Asset
 from .sound import Sound
-
-if TYPE_CHECKING:
-    from app.engine.penguin import Penguin
-    from app.engine.game import Game
 
 class GameObject:
     """

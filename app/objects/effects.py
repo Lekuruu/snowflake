@@ -7,10 +7,12 @@ from twisted.internet import reactor
 if TYPE_CHECKING:
     from app.engine.game import Game
 
-from ..data import MirrorMode, OriginMode
-from .collections import AssetCollection
-from .gameobject import GameObject
-from .asset import Asset
+from app.data import MirrorMode, OriginMode
+from app.objects import (
+    AssetCollection,
+    GameObject,
+    Asset
+)
 
 import time
 

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
+from dataclasses import dataclass
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
@@ -10,8 +11,6 @@ if TYPE_CHECKING:
 from app.engine.callbacks import ActionType
 from app.objects.asset import Asset
 from app import session
-
-from dataclasses import dataclass
 
 @dataclass
 class Sound(Asset):
