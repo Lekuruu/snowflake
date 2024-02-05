@@ -1,7 +1,8 @@
 
-from app.engine import Penguin, Instance
+from app.engine import Penguin
+from app import session
 
-@Instance.triggers.register('windowReady')
+@session.framework.register('windowReady')
 def on_window_ready(client: Penguin, data: dict):
     window_name = data['windowUrl'].split('/')[-1]
 

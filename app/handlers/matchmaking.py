@@ -1,7 +1,8 @@
 
-from app.engine import Penguin, Instance
+from app.engine import Penguin
+from app import session
 
-@Instance.triggers.register('mmElementSelected')
+@session.framework.register('mmElementSelected')
 def on_element_selected(client: Penguin, data: dict):
     client.element = data['element'].lower()
     client.tip_mode = data['tipMode']
@@ -12,6 +13,6 @@ def on_element_selected(client: Penguin, data: dict):
 
     client.server.matchmaking.add(client)
 
-@Instance.triggers.register('mmCancel')
+@session.framework.register('mmCancel')
 def on_matchmaking_cancel(client: Penguin, data: dict):
     client.server.matchmaking.remove(client)

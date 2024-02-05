@@ -1,8 +1,9 @@
 
-from app.engine import Penguin, Instance
 from app.objects import GameObject
+from app.engine import Penguin
+from app import session
 
-@Instance.triggers.register('confirmClicked')
+@session.framework.register('confirmClicked')
 def on_confirm_clicked(client: Penguin, data: dict):
     """Sent by the client after clicking on the confirm button"""
     if client.is_ready:

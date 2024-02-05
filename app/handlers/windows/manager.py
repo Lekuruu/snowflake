@@ -1,11 +1,11 @@
 
-from app.engine import Penguin, Instance
+from app.engine import Penguin
 from app.data import EventType
+from app import session
 
 import config
-import time
 
-@Instance.triggers.register('windowManagerReady')
+@session.framework.register('windowManagerReady')
 def on_window_manager_ready(client: Penguin, data: dict):
     client.window_manager.ready = True
 
@@ -51,10 +51,3 @@ def on_window_manager_ready(client: Penguin, data: dict):
         xPercent=0,
         yPercent=0
     )
-
-@Instance.triggers.register('windowDuplicated')
-def on_window_duplicated(client: Penguin, data: dict):
-    # This will get sent by the client when the server tries to load a
-    # window that already exists.
-    # In most cases, its just the tip window.
-    client.hide_tip()
