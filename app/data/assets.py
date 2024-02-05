@@ -4,6 +4,9 @@ from app.objects.asset import Asset
 import app.session
 import config
 
+# Assets taken from: /game/mpassets/publishdata/r5309/pubdata/spriteList_tokenized.gml.gz
+# TODO: Automatically load assets from the spriteList file
+
 asset_url = f"{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/png/large"
 sound_url = f"{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/sound/gameplay"
 
