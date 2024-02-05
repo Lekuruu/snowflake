@@ -83,7 +83,7 @@ class SWFWindow:
                 'jsonPayload': payload,
                 'targetWindow': self.url,
                 'triggerName': trigger_name,
-                'action': ClientAction.PAYLOAD.value,
+                'action': ClientAction.JSON_PAYLOAD.value,
                 'type': type.value
             },
             **kwargs
