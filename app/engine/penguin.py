@@ -11,7 +11,7 @@ from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 from twisted.python.failure import Failure
 
-from app.protocols.metaplace import MetaplaceProtocol
+from app.protocols import MetaplaceProtocol
 from app.data import (
     Penguin as PenguinObject,
     BuildType,
@@ -89,11 +89,15 @@ class Penguin(MetaplaceProtocol):
         return super().close_connection()
 
     def connectionLost(self, reason: Failure | None = None) -> None:
-        if not self.in_game or not self.ninja:
-            return
+        if self.in_game and self.ninja:
+            self.ninja.set_health(0)
 
-        self.ninja.set_health(0)
-        super().connectionLost(reason)
+        if reason is not None and not self.disconnected:
+            self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
+
+        self.server.matchmaking.remove(self)
+        self.server.players.remove(self)
+        self.disconnected = True
 
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room

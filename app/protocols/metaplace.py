@@ -80,7 +80,6 @@ class MetaplaceProtocol(LineOnlyReceiver):
             self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
 
         self.server.players.remove(self)
-        self.server.matchmaking.remove(self)
         self.disconnected = True
 
     def close_connection(self):
