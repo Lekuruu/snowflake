@@ -113,16 +113,13 @@ class ObjectCollection(Set["GameObject"]):
         super().__init__()
         super().update(initial_data)
 
-    def add(self, object: "GameObject", assign_id=True) -> None:
-        if assign_id:
-            object.id = self.get_id()
-
+    def add(self, object: "GameObject") -> None:
+        object.id = self.get_id()
         return super().add(object)
 
-    def update(self, objects: List["GameObject"], assign_ids=True) -> None:
-        if assign_ids:
-            for object in objects:
-                object.id = self.get_id()
+    def update(self, objects: List["GameObject"]) -> None:
+        for object in objects:
+            object.id = self.get_id()
 
         super().update(objects)
 
