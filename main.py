@@ -4,6 +4,7 @@ from app.protocols import SocketPolicyServer
 from app.engine import SnowflakeWorld
 from app.logging import Console
 
+import traceback
 import logging
 import config
 
@@ -23,5 +24,6 @@ if __name__ == "__main__":
 
         reactor.run()
     except Exception as e:
-        logging.error(f"Failed to start server: {e}")
+        traceback.print_exc()
+        logging.fatal(f'Failed to start server: {e}')
         exit(1)
