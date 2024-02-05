@@ -26,11 +26,6 @@ class Penguin(MetaplaceProtocol):
     def __init__(self, server: Factory, address: IPv4Address | IPv6Address):
         super().__init__(server, address)
 
-        self.pid: int = 0
-        self.name: str = ""
-        self.token: str = ""
-        self.logged_in: bool = False
-
         self.battle_mode: int = 0
         self.screen_size: str = ''
         self.asset_url: str = ''
@@ -45,7 +40,6 @@ class Penguin(MetaplaceProtocol):
         self.displayed_tips: List[Phase] = []
         self.power_cards: List[Card] = []
 
-        self.disconnected: bool = False
         self.in_queue: bool = False
         self.is_ready: bool = False
         self.was_ko: bool = False

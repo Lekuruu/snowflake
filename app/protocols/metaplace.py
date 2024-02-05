@@ -21,11 +21,16 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def __init__(self, server: "MetaplaceWorldServer", address: IPv4Address | IPv6Address):
         self.address = address
         self.server = server
+
+        self.pid: int = 0
+        self.name: str = ""
+        self.token: str = ""
+        self.logged_in: bool = False
         self.disconnected = False
-        self.window_manager = WindowManager(self)
 
         self.last_action = time.time()
         self.logger = logging.getLogger(address.host)
+        self.window_manager = WindowManager(self)
 
     def lineReceived(self, line: bytes):
         self.last_action = time.time()
