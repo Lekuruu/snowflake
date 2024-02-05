@@ -40,9 +40,6 @@ class Enemy(GameObject):
     move: int = 0
     move_duration: int = 600
 
-    assets = AssetCollection()
-    sounds = SoundCollection()
-
     def __init__(
         self,
         game: "Game",
@@ -57,8 +54,6 @@ class Enemy(GameObject):
             x_offset=0.5,
             y_offset=1
         )
-        self.assets = self.__class__.assets
-        self.sounds = self.__class__.sounds
         self.attack = self.__class__.attack
         self.range = self.__class__.range
         self.max_hp = self.__class__.max_hp
@@ -66,9 +61,9 @@ class Enemy(GameObject):
         self.initialize_objects()
 
     def initialize_objects(self) -> None:
-        self.health_bar = GameObject.from_asset(
-            'reghealthbar_animation',
+        self.health_bar = GameObject(
             self.game,
+            'reghealthbar_animation',
             x=self.x,
             y=self.y,
             x_offset=0.5,
@@ -303,25 +298,6 @@ class Sly(Enemy):
     move: int = 3
     move_duration: int = 1200
 
-    assets = AssetCollection({
-        Asset.from_name('sly_idle_anim'),
-        Asset.from_name('sly_attack_anim'),
-        Asset.from_name('sly_move_anim'),
-        Asset.from_name('sly_hit_anim'),
-        Asset.from_name('sly_ko_anim'),
-        Asset.from_name('sly_projectile_anim'),
-        Asset.from_name('sly_daze_anim'),
-        Asset.from_name('snowman_spawn_anim')
-    })
-    sounds = SoundCollection({
-        Sound.from_name('sfx_mg_2013_cjsnow_footstepsly_loop'),
-        Sound.from_name('sfx_mg_2013_cjsnow_attacksly'),
-        Sound.from_name('sfx_mg_2013_cjsnow_impactsly'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmanslyhit'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
-    })
-
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
         distance = abs(x_position - target.x) + abs(y_position - target.y)
 
@@ -420,29 +396,6 @@ class Scrap(Enemy):
     attack: int = 5
     move: int = 2
     move_duration: int = 1200
-
-    assets = AssetCollection({
-       Asset.from_name('scrap_idle_anim'),
-       Asset.from_name('scrap_attack_anim'),
-       Asset.from_name('scrap_attackeffect_anim'),
-       Asset.from_name('scrap_attacklittleeffect_anim'),
-       Asset.from_name('scrap_projectileeast_anim'),
-       Asset.from_name('scrap_projectilenorth_anim'),
-       Asset.from_name('scrap_projectilenortheast_anim'),
-       Asset.from_name('scrap_hit_anim'),
-       Asset.from_name('scrap_move_anim'),
-       Asset.from_name('scrap_ko_anim'),
-       Asset.from_name('scrap_dazed_anim'),
-       Asset.from_name('snowman_spawn_anim')
-    })
-    sounds = SoundCollection({
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmanscraphit'),
-        Sound.from_name('sfx_mg_2013_cjsnow_impactscrap'),
-        Sound.from_name('sfx_mg_2013_cjsnow_footstepscrap_loop'),
-        Sound.from_name('sfx_mg_2013_cjsnow_attackscrap'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
-    })
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
         surrounding_targets = list(self.attackable_tiles(target.x, target.y, range=1))
@@ -560,25 +513,6 @@ class Tank(Enemy):
     attack: int = 10
     move: int = 1
     move_duration: int = 1100
-
-    assets = AssetCollection({
-        Asset.from_name('tank_swipe_horiz_anim'),
-        Asset.from_name('tank_swipe_vert_anim'),
-        Asset.from_name('tank_idle_anim'),
-        Asset.from_name('tank_attack_anim'),
-        Asset.from_name('tank_hit_anim'),
-        Asset.from_name('tank_move_anim'),
-        Asset.from_name('tank_ko_anim'),
-        Asset.from_name('tank_daze_anim'),
-        Asset.from_name('snowman_spawn_anim')
-    })
-    sounds = SoundCollection({
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmantankhit'),
-        Sound.from_name('sfx_mg_2013_cjsnow_footsteptank'),
-        Sound.from_name('sfx_mg_2013_cjsnow_attacktank'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmenappear'),
-        Sound.from_name('sfx_mg_2013_cjsnow_snowmandeathexplode')
-    })
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
         # Horizontal swipe

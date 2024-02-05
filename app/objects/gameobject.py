@@ -27,8 +27,6 @@ class GameObject:
         name: str,
         x: int = 0,
         y: int = 0,
-        assets=AssetCollection(),
-        sounds=SoundCollection(),
         on_click: Callable | None = None,
         grid: bool = False,
         x_offset: int = 0,
@@ -45,8 +43,6 @@ class GameObject:
         self.y = y
         self.x_offset = x_offset
         self.y_offset = y_offset
-        self.assets = assets
-        self.sounds = sounds
         self.game.objects.add(self)
         self.on_click = on_click
         self.grid = grid
@@ -122,39 +118,6 @@ class GameObject:
             mirror_mode=self._mirror_mode
         )
 
-    @classmethod
-    def from_asset(
-        cls,
-        name: str | list,
-        game: "Game",
-        x: int = 0,
-        y: int = 0,
-        grid: bool = False,
-        on_click: Callable | None = None,
-        x_offset: int = 0,
-        y_offset: int = 0,
-        origin_mode: OriginMode = OriginMode.NONE,
-        mirror_mode: MirrorMode = MirrorMode.NONE
-    ) -> "GameObject":
-        if isinstance(name, list):
-            assets = AssetCollection([Asset.from_name(n) for n in name])
-        else:
-            assets = AssetCollection([Asset.from_name(name)])
-
-        return GameObject(
-            game,
-            name,
-            x,
-            y,
-            assets,
-            grid=grid,
-            on_click=on_click,
-            x_offset=x_offset,
-            y_offset=y_offset,
-            origin_mode=origin_mode,
-            mirror_mode=mirror_mode
-        )
-
     def place_object(self) -> None:
         x = self.x
         y = self.y
@@ -225,7 +188,7 @@ class GameObject:
         register: bool = True,
         callback: Callable | None = None
     ) -> None:
-        asset = self.assets.by_name(name)
+        asset = app.session.assets.by_name(name)
         handle_id = -1
 
         if reset:
@@ -252,7 +215,7 @@ class GameObject:
         )
 
     def place_sprite(self, name: str, target: "Penguin" | None = None) -> None:
-        asset = self.assets.by_name(name)
+        asset = app.session.assets.by_name(name)
         target = target or self.target
 
         target.send_tag(
@@ -264,19 +227,12 @@ class GameObject:
         )
 
     def load_sprite(self, name: str) -> None:
-        asset = self.assets.by_name(name)
+        asset = app.session.assets.by_name(name)
 
         self.target.send_tag(
             'S_LOADSPRITE',
             f'0:{asset.index}'
         )
-
-    def load_sprites(self) -> None:
-        for asset in self.assets:
-            self.target.send_tag(
-                'S_LOADSPRITE',
-                f'0:{asset.index}'
-            )
 
     def animate_sprite(
         self,
@@ -379,8 +335,6 @@ class LocalGameObject(GameObject):
         name: str,
         x: int = 0,
         y: int = 0,
-        assets=AssetCollection(),
-        sounds=SoundCollection(),
         on_click: Callable | None = None,
         x_offset: int = 0,
         y_offset: int = 0,
@@ -394,8 +348,6 @@ class LocalGameObject(GameObject):
             name,
             x,
             y,
-            assets,
-            sounds,
             on_click,
             grid=False,
             x_offset=x_offset,

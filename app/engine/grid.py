@@ -92,8 +92,6 @@ class Grid:
     def initialize_tiles(self) -> None:
         """Initialize the tiles, and the tile frame"""
         tile_frame = GameObject(self.game, 'ui_tile_frame')
-        tile_frame.assets.add(Asset.from_name('ui_tile_frame'))
-        tile_frame.assets.add(Asset.from_name('blank_png'))
         tile_frame.place_object()
 
         for x in range(9):
@@ -107,11 +105,6 @@ class Grid:
                     x_offset=0.5,
                     y_offset=0.9998
                 )
-                tile.assets.add(Asset.from_name('ui_tile_move'))
-                tile.assets.add(Asset.from_name('ui_tile_attack'))
-                tile.assets.add(Asset.from_name('ui_tile_heal'))
-                tile.assets.add(Asset.from_name('ui_tile_no_move'))
-                tile.assets.add(Asset.from_name('blank_png'))
                 self.tiles.append(tile)
                 tile.place_object()
 

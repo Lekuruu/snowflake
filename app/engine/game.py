@@ -367,15 +367,15 @@ class Game:
     def create_environment(self) -> None:
         self.backgrounds = {
             1: [
-                GameObject.from_asset('env_mountaintop_bg', self, x=4.5, y=-1.1)
+                GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
             ],
             2: [
-                GameObject.from_asset('forest_bg', self, x=4.5, y=-1.1),
-                GameObject.from_asset('forest_fg', self, x=4.5, y=6.1)
+                GameObject(self, 'forest_bg', x=4.5, y=-1.1),
+                GameObject(self, 'forest_fg', x=4.5, y=6.1)
             ],
             3: [
-                GameObject.from_asset('cragvalley_bg', self, x=4.5, y=-1.1),
-                GameObject.from_asset('cragvalley_fg', self, x=4.5, y=6)
+                GameObject(self, 'cragvalley_bg', x=4.5, y=-1.1),
+                GameObject(self, 'cragvalley_fg', x=4.5, y=6)
             ]
         }[self.map]
 
@@ -386,9 +386,9 @@ class Game:
         rock_positions = [(2, 0), (6, 0), (2, 4), (6, 4)]
 
         self.rocks = [
-            GameObject.from_asset(
-                rock_name,
+            GameObject(
                 self,
+                rock_name,
                 x, y,
                 x_offset=0.5,
                 y_offset=1,

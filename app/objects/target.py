@@ -7,28 +7,10 @@ if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine import Penguin
 
-from ..data import Phase
-from .collections import SoundCollection, AssetCollection
-from .gameobject import LocalGameObject, GameObject
-from .asset import Asset
-from .sound import Sound
+from app.objects.gameobject import LocalGameObject, GameObject
+from app.data import Phase
 
 class Target(LocalGameObject):
-    assets = AssetCollection({
-        Asset.from_name('ui_target_red_attack_intro_anim'),
-        Asset.from_name('ui_target_red_attack_idle_anim'),
-        Asset.from_name("ui_target_green_attack_selected_intro_anim"),
-        Asset.from_name('ui_target_green_attack_selected_idle_anim'),
-        Asset.from_name('ui_target_white_heal_intro_anim'),
-        Asset.from_name('ui_target_white_heal_idle_anim'),
-        Asset.from_name('ui_target_green_heal_selected_intro_anim'),
-        Asset.from_name('ui_target_green_heal_selected_idle_anim')
-    })
-    sounds = SoundCollection({
-       Sound.from_name('sfx_mg_2013_cjsnow_uitargetred'),
-       Sound.from_name('sfx_mg_2013_cjsnow_uiselecttile')
-    })
-
     def __init__(
         self,
         ninja: "Ninja",
@@ -44,8 +26,6 @@ class Target(LocalGameObject):
             x_offset=0.5,
             y_offset=1.05
         )
-        self.assets = self.__class__.assets
-        self.sounds = self.__class__.sounds
         self.selected = False
         self.type = 'attack'
         self.ninja = ninja

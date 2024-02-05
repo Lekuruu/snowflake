@@ -23,7 +23,6 @@ class Effect(GameObject):
         name: str,
         x: int,
         y: int,
-        assets: AssetCollection | None = None,
         x_offset: int = 0,
         y_offset: int = 0,
         origin_mode: OriginMode = OriginMode.NONE,
@@ -34,7 +33,6 @@ class Effect(GameObject):
             name,
             x,
             y,
-            assets or AssetCollection({Asset.from_name(name)}),
             x_offset=x_offset,
             y_offset=y_offset,
             origin_mode=origin_mode,
@@ -119,11 +117,6 @@ class SnowProjectile(Effect):
             "snow_projectile",
             x,
             y,
-            AssetCollection({
-                Asset.from_name("snowninja_projectileangle_anim"),
-                Asset.from_name("snowninja_projectilehoriz_anim"),
-                Asset.from_name("snowninja_projectilevert_anim")
-            }),
             x_offset=0.5,
             y_offset=1
         )
@@ -194,16 +187,6 @@ class FireProjectile(Effect):
             "fire_projectile",
             x,
             y,
-            AssetCollection({
-                Asset.from_name("fireninja_projectile_angleup_anim"),
-                Asset.from_name("fireninja_projectile_angledown_anim"),
-                Asset.from_name("fireninja_projectile_down_anim"),
-                Asset.from_name("fireninja_projectile_downfar_anim"),
-                Asset.from_name("fireninja_projectile_up_anim"),
-                Asset.from_name("fireninja_projectile_upfar_anim"),
-                Asset.from_name("fireninja_projectile_right_anim"),
-                Asset.from_name("fireninja_projectile_rightfar_anim")
-            }),
             x_offset=0.5,
             y_offset=1
         )
@@ -339,11 +322,6 @@ class ScrapProjectile(Effect):
             "scrap_projectile",
             x,
             y,
-            AssetCollection({
-                Asset.from_name("scrap_projectileeast_anim"),
-                Asset.from_name("scrap_projectilenorth_anim"),
-                Asset.from_name("scrap_projectilenortheast_anim")
-            }),
             x_offset=-0.25,
             y_offset=1.5
         )
