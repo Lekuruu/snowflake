@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import app.engine as Engine
+from app import session
 
 @dataclass
 class Asset:
@@ -18,4 +18,4 @@ class Asset:
 
     @classmethod
     def from_name(cls, name: str) -> "Asset" | None:
-        return Engine.Instance.assets.by_name(name)
+        return session.assets.by_name(name)

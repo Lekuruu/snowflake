@@ -7,9 +7,9 @@ if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
-from app.engine.callbacks import CallbackHandler, ActionType
+from app.engine.callbacks import ActionType
 from app.objects.asset import Asset
-import app.engine as Engine
+from app import session
 
 from dataclasses import dataclass
 
@@ -37,7 +37,7 @@ class Sound(Asset):
         game_object_id: int = -1,
         response_object_id: int = -1
     ) -> "Sound":
-        asset = Engine.Instance.sound_assets.by_index(index)
+        asset = session.sound_assets.by_index(index)
 
         return Sound(
             asset.index,
@@ -60,7 +60,7 @@ class Sound(Asset):
         game_object_id: int = -1,
         response_object_id: int = -1
     ) -> "Sound":
-        asset = Engine.Instance.sound_assets.by_name(name)
+        asset = session.sound_assets.by_name(name)
 
         return Sound(
             asset.index,
@@ -75,19 +75,19 @@ class Sound(Asset):
 
     def play(self, target: "Game" | "Penguin", object_id: int = -1, callback: Callable | None = None) -> None:
         try:
-            target.callbacks.register_action(
+            handle_id = target.callbacks.register_action(
                 self.name,
                 ActionType.Sound,
                 object_id,
                 callback
             )
         except AttributeError:
-            pass
+            handle_id = -1
 
         target.send_tag(
             'FX_PLAYSOUND',
             f'0:{self.index}',
-            0, # handleId
+            handle_id,
             int(self.looping),
             self.volume,
             self.game_object_id,

@@ -1,7 +1,7 @@
 
 from sqlalchemy.orm import Session
 from functools import wraps
-import app.engine as engine
+import app.session
 
 def session_wrapper(func):
     @wraps(func)
@@ -14,7 +14,7 @@ def session_wrapper(func):
             # Use existing session
             return func(*args, **kwargs)
 
-        with engine.Instance.database.managed_session() as session:
+        with app.session.database.managed_session() as session:
             # Get new session for this function
             kwargs['session'] = session
             return func(*args, **kwargs)

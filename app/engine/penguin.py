@@ -3,20 +3,25 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, List
 
-from twisted.python.failure import Failure
-
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
-    from .game import Game
+    from app.engine.game import Game
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
+from twisted.python.failure import Failure
 
-from app.data.objects import Card
-from app.data.objects import Penguin as PenguinObject
-from app.data import BuildType, EventType, Phase
-from .windows import WindowManager
-from .receiver import Receiver
+from app.protocols.metaplace import MetaplaceProtocol
+from app.engine.windows import WindowManager
+from app.data import (
+    Penguin as PenguinObject,
+    BuildType,
+    EventType,
+    Phase,
+    Card
+)
+
+import app.session
 
 class Penguin(Receiver):
     def __init__(self, server: Factory, address: IPv4Address | IPv6Address):
@@ -73,7 +78,7 @@ class Penguin(Receiver):
 
     def command_received(self, command: str, args: List[Any]):
         try:
-            self.server.events.call(
+            app.session.events.call(
                 self,
                 command,
                 args
@@ -87,15 +92,17 @@ class Penguin(Receiver):
         if self.logged_in:
             self.send_to_room()
 
+        # Put client in ready state, so that the game doesn't softlock
         self.is_ready = True
+
         return super().close_connection()
 
     def connectionLost(self, reason: Failure | None = None) -> None:
-        super().connectionLost(reason)
         if not self.in_game or not self.ninja:
             return
 
         self.ninja.set_health(0)
+        super().connectionLost(reason)
 
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room

@@ -10,18 +10,16 @@ from app.data.constants import KeyModifier, KeyTarget, KeyInput, Phase
 from app.data.repositories import stamps
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
-from app.objects.collections import ObjectCollection, AssetCollection
 from app.objects.enemies import Sly, Scrap, Tank, Enemy
+from app.objects.collections import ObjectCollection
 from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
-
-from twisted.python.failure import Failure
-from twisted.internet import reactor
 
 from .callbacks import CallbackHandler
 from .timer import Timer
 from .grid import Grid
 
+import app.session
 import logging
 import random
 import config
@@ -328,7 +326,7 @@ class Game:
         self.create_ninjas()
 
         # Load sprites
-        for asset in self.server.assets:
+        for asset in app.session.assets:
             self.send_tag(
                 'S_LOADSPRITE',
                 f'0:{asset.index}'

@@ -1,12 +1,13 @@
 
 from app.objects.asset import Asset
-from app.engine import Instance
+
+import app.session
 import config
 
 asset_url = f"{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/png/large"
 sound_url = f"{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/sound/gameplay"
 
-Instance.assets.update([
+app.session.assets.update([
     Asset(1, "blank_png", f"{asset_url}/env/pixel.png"),
     Asset(30044, "waterninja_move_ghost", f"{asset_url}/ninja_water_char_anim/waterninja_move_ghost_large.tpk"),
     Asset(30070, "fireninja_move_ghost", f"{asset_url}/ninja_fire_char_anim/fireninja_move_ghost_large.tpk"),
@@ -196,7 +197,7 @@ Instance.assets.update([
     Asset(8740011, "snowninja_member_revive", f"{asset_url}/ninja_snow_char_anim/snowninja_member_revive_anim_large.tpk"),
 ])
 
-Instance.sound_assets.update([
+app.session.sound_assets.update([
     Asset(1840002, "mus_mg_201303_cjsnow_gamewindamb", f"{sound_url}/mus_mg_201303_cjsnow_gamewindamb.mp3"),
     Asset(1840003, "sfx_mg_2013_cjsnow_snowmantankhit", f"{sound_url}/sfx_mg_2013_cjsnow_snowmantankhit.mp3"),
     Asset(1840004, "sfx_mg_2013_cjsnow_snowmanslyhit", f"{sound_url}/sfx_mg_2013_cjsnow_snowmanslyhit.mp3"),
