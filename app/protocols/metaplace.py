@@ -10,7 +10,6 @@ from typing import List, Any
 
 from app.data import ServerType, BuildType
 from app.objects import Players
-from app import engine
 
 import logging
 import time
@@ -18,7 +17,7 @@ import json
 import ast
 
 class MetaplaceProtocol(LineOnlyReceiver):
-    def __init__(self, server: engine.SnowflakeWorld, address: IPv4Address | IPv6Address):
+    def __init__(self, server: "MetaplaceWorldServer", address: IPv4Address | IPv6Address):
         self.address = address
         self.server = server
         self.logger = logging.getLogger(address.host)
