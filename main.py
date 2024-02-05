@@ -1,7 +1,7 @@
 
 from twisted.internet import reactor
 from app.protocols import SocketPolicyServer
-from app.engine import SnowflakeWorld
+from app.server import SnowflakeWorld
 from app.logging import Console
 
 import traceback
