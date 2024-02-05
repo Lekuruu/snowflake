@@ -38,7 +38,7 @@ class BuildType(Enum):
     PROFILE = 2
     MEMORY  = 3
 
-class ClientAction(str, Enum):
+class WindowAction(str, Enum):
     ADD_LAYER = "addLayer"
     LOAD_WINDOW = "loadWindow"
     LOAD_GAME = "loadGame"

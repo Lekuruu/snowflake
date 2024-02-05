@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import Dict, Callable
 
-from app.data import ClientAction, MessageType, EventType
+from app.data import WindowAction, MessageType, EventType
 from app import engine
 
 import config
@@ -61,7 +61,7 @@ class SWFWindow:
                 'layerName': self.layer,
                 'assetPath': self.asset_path,
                 'initializationPayload': initial_payload,
-                'action': ClientAction.LOAD_WINDOW.value,
+                'action': WindowAction.LOAD_WINDOW.value,
                 'type': EventType.PLAY_ACTION.value
             },
             **kwargs
@@ -71,7 +71,7 @@ class SWFWindow:
         self.send(
             {
                 'targetWindow': self.url,
-                'action': ClientAction.CLOSE_WINDOW.value,
+                'action': WindowAction.CLOSE_WINDOW.value,
                 'type': EventType.PLAY_ACTION.value,
             },
             **kwargs
@@ -83,7 +83,7 @@ class SWFWindow:
                 'jsonPayload': payload,
                 'targetWindow': self.url,
                 'triggerName': trigger_name,
-                'action': ClientAction.JSON_PAYLOAD.value,
+                'action': WindowAction.JSON_PAYLOAD.value,
                 'type': type.value
             },
             **kwargs
@@ -126,7 +126,7 @@ class WindowManager(Dict[str, SWFWindow]):
 
     def __setitem__(self, name: str, window: SWFWindow) -> None:
         return super().__setitem__(name, window)
-    
+
     def get_window(self, name: str | None = None, url: str | None = None):
         assert url or name, 'You must provide either a url or a name for the window.'
 
