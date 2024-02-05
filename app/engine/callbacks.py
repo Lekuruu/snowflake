@@ -1,8 +1,7 @@
 
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Set, TYPE_CHECKING
-from app.objects.collections import LockedSet
+from typing import Callable, Dict, List, TYPE_CHECKING
 from twisted.internet import reactor
 from collections import defaultdict
 from dataclasses import dataclass
