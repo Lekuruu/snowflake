@@ -3,11 +3,9 @@ from __future__ import annotations
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.protocols.basic import LineOnlyReceiver
-from twisted.internet.error import ConnectionDone
 from twisted.python.failure import Failure
 from typing import List, Any
 
-from app.data import POLICY_FILE
 from app import engine
 
 import logging
@@ -23,17 +21,9 @@ class Receiver(LineOnlyReceiver):
         self.last_action = time.time()
         self.disconnected = False
 
-    def dataReceived(self, data: bytes):
-        if data.startswith(b'<policy-file-request/>'):
-            self.logger.debug(f'-> "{data}"')
-            self.sendLine(POLICY_FILE.encode())
-            self.close_connection()
-            return
-
-        self.last_action = time.time()
-        return super().dataReceived(data)
-
     def lineReceived(self, line: bytes):
+        self.last_action = time.time()
+
         try:
             data = line.decode("utf-8")
         except UnicodeDecodeError:

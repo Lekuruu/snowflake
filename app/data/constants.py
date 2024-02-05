@@ -66,5 +66,3 @@ class OriginMode(IntEnum):
     CENTER = 1
     BOTTOM_MIDDLE = 2
     TOP_LEFT = 3
-
-POLICY_FILE = "<cross-domain-policy><allow-access-from domain='*' to-ports='*' /></cross-domain-policy>"
