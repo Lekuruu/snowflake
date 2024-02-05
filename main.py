@@ -14,8 +14,10 @@ logging.basicConfig(
 
 if __name__ == "__main__":
     try:
+        if not config.DISABLE_POLICY_SERVER:
+            reactor.listenTCP(843, SocketPolicyServer())
+
         reactor.listenTCP(config.PORT, Server)
-        reactor.listenTCP(843, SocketPolicyServer())
         reactor.run()
     except Exception as e:
         Server.logger.error(f"Failed to start server: {e}")
