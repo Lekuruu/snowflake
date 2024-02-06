@@ -109,6 +109,7 @@ class Grid:
                 tile.place_object()
 
     def show_tiles(self) -> None:
+        """Show all initialized tiles, including the tile frame"""
         tile_frame = self.game.objects.by_name('ui_tile_frame')
         tile_frame.place_sprite('ui_tile_frame')
 
@@ -120,6 +121,7 @@ class Grid:
                 tile.place_sprite('ui_tile_move', client)
 
     def hide_tiles(self) -> None:
+        """Hide all initialized tiles, including the tile frame"""
         tile_frame = self.game.objects.by_name('ui_tile_frame')
         tile_frame.hide()
 
@@ -127,9 +129,15 @@ class Grid:
             tile.hide()
 
     def change_tile_sprites(self, name: str) -> None:
+        """Change the sprites of all tiles to a new sprite"""
         for client in self.game.clients:
             for tile in client.ninja.movable_tiles():
                 tile.place_sprite(name, client)
+
+    def change_tile_sprites_for_client(self, client: "Penguin", name: str) -> None:
+        """Change the sprites of all tiles to a new sprite for a specific client"""
+        for tile in client.ninja.movable_tiles():
+            tile.place_sprite(name, client)
 
     def get_tile(self, x: int, y: int) -> GameObject | None:
         """Get a tile by its coordinates"""
@@ -143,6 +151,7 @@ class Grid:
             client.game.hide_tip(client)
 
     def surrounding_tiles(self, center_x: int, center_y: int, distance: int = 1) -> Iterator[GameObject]:
+        """Get the surrounding tiles of a tile, in a rectangle-like pattern"""
         x_range = range(center_x - distance, center_x + distance + 1)
         y_range = range(center_y - distance, center_y + distance + 1)
 
@@ -157,6 +166,7 @@ class Grid:
                 yield self.get_tile(x, y)
 
     def surrounding_objects(self, x: int, y: int, distance: int = 1) -> Iterator[GameObject]:
+        """Get the surrounding objects of a tile, in a rectangle-like pattern"""
         tiles = self.surrounding_tiles(x, y, distance)
 
         for tile in tiles:
