@@ -152,20 +152,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
         self.send_tag('S_WORLDTYPE', self.server.server_type.value, self.server.build_type.value)
 
     def send_world(self):
-        self.send_tag(
-            'S_WORLD',
-            self.server.world_id,
-            self.server.world_name,
-            '0:113140001',                                         # start_placeUniqueId ???
-            1 if self.server.build_type == BuildType.DEBUG else 0, # devMode
-            'none',                                                # ?
-            0,                                                     # ?
-            'crowdcontrol',                                        # ?
-            self.server.world_name,                                # clean_name
-            0,                                                     # ?
-            self.server.stylesheet_id,                             # STYLESHEET_ID ?
-            0                                                      # ?
-        )
+        self.send_tag('S_WORLD', self.server.world_id, self.server.world_name, f'0:{self.place.id}', 0, 'none', 0, self.server.world_owner, self.server.world_name, 0, self.server.stylesheet_id, 0)
 
     def command_received(self, command: str, args: List[Any]):
         """This method should be overridden by the protocol implementation."""
