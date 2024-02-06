@@ -9,7 +9,7 @@ from typing import List, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from app.protocols import MetaplaceWorldServer
 
-from app.protocols.metaplace.places import Place, Camera3D
+from app.protocols.metaplace import Place, Camera3D, Physics
 from app.engine.windows import WindowManager
 from app.objects import ObjectCollection
 from app.data import (
@@ -232,6 +232,14 @@ class MetaplaceProtocol(LineOnlyReceiver):
            settings.aspect, settings.v_fov,
            settings.focal_length, 0, settings.camera_width,
            settings.camera_height
+        )
+
+    def setup_physics(self, settings: Physics):
+        self.send_tag('P_PHYSICS',
+            int(settings.gravity), int(settings.collision),
+            int(settings.friction), int(settings.tile_friction),
+            int(settings.safety_net), settings.net_height,
+            int(settings.net_friction), int(settings.net_bounce)
         )
 
     def command_received(self, command: str, args: List[Any]):

@@ -40,9 +40,8 @@ def ready_handler(client: Penguin):
 
     client.set_renderflags(client.place.render.occlude_tiles, client.place.render.alpha_cutoff)
     client.lock_rendersize(client.place.camera3d.camera_width, client.place.camera3d.camera_height)
+    client.setup_physics(client.place.physics)
     client.send_tag('P_ASSETSCOMPLETE')
-
-    # TODO: Initialize physics & other tags
 
 @session.events.register('/place_ready')
 def on_place_ready(client: Penguin):
