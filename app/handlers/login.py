@@ -1,5 +1,6 @@
 
-from app.data import MapblockType, AlignMode, ScaleMode, ViewMode
+from app.data import MapblockType, AlignMode, ScaleMode
+from app.objects.gameobject import LocalGameObject
 from app.protocols import MetaplaceProtocol
 from app.engine.penguin import Penguin
 from app.data import penguins, cards
@@ -123,8 +124,15 @@ def on_place_ready(client: Penguin):
     client.send_tag('P_LOCKCAMERA', client.place.camera.lock_view)
     client.send_tag('P_LOCKZOOM', client.place.camera.lock_zoom)
 
-    # TODO: Add actual player object
-    client.send_tag('O_PLAYER', 1)
+    player_object = LocalGameObject(
+        client=client,
+        name='Player',
+        x=5,
+        y=2.5
+    )
+
+    player_object.place_object()
+    player_object.set_camera_target()
 
 @session.framework.register('screenSize')
 def screen_size_handler(client: Penguin, data: dict):
