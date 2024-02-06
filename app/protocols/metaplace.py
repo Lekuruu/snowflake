@@ -50,7 +50,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
 
         return super().dataReceived(data)
 
-    def lineReceived(self, line: bytes):
+    def lineReceived(self, line: bytes) -> None:
         self.last_action = time.time()
 
         try:
@@ -89,14 +89,14 @@ class MetaplaceProtocol(LineOnlyReceiver):
         self.server.players.remove(self)
         self.disconnected = True
 
-    def close_connection(self):
+    def close_connection(self) -> None:
         if not self.transport:
             return
 
         self.transport.loseConnection()
         self.connectionLost()
 
-    def send_tag(self, tag: str, *args):
+    def send_tag(self, tag: str, *args) -> None:
         if not self.transport:
             return
 
@@ -104,6 +104,9 @@ class MetaplaceProtocol(LineOnlyReceiver):
 
         encoded_arguments = '|'.join(str(a) for a in args)
         self.sendLine((f'[{tag}]|{encoded_arguments}|').encode())
+
+    def get_window(self, name: str | None = None, url: str | None = None):
+        return self.window_manager.get_window(name, url)
 
     def send_login_reply(self):
         self.send_tag('S_LOGIN', self.pid)
