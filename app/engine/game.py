@@ -102,9 +102,6 @@ class Game:
             key_modifier=InputModifier.NONE
         )
 
-        # Scale screen up to 100
-        self.send_tag('P_TILESIZE', 100)
-
         # Load assets
         self.load_assets()
 
