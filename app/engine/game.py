@@ -632,7 +632,7 @@ class Game:
                     "doubleCoins": False, # TODO
                     "isBoss": 0,
                     "rank": client.object.snow_ninja_rank,
-                    "round": self.round,
+                    "round": self.round + 1,
                     "showItems": 0,       # TODO
                     "stampList": [
                         {
