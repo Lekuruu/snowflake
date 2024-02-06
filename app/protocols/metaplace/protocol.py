@@ -11,9 +11,9 @@ if TYPE_CHECKING:
 
 from app.engine.windows import WindowManager
 from app.protocols.metaplace import Place
+from app.objects import ObjectCollection
 from app.data import (
     MapblockType,
-    BuildType,
     AlignMode,
     ScaleMode,
     ViewMode
@@ -38,7 +38,9 @@ class MetaplaceProtocol(LineOnlyReceiver):
 
         self.last_action = time.time()
         self.logger = logging.getLogger(address.host)
+
         self.window_manager = WindowManager(self)
+        self.local_objects = ObjectCollection()
 
     def dataReceived(self, data: bytes):
         # NOTE: The socket policy file usually gets requested on a seperate server

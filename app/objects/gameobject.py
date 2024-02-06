@@ -343,19 +343,25 @@ class LocalGameObject(GameObject):
         x_scale: int = 1,
         y_scale: int = 1
     ) -> None:
-        super().__init__(
-            game,
-            name,
-            x,
-            y,
-            on_click,
-            grid=False,
-            x_offset=x_offset,
-            y_offset=y_offset,
-            origin_mode=origin_mode,
-            mirror_mode=mirror_mode,
-            x_scale=x_scale,
-            y_scale=y_scale
-        )
+        self.game = game
+        self.name = name
+        self.id = -1
+        self.x = x
+        self.y = y
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+        self.on_click = on_click
+
+        self._origin_mode = origin_mode
+        self._mirror_mode = mirror_mode
+        self._x_scale = x_scale
+        self._y_scale = y_scale
+
         self.target = client
         self.client = client
+        self.client.local_objects.add(self)
+
+    def remove_object(self) -> None:
+        self.target.send_tag('O_GONE', self.id)
+        self.client.local_objects.remove(self)
+        self.remove_pending_actions()
