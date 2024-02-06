@@ -155,8 +155,9 @@ class MetaplaceProtocol(LineOnlyReceiver):
             key_modifier.value, command
         )
 
-    def set_place(self, place_id: int, object_id: int, instance_id: int):
+    def set_place(self, place_id: int, object_id: int = 0, instance_id: int = 0):
         self.send_tag('W_PLACE', place_id, object_id, instance_id)
+        self.place = self.server.get_place(place_id)
 
     def set_asset_url(self, url: str):
         self.send_tag('W_BASEASSETURL', url)
