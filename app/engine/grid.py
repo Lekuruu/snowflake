@@ -13,9 +13,11 @@ if TYPE_CHECKING:
 import random
 
 class Grid:
-    def __init__(self, game: "Game") -> None:
-        self.array: List[List[GameObject | None]] = [[None] * 5 for _ in range(9)]
+    def __init__(self, x_range: int, y_range: int, game: "Game") -> None:
+        self.array: List[List[GameObject | None]] = [[None] * y_range for _ in range(x_range)]
         self.tiles: List[GameObject] = []
+        self.x_range = range(x_range)
+        self.y_range = range(y_range)
         self.game = game
 
     def __repr__(self) -> str:
@@ -72,18 +74,18 @@ class Grid:
 
     def is_valid(self, x: int, y: int) -> bool:
         """Check if a tile is valid"""
-        return x in range(9) and y in range(5)
+        return x in self.x_range and y in self.y_range
 
     def can_move(self, x: int, y: int) -> bool:
         """Check if a tile is empty"""
-        if x not in range(9) or y not in range(5):
+        if not self.is_valid(x, y):
             return False
 
         return self[x, y] is None
 
     def can_move_to_tile(self, ninja: Ninja, x: int, y: int) -> bool:
         """Check if a ninja can move to a tile"""
-        if x not in range(9) or y not in range(5):
+        if not self.is_valid(x, y):
             return False
 
         if not self.can_move(x, y):
@@ -98,8 +100,8 @@ class Grid:
         tile_frame = GameObject(self.game, 'ui_tile_frame')
         tile_frame.place_object()
 
-        for x in range(9):
-            for y in range(5):
+        for x in self.x_range:
+            for y in self.y_range:
                 tile = GameObject(
                     self.game,
                     f'{x}-{y}',

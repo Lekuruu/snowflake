@@ -41,8 +41,8 @@ class Game:
 
         self.callbacks = CallbackHandler(self)
         self.objects = ObjectCollection(offset=1000)
+        self.grid = Grid(9, 5, self)
         self.timer = Timer(self)
-        self.grid = Grid(self)
 
         self.logger = logging.getLogger('Game')
         self.backgrounds = []
