@@ -346,7 +346,7 @@ class Sly(Enemy):
         self.idle_animation()
         self.attack_sound()
 
-        time.sleep(1.4)
+        time.sleep(1.45)
         projectile = SlyProjectile(self.game, self.x, self.y)
         projectile.play(x, y)
 
