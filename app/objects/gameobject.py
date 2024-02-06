@@ -330,11 +330,11 @@ class LocalGameObject(GameObject):
 
     def __init__(
         self,
-        game: "Game",
         client: "Penguin",
         name: str,
         x: int = 0,
         y: int = 0,
+        game: "Game" | None = None,
         on_click: Callable | None = None,
         x_offset: int = 0,
         y_offset: int = 0,
