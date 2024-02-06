@@ -6,8 +6,10 @@ class SnowMapBlocks(MapBlocks):
     heightmap: str = "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAAAAADfm1AaAAAADklEQVQImWOohwMG8pgA1rMdxRJRFewAAAAASUVORK5CYII="
 
 class SnowCamera(Camera):
+    position: tuple = (4.5, 2.5, 0)
     lock_zoom: bool = True
     lock_view: bool = True
+    zoom: float = 1.0
     tile_size: int = 100
     elevation_scale: float = 0.031250
 
