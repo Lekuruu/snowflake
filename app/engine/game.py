@@ -37,6 +37,7 @@ class Game:
 
         self.map = random.randint(1, 3)
         self.round = 0
+        self.coins = 0
 
         self.callbacks = CallbackHandler(self)
         self.objects = ObjectCollection(offset=1000)
@@ -167,7 +168,6 @@ class Game:
             )
 
             self.run_until_next_round()
-            self.round += 1
 
             if all(client.disconnected for client in self.clients):
                 # All players have disconnected
@@ -176,6 +176,18 @@ class Game:
             if all(ninja.hp <= 0 for ninja in self.ninjas):
                 # All ninjas have been defeated
                 break
+
+            # NOTE: No idea if these values are correct
+            #       May need to change this in the future
+            coins = {
+                0: 60,
+                1: 120,
+                2: 120,
+                3: 360
+            }
+
+            self.coins += coins.get(self.round, 0)
+            self.round += 1
 
             if (self.round > 2) and (not self.bonus_cirteria_met):
                 # Bonus criteria not met on round 3
@@ -628,12 +640,14 @@ class Game:
     def display_payout(self) -> None:
         snow_stamps = stamps.fetch_all_by_group(60)
 
+        # TODO: Update coins in database
+
         for client in self.clients:
             payout = client.get_window('cardjitsu_snowpayout.swf')
             payout.layer = 'bottomLayer'
             payout.load(
                 {
-                    "coinsEarned": 0,     # TODO: Implement coins system
+                    "coinsEarned": self.coins,
                     "doubleCoins": False, # TODO
                     "damage": 0,          # Only important for tusk battle
                     "isBoss": 0,
