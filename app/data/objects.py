@@ -22,6 +22,20 @@ from sqlalchemy import (
 
 Base = declarative_base()
 
+__all__ = [
+    'Penguin',
+    'Card',
+    'CardStarterDeck',
+    'PenguinCard',
+    'Stamp',
+    'StampGroup',
+    'CoverStamp',
+    'CoverItem',
+    'PenguinStamp',
+    'Item',
+    'PenguinItem'
+]
+
 class Penguin(Base):
     __tablename__ = 'penguin'
 
