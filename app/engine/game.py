@@ -94,14 +94,11 @@ class Game:
         # Load assets
         self.load_assets()
 
-        # This will trigger the loading transition
-        self.send_tag(
-            'W_PLACE',
-            '1:10001', # PlaceId
-            0,         # PlaceObjectId
-            0          # PlaceInstanceId
-        )
-        # TODO: Implement new place class for this
+        # Place clients in battle place
+        battle_place = self.server.places['snow_battle']
+
+        for client in self.clients:
+            client.set_place(battle_place.id)
 
         self.initialize_objects()
         self.wait_for_players(lambda player: player.is_ready)
