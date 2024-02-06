@@ -4,8 +4,9 @@ from __future__ import annotations
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.internet.protocol import Factory
 from twisted.internet import reactor
+from typing import Dict
 
-from app.protocols.metaplace import MetaplaceProtocol
+from app.protocols.metaplace import MetaplaceProtocol, Place
 from app.data import ServerType, BuildType
 from app.objects import Players
 
@@ -28,8 +29,9 @@ class MetaplaceWorldServer(Factory):
         self.server_type = server_type
         self.stylesheet_id = stylesheet_id
 
-        self.players = Players()
         self.logger = logging.getLogger(f"{world_name} ({world_id})")
+        self.places: Dict[str, Place] = {}
+        self.players = Players()
 
         self.policy_file = (
             "<cross-domain-policy>"
@@ -37,11 +39,14 @@ class MetaplaceWorldServer(Factory):
             "</cross-domain-policy>"
         )
 
-    def buildProtocol(self, address: IPv4Address | IPv6Address):
-        self.logger.debug(f'-> "{address.host}:{address.port}"')
-        self.players.add(player := self.protocol(self, address))
-        return player
+    def register_place(self, place: Place):
+        self.places[place.name] = place
 
     def listen(self, port: int):
         self.logger.info(f"Starting engine: {self} ({port})")
         reactor.listenTCP(port, self)
+
+    def buildProtocol(self, address: IPv4Address | IPv6Address):
+        self.logger.debug(f'-> "{address.host}:{address.port}"')
+        self.players.add(player := self.protocol(self, address))
+        return player
