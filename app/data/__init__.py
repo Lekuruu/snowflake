@@ -1,4 +1,4 @@
 
-from .repositories import penguins, cards, stamps
-from .objects import Penguin, Card, Stamp
+from .repositories import *
 from .constants import *
+from .objects import *
