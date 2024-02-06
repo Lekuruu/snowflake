@@ -6,9 +6,9 @@ from threading import Thread
 
 from app.protocols.metaplace import MetaplaceWorldServer
 from app.engine.matchmaking import MatchmakingQueue
+from app.engine.place import SnowLobby, SnowBattle
 from app.data import ServerType, BuildType
 from app.engine.penguin import Penguin
-from app.engine.place import SnowLobby
 from app.objects import Games
 
 import app.session
@@ -47,6 +47,7 @@ class SnowflakeWorld(MetaplaceWorldServer):
 
     def startFactory(self):
         self.register_place(SnowLobby())
+        self.register_place(SnowBattle())
 
     def stopFactory(self):
         self.logger.warning("Shutting down...")
