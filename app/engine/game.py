@@ -363,6 +363,8 @@ class Game:
                 if len(existing_enemies) <= 3:
                     break
 
+                # TODO: This could lead to softlocks
+
             enemy = enemy_class(self)
             enemy.place_object()
 
