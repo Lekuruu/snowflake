@@ -7,8 +7,8 @@ from twisted.internet import reactor
 from typing import Dict
 
 from app.protocols.metaplace import MetaplaceProtocol, Place
+from app.objects import Players, AssetCollection
 from app.data import ServerType, BuildType
-from app.objects import Players
 
 import logging
 
@@ -33,6 +33,9 @@ class MetaplaceWorldServer(Factory):
 
         self.logger = logging.getLogger(f"{world_name} ({world_id})")
         self.places: Dict[str, Place] = {}
+
+        self.sound_assets = AssetCollection()
+        self.assets = AssetCollection()
         self.players = Players()
 
         self.policy_file = (
