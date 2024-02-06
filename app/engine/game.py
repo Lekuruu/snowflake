@@ -102,6 +102,12 @@ class Game:
             key_modifier=KeyModifier.NONE
         )
 
+        # Scale screen up to 100
+        self.send_tag('P_TILESIZE', 100)
+
+        # Load assets
+        self.load_assets()
+
         # This will trigger the loading transition
         self.send_tag(
             'W_PLACE',
@@ -109,9 +115,6 @@ class Game:
             0,         # PlaceObjectId
             0          # PlaceInstanceId
         )
-
-        # Scale screen up to 100
-        self.send_tag('P_TILESIZE', 100)
 
         self.initialize_objects()
         self.wait_for_players(lambda player: player.is_ready)
@@ -318,8 +321,7 @@ class Game:
             command
         )
 
-    def initialize_objects(self) -> None:
-        """Initialize all game objects"""
+    def load_assets(self) -> None:
         # Load sprites
         for asset in app.session.assets:
             self.send_tag(
@@ -334,6 +336,7 @@ class Game:
                 f'0:{sound.index}'
             )
 
+    def initialize_objects(self) -> None:
         self.grid.initialize_tiles()
         self.create_environment()
         self.create_enemies()
