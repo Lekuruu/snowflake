@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from app.protocols import MetaplaceWorldServer
 
 from app.engine.windows import WindowManager
+from app.protocols.metaplace import Place
 from app.data import (
     MapblockType,
     BuildType,
@@ -32,7 +33,8 @@ class MetaplaceProtocol(LineOnlyReceiver):
         self.name: str = ""
         self.token: str = ""
         self.logged_in: bool = False
-        self.disconnected = False
+        self.disconnected: bool = False
+        self.place: Place | None = None
 
         self.last_action = time.time()
         self.logger = logging.getLogger(address.host)
