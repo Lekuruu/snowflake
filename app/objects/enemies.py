@@ -176,6 +176,10 @@ class Enemy(GameObject):
     def next_target(self) -> Tuple[GameObject, GameObject | None]:
         available_moves = list(self.movable_tiles()) + [self.game.grid[self.x, self.y]]
 
+        if not available_moves:
+            # TODO: Handle this case properly
+            return None, None
+
         # Get move with most available targets
         moves = {
             move: list(self.attackable_tiles(move.x, move.y))
