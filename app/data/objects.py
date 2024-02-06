@@ -12,6 +12,7 @@ from sqlalchemy import (
     Integer,
     Column,
     String,
+    Date,
     Time,
     CHAR
 )
@@ -229,4 +230,67 @@ class PenguinStamp(Base):
         Boolean,
         nullable=False,
         server_default=text("true")
+    )
+
+class Item(Base):
+    __tablename__ = 'item'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    type = Column(SmallInteger, nullable=False, server_default=text("1"))
+    cost = Column(Integer, nullable=False, server_default=text("0"))
+    member = Column(Boolean, nullable=False, server_default=text("false"))
+    bait = Column(Boolean, nullable=False, server_default=text("false"))
+    patched = Column(Boolean, nullable=False, server_default=text("false"))
+    legacy_inventory = Column(Boolean, nullable=False, server_default=text("false"))
+    vanilla_inventory = Column(Boolean, nullable=False, server_default=text("false"))
+    epf = Column(Boolean, nullable=False, server_default=text("false"))
+    tour = Column(Boolean, nullable=False, server_default=text("false"))
+    release_date = Column(Date, nullable=False, server_default=text("now()"))
+    treasure = Column(Boolean, nullable=False, server_default=text("false"))
+    innocent = Column(Boolean, nullable=False, server_default=text("false"))
+
+    def is_color(self):
+        return self.type == 1
+
+    def is_head(self):
+        return self.type == 2
+
+    def is_face(self):
+        return self.type == 3
+
+    def is_neck(self):
+        return self.type == 4
+
+    def is_body(self):
+        return self.type == 5
+
+    def is_hand(self):
+        return self.type == 6
+
+    def is_feet(self):
+        return self.type == 7
+
+    def is_flag(self):
+        return self.type == 8
+
+    def is_photo(self):
+        return self.type == 9
+
+    def is_award(self):
+        return self.type == 10
+
+class PenguinItem(Base):
+    __tablename__ = 'penguin_item'
+
+    penguin_id = Column(
+        ForeignKey('penguin.id', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True,
+        nullable=False
+    )
+
+    item_id = Column(
+        ForeignKey('item.id', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True,
+        nullable=False
     )
