@@ -4,7 +4,10 @@ from __future__ import annotations
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.protocols.basic import LineOnlyReceiver
 from twisted.python.failure import Failure
-from typing import List, Any
+from typing import List, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.protocols import MetaplaceWorldServer
 
 from app.engine.windows import WindowManager
 from app.data import (
@@ -21,7 +24,7 @@ import json
 import ast
 
 class MetaplaceProtocol(LineOnlyReceiver):
-    def __init__(self, server, address: IPv4Address | IPv6Address):
+    def __init__(self, server: "MetaplaceWorldServer", address: IPv4Address | IPv6Address):
         self.address = address
         self.server = server
 
