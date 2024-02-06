@@ -44,6 +44,9 @@ class MetaplaceWorldServer(Factory):
             "</cross-domain-policy>"
         )
 
+    def get_place(self, place_id: int) -> Place | None:
+        return next((place for place in self.places.values() if place.id == place_id), None)
+
     def register_place(self, place: Place):
         self.places[place.name] = place
         self.logger.info(f'Registered place: "{place.name}"')
