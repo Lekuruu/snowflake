@@ -26,6 +26,9 @@ class Grid:
             return self.array[index[0]][index[1]]
 
     def __setitem__(self, index: Tuple[int, int], value: GameObject | None) -> None:
+        if not self.is_valid(*index):
+            return
+
         self.array[index[0]][index[1]] = value
 
         if value is not None:
