@@ -320,17 +320,24 @@ class Game:
 
     def initialize_objects(self) -> None:
         """Initialize all game objects"""
-        self.grid.initialize_tiles()
-        self.create_environment()
-        self.create_enemies()
-        self.create_ninjas()
-
         # Load sprites
         for asset in app.session.assets:
             self.send_tag(
                 'S_LOADSPRITE',
                 f'0:{asset.index}'
             )
+
+        # Load sounds
+        for sound in app.session.sound_assets:
+            self.send_tag(
+                'S_LOADSPRITE',
+                f'0:{sound.index}'
+            )
+
+        self.grid.initialize_tiles()
+        self.create_environment()
+        self.create_enemies()
+        self.create_ninjas()
 
     def create_ninjas(self) -> None:
         water = WaterNinja(self.water, x=0, y=0)
