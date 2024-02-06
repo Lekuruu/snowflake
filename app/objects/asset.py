@@ -8,7 +8,6 @@ from app import session
 class Asset:
     index: int
     name: str
-    url: str
 
     def __eq__(self, asset: "Asset") -> bool:
         return self.index == asset.index
