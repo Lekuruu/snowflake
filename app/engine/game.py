@@ -323,14 +323,14 @@ class Game:
 
     def load_assets(self) -> None:
         # Load sprites
-        for asset in app.session.assets:
+        for asset in self.server.assets:
             self.send_tag(
                 'S_LOADSPRITE',
                 f'0:{asset.index}'
             )
 
         # Load sounds
-        for sound in app.session.sound_assets:
+        for sound in self.server.sound_assets:
             self.send_tag(
                 'S_LOADSPRITE',
                 f'0:{sound.index}'

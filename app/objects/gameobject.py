@@ -11,8 +11,6 @@ from app.engine.callbacks import ActionType
 from app.data.constants import OriginMode, MirrorMode
 from .sound import Sound
 
-import app.session
-
 class GameObject:
     """
     This class represents a game object. It is the base class for all objects in the game, such as ninjas and enemies.
@@ -186,7 +184,7 @@ class GameObject:
         register: bool = True,
         callback: Callable | None = None
     ) -> None:
-        asset = app.session.assets.by_name(name)
+        asset = self.target.server.assets.by_name(name)
         handle_id = -1
 
         if reset:
@@ -216,7 +214,7 @@ class GameObject:
         self.target.send_tag('O_PLAYER', self.id)
 
     def place_sprite(self, name: str, target: "Penguin" | None = None) -> None:
-        asset = app.session.assets.by_name(name)
+        asset = self.target.server.assets.by_name(name)
         target = target or self.target
 
         target.send_tag(
@@ -228,7 +226,7 @@ class GameObject:
         )
 
     def load_sprite(self, name: str) -> None:
-        asset = app.session.assets.by_name(name)
+        asset = self.target.server.assets.by_name(name)
 
         self.target.send_tag(
             'S_LOADSPRITE',
@@ -309,7 +307,8 @@ class GameObject:
         radius: int = 0,
         callback: Callable | None = None
     ) -> Sound:
-        asset = app.session.sound_assets.by_name(sound_name)
+        asset = self.target.server.sound_assets.by_name(sound_name)
+
         sound = Sound.from_index(
             asset.index,
             looping,
@@ -317,7 +316,8 @@ class GameObject:
             radius,
             self.id,
             self.id  # TODO: Different id for response object?
-        ).play(
+        )
+        sound.play(
             target or self.game,
             self.id,
             callback
