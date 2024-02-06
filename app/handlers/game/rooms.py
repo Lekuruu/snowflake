@@ -1,11 +1,26 @@
 
 from app.engine import Penguin
-from app.data import TipPhase
 from app import session
+from app.data import (
+    InputModifier,
+    InputTarget,
+    InputType,
+    TipPhase
+)
 
 @session.framework.register('roomToRoomMinTime')
 def on_room_to_room_min_time(client: Penguin, data: dict):
     client.is_ready = True
+
+    # Register /use event
+    client.register_input(
+        command='/use',
+        input_id='/use',
+        script_id='4375706:1',
+        target=InputTarget.GOB,
+        event=InputType.MOUSE_CLICK,
+        key_modifier=InputModifier.NONE
+    )
 
 @session.framework.register('roomToRoomComplete')
 def on_room_to_room_complete(client: Penguin, data: dict):

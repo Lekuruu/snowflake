@@ -19,7 +19,6 @@ from .callbacks import CallbackHandler
 from .timer import Timer
 from .grid import Grid
 
-import app.session
 import logging
 import random
 import config
@@ -91,16 +90,6 @@ class Game:
         for client in self.clients:
             player_select = client.get_window('cardjitsu_snowplayerselect.swf')
             player_select.close()
-
-        # Register "/use" event
-        self.register_input(
-            command='/use',
-            input_id='/use',
-            script_id='4375706:1',
-            target=InputTarget.GOB,
-            event=InputType.MOUSE_CLICK,
-            key_modifier=InputModifier.NONE
-        )
 
         # Load assets
         self.load_assets()
