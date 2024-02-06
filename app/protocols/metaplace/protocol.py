@@ -123,7 +123,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def send_login_error(self, code: int = 900):
         self.send_tag('S_LOGINDEBUG', f'user code {code}')
 
-    def align_ui(self, x: int, y: int, align: AlignMode, scale: ScaleMode):
+    def align_windows(self, x: int, y: int, align: AlignMode, scale: ScaleMode):
         self.send_tag('UI_ALIGN', self.server.world_id, x, y, align.value, scale.value)
 
     def set_background_color(self, r: int, g: int, b: int):

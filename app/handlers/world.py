@@ -10,7 +10,7 @@ def ready_handler(client: Penguin):
     client.window_manager.load()
 
     # Intialize game
-    client.align_ui(0, 0, AlignMode.CENTER, ScaleMode.NONE)
+    client.align_windows(0, 0, AlignMode.CENTER, ScaleMode.NONE)
     client.set_background_color(34, 164, 243)
     client.set_place(client.place.id, 1, 0)
 
