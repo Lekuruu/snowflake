@@ -13,7 +13,10 @@ from app.protocols.metaplace.places import Place, Camera3D
 from app.engine.windows import WindowManager
 from app.objects import ObjectCollection
 from app.data import (
+    InputModifier,
     MapblockType,
+    InputTarget,
+    InputType,
     AlignMode,
     ScaleMode,
     ViewMode
@@ -137,17 +140,32 @@ class MetaplaceProtocol(LineOnlyReceiver):
             0, self.server.stylesheet_id, 0
         )
 
-    def align_windows(self, x: int, y: int, align: AlignMode, scale: ScaleMode):
-        self.send_tag('UI_ALIGN', self.server.world_id, x, y, align.value, scale.value)
-
-    def set_background_color(self, r: int, g: int, b: int):
-        self.send_tag('UI_BGCOLOR', r, g, b)
+    def register_input(
+        self,
+        input_id: str,
+        script_id: int,
+        target: InputTarget,
+        event: InputType,
+        key_modifier: InputModifier,
+        command: str
+    ) -> None:
+        self.send_tag('W_INPUT',
+            input_id, script_id,
+            target.value, event.value,
+            key_modifier.value, command
+        )
 
     def set_place(self, place_id: int, object_id: int, instance_id: int):
         self.send_tag('W_PLACE', place_id, object_id, instance_id)
 
     def set_asset_url(self, url: str):
         self.send_tag('W_BASEASSETURL', url)
+
+    def align_windows(self, x: int, y: int, align: AlignMode, scale: ScaleMode):
+        self.send_tag('UI_ALIGN', self.server.world_id, x, y, align.value, scale.value)
+
+    def set_background_color(self, r: int, g: int, b: int):
+        self.send_tag('UI_BGCOLOR', r, g, b)
 
     def set_view_mode(self, mode: ViewMode):
         self.send_tag('P_VIEW', mode.value)
