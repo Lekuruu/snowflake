@@ -13,11 +13,7 @@ def version_handler(client: Penguin):
     client.send_tag('S_VERSION', config.VERSION)
 
 @session.events.register("/place_context", login_required=False)
-def context_handler(client: Penguin, location: str, param_string: str):
-    if location != 'snow_lobby':
-        client.close_connection()
-        return
-
+def context_handler(client: Penguin, place_name: str, param_string: str):
     params = urllib.parse.parse_qs(param_string)
 
     if not (battle_mode := params.get('battleMode')):
@@ -28,8 +24,13 @@ def context_handler(client: Penguin, location: str, param_string: str):
         client.close_connection()
         return
 
+    if not (place := client.server.places.get(place_name)):
+        client.close_connection()
+        return
+
     client.battle_mode = int(battle_mode[0])
     client.asset_url = asset_url[0]
+    client.place = place
 
 @session.events.register('/login', login_required=False)
 def login_handler(client: Penguin, server_type: str, pid: int, token: str):
