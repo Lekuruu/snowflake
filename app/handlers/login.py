@@ -59,6 +59,8 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.object = penguin
     client.power_cards = cards.fetch_by_penguin_id(pid)
 
+    # TODO: Check player username approval
+
     other_connections = client.server.players.with_id(pid)
     other_connections.remove(client)
 
