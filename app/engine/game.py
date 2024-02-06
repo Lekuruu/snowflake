@@ -360,7 +360,18 @@ class Game:
         enemy_classes = (Sly, Scrap, Tank)
 
         for _ in range(amount_enemies):
-            enemy_class = random.choice(enemy_classes)
+            while True:
+                enemy_class = random.choice(enemy_classes)
+
+                existing_enemies = [
+                    enemy for enemy in self.enemies
+                    if isinstance(enemy, enemy_class)
+                ]
+
+                # There can't be more than 3 enemies of the same type 
+                if len(existing_enemies) <= 3:
+                    break
+
             enemy = enemy_class(self)
             enemy.place_object()
 
