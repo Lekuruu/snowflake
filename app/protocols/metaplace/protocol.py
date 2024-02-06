@@ -9,9 +9,9 @@ from typing import List, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from app.protocols import MetaplaceWorldServer
 
+from app.objects import ObjectCollection, AssetCollection
 from app.engine.windows import WindowManager
 from app.protocols.metaplace import Place
-from app.objects import ObjectCollection
 from app.data import (
     MapblockType,
     AlignMode,

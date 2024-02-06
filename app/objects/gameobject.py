@@ -9,8 +9,6 @@ if TYPE_CHECKING:
 
 from app.engine.callbacks import ActionType
 from app.data.constants import OriginMode, MirrorMode
-from .collections import SoundCollection, AssetCollection
-from .asset import Asset
 from .sound import Sound
 
 import app.session

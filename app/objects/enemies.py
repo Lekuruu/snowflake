@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from app.engine.game import Game
 
 from app.data import MirrorMode
-
+from app.objects import GameObject
 from app.objects.effects import (
     ScrapImpactSurroundings,
     ScrapProjectileImpact,
@@ -19,14 +19,6 @@ from app.objects.effects import (
     AttackTile,
     Explosion,
     Effect
-)
-
-from app.objects import (
-    SoundCollection,
-    AssetCollection,
-    GameObject,
-    Sound,
-    Asset
 )
 
 import random

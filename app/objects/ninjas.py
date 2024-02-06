@@ -18,7 +18,6 @@ from app.objects.effects import (
 
 from app.objects.enemies import Enemy
 from app.objects import (
-    SoundCollection,
     AssetCollection,
     GameObject,
     Sound,
