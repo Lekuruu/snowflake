@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from app.data.constants import KeyModifier, KeyTarget, KeyInput, Phase
+from app.data.constants import KeyModifier, KeyTarget, KeyInput, TipPhase
 from app.data.repositories import stamps
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
@@ -153,7 +153,7 @@ class Game:
         time.sleep(1)
 
         self.show_ui()
-        self.send_tip(Phase.MOVE)
+        self.send_tip(TipPhase.MOVE)
 
         for client in self.disconnected_clients:
             client.ninja.set_health(0)
@@ -578,7 +578,7 @@ class Game:
                 yPercent=1
             )
 
-    def send_tip(self, phase: Phase, client: "Penguin" | None = None) -> None:
+    def send_tip(self, phase: TipPhase, client: "Penguin" | None = None) -> None:
         clients = [client] if client else self.clients
 
         for client in clients:

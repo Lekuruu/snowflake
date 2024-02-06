@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
-from app.data import MirrorMode, Phase
+from app.data import MirrorMode, TipPhase
 from app.objects.target import Target
 from app.objects.effects import (
     SnowProjectile,
@@ -263,7 +263,7 @@ class Ninja(GameObject):
         target.set_health(target.hp - self.attack)
 
     def heal_target(self, target: "Ninja"):
-        if self.client.last_tip == Phase.HEAL:
+        if self.client.last_tip == TipPhase.HEAL:
             self.game.hide_tip(self.client)
 
         if target.hp <= 0:

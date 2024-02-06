@@ -1,15 +1,15 @@
 
 from app.engine import Penguin
-from app.data import Phase
+from app.data import TipPhase
 from app import session
 
 @session.framework.register('ShowMemberCardInfoTip')
 def on_membercard_info_clicked(client: Penguin, data: dict):
-    if client.last_tip == Phase.MEMBER_CARD:
+    if client.last_tip == TipPhase.MEMBER_CARD:
         client.hide_tip()
         return
 
-    client.send_tip(Phase.MEMBER_CARD)
+    client.send_tip(TipPhase.MEMBER_CARD)
 
 @session.framework.register('memberCardClick')
 def on_membercard_select(client: Penguin, data: dict):

@@ -1,6 +1,6 @@
 
 from app.engine import Penguin
-from app.data import Phase
+from app.data import TipPhase
 from app import session
 
 @session.framework.register('roomToRoomMinTime')
@@ -13,7 +13,7 @@ def on_room_to_room_complete(client: Penguin, data: dict):
 
 @session.framework.register('roomToRoomScreenClosed')
 def on_room_to_room_screen_closed(client: Penguin, data: dict):
-    if client.last_tip in (Phase.MEMBER_CARD, Phase.CARD):
+    if client.last_tip in (TipPhase.MEMBER_CARD, TipPhase.CARD):
         client.game.hide_tip(client)
 
 @session.framework.register('roomToRoomMemberReviveTip')

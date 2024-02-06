@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Tuple, Iterator
 from app.objects import GameObject, Asset
 from app.objects.ninjas import Ninja
-from app.data.constants import Phase
+from app.data.constants import TipPhase
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
@@ -139,7 +139,7 @@ class Grid:
         ninja = self.game.objects.by_name(client.element.capitalize())
         ninja.place_ghost(tile.x, tile.y)
 
-        if client.tip_mode and client.last_tip == Phase.MOVE:
+        if client.tip_mode and client.last_tip == TipPhase.MOVE:
             client.game.hide_tip(client)
 
     def surrounding_tiles(self, center_x: int, center_y: int, distance: int = 1) -> Iterator[GameObject]:

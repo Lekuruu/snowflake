@@ -29,7 +29,7 @@ class BuildType(IntEnum):
     PROFILE = 2
     MEMORY  = 3
 
-class Phase(str, Enum):
+class TipPhase(str, Enum):
     MOVE = "Move"
     ATTACK = "Attack"
     CARD = "Card"

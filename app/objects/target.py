@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from app.engine import Penguin
 
 from app.objects.gameobject import LocalGameObject, GameObject
-from app.data import Phase
+from app.data import TipPhase
 
 class Target(LocalGameObject):
     def __init__(
@@ -43,7 +43,7 @@ class Target(LocalGameObject):
         self.animate_object('ui_target_red_attack_intro_anim', reset=True)
         self.animate_object('ui_target_red_attack_idle_anim', play_style='loop')
         self.play_sound('sfx_mg_2013_cjsnow_uitargetred', self.client)
-        self.game.send_tip(Phase.ATTACK, self.client)
+        self.game.send_tip(TipPhase.ATTACK, self.client)
 
     def show_heal(self) -> None:
         if self.selected:
@@ -54,7 +54,7 @@ class Target(LocalGameObject):
         self.animate_object('ui_target_white_heal_intro_anim', reset=True)
         self.animate_object('ui_target_white_heal_idle_anim', play_style='loop')
         self.play_sound('sfx_mg_2013_cjsnow_uitargetred', self.client)
-        self.game.send_tip(Phase.HEAL, self.client)
+        self.game.send_tip(TipPhase.HEAL, self.client)
 
     def select(self) -> None:
         if self.selected:
@@ -72,7 +72,7 @@ class Target(LocalGameObject):
             self.animate_object('ui_target_green_heal_selected_intro_anim', reset=True)
             self.animate_object('ui_target_green_heal_selected_idle_anim', play_style='loop')
 
-        if self.client.last_tip in (Phase.ATTACK, Phase.HEAL):
+        if self.client.last_tip in (TipPhase.ATTACK, TipPhase.HEAL):
             self.game.hide_tip(self.client)
 
         self.selected = True

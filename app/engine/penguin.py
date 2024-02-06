@@ -19,7 +19,7 @@ from app.data import (
     ScaleMode,
     EventType,
     ViewMode,
-    Phase,
+    TipPhase,
     Card
 )
 
@@ -39,8 +39,8 @@ class Penguin(MetaplaceProtocol):
         self.element: str = ""
 
         self.tip_mode: bool = True
-        self.last_tip: Phase | None = None
-        self.displayed_tips: List[Phase] = []
+        self.last_tip: TipPhase | None = None
+        self.displayed_tips: List[TipPhase] = []
         self.power_cards: List[Card] = []
 
         self.in_queue: bool = False
@@ -119,7 +119,7 @@ class Penguin(MetaplaceProtocol):
             }
         )
 
-    def send_tip(self, phase: Phase) -> None:
+    def send_tip(self, phase: TipPhase) -> None:
         infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.layer = 'topLayer'
         infotip.load(
