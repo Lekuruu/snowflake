@@ -50,7 +50,7 @@ class Timer:
 
     def load(self) -> None:
         for client in self.game.clients:
-            timer = client.window_manager.get_window('cardjitsu_snowtimer.swf')
+            timer = client.get_window('cardjitsu_snowtimer.swf')
             timer.layer = 'bottomLayer'
             timer.load(
                 {'element': client.element},
@@ -62,7 +62,7 @@ class Timer:
 
     def update(self) -> None:
         for client in self.game.clients:
-            timer = client.window_manager.get_window('cardjitsu_snowtimer.swf')
+            timer = client.get_window('cardjitsu_snowtimer.swf')
             timer.send_payload(
                 'update',
                 {'tick': self.tick}
@@ -70,12 +70,12 @@ class Timer:
 
     def show(self) -> None:
         for client in self.game.clients:
-            timer = client.window_manager.get_window('cardjitsu_snowtimer.swf')
+            timer = client.get_window('cardjitsu_snowtimer.swf')
             timer.send_payload('Timer_Start')
             timer.send_payload('enableConfirm')
 
     def hide(self) -> None:
         for client in self.game.clients:
-            timer = client.window_manager.get_window('cardjitsu_snowtimer.swf')
+            timer = client.get_window('cardjitsu_snowtimer.swf')
             timer.send_payload('skipToTransitionOut')
             timer.send_payload('disableConfirm')

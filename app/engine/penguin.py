@@ -104,12 +104,12 @@ class Penguin(MetaplaceProtocol):
 
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room
-        window = self.window_manager.get_window('cardjitsu_snowexternalinterfaceconnector.swf')
+        window = self.get_window('cardjitsu_snowexternalinterfaceconnector.swf')
         window.layer = 'toolLayer'
         window.load(type=EventType.IMMEDIATE.value)
 
     def send_error(self, message: str) -> None:
-        window = self.window_manager.get_window('cardjitsu_snowerrorhandler.swf')
+        window = self.get_window('cardjitsu_snowerrorhandler.swf')
         window.send_payload(
             'error',
             {
@@ -120,7 +120,7 @@ class Penguin(MetaplaceProtocol):
         )
 
     def send_tip(self, phase: Phase) -> None:
-        infotip = self.window_manager.get_window('cardjitsu_snowinfotip.swf')
+        infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.layer = 'topLayer'
         infotip.load(
             {
@@ -140,7 +140,7 @@ class Penguin(MetaplaceProtocol):
         infotip.on_close = on_close
 
     def hide_tip(self) -> None:
-        infotip = self.window_manager.get_window('cardjitsu_snowinfotip.swf')
+        infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.send_payload('disable')
 
     def initialize_game(self) -> None:

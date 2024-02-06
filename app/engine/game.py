@@ -89,7 +89,7 @@ class Game:
 
         # Close player select window
         for client in self.clients:
-            player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')
+            player_select = client.get_window('cardjitsu_snowplayerselect.swf')
             player_select.close()
 
         # Register "/use" event
@@ -127,11 +127,11 @@ class Game:
 
         for client in self.clients:
             # Close loading screen
-            player_select = client.window_manager.get_window('cardjitsu_snowplayerselect.swf')
+            player_select = client.get_window('cardjitsu_snowplayerselect.swf')
             player_select.send_action('closeCjsnowRoomToRoom')
 
             # Load exit button
-            close_button = client.window_manager.get_window('cardjitsu_snowclose.swf')
+            close_button = client.get_window('cardjitsu_snowclose.swf')
             close_button.layer = 'bottomLayer'
             close_button.load(
                 loadDescription="",
@@ -378,7 +378,7 @@ class Game:
                     if isinstance(enemy, enemy_class)
                 ]
 
-                # There can't be more than 3 enemies of the same type 
+                # There can't be more than 3 enemies of the same type
                 if len(existing_enemies) <= 3:
                     break
 
@@ -564,7 +564,7 @@ class Game:
 
     def show_ui(self) -> None:
         for client in self.clients:
-            snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
+            snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.layer = 'bottomLayer'
             snow_ui.load(
                 {
@@ -593,7 +593,7 @@ class Game:
 
             if client.last_tip != None:
                 # Wait for infotip to close
-                infotip = client.window_manager.get_window('cardjitsu_snowinfotip.swf')
+                infotip = client.get_window('cardjitsu_snowinfotip.swf')
                 infotip.on_close = after_close
                 return
 
@@ -605,17 +605,17 @@ class Game:
 
     def enable_cards(self) -> None:
         for client in self.clients:
-            snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
+            snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload('enableCards')
 
     def disable_cards(self) -> None:
         for client in self.clients:
-            snow_ui = client.window_manager.get_window('cardjitsu_snowui.swf')
+            snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload('disableCards')
 
     def display_round_title(self) -> None:
         for client in self.clients:
-            round_title = client.window_manager.get_window('cardjitsu_snowrounds.swf')
+            round_title = client.get_window('cardjitsu_snowrounds.swf')
             round_title.layer = 'bottomLayer'
             round_title.load(
                 {
@@ -646,7 +646,7 @@ class Game:
         snow_stamps = stamps.fetch_all_by_group(60)
 
         for client in self.clients:
-            payout = client.window_manager.get_window('cardjitsu_snowpayout.swf')
+            payout = client.get_window('cardjitsu_snowpayout.swf')
             payout.layer = 'bottomLayer'
             payout.load(
                 {

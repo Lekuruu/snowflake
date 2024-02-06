@@ -6,7 +6,7 @@ from app import session
 def on_window_closed(client: Penguin, data: dict):
     window_name = data['windowUrl'].split('/')[-1]
 
-    window = client.window_manager.get_window(window_name)
+    window = client.get_window(window_name)
     window.loaded = False
 
     if window.on_close:
