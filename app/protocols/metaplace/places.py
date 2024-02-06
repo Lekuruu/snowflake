@@ -8,11 +8,6 @@ class MapBlocks:
     heightmap: str = ""
 
 @dataclass
-class ZoomLimit:
-    x: int = -1
-    y: int = -1
-
-@dataclass
 class Render:
     alpha_cutoff: int = 48
     occlude_tiles: bool = False
@@ -38,6 +33,10 @@ class Camera:
     margin_top_left_y: int = 0
     margin_bottom_right_x: int = 0
     margin_bottom_right_y: int = 0
+
+    zoom: int = 1
+    zoom_lock_x: int = -1
+    zoom_lock_y: int = -1
 
 @dataclass
 class Camera3D:
@@ -73,7 +72,6 @@ class Place:
     id: int = 0
     name: str = ""
     mapblocks: MapBlocks = MapBlocks()
-    zoom_limit: ZoomLimit = ZoomLimit()
     render: Render = Render()
     camera: Camera = Camera()
     camera3d: Camera3D = Camera3D()
