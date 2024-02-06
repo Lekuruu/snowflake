@@ -108,6 +108,9 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def get_window(self, name: str | None = None, url: str | None = None):
         return self.window_manager.get_window(name, url)
 
+    def load_window(self, name: str, initial_payload: dict = None, **kwargs) -> None:
+        return self.window_manager.get_window(name).load(initial_payload, **kwargs)
+
     def send_login_reply(self):
         self.send_tag('S_LOGIN', self.pid)
 
