@@ -21,6 +21,7 @@ class Render:
 class Camera:
     view_mode: ViewMode = ViewMode.SIDE
     lock_view: bool = False
+    lock_zoom: bool = False
     tile_size: int = 64
     elevation_scale: float = -1
     terrain_lighting: bool = True
