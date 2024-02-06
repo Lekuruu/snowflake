@@ -41,6 +41,7 @@ class Sound(Asset):
         return cls(
             asset.index,
             asset.name,
+            asset.priority,
             looping,
             volume,
             radius,
@@ -63,6 +64,7 @@ class Sound(Asset):
         return cls(
             asset.index,
             asset.name,
+            asset.priority,
             looping,
             volume,
             radius,

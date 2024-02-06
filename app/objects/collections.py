@@ -86,7 +86,8 @@ class Games(LockedSet["Game"]):
         return max([game.id for game in self] or [0]) + 1
 
 class AssetCollection(Set["Asset"]):
-    def __init__(self, initial_data: Iterable = {}) -> None:
+    def __init__(self, initial_data: List["Asset"] = []) -> None:
+        initial_data.sort(key=lambda asset: asset.priority)
         super().__init__()
         super().update(initial_data)
 
@@ -109,7 +110,7 @@ class AssetCollection(Set["Asset"]):
         return next((asset for asset in self if asset.name == name), None)
 
 class ObjectCollection(Set["GameObject"]):
-    def __init__(self, initial_data: Iterable = {}) -> None:
+    def __init__(self, initial_data: List["GameObject"] = []) -> None:
         super().__init__()
         super().update(initial_data)
 
@@ -143,7 +144,7 @@ class ObjectCollection(Set["GameObject"]):
         return max([object.id for object in self] or [0]) + 1
 
 class SoundCollection(AssetCollection):
-    def __init__(self, initial_data: Iterable = {}) -> None:
+    def __init__(self, initial_data: List["Sound"] = []) -> None:
         super().__init__()
         super().update(initial_data)
 

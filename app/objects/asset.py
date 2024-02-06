@@ -8,6 +8,7 @@ from app import session
 class Asset:
     index: int
     name: str
+    priority: int = 0
 
     def __eq__(self, asset: "Asset") -> bool:
         return self.index == asset.index
