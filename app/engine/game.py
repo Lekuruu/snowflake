@@ -650,13 +650,13 @@ class Game:
             payout.layer = 'bottomLayer'
             payout.load(
                 {
-                    "coinsEarned": 0,     # TODO
-                    "damage": 0,          # TODO
+                    "coinsEarned": 0,     # TODO: Implement coins system
                     "doubleCoins": False, # TODO
+                    "damage": 0,          # Only important for tusk battle
                     "isBoss": 0,
                     "rank": client.object.snow_ninja_rank,
                     "round": self.get_payout_round(),
-                    "showItems": 0,       # TODO
+                    "showItems": 0,       # This will show the unlocked item(s)
                     "stampList": [
                         {
                             "stamp_id": stamp.id,
@@ -669,7 +669,7 @@ class Game:
                         for stamp in snow_stamps
                     ],
                     "stamps": [], # TODO
-                    "xpEnd": client.object.snow_ninja_progress, # TODO
+                    "xpEnd": client.object.snow_ninja_progress, # TODO: Implement xp system
                     "xpStart": client.object.snow_ninja_progress,
                 },
                 loadDescription="",
