@@ -17,12 +17,7 @@ from app.objects.effects import (
 )
 
 from app.objects.enemies import Enemy
-from app.objects import (
-    AssetCollection,
-    GameObject,
-    Sound,
-    Asset
-)
+from app.objects import GameObject
 
 import time
 

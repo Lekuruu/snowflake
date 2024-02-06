@@ -8,10 +8,9 @@ if TYPE_CHECKING:
     from ..engine.penguin import Penguin
     from .gameobject import GameObject
     from .ninjas import Ninja
-    from .sound import Sound
     from .asset import Asset
 
-from typing import Set, List, TypeVar, Iterator, Iterable, Generic
+from typing import Set, List, TypeVar, Iterator, Generic
 from threading import Lock
 
 import logging
