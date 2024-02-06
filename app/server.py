@@ -11,6 +11,7 @@ from app.engine.penguin import Penguin
 from app.engine.place import SnowLobby
 from app.objects import Games
 
+import app.session
 import logging
 import signal
 import os
@@ -35,6 +36,9 @@ class SnowflakeWorld(MetaplaceWorldServer):
         self.logger = logging.getLogger("Snowflake")
         self.threads: List[Thread] = []
         self.shutting_down = False
+
+        self.sound_assets = app.session.sound_assets
+        self.assets = app.session.assets
 
     def runThread(self, func: Callable, *args, **kwargs):
         thread = Thread(target=func, args=args, kwargs=kwargs)
