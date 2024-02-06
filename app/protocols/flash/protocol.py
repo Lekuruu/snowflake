@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.protocols.basic import LineOnlyReceiver
-from twisted.internet.protocol import Factory
-from twisted.internet import reactor
 
 import logging
 
@@ -36,20 +34,3 @@ class SocketPolicyHandler(LineOnlyReceiver):
 
     def closeConnection(self):
         self.transport.loseConnection()
-
-class SocketPolicyServer(Factory):
-    def __init__(self):
-        self.logger = logging.getLogger("SocketPolicyServer")
-        self.policy = (
-            "<cross-domain-policy>"
-            "<allow-access-from domain='*' to-ports='*' />"
-            "</cross-domain-policy>"
-        )
-
-    def buildProtocol(self, address: IPv4Address | IPv6Address):
-        self.logger.debug(f"-> {address.host}:{address.port}")
-        return SocketPolicyHandler(address, self.policy)
-
-    def listenTCP(self, port: int):
-        self.logger.info(f"Starting engine: {self} ({port})")
-        reactor.listenTCP(port, self)
