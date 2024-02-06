@@ -438,7 +438,7 @@ class Game:
             ninja.remove_object()
 
     def remove_confirm(self) -> None:
-        for object in self.objects.with_name('confirm'):
+        for object in self.objects.with_name('ui_confirm'):
             object.remove_object()
 
     def hide_ghosts(self) -> None:

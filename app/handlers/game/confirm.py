@@ -11,7 +11,7 @@ def on_confirm_clicked(client: Penguin, data: dict):
 
     confirm = GameObject(
         client.game,
-        'confirm',
+        'ui_confirm',
         x_offset=0.5,
         y_offset=1.05
     )

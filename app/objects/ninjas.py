@@ -572,7 +572,7 @@ class SnowNinja(Ninja):
 
     def revive_animation(self) -> None:
         self.animate_object(
-            'snowninja_revive_anim_',
+            'snowninja_revive_anim',
             play_style='play_once'
         )
         HealParticles(self.game, self.x, self.y).play()
