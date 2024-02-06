@@ -87,7 +87,6 @@ class Games(LockedSet["Game"]):
 
 class AssetCollection(Set["Asset"]):
     def __init__(self, initial_data: List["Asset"] = []) -> None:
-        initial_data.sort(key=lambda asset: asset.priority)
         super().__init__()
         super().update(initial_data)
 
