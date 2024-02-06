@@ -20,7 +20,7 @@ if __name__ == "__main__":
         world_server.listen(config.PORT)
 
         if not config.DISABLE_POLICY_SERVER:
-            policy_server.listenTCP(843)
+            policy_server.listen(843)
 
         reactor.run()
     except Exception as e:

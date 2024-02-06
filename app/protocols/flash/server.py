@@ -23,6 +23,6 @@ class SocketPolicyServer(Factory):
         self.logger.debug(f"-> {address.host}:{address.port}")
         return self.protocol(address, self.policy)
 
-    def listenTCP(self, port: int):
+    def listen(self, port: int):
         self.logger.info(f"Starting engine: {self} ({port})")
         reactor.listenTCP(port, self)
