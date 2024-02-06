@@ -9,9 +9,9 @@ from typing import List, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from app.protocols import MetaplaceWorldServer
 
-from app.objects import ObjectCollection, AssetCollection
+from app.protocols.metaplace.places import Place, Camera3D
 from app.engine.windows import WindowManager
-from app.protocols.metaplace import Place
+from app.objects import ObjectCollection
 from app.data import (
     MapblockType,
     AlignMode,
@@ -135,6 +135,24 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def set_view_mode(self, mode: ViewMode):
         self.send_tag('P_VIEW', mode.value)
 
+    def lock_view(self, lock: bool):
+        self.send_tag('P_LOCKVIEW', int(lock))
+
+    def lock_scroll(self, lock: bool):
+        self.send_tag('P_LOCKSCROLL', int(lock))
+
+    def lock_camera(self, lock: bool):
+        self.send_tag('P_LOCKCAMERA', int(lock))
+
+    def lock_zoom(self, lock: bool):
+        self.send_tag('P_LOCKZOOM', int(lock))
+
+    def set_elevation_scale(self, scale: float):
+        self.send_tag('P_ELEVSCALE', scale)
+
+    def set_terrain_lighting(self, enabled: bool):
+        self.send_tag('P_RELIEF', int(enabled))
+
     def set_mapblock(self, type: MapblockType, data: str, index: int = 1, size: int = 1):
         self.send_tag('P_MAPBLOCK', type.value, index, size, data)
 
@@ -147,17 +165,49 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def set_tilesize(self, size: int):
         self.send_tag('P_TILESIZE', size)
 
+    def lock_objects(self, lock: bool):
+        self.send_tag('P_LOCKOBJECTS', int(lock))
+
     def lock_rendersize(self, width: int, height: int, size: int = 0):
         self.send_tag('P_LOCKRENDERSIZE', size, width, height)
 
     def set_renderflags(self, allow_tile_occ: bool, alpha_cutoff: int):
         self.send_tag('P_RENDERFLAGS', int(allow_tile_occ), alpha_cutoff)
 
+    def set_draggable(self, draggable: bool):
+        self.send_tag('P_DRAG', int(draggable))
+
+    def set_zoom(self, zoom: float):
+        self.send_tag('P_ZOOM', zoom)
+
+    def set_camlimits(self, top_left_x: int, top_left_y: int, bottom_right_x: int, bottom_right_y):
+        self.send_tag('P_CAMLIMITS', top_left_x, top_left_y, bottom_right_x, bottom_right_y)
+
+    def setup_camera(self, x: int, y: int, z: int, recenter: bool = True):
+        self.send_tag('P_CAMERA', x, y, z, 0, int(recenter))
+
+    def setup_camera3d(self, settings: Camera3D):
+        self.send_tag('P_CAMERA3D',
+           settings.near, settings.far,
+           *settings.position, *settings.angle,
+           settings.camera_view, settings.left,
+           settings.right, settings.top,
+           settings.top, settings.bottom,
+           settings.aspect, settings.v_fov,
+           settings.focal_length, 0, settings.camera_width,
+           settings.camera_height
+        )
+
     def send_world_type(self):
         self.send_tag('S_WORLDTYPE', self.server.server_type.value, self.server.build_type.value)
 
     def send_world(self):
-        self.send_tag('S_WORLD', self.server.world_id, self.server.world_name, f'0:{self.place.id}', 0, 'none', 0, self.server.world_owner, self.server.world_name, 0, self.server.stylesheet_id, 0)
+        self.send_tag('S_WORLD',
+            self.server.world_id, self.server.world_name,
+            f'0:{self.place.id}', 0, 'none', 0,
+            self.server.world_owner, self.server.world_name,
+            0, self.server.stylesheet_id, 0
+        )
 
     def command_received(self, command: str, args: List[Any]):
         """This method should be overridden by the protocol implementation."""
