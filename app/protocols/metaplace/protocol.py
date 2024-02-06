@@ -9,8 +9,7 @@ from typing import List, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from app.protocols import MetaplaceWorldServer
 
-from app.protocols.metaplace import Place, Camera3D, Physics
-from app.engine.windows import WindowManager
+from app.protocols.metaplace import Place, Camera3D, Physics, WindowManager
 from app.objects import ObjectCollection
 from app.data import (
     InputModifier,

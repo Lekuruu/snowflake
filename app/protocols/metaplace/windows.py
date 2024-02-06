@@ -11,7 +11,7 @@ import json
 class SWFWindow:
     """
     This class represents an swf window inside the game. The window can be loaded, using the WindowManager class.
-    The server can send various payloads to the window, which can do different things, depending on the swf file.
+    The server can then send various payloads to the window, which can do different things, depending on the swf file.
     For example: `cardjitsu_snowtimer.swf` will receive a "tick" update every second, which will update the timer.
     """
 
