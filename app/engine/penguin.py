@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, List
 
 if TYPE_CHECKING:
+    from app.server import SnowflakeWorld
     from app.objects.ninjas import Ninja
     from app.engine.game import Game
 
@@ -26,7 +27,7 @@ from app.data import (
 import app.session
 
 class Penguin(MetaplaceProtocol):
-    def __init__(self, server: Factory, address: IPv4Address | IPv6Address):
+    def __init__(self, server: "SnowflakeWorld", address: IPv4Address | IPv6Address):
         super().__init__(server, address)
 
         self.battle_mode: int = 0
