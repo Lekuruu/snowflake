@@ -1,4 +1,7 @@
 
+# Modified sqlalchemy classes from solero/houdini:
+# https://github.com/solero/houdini/tree/master/houdini/data/
+
 from __future__ import annotations
 
 from sqlalchemy.ext.declarative import declarative_base
