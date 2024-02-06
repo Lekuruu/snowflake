@@ -55,6 +55,10 @@ class SWFWindow:
         )
 
     def load(self, initial_payload: dict = None, **kwargs):
+        if config.APPLY_WINDOWMANAGER_OFFSET:
+            kwargs['xPercent'] = kwargs.get('xPercent', 0) - 0.5
+            kwargs['yPercent'] = kwargs.get('yPercent', 0) - 0.5
+
         self.send(
             {
                 'windowUrl': self.url,
