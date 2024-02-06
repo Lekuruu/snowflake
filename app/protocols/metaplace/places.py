@@ -14,14 +14,19 @@ class Render:
 
 @dataclass
 class Camera:
+    position: tuple = (0, 0, 0)
     view_mode: ViewMode = ViewMode.SIDE
-    lock_view: bool = False
-    lock_zoom: bool = False
     tile_size: int = 64
     elevation_scale: float = -1
     terrain_lighting: bool = True
 
+    lock_view: bool = False
+    lock_zoom: bool = False
     lock_scroll: bool = True
+
+    zoom: int = 1
+    zoom_lock: int = (-1, -1)
+
     move_radius: int = 0
     move_rate: int = 0
     move_recenter: int = 0
@@ -33,9 +38,6 @@ class Camera:
     margin_top_left_y: int = 0
     margin_bottom_right_x: int = 0
     margin_bottom_right_y: int = 0
-
-    zoom: int = 1
-    zoom_lock: int = (-1, -1)
 
 @dataclass
 class Camera3D:
