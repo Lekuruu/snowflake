@@ -26,6 +26,7 @@ def context_handler(client: Penguin, place_name: str, param_string: str):
         return
 
     if not (place := client.server.places.get(place_name)):
+        # TODO: Error message
         client.close_connection()
         return
 
