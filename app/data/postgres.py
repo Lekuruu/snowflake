@@ -40,11 +40,6 @@ class Postgres:
         try:
             yield session
         except Exception as e:
-            exception_name = e.__class__.__name__
-
-            if exception_name in ('HTTPException', 'NotFound'):
-                raise e
-
             self.logger.fatal(f'Transaction failed: {e}', exc_info=e)
             self.logger.fatal('Performing rollback...')
             session.rollback()
