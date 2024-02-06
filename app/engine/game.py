@@ -40,7 +40,7 @@ class Game:
         self.round = 0
 
         self.callbacks = CallbackHandler(self)
-        self.objects = ObjectCollection()
+        self.objects = ObjectCollection(offset=100)
         self.timer = Timer(self)
         self.grid = Grid(self)
 
