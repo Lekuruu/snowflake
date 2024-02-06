@@ -59,7 +59,3 @@ def on_place_ready(client: Penguin):
 
     player_object.place_object()
     player_object.set_camera_target()
-
-@session.framework.register('screenSize')
-def screen_size_handler(client: Penguin, data: dict):
-    client.screen_size = data['smallViewEnabled']
