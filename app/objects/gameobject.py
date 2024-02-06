@@ -214,6 +214,9 @@ class GameObject:
             handle_id
         )
 
+    def set_camera_target(self) -> None:
+        self.target.send_tag('O_PLAYER', self.id)
+
     def place_sprite(self, name: str, target: "Penguin" | None = None) -> None:
         asset = app.session.assets.by_name(name)
         target = target or self.target
