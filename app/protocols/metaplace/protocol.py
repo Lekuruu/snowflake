@@ -139,6 +139,9 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def set_heighmap_division(self, division: float):
         self.send_tag('P_HEIGHTMAPDIVISIONS', division)
 
+    def set_heightmap_scale(self, scale: float):
+        self.send_tag('P_HEIGHTMAPSCALE', scale)
+
     def set_tilesize(self, size: int):
         self.send_tag('P_TILESIZE', size)
 

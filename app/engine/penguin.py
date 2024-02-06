@@ -9,17 +9,12 @@ if TYPE_CHECKING:
     from app.engine.game import Game
 
 from twisted.internet.address import IPv4Address, IPv6Address
-from twisted.internet.protocol import Factory
 from twisted.python.failure import Failure
 
 from app.protocols import MetaplaceProtocol
 from app.data import (
     Penguin as PenguinObject,
-    MapblockType,
-    AlignMode,
-    ScaleMode,
     EventType,
-    ViewMode,
     TipPhase,
     Card
 )
@@ -143,19 +138,3 @@ class Penguin(MetaplaceProtocol):
     def hide_tip(self) -> None:
         infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.send_payload('disable')
-
-    def initialize_game(self) -> None:
-        self.align_ui(0, 0, AlignMode.CENTER, ScaleMode.NONE)
-        self.set_background_color(34, 164, 243)
-        self.set_place(0, 1, 0)
-
-        self.set_mapblock(MapblockType.TILEMAP, 'iVBORw0KGgoAAAANSUhEUgAAAAkAAAAFCAAAAACyOJm3AAAADklEQVQImWNghgEGIlkADWEAiDEh28IAAAAASUVORK5CYII=')
-        self.set_mapblock(MapblockType.HEIGHTMAP, 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAAAAADfm1AaAAAADklEQVQImWOohwMG8pgA1rMdxRJRFewAAAAASUVORK5CYII=')
-        self.set_heighmap_division(1)
-
-        self.set_view_mode(ViewMode.SIDE)
-        self.set_tilesize(100)
-
-        self.set_renderflags(False, 48)
-        self.lock_rendersize(1024, 768)
-        self.send_tag('P_ASSETSCOMPLETE')
