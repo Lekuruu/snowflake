@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from app.data.constants import KeyModifier, KeyTarget, KeyInput, TipPhase
+from app.data.constants import InputModifier, InputTarget, InputType, TipPhase
 from app.data.repositories import stamps
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
@@ -97,9 +97,9 @@ class Game:
             command='/use',
             input_id='/use',
             script_id='4375706:1',
-            target=KeyTarget.GOB,
-            event=KeyInput.MOUSE_CLICK,
-            key_modifier=KeyModifier.NONE
+            target=InputTarget.GOB,
+            event=InputType.MOUSE_CLICK,
+            key_modifier=InputModifier.NONE
         )
 
         # Scale screen up to 100
@@ -306,9 +306,9 @@ class Game:
         self,
         input_id: str,
         script_id: int,
-        target: KeyTarget,
-        event: KeyInput,
-        key_modifier: KeyModifier,
+        target: InputTarget,
+        event: InputType,
+        key_modifier: InputModifier,
         command: str
     ) -> None:
         self.send_tag(

@@ -1,7 +1,7 @@
 
 from enum import Enum, IntEnum
 
-class KeyInput(IntEnum):
+class InputType(IntEnum):
     UP                 = 1
     DOWN               = 2
     MOUSE_CLICK        = 3
@@ -9,13 +9,13 @@ class KeyInput(IntEnum):
     MOUSE_DOUBLE_CLICK = 5
     MOUSE_UP           = 6
 
-class KeyModifier(IntEnum):
+class InputModifier(IntEnum):
     NONE  = 0
     SHIFT = 1
     CTRL  = 2
     ALT   = 3
 
-class KeyTarget(IntEnum):
+class InputTarget(IntEnum):
     TILE = 1
     GOB  = 2
 
