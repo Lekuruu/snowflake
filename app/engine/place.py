@@ -22,3 +22,8 @@ class SnowLobby(Place):
     name: str = "snow_lobby"
     mapblocks=SnowMapBlocks()
     camera=SnowCamera()
+
+@dataclass
+class SnowBattle(SnowLobby):
+    id: int = 10001
+    name: str = "snow_battle"
