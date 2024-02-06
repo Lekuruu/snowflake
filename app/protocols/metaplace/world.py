@@ -43,6 +43,7 @@ class MetaplaceWorldServer(Factory):
 
     def register_place(self, place: Place):
         self.places[place.name] = place
+        self.logger.info(f'Registered place: "{place.name}"')
 
     def listen(self, port: int):
         self.logger.info(f"Starting engine: {self} ({port})")
