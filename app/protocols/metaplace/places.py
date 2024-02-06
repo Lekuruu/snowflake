@@ -72,10 +72,10 @@ class Physics:
 class Place:
     id: int = 0
     name: str = ""
-    mapblocks: MapBlocks = MapBlocks()
-    render: Render = Render()
-    camera: Camera = Camera()
-    camera3d: Camera3D = Camera3D()
-    physics: Physics = Physics()
+    mapblocks=MapBlocks()
+    render=Render()
+    camera=Camera()
+    camera3d=Camera3D()
+    physics=Physics()
     draggable: bool = False
     object_lock: bool = False

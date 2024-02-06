@@ -20,5 +20,5 @@ class SnowCamera(Camera):
 class SnowLobby(Place):
     id: int = 0
     name: str = "snow_lobby"
-    mapblocks: MapBlocks = SnowMapBlocks()
-    camera: Camera = SnowCamera()
+    mapblocks=SnowMapBlocks()
+    camera=SnowCamera()
