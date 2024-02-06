@@ -50,14 +50,14 @@ class OriginMode(IntEnum):
     TOP_LEFT = 3
 
 class ViewMode(IntEnum):
-    VIEW_MODE_OVERHEAD = 0
-    VIEW_MODE_OVERHEAD_ROTATED = 1
-    VIEW_MODE_ISO_STEPPED = 2
-    VIEW_MODE_ISO_SLOPED = 3
-    VIEW_MODE_ISO = 4
-    VIEW_MODE_SIDE = 5
-    VIEW_MODE_3D = 6
-    VIEW_MODE_FREE = 7
+    OVERHEAD = 0
+    OVERHEAD_ROTATED = 1
+    ISO_STEPPED = 2
+    ISO_SLOPED = 3
+    ISO = 4
+    SIDE = 5
+    VIEW_3D = 6
+    FREE = 7
 
 class MapblockType(str, Enum):
     HEIGHTMAP = "h"

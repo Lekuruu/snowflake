@@ -152,7 +152,7 @@ class Penguin(MetaplaceProtocol):
         self.set_mapblock(MapblockType.HEIGHTMAP, 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAGCAAAAADfm1AaAAAADklEQVQImWOohwMG8pgA1rMdxRJRFewAAAAASUVORK5CYII=')
         self.set_heighmap_division(1)
 
-        self.set_view_mode(ViewMode.VIEW_MODE_SIDE)
+        self.set_view_mode(ViewMode.SIDE)
         self.set_tilesize(100)
 
         self.set_renderflags(False, 48)
