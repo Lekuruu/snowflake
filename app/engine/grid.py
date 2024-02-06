@@ -59,17 +59,7 @@ class Grid:
 
     def enemy_spawn_location(self, enemy: GameObject, max_attempts=100) -> Tuple[int, int]:
         """Get a random enemy spawn location"""
-        spawn_range = [range(9), range(5)]
-
-        if self.game.round <= 0:
-            # TODO: Move this to enemy class
-            spawn_ranges = {
-                'Sly': [range(8, 9), range(5)],
-                'Scrap': [range(7, 9), range(5)],
-                'Tank': [range(6, 9), range(5)]
-            }
-
-            spawn_range = spawn_ranges.get(enemy.name, spawn_range)
+        spawn_range = [range(6, 9), range(4)]
 
         for _ in range(max_attempts):
             x = random.choice(spawn_range[0])
