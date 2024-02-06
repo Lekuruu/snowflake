@@ -114,6 +114,9 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def load_window(self, name: str, initial_payload: dict = None, **kwargs) -> None:
         return self.window_manager.get_window(name).load(initial_payload, **kwargs)
 
+    def send_version(self, version: str):
+        self.send_tag('S_VERSION', version)
+
     def send_login_reply(self):
         self.send_tag('S_LOGIN', self.pid)
 
@@ -123,6 +126,17 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def send_login_error(self, code: int = 900):
         self.send_tag('S_LOGINDEBUG', f'user code {code}')
 
+    def send_world_type(self):
+        self.send_tag('S_WORLDTYPE', self.server.server_type.value, self.server.build_type.value)
+
+    def send_world(self):
+        self.send_tag('S_WORLD',
+            self.server.world_id, self.server.world_name,
+            f'0:{self.place.id}', 0, 'none', 0,
+            self.server.world_owner, self.server.world_name,
+            0, self.server.stylesheet_id, 0
+        )
+
     def align_windows(self, x: int, y: int, align: AlignMode, scale: ScaleMode):
         self.send_tag('UI_ALIGN', self.server.world_id, x, y, align.value, scale.value)
 
@@ -131,6 +145,9 @@ class MetaplaceProtocol(LineOnlyReceiver):
 
     def set_place(self, place_id: int, object_id: int, instance_id: int):
         self.send_tag('W_PLACE', place_id, object_id, instance_id)
+
+    def set_asset_url(self, url: str):
+        self.send_tag('W_BASEASSETURL', url)
 
     def set_view_mode(self, mode: ViewMode):
         self.send_tag('P_VIEW', mode.value)
@@ -196,17 +213,6 @@ class MetaplaceProtocol(LineOnlyReceiver):
            settings.aspect, settings.v_fov,
            settings.focal_length, 0, settings.camera_width,
            settings.camera_height
-        )
-
-    def send_world_type(self):
-        self.send_tag('S_WORLDTYPE', self.server.server_type.value, self.server.build_type.value)
-
-    def send_world(self):
-        self.send_tag('S_WORLD',
-            self.server.world_id, self.server.world_name,
-            f'0:{self.place.id}', 0, 'none', 0,
-            self.server.world_owner, self.server.world_name,
-            0, self.server.stylesheet_id, 0
         )
 
     def command_received(self, command: str, args: List[Any]):

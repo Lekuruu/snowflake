@@ -10,7 +10,7 @@ import config
 
 @session.events.register('/version', login_required=False)
 def version_handler(client: Penguin):
-    client.send_tag('S_VERSION', config.VERSION)
+    client.send_version(config.VERSION)
 
 @session.events.register("/place_context", login_required=False)
 def context_handler(client: Penguin, place_name: str, param_string: str):
@@ -79,13 +79,9 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.send_login_message('Finalizing login')
     client.send_login_reply()
 
+    client.set_asset_url(config.MEDIA_DOMAIN)
     client.send_world_type()
     client.send_world()
-
-    client.send_tag(
-        'W_BASEASSETURL',
-        config.MEDIA_DOMAIN
-    )
 
     client.send_tag('W_DISPLAYSTATE') # Is probably used for mobile
     client.send_tag('W_ASSETSCOMPLETE') # This will send the /ready command
