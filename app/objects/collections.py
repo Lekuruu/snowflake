@@ -110,9 +110,10 @@ class AssetCollection(Set["Asset"]):
         return next((asset for asset in self if asset.name == name), None)
 
 class ObjectCollection(Set["GameObject"]):
-    def __init__(self, initial_data: List["GameObject"] = []) -> None:
+    def __init__(self, initial_data: List["GameObject"] = [], offset: int = 0) -> None:
         super().__init__()
         super().update(initial_data)
+        self.offset = offset
 
     def add(self, object: "GameObject") -> None:
         object.id = self.get_id()
@@ -141,7 +142,7 @@ class ObjectCollection(Set["GameObject"]):
         return [object for object in self if object.name == name]
 
     def get_id(self) -> int:
-        return max([object.id for object in self] or [0]) + 1
+        return max([object.id for object in self] or [0]) + 1 + self.offset
 
 class SoundCollection(AssetCollection):
     def __init__(self, initial_data: List["Sound"] = []) -> None:
