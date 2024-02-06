@@ -23,6 +23,7 @@ class SnowflakeWorld(MetaplaceWorldServer):
         super().__init__(
             world_id=101,
             world_name='cjsnow_0',
+            world_owner='crowdcontrol',
             stylesheet_id='87.5309',
             server_type=ServerType.LIVE,
             build_type=BuildType.RELEASE

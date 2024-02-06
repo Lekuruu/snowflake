@@ -19,12 +19,14 @@ class MetaplaceWorldServer(Factory):
         self,
         world_id: int,
         world_name: str,
+        world_owner: str,
         stylesheet_id: str,
         server_type: ServerType = ServerType.LIVE,
         build_type: BuildType = BuildType.RELEASE
     ) -> None:
         self.world_id = world_id
         self.world_name = world_name
+        self.world_owner = world_owner
         self.build_type = build_type
         self.server_type = server_type
         self.stylesheet_id = stylesheet_id
