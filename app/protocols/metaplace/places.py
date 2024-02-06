@@ -2,6 +2,9 @@
 from dataclasses import dataclass
 from app.data import ViewMode
 
+# Inspiration taken from solero/tusk:
+# https://github.com/solero/tusk/blob/master/tusk/places/__init__.py
+
 @dataclass
 class MapBlocks:
     tilemap: str = ""
