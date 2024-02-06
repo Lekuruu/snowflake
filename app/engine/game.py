@@ -101,6 +101,7 @@ class Game:
             0,         # PlaceObjectId
             0          # PlaceInstanceId
         )
+        # TODO: Implement new place class for this
 
         self.initialize_objects()
         self.wait_for_players(lambda player: player.is_ready)
