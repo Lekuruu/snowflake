@@ -16,7 +16,6 @@ class Grid:
     def __init__(self, game: "Game") -> None:
         self.array: List[List[GameObject | None]] = [[None] * 5 for _ in range(9)]
         self.tiles: List[GameObject] = []
-        self.enemy_spawns = [range(6, 9), range(5)]
         self.game = game
 
     def __repr__(self) -> str:
@@ -55,11 +54,23 @@ class Grid:
                 return (x, y)
         return (-1, -1)
 
-    def enemy_spawn_location(self, max_attempts=100) -> Tuple[int, int]:
+    def enemy_spawn_location(self, enemy: GameObject, max_attempts=100) -> Tuple[int, int]:
         """Get a random enemy spawn location"""
+        spawn_range = [range(9), range(5)]
+
+        if self.game.round <= 0:
+            # TODO: Move this to enemy class
+            spawn_ranges = {
+                'Sly': [range(8, 9), range(5)],
+                'Scrap': [range(7, 9), range(5)],
+                'Tank': [range(6, 9), range(5)]
+            }
+
+            spawn_range = spawn_ranges.get(enemy.name, spawn_range)
+
         for _ in range(max_attempts):
-            x = random.choice(self.enemy_spawns[0])
-            y = random.choice(self.enemy_spawns[1])
+            x = random.choice(spawn_range[0])
+            y = random.choice(spawn_range[1])
 
             if self.can_move(x, y):
                 return (x, y)

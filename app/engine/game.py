@@ -188,9 +188,6 @@ class Game:
             # Remove any existing enemies
             self.remove_enemies()
 
-            # Enemies can spawn anywhere now
-            self.grid.enemy_spawns = [range(9), range(5)]
-
             self.display_round_title()
             time.sleep(1.6)
 
@@ -425,7 +422,7 @@ class Game:
         """Spawn enemies for the current round"""
         for enemy in self.enemies:
             # Choose spawn location on grid
-            x, y = self.grid.enemy_spawn_location()
+            x, y = self.grid.enemy_spawn_location(enemy)
 
             self.grid[x, y] = enemy
             enemy.place_object()
