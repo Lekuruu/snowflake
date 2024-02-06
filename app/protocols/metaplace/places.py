@@ -35,8 +35,7 @@ class Camera:
     margin_bottom_right_y: int = 0
 
     zoom: int = 1
-    zoom_lock_x: int = -1
-    zoom_lock_y: int = -1
+    zoom_lock: int = (-1, -1)
 
 @dataclass
 class Camera3D:
