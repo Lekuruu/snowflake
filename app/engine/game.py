@@ -656,7 +656,7 @@ class Game:
                     "isBoss": 0,
                     "rank": client.object.snow_ninja_rank,
                     "round": self.get_payout_round(),
-                    "showItems": 0,       # This will show the unlocked item(s)
+                    "showItems": 0,       # TODO: This will show the unlocked item(s)
                     "stampList": [
                         {
                             "stamp_id": stamp.id,
@@ -668,7 +668,13 @@ class Game:
                         }
                         for stamp in snow_stamps
                     ],
-                    "stamps": [], # TODO
+                    "stamps": [
+                        {
+                            "_id": stamp.id,
+                            "new": False # TODO
+                        }
+                        for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
+                    ],
                     "xpEnd": client.object.snow_ninja_progress, # TODO: Implement xp system
                     "xpStart": client.object.snow_ninja_progress,
                 },
