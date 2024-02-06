@@ -352,6 +352,7 @@ class LocalGameObject(GameObject):
         self.x_offset = x_offset
         self.y_offset = y_offset
         self.on_click = on_click
+        self.grid = False
 
         self._origin_mode = origin_mode
         self._mirror_mode = mirror_mode
