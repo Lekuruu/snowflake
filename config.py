@@ -22,3 +22,9 @@ ENABLE_DEBUG_PLAYERS = os.environ.get('ENABLE_DEBUG_PLAYERS', 'False').lower() =
 ENABLE_DEBUG_LOGGING = os.environ.get('ENABLE_DEBUG_LOGGING', 'False').lower() == 'true'
 DISABLE_POLICY_SERVER = os.environ.get('DISABLE_POLICY_SERVER', 'False').lower() == 'true'
 DISABLE_ENEMY_AI = os.environ.get('DISABLE_ENEMY_AI', 'False').lower() == 'true'
+
+BASE_URL = f'{MEDIA_LOCATION}/game/mpassets/'
+CARDS_ASSET_LOCATION = f'{MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/'
+WINDOW_MANAGER_LOCATION = f'{MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/windowManager/windowmanager.swf'
+WINDOW_BASEURL = f'{MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows'
+ASSET_BASEURL = f'{MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/assets'

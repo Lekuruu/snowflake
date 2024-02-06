@@ -15,14 +15,14 @@ def on_window_manager_ready(client: Penguin, data: dict):
         return
 
     loading_screen = client.get_window(
-        url=f'{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/assets/cjsnow_loadingscreenassets.swf',
+        url=f'{config.ASSET_BASEURL}/cjsnow_loadingscreenassets.swf',
         name='cjsnow_loadingscreenassets.swf'
     )
 
     wm = client.get_window('windowmanager.swf')
     wm.send_action('setWorldId', worldId=client.server.world_id)
-    wm.send_action('setBaseAssetUrl', baseAssetUrl=f'{config.MEDIA_LOCATION}/game/mpassets/')
-    wm.send_action('setFontPath', defaultFontPath=f'{config.MEDIA_LOCATION}/game/mpassets//fonts/')
+    wm.send_action('setBaseAssetUrl', baseAssetUrl=f'{config.BASE_URL}')
+    wm.send_action('setFontPath', defaultFontPath=f'{config.BASE_URL}/fonts/')
 
     # Set loading screen as "RoomToRoom" transition
     wm.send_action('skinRoomToRoom', EventType.PLAY_ACTION, url=loading_screen.url, className="", variant=0)

@@ -28,7 +28,7 @@ class SWFWindow:
 
         elif not url:
             # Default location
-            url = f'{config.MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows/{name}'
+            url = f'{config.WINDOW_BASEURL}/{name}'
 
         assert url or name, 'You must provide either a url or a name for the window.'
 
@@ -107,7 +107,7 @@ class WindowManager(Dict[str, SWFWindow]):
     def __init__(
         self,
         client: engine.Penguin,
-        swf_url: str = f'{config.MEDIA_LOCATION}/game/mpassets//minigames/cjsnow/en_US/deploy/swf/windowManager/windowmanager.swf'
+        swf_url: str = config.WINDOW_MANAGER_LOCATION
     ) -> None:
         self.element_name = "WindowManagerSwf"
         self.command_prefix = "/framework"

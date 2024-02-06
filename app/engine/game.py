@@ -568,7 +568,7 @@ class Game:
             snow_ui.layer = 'bottomLayer'
             snow_ui.load(
                 {
-                    'cardsAssetPath': f'{config.MEDIA_LOCATION}/game/mpassets//minigames/cjsnow/en_US/deploy/',
+                    'cardsAssetPath': config.CARDS_ASSET_LOCATION,
                     'element': client.element,
                     'isMember': client.is_member,
                 },
