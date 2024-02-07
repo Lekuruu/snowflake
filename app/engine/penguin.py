@@ -12,6 +12,7 @@ from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.python.failure import Failure
 
 from app.protocols import MetaplaceProtocol
+from app.engine.cards import CardObject
 from app.data import (
     Penguin as PenguinObject,
     EventType,
@@ -39,9 +40,9 @@ class Penguin(MetaplaceProtocol):
         self.last_tip: TipPhase | None = None
         self.displayed_tips: List[TipPhase] = []
 
-        self.selected_card: Card | None = None
+        self.selected_card: CardObject | None = None
+        self.power_card_slots: List[CardObject] = []
         self.power_card_stamina: int = 0
-        self.power_card_slots: List[Card] = []
         self.power_cards_all: List[Card] = []
 
         self.in_queue: bool = False
@@ -73,12 +74,11 @@ class Penguin(MetaplaceProtocol):
 
     @property
     def power_cards(self) -> List[Card]:
-        power_cards_list = {
-            'water': self.power_cards_water,
-            'fire': self.power_cards_fire,
-            'snow': self.power_cards_snow
-        }.get(self.element, [])
-        return [c for c in power_cards_list if c not in self.power_card_slots]
+        return [
+            c for c in self.power_cards_all
+            if c not in self.power_card_slots
+            and c.element == self.element[0]
+        ]
 
     def command_received(self, command: str, args: List[Any]):
         try:
@@ -112,19 +112,19 @@ class Penguin(MetaplaceProtocol):
         self.server.players.remove(self)
         self.disconnected = True
 
-    def get_random_power_card(self) -> Card | None:
+    def get_next_power_card(self) -> CardObject | None:
         if not self.power_cards:
             return
 
         if len(self.power_card_slots) > 3:
             return
 
-        next_card = random.choice(self.power_cards)
+        next_card = CardObject(random.choice(self.power_cards), self.game)
         self.power_card_slots.append(next_card)
         return next_card
 
     def get_power_card(self, card_id: int) -> Card | None:
-        return next((c for c in self.power_cards_all if c.id == card_id), None)
+        return next((c for c in self.power_card_slots if c.id == card_id), None)
 
     def update_cards(self) -> None:
         if self.disconnected:
@@ -142,7 +142,7 @@ class Penguin(MetaplaceProtocol):
             self.power_card_stamina = 0
             update['stamina'] = 0
 
-            if next_card := self.get_random_power_card():
+            if next_card := self.get_next_power_card():
                 update['cardData'] = {
                     "card_id": next_card.id,
                     "color": next_card.color,
