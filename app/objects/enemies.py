@@ -290,16 +290,17 @@ class Sly(Enemy):
     name: str = 'Sly'
     max_hp: int = 30
     range: int = 3
-    attack: int = 4
+    attack: int = 3
+    attack_per_tile: int = 1
     move: int = 3
     move_duration: int = 1200
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
         distance = abs(x_position - target.x) + abs(y_position - target.y)
 
-        # NOTE: Sly hits harder from a distance. I don't know how much
-        #       damage he does, so I'm just making up a formula.
-        return round(self.attack * max(1, distance * 0.45))
+        # NOTE: Sly hits harder from a distance. According to the
+        #       Wiki, it does an additional 1 damage per tile
+        return self.attack + round(self.attack_per_tile * distance)
 
     def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
