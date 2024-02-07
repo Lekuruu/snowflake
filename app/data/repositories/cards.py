@@ -33,6 +33,7 @@ def fetch_power_cards(session: Session | None = None) -> List[Card]:
 @session_wrapper
 def fetch_by_penguin_id(
     penguin_id: int,
+    is_power: bool = False,
     element: str | None = None,
     session: Session | None = None
 ) -> List[Card]:
@@ -42,6 +43,9 @@ def fetch_by_penguin_id(
 
     if element:
         query = query.filter(Card.element == element)
+
+    if is_power:
+        query = query.filter(Card.power_id > 0)
 
     return query.all()
 
