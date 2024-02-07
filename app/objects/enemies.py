@@ -300,7 +300,7 @@ class Sly(Enemy):
 
         # NOTE: Sly hits harder from a distance. According to the
         #       Wiki, it does an additional 1 damage per tile
-        return self.attack + round(self.attack_per_tile * distance)
+        return self.attack + round(self.attack_per_tile * (distance - 1))
 
     def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
