@@ -9,6 +9,9 @@ def on_card_loaded(client: Penguin, data: dict):
 
 @session.framework.register('cardClick')
 def on_card_clicked(client: Penguin, data: dict):
+    if not client.game.timer.running:
+        return
+
     element = data['element']
     value = data['value']
     id = data['cardId']
@@ -27,6 +30,9 @@ def on_card_clicked(client: Penguin, data: dict):
 
 @session.framework.register('unselectCard')
 def on_card_deselect(client: Penguin, data: dict):
+    if not client.game.timer.running:
+        return
+
     if not client.selected_card:
         return
 
@@ -51,11 +57,17 @@ def on_membercard_select(client: Penguin, data: dict):
     if not client.is_member:
         return
 
+    if not client.game.timer.running:
+        return
+
     # TODO
 
 @session.framework.register('unselectMemberCard')
 def on_membercard_deselect(client: Penguin, data: dict):
     if not client.is_member:
+        return
+
+    if not client.game.timer.running:
         return
 
     # TODO
