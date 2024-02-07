@@ -27,6 +27,7 @@ def on_card_clicked(client: Penguin, data: dict):
 
     client.selected_card = card
     client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_attack')
+    client.ninja.hide_ghost()
 
 @session.framework.register('unselectCard')
 def on_card_deselect(client: Penguin, data: dict):
@@ -38,6 +39,7 @@ def on_card_deselect(client: Penguin, data: dict):
 
     client.selected_card = None
     client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_move')
+    client.ninja.hide_ghost()
 
 @session.framework.register('cardCount')
 def on_card_count(client: Penguin, data: dict):
