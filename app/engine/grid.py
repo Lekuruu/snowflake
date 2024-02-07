@@ -150,6 +150,10 @@ class Grid:
         return next((tile for tile in self.tiles if tile.x == x and tile.y == y), None)
 
     def on_tile_click(self, client: "Penguin", tile: GameObject, *args) -> None:
+        if client.selected_card:
+            # TODO: Handle power cards
+            return
+
         ninja = self.game.objects.by_name(client.element.capitalize())
         ninja.place_ghost(tile.x, tile.y)
 
