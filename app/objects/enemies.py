@@ -389,7 +389,7 @@ class Scrap(Enemy):
     name: str = 'Scrap'
     max_hp: int = 45
     range: int = 2
-    attack: int = 5
+    attack: int = 8
     move: int = 2
     move_duration: int = 1200
 
