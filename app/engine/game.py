@@ -336,15 +336,24 @@ class Game:
         self.create_ninjas()
 
     def create_ninjas(self) -> None:
-        water = WaterNinja(self.water, x=0, y=0)
+        spawn_positions = [
+            {'x': 0, 'y': 0},
+            {'x': 0, 'y': 2},
+            {'x': 0, 'y': 4}
+        ]
+
+        # Randomize spawn positions
+        random.shuffle(spawn_positions)
+
+        water = WaterNinja(self.water, **spawn_positions[0])
         water.place_object()
         self.water.ninja = water
 
-        fire = FireNinja(self.fire, x=0, y=2)
+        fire = FireNinja(self.fire, **spawn_positions[1])
         fire.place_object()
         self.fire.ninja = fire
 
-        snow = SnowNinja(self.snow, x=0, y=4)
+        snow = SnowNinja(self.snow, **spawn_positions[2])
         snow.place_object()
         self.snow.ninja = snow
 
