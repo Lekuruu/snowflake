@@ -467,6 +467,7 @@ class Game:
                 ninja.ghost.x,
                 ninja.ghost.y
             )
+            ninja.client.update_cards()
 
         # Wait for move animations
         self.wait_for_animations()
@@ -521,6 +522,7 @@ class Game:
             else:
                 ninja.heal_target(target)
 
+            ninja.client.update_cards()
             time.sleep(1)
 
     def do_enemy_actions(self) -> None:

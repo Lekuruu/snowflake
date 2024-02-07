@@ -161,15 +161,17 @@ class Ninja(GameObject):
             if self.hp <= 0:
                 return
 
-            self.ko_animation()
             self.targets = []
+            self.ko_animation()
 
             if not self.client.disconnected:
                 self.client.was_ko = True
+                self.client.update_cards()
                 self.ko_sound()
         else:
             if hp < self.hp:
                 self.hit_animation()
+                self.client.update_cards()
             else:
                 self.revive_animation()
 
