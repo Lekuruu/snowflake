@@ -220,6 +220,8 @@ class Enemy(GameObject):
             if self.simulate_damage(move.x, move.y, targets[0]) == highest_damage
         ])
 
+        # TODO: Handle obstacles
+
         return next_move, targets[0]
 
     def closest_target(self) -> GameObject | None:
@@ -235,6 +237,8 @@ class Enemy(GameObject):
 
         if not tiles:
             return
+
+        # TODO: Handle obstacles
 
         # Return tile that is closest to enemy
         return min(
