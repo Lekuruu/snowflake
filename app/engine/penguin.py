@@ -20,6 +20,7 @@ from app.data import (
 )
 
 import app.session
+import random
 
 class Penguin(MetaplaceProtocol):
     def __init__(self, server: "SnowflakeWorld", address: IPv4Address | IPv6Address):
@@ -37,7 +38,11 @@ class Penguin(MetaplaceProtocol):
         self.tip_mode: bool = True
         self.last_tip: TipPhase | None = None
         self.displayed_tips: List[TipPhase] = []
-        self.power_cards: List[Card] = []
+
+        self.selected_card: Card | None = None
+        self.power_card_stamina: int = 0
+        self.power_card_slots: List[Card] = []
+        self.power_cards_all: List[Card] = []
 
         self.in_queue: bool = False
         self.is_ready: bool = False
@@ -56,15 +61,24 @@ class Penguin(MetaplaceProtocol):
 
     @property
     def power_cards_water(self) -> List[Card]:
-        return [c for c in self.power_cards if c.element == 'w']
+        return [c for c in self.power_cards_all if c.element == 'w']
 
     @property
     def power_cards_fire(self) -> List[Card]:
-        return [c for c in self.power_cards if c.element == 'f']
+        return [c for c in self.power_cards_all if c.element == 'f']
 
     @property
     def power_cards_snow(self) -> List[Card]:
-        return [c for c in self.power_cards if c.element == 's']
+        return [c for c in self.power_cards_all if c.element == 's']
+
+    @property
+    def power_cards(self) -> List[Card]:
+        power_cards_list = {
+            'water': self.power_cards_water,
+            'fire': self.power_cards_fire,
+            'snow': self.power_cards_snow
+        }.get(self.element, [])
+        return [c for c in power_cards_list if c not in self.power_card_slots]
 
     def command_received(self, command: str, args: List[Any]):
         try:
@@ -97,6 +111,58 @@ class Penguin(MetaplaceProtocol):
         self.server.matchmaking.remove(self)
         self.server.players.remove(self)
         self.disconnected = True
+
+    def get_random_power_card(self) -> Card | None:
+        if not self.power_cards:
+            return
+
+        if len(self.power_card_slots) > 3:
+            return
+
+        next_card = random.choice(self.power_cards)
+        self.power_card_slots.append(next_card)
+        return next_card
+
+    def get_power_card(self, card_id: int) -> Card | None:
+        return next((c for c in self.power_cards_all if c.id == card_id), None)
+
+    def update_cards(self) -> None:
+        if self.disconnected:
+            return
+
+        self.power_card_stamina += 1
+
+        update = {
+            'cardData': None,
+            'cycle': False,
+            'stamina': self.power_card_stamina
+        }
+
+        if self.power_card_stamina >= 10:
+            self.power_card_stamina = 0
+            update['stamina'] = 0
+
+            if next_card := self.get_random_power_card():
+                update['cardData'] = {
+                    "card_id": next_card.id,
+                    "color": next_card.color,
+                    "description": next_card.description,
+                    "element": next_card.element,
+                    "label": next_card.name,
+                    "name": next_card.name,
+                    "power_id": next_card.power_id,
+                    "prompt": next_card.name,
+                    "set_id": next_card.set_id,
+                    "value": next_card.value
+                }
+
+            if len(self.power_card_slots) > 3:
+                update['cycle'] = True
+
+        # TODO: Check if client has no power cards anymore
+
+        snow_ui = self.get_window('cardjitsu_snowui.swf')
+        snow_ui.send_payload('updateStamina', update)
 
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room

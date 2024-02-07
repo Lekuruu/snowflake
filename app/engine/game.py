@@ -608,6 +608,10 @@ class Game:
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload('disableCards')
 
+    def update_cards(self) -> None:
+        for client in self.clients:
+            client.update_cards()
+
     def display_round_title(self) -> None:
         for client in self.clients:
             round_title = client.get_window('cardjitsu_snowrounds.swf')
