@@ -12,6 +12,9 @@ def on_card_clicked(client: Penguin, data: dict):
     if not client.game.timer.running:
         return
 
+    if client.is_ready:
+        return
+
     element = data['element']
     value = data['value']
     id = data['cardId']
@@ -26,8 +29,9 @@ def on_card_clicked(client: Penguin, data: dict):
         return
 
     client.selected_card = card
-    client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_attack')
     client.ninja.hide_ghost()
+    client.ninja.hide_targets()
+    client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_attack')
 
 @session.framework.register('unselectCard')
 def on_card_deselect(client: Penguin, data: dict):
@@ -37,9 +41,13 @@ def on_card_deselect(client: Penguin, data: dict):
     if not client.selected_card:
         return
 
+    if client.is_ready:
+        return
+
     client.selected_card = None
-    client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_move')
     client.ninja.hide_ghost()
+    client.ninja.show_targets()
+    client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_move')
 
 @session.framework.register('cardCount')
 def on_card_count(client: Penguin, data: dict):
@@ -62,6 +70,9 @@ def on_membercard_select(client: Penguin, data: dict):
     if not client.game.timer.running:
         return
 
+    if client.is_ready:
+        return
+
     # TODO
 
 @session.framework.register('unselectMemberCard')
@@ -70,6 +81,9 @@ def on_membercard_deselect(client: Penguin, data: dict):
         return
 
     if not client.game.timer.running:
+        return
+
+    if client.is_ready:
         return
 
     # TODO
