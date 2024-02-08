@@ -26,6 +26,8 @@ import random
 class Penguin(MetaplaceProtocol):
     def __init__(self, server: "SnowflakeWorld", address: IPv4Address | IPv6Address):
         super().__init__(server, address)
+        self.address = address
+        self.server = server
 
         self.battle_mode: int = 0
         self.screen_size: str = ''

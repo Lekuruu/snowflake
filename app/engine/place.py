@@ -1,4 +1,3 @@
-
 from app.protocols.metaplace.places import Place, MapBlocks, Camera
 from dataclasses import dataclass
 
@@ -20,8 +19,8 @@ class SnowCamera(Camera):
 class SnowLobby(Place):
     id: int = 0
     name: str = "snow_lobby"
-    mapblocks=SnowMapBlocks()
-    camera=SnowCamera()
+    mapblocks = SnowMapBlocks()
+    camera = SnowCamera()
 
 @dataclass
 class SnowBattle(SnowLobby):

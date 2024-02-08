@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Dict, Callable
 
 from app.data import WindowAction, MessageType, EventType
-from app import engine
+from app import protocols
 
 import config
 import json
@@ -17,7 +17,7 @@ class SWFWindow:
 
     def __init__(
         self,
-        client: engine.Penguin,
+        client: protocols.MetaplaceProtocol,
         url: str | None = None,
         name: str | None = None,
         layer: str = 'topLayer'
@@ -110,7 +110,7 @@ class WindowManager(Dict[str, SWFWindow]):
 
     def __init__(
         self,
-        client: engine.Penguin,
+        client: protocols.MetaplaceProtocol,
         swf_url: str = config.WINDOW_MANAGER_LOCATION
     ) -> None:
         self.element_name = "WindowManagerSwf"

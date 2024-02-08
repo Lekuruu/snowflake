@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 from app.data import ViewMode
 
@@ -75,10 +74,10 @@ class Physics:
 class Place:
     id: int = 0
     name: str = ""
-    mapblocks=MapBlocks()
-    render=Render()
-    camera=Camera()
-    camera3d=Camera3D()
-    physics=Physics()
+    mapblocks = MapBlocks()
+    render = Render()
+    camera = Camera()
+    camera3d = Camera3D()
+    physics = Physics()
     draggable: bool = False
     object_lock: bool = False
