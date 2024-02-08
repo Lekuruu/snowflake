@@ -32,7 +32,7 @@ class Game:
         self.snow = snow
         self.id = -1
 
-        self.bonus_cirteria = random.choice(['no_ko', 'under_time', 'full_health'])
+        self.bonus_criteria = random.choice(['no_ko', 'under_time', 'full_health'])
         self.game_start = time.time()
 
         self.map = random.randint(1, 3)
@@ -73,12 +73,12 @@ class Game:
         ]
 
     @property
-    def bonus_cirteria_met(self) -> bool:
+    def bonus_criteria_met(self) -> bool:
         return {
             'no_ko': all(not player.was_ko for player in self.clients),
             'full_health': all(ninja.hp == ninja.max_hp for ninja in self.ninjas),
             'under_time': (time.time() < self.game_start + 300)
-        }[self.bonus_cirteria]
+        }[self.bonus_criteria]
 
     def start(self) -> None:
         for client in self.clients:
@@ -189,7 +189,7 @@ class Game:
             self.coins += coins.get(self.round, 0)
             self.round += 1
 
-            if (self.round > 2) and (not self.bonus_cirteria_met):
+            if (self.round > 2) and (not self.bonus_criteria_met):
                 # Bonus criteria not met on round 3
                 break
 
@@ -629,7 +629,7 @@ class Game:
             round_title.layer = 'bottomLayer'
             round_title.load(
                 {
-                    'bonusCriteria': self.bonus_cirteria,
+                    'bonusCriteria': self.bonus_criteria,
                     'remainingTime': ((self.game_start + 300) - time.time()) * 1000,
                     'roundNumber': self.round
                 },
