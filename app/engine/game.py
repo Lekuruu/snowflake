@@ -472,11 +472,13 @@ class Game:
 
     def move_ninjas(self) -> None:
         for ninja in self.ninjas:
+            if ninja.placed_ghost:
+                ninja.client.update_cards()
+
             ninja.move_ninja(
                 ninja.ghost.x,
                 ninja.ghost.y
             )
-            ninja.client.update_cards()
 
         # Wait for move animations
         self.wait_for_animations()
