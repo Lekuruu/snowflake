@@ -24,6 +24,11 @@ def use_handler(client: Penguin, object_id: int, x: int, y: int, local_x: float,
         return
 
     if object.on_click is None:
+        if not client.selected_card:
+            return
+
+        # Client wants to place a power card
+        client.ninja.place_powercard(object.x, object.y)
         return
 
     object.on_click(client, object, x, y, local_x, local_y)
