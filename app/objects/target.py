@@ -21,7 +21,6 @@ class Target(LocalGameObject):
             ninja.client,
             'Target',
             x, y,
-            game=ninja.game,
             on_click=self.on_click,
             x_offset=0.5,
             y_offset=1.05
