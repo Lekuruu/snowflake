@@ -1,22 +1,21 @@
 
 from __future__ import annotations
 
-from app.objects import GameObject
-from app.engine.game import Game
+from app.objects import GameObject, LocalGameObject
 from app.data import Card
 
 class CardObject(Card):
-    def __init__(self, card: Card, game: Game) -> None:
+    def __init__(self, card: Card, client) -> None:
         self.__dict__.update(card.__dict__)
-        self.game = game
+        self.game = client.game
         self.object = GameObject(
-            game,
+            client.game,
             card.name,
             x_offset=0.5,
             y_offset=1
         )
-        self.pattern = GameObject(
-            game,
+        self.pattern = LocalGameObject(
+            client,
             'ui_card_pattern',
             x_offset=0.5,
             y_offset=1

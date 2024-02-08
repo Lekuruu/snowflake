@@ -121,7 +121,7 @@ class Penguin(MetaplaceProtocol):
         if len(self.power_card_slots) > 3:
             return
 
-        next_card = CardObject(random.choice(self.power_cards), self.game)
+        next_card = CardObject(random.choice(self.power_cards), self)
         self.power_card_slots.append(next_card)
         return next_card
 
