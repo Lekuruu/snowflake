@@ -44,6 +44,7 @@ def on_card_deselect(client: Penguin, data: dict):
     if client.is_ready:
         return
 
+    client.selected_card.remove()
     client.selected_card = None
     client.ninja.hide_ghost()
     client.ninja.show_targets()
