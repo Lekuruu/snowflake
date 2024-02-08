@@ -146,7 +146,7 @@ class Game:
         # Run game loop until game ends
         self.run_game_loop()
 
-        self.remove_confirm()
+        self.remove_ui()
         self.remove_targets()
         self.display_win_sequence()
 
@@ -211,19 +211,20 @@ class Game:
     def run_until_next_round(self) -> None:
         while True:
             for client in self.clients:
+                client.selected_card = None
                 client.is_ready = False
 
             self.show_targets()
             self.wait_for_timer()
 
             self.hide_ghosts()
-            self.remove_confirm()
+            self.remove_ui()
             self.hide_targets()
             time.sleep(1.25)
 
             # Sometimes the targets are still visible?
             self.hide_targets()
-            self.remove_confirm()
+            self.remove_ui()
 
             self.move_ninjas()
             self.do_ninja_actions()
@@ -462,9 +463,15 @@ class Game:
         for ninja in self.ninjas:
             ninja.remove_object()
 
-    def remove_confirm(self) -> None:
+    def remove_ui(self) -> None:
         for object in self.objects.with_name('ui_confirm'):
             object.remove_object()
+
+        for client in self.clients:
+            if not client.selected_card:
+                continue
+
+            client.selected_card.remove()
 
     def hide_ghosts(self) -> None:
         for ninja in self.ninjas:
@@ -506,7 +513,7 @@ class Game:
 
     def remove_objects(self) -> None:
         self.remove_targets()
-        self.remove_confirm()
+        self.remove_ui()
 
         for ninja in self.ninjas:
             ninja.remove_object()
