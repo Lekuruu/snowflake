@@ -39,6 +39,7 @@ class Ninja(GameObject):
             client.game,
             self.__class__.name,
             x, y,
+            on_click=self.on_click,
             grid=True,
             x_offset=0.5,
             y_offset=1
@@ -53,10 +54,10 @@ class Ninja(GameObject):
         self.ghost = GameObject(
             self.game,
             f'{self.name.lower()}ninja_move_ghost',
-            grid=True,
             x=-1,
             y=-1,
             on_click=self.on_ghost_click,
+            grid=True,
             x_offset=0.5,
             y_offset=1
         )
@@ -66,6 +67,7 @@ class Ninja(GameObject):
             'reghealthbar_animation',
             x=self.x,
             y=self.y,
+            on_click=self.on_click,
             x_offset=0.5,
             y_offset=1
         )
@@ -85,6 +87,10 @@ class Ninja(GameObject):
     @property
     def is_reviving(self) -> bool:
         return isinstance(self.selected_object, Ninja) and self.selected_object.hp <= 0
+
+    def on_click(self, client: "Penguin", target: GameObject, *args):
+        if client.selected_card:
+            client.ninja.place_powercard(target.x, target.y)
 
     def remove_object(self) -> None:
         self.health_bar.remove_object()

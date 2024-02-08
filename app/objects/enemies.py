@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Iterator, Tuple, List
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine.game import Game
+    from app.engine import Penguin
 
 from app.data import MirrorMode
 from app.objects import GameObject
@@ -43,6 +44,7 @@ class Enemy(GameObject):
             self.__class__.name,
             x, y,
             grid=True,
+            on_click=self.on_click,
             x_offset=0.5,
             y_offset=1
         )
@@ -56,9 +58,14 @@ class Enemy(GameObject):
             'reghealthbar_animation',
             x=self.x,
             y=self.y,
+            on_click=self.on_click,
             x_offset=0.5,
             y_offset=1
         )
+
+    def on_click(self, client: "Penguin", target: GameObject, *args) -> None:
+        if client.selected_card:
+            client.ninja.place_powercard(target.x, target.y)
 
     def remove_object(self) -> None:
         self.health_bar.remove_object()
