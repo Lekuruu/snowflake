@@ -364,10 +364,9 @@ class ScrapProjectileImpact:
         self.game = game
         self.center_x = center_x
         self.center_y = center_y
-
-    def play(self):
         self.effects: List[ScrapProjectile] = []
 
+    def play(self):
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
         projectile.play_east(self.center_x + 1, self.center_y)
 
