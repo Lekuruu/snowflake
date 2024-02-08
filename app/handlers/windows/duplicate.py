@@ -6,5 +6,5 @@ from app import session
 def on_window_duplicated(client: Penguin, data: dict):
     # This will get sent by the client when the server tries to load a
     # window that already exists.
-    # In most cases, its just the tip window.
+    # In most cases, it's just the tip window.
     client.hide_tip()
