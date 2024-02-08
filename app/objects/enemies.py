@@ -50,9 +50,7 @@ class Enemy(GameObject):
         self.range = self.__class__.range
         self.max_hp = self.__class__.max_hp
         self.hp = self.max_hp
-        self.initialize_objects()
 
-    def initialize_objects(self) -> None:
         self.health_bar = GameObject(
             self.game,
             'reghealthbar_animation',

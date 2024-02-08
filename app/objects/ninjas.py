@@ -48,27 +48,8 @@ class Ninja(GameObject):
         self.max_hp = self.__class__.max_hp
         self.hp = self.__class__.max_hp
         self.client = client
-
         self.targets: List["Target"] = []
-        self.initialize_objects()
 
-    @property
-    def selected_target(self) -> "Target" | None:
-        return next((target for target in self.targets if target.selected), None)
-
-    @property
-    def selected_object(self) -> GameObject | None:
-        return self.selected_target.object if self.selected_target else None
-
-    @property
-    def placed_ghost(self) -> bool:
-        return self.ghost.x != -1 and self.ghost.y != -1
-
-    @property
-    def is_reviving(self) -> bool:
-        return isinstance(self.selected_object, Ninja) and self.selected_object.hp <= 0
-
-    def initialize_objects(self) -> None:
         self.ghost = GameObject(
             self.game,
             f'{self.name.lower()}ninja_move_ghost',
@@ -88,6 +69,22 @@ class Ninja(GameObject):
             x_offset=0.5,
             y_offset=1
         )
+
+    @property
+    def selected_target(self) -> "Target" | None:
+        return next((target for target in self.targets if target.selected), None)
+
+    @property
+    def selected_object(self) -> GameObject | None:
+        return self.selected_target.object if self.selected_target else None
+
+    @property
+    def placed_ghost(self) -> bool:
+        return self.ghost.x != -1 and self.ghost.y != -1
+
+    @property
+    def is_reviving(self) -> bool:
+        return isinstance(self.selected_object, Ninja) and self.selected_object.hp <= 0
 
     def remove_object(self) -> None:
         self.health_bar.remove_object()
