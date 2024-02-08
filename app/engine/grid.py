@@ -151,7 +151,7 @@ class Grid:
 
     def on_tile_click(self, client: "Penguin", tile: GameObject, *args) -> None:
         if client.selected_card:
-            # TODO: Handle power cards
+            client.ninja.place_powercard(tile.x, tile.y)
             return
 
         ninja = self.game.objects.by_name(client.element.capitalize())
