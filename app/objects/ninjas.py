@@ -329,6 +329,11 @@ class Ninja(GameObject):
                 if current_tile in tiles:
                     yield self.game.grid.get_tile(ninja.x, ninja.y)
 
+    def place_powercard(self, x: int, y: int) -> None:
+        self.client.selected_card.place(x, y)
+
+    """Animations"""
+
     def idle_animation(self) -> None:
         ...
 
@@ -358,6 +363,8 @@ class Ninja(GameObject):
 
     def revive_other_animation_loop(self) -> None:
         ...
+
+    """Sounds"""
 
     def ko_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_penguinground')
