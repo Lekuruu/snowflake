@@ -132,7 +132,7 @@ class Penguin(MetaplaceProtocol):
         if self.disconnected:
             return
 
-        self.power_card_stamina += 1
+        self.power_card_stamina += 2
 
         update = {
             'cardData': None,
