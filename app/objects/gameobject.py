@@ -335,7 +335,6 @@ class LocalGameObject(GameObject):
         name: str,
         x: int | float = 0,
         y: int | float = 0,
-        game: "Game" | None = None,
         on_click: Callable | None = None,
         x_offset: int | float = 0,
         y_offset: int | float = 0,
@@ -344,7 +343,7 @@ class LocalGameObject(GameObject):
         x_scale: int | float = 1,
         y_scale: int | float = 1
     ) -> None:
-        self.game = game
+        self.game = client.game
         self.name = name
         self.id = -1
         self.x = x
