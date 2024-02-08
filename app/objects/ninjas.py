@@ -211,7 +211,11 @@ class Ninja(GameObject):
         if client.ninja != self:
             return
 
-        if self.client.is_ready:
+        if client.is_ready:
+            return
+
+        if client.selected_card:
+            client.selected_card.place(object.x, object.y)
             return
 
         self.hide_ghost()
