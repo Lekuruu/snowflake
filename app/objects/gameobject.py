@@ -21,16 +21,16 @@ class GameObject:
         self,
         game: "Game",
         name: str,
-        x: int = 0,
-        y: int = 0,
+        x: int | float = 0,
+        y: int | float = 0,
         on_click: Callable | None = None,
         grid: bool = False,
         x_offset: int | float = 0,
         y_offset: int | float = 0,
         origin_mode: OriginMode = OriginMode.NONE,
         mirror_mode: MirrorMode = MirrorMode.NONE,
-        x_scale: int = 1,
-        y_scale: int = 1
+        x_scale: int | float = 1,
+        y_scale: int | float = 1
     ) -> None:
         self.game = game
         self.name = name
@@ -333,16 +333,16 @@ class LocalGameObject(GameObject):
         self,
         client: "Penguin",
         name: str,
-        x: int = 0,
-        y: int = 0,
+        x: int | float = 0,
+        y: int | float = 0,
         game: "Game" | None = None,
         on_click: Callable | None = None,
-        x_offset: int = 0,
-        y_offset: int = 0,
+        x_offset: int | float = 0,
+        y_offset: int | float = 0,
         origin_mode: OriginMode = OriginMode.NONE,
         mirror_mode: MirrorMode = MirrorMode.NONE,
-        x_scale: int = 1,
-        y_scale: int = 1
+        x_scale: int | float = 1,
+        y_scale: int | float = 1
     ) -> None:
         self.game = game
         self.name = name
