@@ -23,6 +23,7 @@ from sqlalchemy import (
 Base = declarative_base()
 
 __all__ = [
+    'Base',
     'Penguin',
     'Card',
     'CardStarterDeck',
