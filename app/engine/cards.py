@@ -25,6 +25,14 @@ class CardObject(Card):
     def __repr__(self) -> str:
         return f'<CardObject {self.id} ({self.x}, {self.y})>'
 
+    @property
+    def x(self):
+        return self.object.x
+
+    @property
+    def y(self):
+        return self.object.y
+
     def place(self, x: int, y: int) -> None:
         self.place_card_sprite(x, y)
         self.place_pattern_sprite(x, y)
