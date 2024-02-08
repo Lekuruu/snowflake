@@ -18,15 +18,15 @@ class Timer:
             self.load()
             self.loaded = True
 
-        self.show()
         self.running = True
+        self.show()
 
         while self.tick > 0:
             self.update_tick()
 
-        self.hide()
-        self.tick = 10
         self.running = False
+        self.tick = 10
+        self.hide()
 
     def update_tick(self, seconds: int = 1, interval: int = 0.25) -> None:
         while seconds > 0:
