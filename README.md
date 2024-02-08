@@ -2,7 +2,7 @@
 
 A work-in-progress card-jitsu snow server emulator, made for houdini.
 
-## What works?
+## Progress
 
 - [x] Player Select
 - [x] Matchmaking
