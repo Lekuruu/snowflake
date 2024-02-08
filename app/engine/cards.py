@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from typing import Tuple, List
 
 from app.objects import GameObject, LocalGameObject
 from app.data import Card
@@ -36,6 +37,10 @@ class CardObject(Card):
         self.place_card_sprite(x, y)
         self.place_pattern_sprite(x, y)
 
+    def remove(self) -> None:
+        self.object.remove_object()
+        self.pattern.remove_object()
+
     def place_card_sprite(self, x: int, y: int) -> None:
         self.object.x = x
         self.object.y = y
@@ -47,9 +52,18 @@ class CardObject(Card):
         }[self.element])
 
     def place_pattern_sprite(self, x: int, y: int) -> None:
+        # Set default offsets
         self.pattern.x_offset = 0.5
         self.pattern.y_offset = 1
 
+        x_range, y_range = self.pattern_range(x, y)
+
+        self.pattern.x = x
+        self.pattern.y = y
+        self.pattern.place_object()
+        self.pattern.place_sprite(f'ui_card_pattern{len(x_range)}x{len(y_range)}')
+
+    def pattern_range(self, x: int, y: int) -> Tuple[List[int], List[int]]:
         max_x = max(*self.game.grid.x_range)
         min_x = min(*self.game.grid.x_range)
         max_y = max(*self.game.grid.y_range)
@@ -76,13 +90,4 @@ class CardObject(Card):
             x_range = x_range[:-1]
             self.pattern.x_offset = 0
 
-        pattern = f'{len(x_range)}x{len(y_range)}'
-
-        self.pattern.x = x
-        self.pattern.y = y
-        self.pattern.place_object()
-        self.pattern.place_sprite(f'ui_card_pattern{pattern}')
-
-    def remove(self) -> None:
-        self.object.remove_object()
-        self.pattern.remove_object()
+        return x_range, y_range
