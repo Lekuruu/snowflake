@@ -102,15 +102,16 @@ class CardObject(Card):
         if self.client.selected_card != self:
             return
 
+        # Wait for any pending animations
+        self.game.wait_for_animations()
+
         for client in self.game.clients:
             payload_name = 'consumeCard' if self.client == client else 'showCaseOthersCard'
 
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload(payload_name)
 
-        self.client.selected_card = None
-        self.client.power_card_slots.remove(self)
-
+        # Wait for client to consume card
         self.game.callbacks.wait_for_client('ConsumeCardResponse', self.client)
 
         # Wait for client to play the animation

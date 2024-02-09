@@ -48,6 +48,14 @@ def on_card_deselect(client: Penguin, data: dict):
     client.ninja.show_targets()
     client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_move')
 
+@session.framework.register('ConsumeCardResponse')
+def on_card_consumed(client: Penguin, data: dict):
+    if not client.selected_card:
+        return
+
+    client.power_card_slots.remove(client.selected_card)
+    client.selected_card = None
+
 @session.framework.register('cardCount')
 def on_card_count(client: Penguin, data: dict):
     card_amount = data['numCards']
