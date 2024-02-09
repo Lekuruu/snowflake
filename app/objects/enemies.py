@@ -183,6 +183,7 @@ class Enemy(GameObject):
                 yield tile
 
     def next_target(self) -> Tuple[GameObject | None, GameObject | None]:
+        """Find and return the next move and attack"""
         available_moves = list(self.movable_tiles()) + [self.game.grid[self.x, self.y]]
 
         if not available_moves:
@@ -196,10 +197,11 @@ class Enemy(GameObject):
         }
 
         if not any(moves.values()):
-            # No targets in range
+            # No targets in range, move to the closest possible tile
             return self.closest_move(), None
 
         for move, targets in list(moves.items()):
+            # Check if there are any targets
             if not targets:
                 moves.pop(move)
                 continue
