@@ -50,11 +50,11 @@ def on_card_deselect(client: Penguin, data: dict):
 
 @session.framework.register('ConsumeCardResponse')
 def on_card_consumed(client: Penguin, data: dict):
-    if not client.selected_card:
-        return
-
-    client.power_card_slots.remove(client.selected_card)
-    client.selected_card = None
+    try:
+        client.power_card_slots.remove(client.selected_card)
+        client.selected_card = None
+    except ValueError:
+        pass
 
 @session.framework.register('cardCount')
 def on_card_count(client: Penguin, data: dict):
