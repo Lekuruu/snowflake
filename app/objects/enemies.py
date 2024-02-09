@@ -141,7 +141,16 @@ class Enemy(GameObject):
             if not self.game.grid.can_move(tile.x, tile.y):
                 continue
 
-            distance = abs(tile.x - self.x) + abs(tile.y - self.y)
+            # TODO: Implement this when `closest_target` is fixed
+            # distance = self.game.grid.distance_with_obstacles(
+            #     (target_x, target_y),
+            #     (tile.x, tile.y)
+            # )
+
+            distance = self.game.grid.distance(
+                (self.x, self.y),
+                (tile.x, tile.y)
+            )
 
             if distance <= self.move:
                 yield tile
@@ -159,12 +168,21 @@ class Enemy(GameObject):
             if target_object.hp <= 0:
                 continue
 
-            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
+            # TODO: Implement this when `closest_target` is fixed
+            # distance = self.game.grid.distance_with_obstacles(
+            #     (target_x, target_y),
+            #     (tile.x, tile.y)
+            # )
+
+            distance = self.game.grid.distance(
+                (target_x, target_y),
+                (tile.x, tile.y)
+            )
 
             if distance <= (range or self.range):
                 yield tile
 
-    def next_target(self) -> Tuple[GameObject, GameObject | None]:
+    def next_target(self) -> Tuple[GameObject | None, GameObject | None]:
         available_moves = list(self.movable_tiles()) + [self.game.grid[self.x, self.y]]
 
         if not available_moves:
@@ -219,11 +237,13 @@ class Enemy(GameObject):
             if self.simulate_damage(move.x, move.y, targets[0]) == highest_damage
         ])
 
-        # TODO: Handle obstacles
-
         return next_move, targets[0]
 
     def closest_target(self) -> GameObject | None:
+        # TODO: This method can sometimes lead to the enemy being stuck
+        #       if the target is behind an obstacle. We should probably
+        #       implement a pathfinding algorithm to fix this.
+
         # Get all enemy tiles
         tiles = [
             min(
@@ -236,8 +256,6 @@ class Enemy(GameObject):
 
         if not tiles:
             return
-
-        # TODO: Handle obstacles
 
         # Return tile that is closest to enemy
         return min(
