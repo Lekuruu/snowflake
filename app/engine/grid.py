@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from app.engine.game import Game
 
 import random
+import math
 
 class Grid:
     def __init__(self, x_range: int, y_range: int, game: "Game") -> None:
@@ -36,6 +37,12 @@ class Grid:
         if value is not None:
             value.x, value.y = index[0], index[1]
 
+    @property
+    def obstacles(self) -> List[Tuple[int, int]]:
+        """Get all obstacles on the grid"""
+        # TODO: Add more obstacles?
+        return [(obj.x, obj.y) for obj in self.game.rocks]
+
     def add(self, obj: GameObject) -> None:
         """Add a game object to the grid"""
         self.__setitem__((obj.x, obj.y), obj)
@@ -58,6 +65,29 @@ class Grid:
                     continue
                 return (x, y)
         return (-1, -1)
+
+    def distance(self, start: Tuple[int, int], target: Tuple[int, int]) -> int:
+        """Get the manhatten distance between two tiles"""
+        return abs(start[0] - target[0]) + abs(start[1] - target[1])
+
+    def distance_with_obstacles(self, start: Tuple[int, int], target: Tuple[int, int]) -> int | float:
+        """Get the manhatten distance between two tiles, and also accounting for obstacles"""
+        if target in self.obstacles:
+            return math.inf
+
+        distance = self.distance(start, target)
+
+        for obstacle in self.obstacles:
+            if (obstacle == start) or (obstacle == target):
+                continue
+
+            if (
+                (start[0] <= obstacle[0] <= target[0] or target[0] <= obstacle[0] <= start[0]) and
+                (start[1] <= obstacle[1] <= target[1] or target[1] <= obstacle[1] <= start[1])
+            ):
+                return math.inf
+
+        return distance
 
     def enemy_spawn_location(self, max_attempts=100) -> Tuple[int, int]:
         """Get a random enemy spawn location"""
