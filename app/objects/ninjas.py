@@ -342,6 +342,9 @@ class Ninja(GameObject):
 
         if not self.game.grid.is_valid(x, y):
             return
+        
+        if self.hp <= 0:
+            return
 
         distance = abs(x - self.x) + abs(y - self.y)
 
