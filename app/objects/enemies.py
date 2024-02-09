@@ -137,6 +137,7 @@ class Enemy(GameObject):
         target.set_health(target.hp - self.attack)
 
     def movable_tiles(self) -> Iterator[GameObject]:
+        """Get all tiles that the enemy can move to from its current position"""
         for tile in self.game.grid.tiles:
             if not self.game.grid.can_move(tile.x, tile.y):
                 continue
@@ -156,6 +157,7 @@ class Enemy(GameObject):
                 yield tile
 
     def attackable_tiles(self, target_x: int, target_y: int, range: int | None = None) -> Iterator[GameObject]:
+        """Get all tiles that the enemy can attack from its current position"""
         for tile in self.game.grid.tiles:
             target_object = self.game.grid[tile.x, tile.y]
 
@@ -268,7 +270,10 @@ class Enemy(GameObject):
         )
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+        """Simulate the damage that the enemy would do to a target"""
         ...
+
+    """Animations"""
 
     def spawn_animation(self) -> None:
         self.animate_object(
@@ -292,6 +297,8 @@ class Enemy(GameObject):
 
     def hit_animation(self) -> None:
         ...
+
+    """Sounds"""
 
     def spawn_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_snowmenappear')
@@ -321,6 +328,7 @@ class Sly(Enemy):
     move_duration: int = 1200
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+        """Simulate the damage that the enemy would do to a target"""
         distance = abs(x_position - target.x) + abs(y_position - target.y)
 
         # NOTE: Sly hits harder from a distance. According to the
@@ -420,6 +428,7 @@ class Scrap(Enemy):
     move_duration: int = 1200
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+        """Simulate the damage that the enemy would do to a target"""
         surrounding_targets = list(self.attackable_tiles(target.x, target.y, range=1))
         surrounding_targets.remove(target)
 
@@ -537,6 +546,7 @@ class Tank(Enemy):
     move_duration: int = 1100
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+        """Simulate the damage that the enemy would do to a target"""
         # Horizontal swipe
         if x_position == target.x:
             total_damage = self.attack
