@@ -164,6 +164,11 @@ class Grid:
         for tile in self.tiles:
             tile.hide()
 
+    def place_tile(self, x: int, y: int, sprite: str = 'ui_tile_move') -> None:
+        """Place a tile at a specific location"""
+        tile = self.get_tile(x, y)
+        tile.place_sprite(sprite)
+
     def change_tile_sprites(self, name: str) -> None:
         """Change the sprites of all tiles to a new sprite"""
         for client in self.game.clients:
