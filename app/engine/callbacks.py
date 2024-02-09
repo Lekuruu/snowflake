@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from typing import Callable, Dict, List, TYPE_CHECKING
+from typing import Callable, Dict, List, Any, TYPE_CHECKING
 from twisted.internet import reactor
 from collections import defaultdict
 from dataclasses import dataclass
@@ -9,6 +9,7 @@ from enum import IntEnum
 
 if TYPE_CHECKING:
     from app.engine.game import Game
+    from app.engine import Penguin
 
 class ActionType(IntEnum):
     Animation = 0
@@ -32,14 +33,15 @@ class CallbackHandler:
     """This class manages callbacks for animations and sounds"""
 
     def __init__(self, game: "Game"):
-        self.pending: Dict[int, List[Action]] = defaultdict(list)
+        self.pending_actions: Dict[int, List[Action]] = defaultdict(list)
+        self.pending_events: Dict[Any, List[str]] = defaultdict(list)
         self.game = game
 
     @property
     def ids(self) -> List[int]:
         return [
             action.handle_id
-            for actions in list(self.pending.values())
+            for actions in list(self.pending_actions.values())
             for action in actions
         ]
 
@@ -47,7 +49,7 @@ class CallbackHandler:
     def actions(self) -> List[Action]:
         return [
             action
-            for actions in list(self.pending.values())
+            for actions in list(self.pending_actions.values())
             for action in actions
         ]
 
@@ -74,8 +76,8 @@ class CallbackHandler:
         return next([action for action in self.actions if action.name == name], None)
 
     def remove(self, object_id: int) -> None:
-        if object_id in self.pending:
-            self.pending.pop(object_id, None)
+        if object_id in self.pending_actions:
+            self.pending_actions.pop(object_id, None)
 
     def next_id(self) -> int:
         return max(self.ids or [0]) + 1
@@ -95,13 +97,13 @@ class CallbackHandler:
             callback
         )
 
-        self.pending[object_id].append(action)
+        self.pending_actions[object_id].append(action)
         return action.handle_id
 
     def action_done(self, id: int, object_id: int):
         target_object = self.game.objects.by_id(object_id)
 
-        for action in self.pending[object_id]:
+        for action in self.pending_actions[object_id]:
             if action.handle_id != id:
                 continue
 
@@ -111,5 +113,30 @@ class CallbackHandler:
                     target_object
                 )
 
-            self.pending[object_id].remove(action)
+            self.pending_actions[object_id].remove(action)
             break
+
+    def register_event(self, target: Any, event: str) -> None:
+        self.pending_events[target].append(event)
+
+    def event_done(self, event: str, target: Any) -> None:
+        if event in self.pending_events.get(target, []):
+            self.pending_events[target].remove(event)
+
+    def remove_events(self, target: Any) -> None:
+        if target in self.pending_events:
+            self.pending_events.pop(target, None)
+
+    def wait_for_client(self, event: str, client: "Penguin") -> None:
+        """Wait for an event to be called by the client"""
+        self.register_event(client, event)
+
+        while event in self.pending_events.get(client, []):
+            pass
+
+    def wait_for_event(self, event: str) -> None:
+        """Wait for an event to be called by any of the clients"""
+        self.register_event(self.game, event)
+
+        while event in self.pending_events.get(self.game, []):
+            pass

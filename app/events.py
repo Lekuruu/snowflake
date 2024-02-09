@@ -47,6 +47,10 @@ class FrameworkHandler:
 
         self.logger.debug(f"{trigger}: {data}")
 
+        if client.in_game:
+            client.game.callbacks.event_done(trigger, client.game)
+            client.game.callbacks.event_done(trigger, client)
+
         if trigger in self.handlers:
             self.handlers[trigger](client, data)
             return
