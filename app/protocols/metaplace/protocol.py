@@ -27,7 +27,7 @@ import json
 import ast
 
 class MetaplaceProtocol(LineOnlyReceiver):
-    def __init__(self, server: "MetaplaceWorldServer", address: IPv4Address | IPv6Address):
+    def __init__(self, server: "MetaplaceWorldServer", address: IPv4Address | IPv6Address) -> None:
         self.address = address
         self.server = server
 
@@ -191,7 +191,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def set_mapblock(self, type: MapblockType, data: str, index: int = 1, size: int = 1):
         self.send_tag('P_MAPBLOCK', type.value, index, size, data)
 
-    def set_heighmap_division(self, division: float):
+    def set_heightmap_division(self, division: float):
         self.send_tag('P_HEIGHTMAPDIVISIONS', division)
 
     def set_heightmap_scale(self, scale: float):

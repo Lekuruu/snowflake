@@ -24,12 +24,12 @@ def ready_handler(client: Penguin):
     client.lock_scroll(client.place.camera.lock_scroll)
     client.lock_objects(client.place.object_lock)
 
-    client.set_heighmap_division(client.place.camera.height_map_divisions)
+    client.set_heightmap_division(client.place.camera.height_map_divisions)
     client.set_heightmap_scale(client.place.camera.height_map_scale)
     client.set_draggable(client.place.draggable)
     client.set_elevation_scale(client.place.camera.elevation_scale)
     client.set_terrain_lighting(client.place.camera.terrain_lighting)
-    client.set_heighmap_division(client.place.camera.height_map_divisions)
+    client.set_heightmap_division(client.place.camera.height_map_divisions)
     client.set_heightmap_scale(client.place.camera.height_map_scale)
 
     client.setup_camera3d(client.place.camera3d)
