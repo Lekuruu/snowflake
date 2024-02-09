@@ -98,6 +98,10 @@ class Penguin(MetaplaceProtocol):
         if self.logged_in:
             self.send_to_room()
 
+        if self.in_game:
+            # Remove any pending events
+            self.game.callbacks.remove_events(self)
+
         # Put client in ready state, so that the game doesn't softlock
         self.is_ready = True
 
