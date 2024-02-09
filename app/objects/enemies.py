@@ -197,7 +197,7 @@ class Enemy(GameObject):
 
         if not any(moves.values()):
             # No targets in range
-            return self.closest_target(), None
+            return self.closest_move(), None
 
         for move, targets in list(moves.items()):
             if not targets:
@@ -239,7 +239,9 @@ class Enemy(GameObject):
 
         return next_move, targets[0]
 
-    def closest_target(self) -> GameObject | None:
+    def closest_move(self) -> GameObject | None:
+        """Get the closest tile to a ninja, that the enemy can move to"""
+
         # TODO: This method can sometimes lead to the enemy being stuck
         #       if the target is behind an obstacle. We should probably
         #       implement a pathfinding algorithm to fix this.
