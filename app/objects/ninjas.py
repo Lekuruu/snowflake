@@ -165,6 +165,11 @@ class Ninja(GameObject):
                 self.client.was_ko = True
                 self.client.update_cards()
                 self.ko_sound()
+
+            # Check if any ninjas are still in healing state
+            for ninja in self.game.ninjas:
+                if ninja.selected_object == self:
+                    ninja.targets = []
         else:
             if hp < self.hp:
                 self.hit_animation()
