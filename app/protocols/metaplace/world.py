@@ -31,7 +31,7 @@ class MetaplaceWorldServer(Factory):
         self.server_type = server_type
         self.stylesheet_id = stylesheet_id
 
-        self.logger = logging.getLogger(f"{world_name} ({world_id})")
+        self.logger = logging.getLogger(world_name)
         self.places: Dict[str, Place] = {}
 
         self.sound_assets = AssetCollection()
@@ -47,15 +47,15 @@ class MetaplaceWorldServer(Factory):
     def get_place(self, place_id: int) -> Place | None:
         return next((place for place in self.places.values() if place.id == place_id), None)
 
-    def register_place(self, place: Place):
+    def register_place(self, place: Place) -> None:
         self.places[place.name] = place
         self.logger.info(f'Registered place: "{place.name}"')
 
-    def listen(self, port: int):
-        self.logger.info(f"Starting engine: {self} ({port})")
+    def listen(self, port: int) -> None:
+        self.logger.info(f'Starting world server "{self.world_name}" ({port})')
         reactor.listenTCP(port, self)
 
-    def buildProtocol(self, address: IPv4Address | IPv6Address):
+    def buildProtocol(self, address: IPv4Address | IPv6Address) -> MetaplaceProtocol:
         self.logger.debug(f'-> "{address.host}:{address.port}"')
         self.players.add(player := self.protocol(self, address))
         return player

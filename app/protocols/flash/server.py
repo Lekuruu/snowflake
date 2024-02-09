@@ -24,5 +24,5 @@ class SocketPolicyServer(Factory):
         return self.protocol(address, self.policy)
 
     def listen(self, port: int):
-        self.logger.info(f"Starting engine: {self} ({port})")
+        self.logger.info(f"Starting policy server ({port})")
         reactor.listenTCP(port, self)
