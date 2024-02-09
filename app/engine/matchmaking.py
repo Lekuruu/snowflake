@@ -4,6 +4,7 @@ from typing import List
 
 from ..objects.collections import Players
 from .penguin import Penguin
+from .game import Game
 
 import logging
 import config
@@ -51,8 +52,6 @@ class MatchmakingQueue:
         return players
 
     def create_game(self, fire: Penguin, snow: Penguin, water: Penguin) -> None:
-        from .game import Game
-
         self.logger.info('Creating game...')
 
         game = Game(fire, snow, water)
