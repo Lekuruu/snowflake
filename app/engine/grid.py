@@ -59,7 +59,7 @@ class Grid:
                 return (x, y)
         return (-1, -1)
 
-    def enemy_spawn_location(self, enemy: GameObject, max_attempts=100) -> Tuple[int, int]:
+    def enemy_spawn_location(self, max_attempts=100) -> Tuple[int, int]:
         """Get a random enemy spawn location"""
         spawn_range = [range(7, 9), range(5)]
 

@@ -446,7 +446,7 @@ class Game:
         """Spawn enemies for the current round"""
         for enemy in self.enemies:
             # Choose spawn location on grid
-            x, y = self.grid.enemy_spawn_location(enemy)
+            x, y = self.grid.enemy_spawn_location()
 
             self.grid[x, y] = enemy
             enemy.place_object()
