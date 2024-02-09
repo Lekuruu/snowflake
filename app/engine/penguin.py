@@ -170,6 +170,12 @@ class Penguin(MetaplaceProtocol):
         snow_ui = self.get_window('cardjitsu_snowui.swf')
         snow_ui.send_payload('updateStamina', update)
 
+    def consume_card(self) -> None:
+        if not self.selected_card:
+            return
+
+        self.selected_card.use()
+
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room
         window = self.get_window('cardjitsu_snowexternalinterfaceconnector.swf')

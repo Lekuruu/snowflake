@@ -358,6 +358,12 @@ class Ninja(GameObject):
 
         self.client.selected_card.place(x, y)
 
+    def use_powercard(self) -> None:
+        if not self.client.selected_card:
+            return
+
+        self.client.selected_card.use()
+
     """Animations"""
 
     def idle_animation(self) -> None:

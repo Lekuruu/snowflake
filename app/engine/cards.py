@@ -1,14 +1,20 @@
 
 from __future__ import annotations
-from typing import Tuple, List
+
+import time
+from typing import Tuple, List, TYPE_CHECKING
 
 from app.objects import GameObject, LocalGameObject
 from app.data import Card
 
+if TYPE_CHECKING:
+    from app.engine import Penguin
+
 class CardObject(Card):
-    def __init__(self, card: Card, client) -> None:
+    def __init__(self, card: Card, client: "Penguin") -> None:
         self.__dict__.update(card.__dict__)
         self.game = client.game
+        self.client = client
         self.object = GameObject(
             client.game,
             card.name,
@@ -91,3 +97,21 @@ class CardObject(Card):
             self.pattern.x_offset = 0
 
         return x_range, y_range
+
+    def use(self) -> None:
+        if self.client.selected_card != self:
+            return
+
+        for client in self.game.clients:
+            payload_name = 'consumeCard' if self.client == client else 'showCaseOthersCard'
+
+            snow_ui = client.get_window('cardjitsu_snowui.swf')
+            snow_ui.send_payload(payload_name)
+
+        self.client.selected_card = None
+        self.client.power_card_slots.remove(self)
+
+        self.game.callbacks.wait_for_client('ConsumeCardResponse', self.client)
+
+        # Wait for client to play the animation
+        time.sleep(1)

@@ -525,20 +525,27 @@ class Game:
             rock.remove_object()
 
     def do_ninja_actions(self) -> None:
+        # TODO: Check powercard combos
+
         for ninja in self.ninjas:
-            if not ninja.selected_target:
-                continue
+            if ninja.selected_target:
+                target = ninja.selected_object
 
-            target = ninja.selected_target.object
+                if target is None:
+                    # Target has been removed/defeated
+                    continue
 
-            if target is None:
-                # Target has been removed/defeated
-                continue
+                if isinstance(target, Enemy):
+                    ninja.attack_target(target)
 
-            if isinstance(target, Enemy):
-                ninja.attack_target(target)
+                if isinstance(target, Ninja):
+                    ninja.heal_target(target)
+
+            elif ninja.client.selected_card:
+                ninja.use_powercard()
+
             else:
-                ninja.heal_target(target)
+                continue
 
             ninja.client.update_cards()
             time.sleep(1)
