@@ -114,14 +114,15 @@ class Enemy(GameObject):
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
 
-    def set_health(self, hp: int) -> None:
+    def set_health(self, hp: int, wait=True) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
         self.hp = hp
 
         if self.hp <= 0:
             self.ko_animation()
-            self.game.wait_for_animations()
+            if wait:
+                self.game.wait_for_animations()
             self.remove_object()
         else:
             self.hit_animation()
