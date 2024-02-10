@@ -109,6 +109,9 @@ class CardObject(Card):
         return x_range, y_range
 
     def use(self) -> None:
+        if self.client.ninja.hp <= 0:
+            return
+
         if self.client.selected_card != self:
             return
 
