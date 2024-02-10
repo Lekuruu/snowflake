@@ -94,8 +94,7 @@ class HealParticles(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 10, duration=self.duration * 1000)
-        time.sleep(self.duration)
-        self.remove_object()
+        reactor.callLater(self.duration, self.remove_object)
 
 class Explosion(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -489,7 +488,7 @@ class SnowIgloo(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=2.5,
+            y_offset=3,
             duration=1
         )
 
