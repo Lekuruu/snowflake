@@ -440,8 +440,7 @@ class WaterPowerBeam(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1,
-            duration=0.8
+            y_offset=1
         )
 
     def play(self):
@@ -456,8 +455,7 @@ class FirePowerBeam(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1,
-            duration=1.8
+            y_offset=1
         )
 
     def play(self):
@@ -472,8 +470,7 @@ class SnowPowerBeam(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1,
-            duration=1
+            y_offset=1
         )
 
     def play(self):
@@ -489,7 +486,7 @@ class SnowIgloo(Effect):
             y,
             x_offset=0.5,
             y_offset=3,
-            duration=1
+            duration=2
         )
 
     def play(self):
@@ -508,7 +505,7 @@ class WaterFishDrop(Effect):
             y,
             x_offset=0.5,
             y_offset=3,
-            duration=0.8
+            duration=1.8
         )
 
     def play(self):
@@ -524,9 +521,11 @@ class FirePowerBottle(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1,
+            y_offset=3,
             duration=1
         )
 
     def play(self):
-        ... # TODO
+        time.sleep(0.2)
+        self.place_object()
+        self.place_sprite(self.name)

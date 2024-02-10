@@ -147,11 +147,9 @@ class CardObject(Card):
         impact = impact_class(self.game, self.x, self.y)
         impact.play()
 
-        time.sleep(beam.duration)
-        beam.remove_object()
-
         time.sleep(impact.duration)
         impact.remove_object()
+        beam.remove_object()
 
         x_range, y_range = self.pattern_range(self.x, self.y)
 
@@ -174,3 +172,5 @@ class CardObject(Card):
                 target.set_health(target.hp - self.client.ninja.attack, wait=False)
 
         # TODO: Effects
+
+        self.game.wait_for_animations()
