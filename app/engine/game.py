@@ -685,11 +685,11 @@ class Game:
 
     def get_payout_round(self) -> int:
         """Get the round number for the payout screen"""
-        if not self.enemies and self.round == 3:
+        if not self.enemies and self.round == 2:
             # Players have defeated all enemies
             return 4
 
-        elif self.round > 3:
+        elif self.round > 2:
             # Players have entered bonus round
             return 9 - len(self.enemies)
 
