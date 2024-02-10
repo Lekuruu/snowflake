@@ -25,7 +25,7 @@ def on_card_clicked(client: Penguin, data: dict):
         return
 
     client.selected_card = card
-    client.ninja.hide_targets()
+    client.ninja.remove_targets()
     client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_attack')
 
 @session.framework.register('unselectCard')
