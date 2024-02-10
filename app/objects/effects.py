@@ -432,3 +432,51 @@ class TankSwipeVertical(Effect):
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
+
+class WaterPowerBeam(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "waterninja_powercard_water_loop_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1,
+            duration=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+
+class FirePowerBeam(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "fireninja_powerskyfire_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1,
+            duration=1.8
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+
+class SnowPowerBeam(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "snowninja_beam_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1,
+            duration=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
