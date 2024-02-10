@@ -1,11 +1,11 @@
 
 from __future__ import annotations
-
-import time
-
 from typing import Tuple, List, TYPE_CHECKING
-from app.objects import GameObject, LocalGameObject
+
 from app.data import Card
+from app.objects import GameObject, LocalGameObject
+from app.objects.ninjas import Ninja
+from app.objects.enemies import Enemy
 from app.objects.effects import (
     WaterPowerBeam,
     FirePowerBeam,
@@ -14,6 +14,8 @@ from app.objects.effects import (
     WaterFishDrop,
     SnowIgloo
 )
+
+import time
 
 if TYPE_CHECKING:
     from app.engine import Penguin
@@ -151,4 +153,24 @@ class CardObject(Card):
         time.sleep(impact.duration)
         impact.remove_object()
 
-        # TODO: Damage & Effects
+        x_range, y_range = self.pattern_range(self.x, self.y)
+
+        targets = [
+            self.game.grid[x, y]
+            for x in x_range
+            for y in y_range
+        ]
+
+        for target in targets:
+            if isinstance(target, Ninja) and self.client.element == 'snow':
+                if target.client.disconnected:
+                    continue
+
+                target.set_health(target.hp + self.value)
+                continue
+
+            if isinstance(target, Enemy):
+                # TODO: Figure out how much damage to deal
+                target.set_health(target.hp - self.client.ninja.attack, wait=False)
+
+        # TODO: Effects
