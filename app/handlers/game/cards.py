@@ -98,3 +98,7 @@ def on_membercard_deselect(client: Penguin, data: dict):
         return
 
     # TODO
+
+@session.framework.register('comboScreenComplete')
+def on_combo_screen_complete(client: Penguin, data: dict):
+    ...
