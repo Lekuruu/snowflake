@@ -3,10 +3,6 @@ from app.engine import Penguin
 from app.data import TipPhase
 from app import session
 
-@session.framework.register('RewardCardResponse')
-def on_card_loaded(client: Penguin, data: dict):
-    ...
-
 @session.framework.register('cardClick')
 def on_card_clicked(client: Penguin, data: dict):
     if not client.game.timer.running:
@@ -101,4 +97,8 @@ def on_membercard_deselect(client: Penguin, data: dict):
 
 @session.framework.register('comboScreenComplete')
 def on_combo_screen_complete(client: Penguin, data: dict):
+    ...
+
+@session.framework.register('RewardCardResponse')
+def on_card_loaded(client: Penguin, data: dict):
     ...
