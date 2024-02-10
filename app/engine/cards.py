@@ -2,10 +2,18 @@
 from __future__ import annotations
 
 import time
-from typing import Tuple, List, TYPE_CHECKING
 
+from typing import Tuple, List, TYPE_CHECKING
 from app.objects import GameObject, LocalGameObject
 from app.data import Card
+from app.objects.effects import (
+    WaterPowerBeam,
+    FirePowerBeam,
+    SnowPowerBeam,
+    FirePowerBottle,
+    WaterFishDrop,
+    SnowIgloo
+)
 
 if TYPE_CHECKING:
     from app.engine import Penguin
@@ -115,4 +123,32 @@ class CardObject(Card):
         self.game.callbacks.wait_for_client('ConsumeCardResponse', self.client)
 
         # Wait for client to play the animation
-        time.sleep(1)
+        time.sleep(1.2)
+
+        self.client.ninja.power_animation()
+
+        beam_class = {
+            'fire': FirePowerBeam,
+            'water': WaterPowerBeam,
+            'snow': SnowPowerBeam
+        }[self.client.element]
+
+        beam = beam_class(self.game, self.client.ninja.x, self.client.ninja.y)
+        beam.play()
+
+        impact_class = {
+            'fire': FirePowerBottle,
+            'water': WaterFishDrop,
+            'snow': SnowIgloo
+        }[self.client.element]
+
+        impact = impact_class(self.game, self.x, self.y)
+        impact.play()
+
+        time.sleep(beam.duration)
+        beam.remove_object()
+
+        time.sleep(impact.duration)
+        impact.remove_object()
+
+        # TODO: Damage & Effects
