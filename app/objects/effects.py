@@ -441,7 +441,7 @@ class WaterPowerBeam(Effect):
             y,
             x_offset=0.5,
             y_offset=1,
-            duration=1
+            duration=0.8
         )
 
     def play(self):
@@ -507,13 +507,14 @@ class WaterFishDrop(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1,
-            duration=1
+            y_offset=3,
+            duration=0.8
         )
 
     def play(self):
+        time.sleep(0.2)
         self.place_object()
-        # TODO
+        self.place_sprite(self.name)
 
 class FirePowerBottle(Effect):
     def __init__(self, game: "Game", x: int, y: int):
