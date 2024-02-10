@@ -43,7 +43,7 @@ A work-in-progress card-jitsu snow server emulator, made for houdini.
 
 ## Setup
 
-This setup requires you to have a working installation of houdini with dash, as well as a copy of [python](https://python.org) (3.9 is recommended).
+This setup requires you to have a working installation of houdini with dash, as well as a copy of [python](https://python.org) (3.8 to 3.12).
 There is some necessary configuration to get this working, which I will cover in the following sections.
 
 ### Changing the wns url
