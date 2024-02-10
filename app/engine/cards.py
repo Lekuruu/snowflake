@@ -113,7 +113,7 @@ class CardObject(Card):
             return
 
         # Add delay before card gets played
-        time.sleep(0.5)
+        time.sleep(0.2)
 
         for client in self.game.clients:
             payload_name = 'consumeCard'
