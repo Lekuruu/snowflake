@@ -480,3 +480,53 @@ class SnowPowerBeam(Effect):
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
+
+class SnowIgloo(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "snowninja_igloodrop",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=2.5,
+            duration=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.animate_object('snowninja_igloodrop_anim1', reset=True)
+        self.animate_object('snowninja_igloodrop_anim2')
+        self.animate_object('blank_png', play_style='loop')
+        # TODO: Change offsets, when card is placed at the edge of the screen
+
+class WaterFishDrop(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "waterninja_powercard_fishdrop_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1,
+            duration=1
+        )
+
+    def play(self):
+        self.place_object()
+        # TODO
+
+class FirePowerBottle(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "fireninja_powerbottle_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1,
+            duration=1
+        )
+
+    def play(self):
+        ... # TODO
