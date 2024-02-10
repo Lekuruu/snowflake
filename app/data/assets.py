@@ -63,7 +63,7 @@ app.session.assets.update([
     Asset(100366, "snowninja_koloop_anim"),
     Asset(100367, "snowninja_move_anim"),
     Asset(100368, "snowninja_celebrate_anim"),
-    Asset(100370, "snowninja_beam_anim_"),
+    Asset(100370, "snowninja_beam_anim"),
     Asset(100371, "snowninja_powercard_anim"),
     Asset(100372, "snowninja_projectileangle_anim"),
     Asset(100373, "snowninja_projectilehoriz_anim"),
