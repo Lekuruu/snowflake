@@ -446,6 +446,7 @@ class WaterPowerBeam(Effect):
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
+        reactor.callLater(1, self.remove_object)
 
 class FirePowerBeam(Effect):
     def __init__(self, game: "Game", x: int, y: int):
