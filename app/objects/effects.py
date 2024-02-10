@@ -26,7 +26,8 @@ class Effect(GameObject):
         x_offset: int = 0,
         y_offset: int = 0,
         origin_mode: OriginMode = OriginMode.NONE,
-        mirror_mode: MirrorMode = MirrorMode.NONE
+        mirror_mode: MirrorMode = MirrorMode.NONE,
+        duration: int = 0
     ):
         super().__init__(
             game,
@@ -38,6 +39,7 @@ class Effect(GameObject):
             origin_mode=origin_mode,
             mirror_mode=mirror_mode
         )
+        self.duration = duration
 
     def play(self):
         self.place_object()
@@ -84,14 +86,15 @@ class HealParticles(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1,
+            duration=0.737
         )
 
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
-        self.animate_sprite(0, 10, duration=737)
-        time.sleep(0.737)
+        self.animate_sprite(0, 10, duration=self.duration * 1000)
+        time.sleep(self.duration)
         self.remove_object()
 
 class Explosion(Effect):
@@ -102,13 +105,14 @@ class Explosion(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1,
+            duration=0.4
         )
 
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
-        reactor.callLater(0.4, self.remove_object)
+        reactor.callLater(self.duration, self.remove_object)
 
 class SnowProjectile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -118,7 +122,8 @@ class SnowProjectile(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1,
+            duration=0.2
         )
 
     def play(self, target_x: int, target_y: int):
@@ -132,7 +137,7 @@ class SnowProjectile(Effect):
         self.move_object(
             target_x,
             target_y,
-            duration=200
+            duration=self.duration * 1000
         )
 
     def set_mirror_mode(self, target_x: int, target_y: int):
@@ -238,7 +243,8 @@ class SlyProjectile(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1,
+            duration=0.5
         )
 
     def play(self, target_x: int, target_y: int):
@@ -251,7 +257,7 @@ class SlyProjectile(Effect):
 
         self.x_offset = 0.5
         self.y_offset = 1
-        self.move_object(target_x, target_y, duration=500)
+        self.move_object(target_x, target_y, duration=self.duration * 1000)
 
 class ScrapImpact(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -261,13 +267,14 @@ class ScrapImpact(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1,
+            duration=0.4
         )
 
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
-        reactor.callLater(0.4, self.remove_object)
+        reactor.callLater(self.duration, self.remove_object)
 
 class ScrapImpactLittle(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -365,6 +372,7 @@ class ScrapProjectileImpact:
         self.center_x = center_x
         self.center_y = center_y
         self.effects: List[ScrapProjectile] = []
+        self.duration = 0.4
 
     def play(self):
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
@@ -391,7 +399,7 @@ class ScrapProjectileImpact:
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
         projectile.play_northeast(self.center_x - 1, self.center_y + 0.8)
 
-        time.sleep(0.4)
+        time.sleep(self.duration)
         for effect in self.effects:
             effect.remove_object()
 
