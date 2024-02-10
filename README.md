@@ -30,8 +30,8 @@ A work-in-progress card-jitsu snow server emulator, made for houdini.
     - [x] Progressbar
     - [x] Placing
     - [x] Animations
+    - [x] Combos
     - [ ] Effects
-    - [ ] Combos
 - [ ] Member Card
 - [ ] EXP/Coins System
 - [x] Payout
