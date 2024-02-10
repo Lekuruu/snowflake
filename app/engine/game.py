@@ -530,7 +530,18 @@ class Game:
             rock.remove_object()
 
     def do_ninja_actions(self) -> None:
-        # TODO: Check powercard combos
+        ninjas_with_cards = [
+            ninja for ninja in self.ninjas
+            if ninja.client.selected_card
+        ]
+
+        if len(ninjas_with_cards) > 1:
+            self.display_combo_title([
+                ninja.client.element
+                for ninja in ninjas_with_cards
+            ])
+
+            self.callbacks.wait_for_event('comboScreenComplete')
 
         for ninja in self.ninjas:
             if ninja.selected_target:
@@ -658,6 +669,18 @@ class Game:
                 assetPath="",
                 xPercent=0.15,
                 yPercent=0.15
+            )
+
+    def display_combo_title(self, elements: List[str]) -> None:
+        for client in self.clients:
+            combo_title = client.get_window('cardjitsu_snowcombos.swf')
+            combo_title.layer = 'bottomLayer'
+            combo_title.load(
+                {'data': elements},
+                loadDescription="",
+                assetPath="",
+                xPercent=0.5,
+                yPercent=0.5
             )
 
     def get_payout_round(self) -> int:
