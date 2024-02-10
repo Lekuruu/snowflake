@@ -143,6 +143,11 @@ class Game:
         for client in self.disconnected_clients:
             client.ninja.set_health(0)
 
+        for client in self.clients:
+            if not client.has_power_cards:
+                snow_ui = client.get_window('cardjitsu_snowui.swf')
+                snow_ui.send_payload('noCards')
+
         # Run game loop until game ends
         self.run_game_loop()
 

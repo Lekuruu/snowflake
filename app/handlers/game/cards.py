@@ -19,7 +19,7 @@ def on_card_clicked(client: Penguin, data: dict):
     value = data['value']
     id = data['cardId']
 
-    if not (card := client.get_power_card(id)):
+    if not (card := client.power_card_by_id(id)):
         return
 
     if card.value != value:
@@ -55,6 +55,10 @@ def on_card_consumed(client: Penguin, data: dict):
         client.selected_card = None
     except ValueError:
         pass
+
+    if not client.has_power_cards:
+        snow_ui = client.get_window('cardjitsu_snowui.swf')
+        snow_ui.send_payload('noCards')
 
 @session.framework.register('cardCount')
 def on_card_count(client: Penguin, data: dict):

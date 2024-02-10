@@ -75,6 +75,10 @@ class Penguin(MetaplaceProtocol):
         return [c for c in self.power_cards_all if c.element == 's']
 
     @property
+    def has_power_cards(self) -> bool:
+        return bool(self.power_cards or self.power_card_slots)
+
+    @property
     def power_cards(self) -> List[Card]:
         return [
             c for c in self.power_cards_all
@@ -118,18 +122,22 @@ class Penguin(MetaplaceProtocol):
         self.server.players.remove(self)
         self.disconnected = True
 
-    def get_next_power_card(self) -> CardObject | None:
+    def next_power_card(self) -> CardObject | None:
         if not self.power_cards:
+            # Client has no more power cards
             return
 
-        if len(self.power_card_slots) > 3:
+        if len(self.power_card_slots) >= 4:
+            # Client cannot hold more than 4 power cards
             return
 
-        next_card = CardObject(random.choice(self.power_cards), self)
-        self.power_card_slots.append(next_card)
-        return next_card
+        next_card = random.choice(self.power_cards)
+        card_object = CardObject(next_card, self)
+        self.power_card_slots.append(card_object)
+        self.power_cards_all.remove(next_card)
+        return card_object
 
-    def get_power_card(self, card_id: int) -> Card | None:
+    def power_card_by_id(self, card_id: int) -> Card | None:
         return next((c for c in self.power_card_slots if c.id == card_id), None)
 
     def update_cards(self) -> None:
@@ -148,7 +156,7 @@ class Penguin(MetaplaceProtocol):
             self.power_card_stamina = 0
             update['stamina'] = 0
 
-            if next_card := self.get_next_power_card():
+            if next_card := self.next_power_card():
                 update['cardData'] = {
                     "card_id": next_card.id,
                     "color": next_card.color,
@@ -164,8 +172,6 @@ class Penguin(MetaplaceProtocol):
 
             if len(self.power_card_slots) > 3:
                 update['cycle'] = True
-
-        # TODO: Check if client has no power cards anymore
 
         snow_ui = self.get_window('cardjitsu_snowui.swf')
         snow_ui.send_payload('updateStamina', update)
