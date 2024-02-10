@@ -396,6 +396,9 @@ class Ninja(GameObject):
     def revive_other_animation_loop(self) -> None:
         ...
 
+    def power_animation(self) -> None:
+        ...
+
     """Sounds"""
 
     def ko_sound(self) -> None:
@@ -405,6 +408,9 @@ class Ninja(GameObject):
         self.play_sound('sfx_mg_2013_cjsnow_footsteppenguin')
 
     def attack_sound(self) -> None:
+        ...
+
+    def powercard_sound(self) -> None:
         ...
 
 class WaterNinja(Ninja):
@@ -502,6 +508,16 @@ class WaterNinja(Ninja):
             play_style='loop'
         )
 
+    def power_animation(self) -> None:
+        self.animate_object(
+            'waterninja_powercard_summon_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+        self.powercard_sound()
+        time.sleep(0.65)
+
     def revive_other_animation_loop(self) -> None:
         self.animate_object(
             'waterninja_revive_other_loop_anim',
@@ -510,6 +526,9 @@ class WaterNinja(Ninja):
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackwater')
+
+    def powercard_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attackpowercardwater')
 
 class SnowNinja(Ninja):
     name: str = 'Snow'
@@ -632,8 +651,21 @@ class SnowNinja(Ninja):
             play_style='loop'
         )
 
+    def power_animation(self) -> None:
+        self.animate_object(
+            'snowninja_powercard_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+        self.powercard_sound()
+        time.sleep(0.45)
+
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attacksnow')
+
+    def powercard_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attackpowercardsnow')
 
 class FireNinja(Ninja):
     name: str = 'Fire'
@@ -746,8 +778,21 @@ class FireNinja(Ninja):
             play_style='loop'
         )
 
+    def power_animation(self) -> None:
+        self.animate_object(
+            'fireninja_power_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+        self.powercard_sound()
+        time.sleep(1)
+
     def move_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_footsteppenguinfire')
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackfire')
+
+    def powercard_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attackpowercardfire')
