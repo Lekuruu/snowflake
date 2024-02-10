@@ -29,7 +29,7 @@ A work-in-progress card-jitsu snow server emulator, made for houdini.
 - [ ] Powercards
     - [x] Progressbar
     - [x] Placing
-    - [ ] Animations
+    - [x] Animations
     - [ ] Effects
     - [ ] Combos
 - [ ] Member Card
