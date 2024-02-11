@@ -131,7 +131,7 @@ class Enemy(GameObject):
             self.ko_animation()
 
             if not wait:
-                reactor.callLater(2, self.remove_object)
+                reactor.callLater(2.5, self.remove_object)
                 return
 
             self.game.wait_for_animations()
