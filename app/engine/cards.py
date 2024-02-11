@@ -35,7 +35,7 @@ class CardObject(Card):
             x=-1,
             y=-1,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1.002
         )
         self.pattern = LocalGameObject(
             client,
