@@ -109,7 +109,7 @@ class CardObject(Card):
 
         return x_range, y_range
 
-    def use(self) -> None:
+    def use(self, is_combo=False) -> None:
         if self.client.ninja.hp <= 0:
             return
 

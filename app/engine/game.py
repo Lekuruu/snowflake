@@ -535,7 +535,9 @@ class Game:
             if ninja.client.selected_card
         ]
 
-        if len(ninjas_with_cards) > 1:
+        is_combo = len(ninjas_with_cards) > 1
+
+        if is_combo:
             self.display_combo_title([
                 ninja.client.element
                 for ninja in ninjas_with_cards
@@ -558,7 +560,7 @@ class Game:
                     ninja.heal_target(target)
 
             elif ninja.client.selected_card:
-                ninja.use_powercard()
+                ninja.use_powercard(is_combo)
 
             else:
                 continue
