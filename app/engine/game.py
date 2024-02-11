@@ -59,9 +59,9 @@ class Game:
     @property
     def ninjas(self) -> List[Ninja]:
         return [
-            self.objects.by_name('Fire'),
-            self.objects.by_name('Water'),
-            self.objects.by_name('Snow'),
+            *self.objects.with_name('Fire'),
+            *self.objects.with_name('Water'),
+            *self.objects.with_name('Snow')
         ]
 
     @property
