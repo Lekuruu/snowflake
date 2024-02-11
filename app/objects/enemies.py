@@ -148,13 +148,7 @@ class Enemy(GameObject):
             if not self.game.grid.can_move(tile.x, tile.y):
                 continue
 
-            # TODO: Implement this when `closest_target` is fixed
-            # distance = self.game.grid.distance_with_obstacles(
-            #     (target_x, target_y),
-            #     (tile.x, tile.y)
-            # )
-
-            distance = self.game.grid.distance(
+            distance = self.game.grid.distance_with_obstacles(
                 (self.x, self.y),
                 (tile.x, tile.y)
             )
@@ -176,13 +170,7 @@ class Enemy(GameObject):
             if target_object.hp <= 0:
                 continue
 
-            # TODO: Implement this when `closest_target` is fixed
-            # distance = self.game.grid.distance_with_obstacles(
-            #     (target_x, target_y),
-            #     (tile.x, tile.y)
-            # )
-
-            distance = self.game.grid.distance(
+            distance = self.game.grid.distance_with_obstacles(
                 (target_x, target_y),
                 (tile.x, tile.y)
             )
