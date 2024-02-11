@@ -102,6 +102,12 @@ class Ninja(GameObject):
         self.ghost.x = x
         self.ghost.y = y
 
+        if self.shield:
+            self.shield.move_object(x, y, self.move_duration)
+
+        if self.rage:
+            self.rage.move_object(x, y, self.move_duration)
+
     def move_ninja(self, x: int, y: int) -> None:
         if self.hp <= 0 or self.client.disconnected:
             return
