@@ -177,6 +177,9 @@ class Ninja(GameObject):
             self.targets = []
             self.ko_animation()
 
+            if self.rage:
+                self.rage.remove_object()
+
             if not self.client.disconnected:
                 self.client.was_ko = True
                 self.client.update_cards()
