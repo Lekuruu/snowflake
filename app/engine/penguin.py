@@ -112,7 +112,7 @@ class Penguin(MetaplaceProtocol):
         return super().close_connection()
 
     def connectionLost(self, reason: Failure | None = None) -> None:
-        if self.in_game and self.ninja:
+        if self.in_game and self.ninja and self.game.ninjas:
             self.ninja.set_health(0)
 
         if reason is not None and not self.disconnected:
