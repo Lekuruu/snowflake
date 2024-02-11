@@ -228,4 +228,19 @@ class CardObject(Card):
                 target.shield = Shield(self.game, target.x, target.y)
                 target.shield.play()
 
+        elif self.element == 'w':
+            # Apply rage to all ninjas in targets
+            for target in self.targets:
+                if not isinstance(target, Ninja):
+                    continue
+
+                if target.client.disconnected:
+                    continue
+
+                if target.rage is not None:
+                    continue
+
+                target.rage = Rage(self.game, target.x, target.y)
+                target.rage.play()
+
         # TODO: Implement other effects

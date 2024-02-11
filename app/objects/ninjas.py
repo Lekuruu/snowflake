@@ -278,8 +278,15 @@ class Ninja(GameObject):
         time.sleep(0.25)
 
         self.attack_animation(target.x, target.y)
-        target.set_health(target.hp - self.attack)
         self.client.update_cards()
+
+        if self.rage:
+            self.rage.use(target.x, target.y)
+            self.rage = None
+
+        target.set_health(
+            target.hp - (self.attack if not self.rage else self.attack * 2)
+        )
 
     def heal_target(self, target: "Ninja"):
         if self.client.last_tip == TipPhase.HEAL:
