@@ -24,6 +24,8 @@ class MatchmakingQueue:
             self.logger.info(f'Found match: {match}')
             self.create_game(*match)
 
+        # TODO: Add matchmakuing timeout error
+
     def remove(self, player: Penguin) -> None:
         if player in self.players:
             self.players.remove(player)
