@@ -530,6 +530,30 @@ class Game:
             rock.remove_object()
 
     def do_ninja_actions(self) -> None:
+        ninjas_without_cards = [
+            ninja for ninja in self.ninjas
+            if not ninja.client.selected_card
+        ]
+
+        for ninja in ninjas_without_cards:
+            if ninja.selected_target:
+                target = ninja.selected_object
+
+                if target is None:
+                    # Target has been removed/defeated
+                    continue
+
+                if isinstance(target, Enemy):
+                    ninja.attack_target(target)
+
+                if isinstance(target, Ninja):
+                    ninja.heal_target(target)
+
+            else:
+                continue
+
+            time.sleep(1)
+
         ninjas_with_cards = [
             ninja for ninja in self.ninjas
             if ninja.client.selected_card
@@ -545,27 +569,8 @@ class Game:
 
             self.callbacks.wait_for_event('comboScreenComplete')
 
-        for ninja in self.ninjas:
-            if ninja.selected_target:
-                target = ninja.selected_object
-
-                if target is None:
-                    # Target has been removed/defeated
-                    continue
-
-                if isinstance(target, Enemy):
-                    ninja.attack_target(target)
-
-                if isinstance(target, Ninja):
-                    ninja.heal_target(target)
-
-            elif ninja.client.selected_card:
-                ninja.use_powercard(is_combo)
-
-            else:
-                continue
-
-            time.sleep(1)
+        for ninja in ninjas_with_cards:
+            ninja.use_powercard(is_combo)
 
     def do_enemy_actions(self) -> None:
         self.wait_for_animations()
