@@ -39,9 +39,12 @@ class Grid:
 
     @property
     def obstacles(self) -> List[Tuple[int, int]]:
-        """Get all obstacles on the grid"""
-        # TODO: Add more obstacles?
-        return [(obj.x, obj.y) for obj in self.game.rocks]
+        """Get all "obstacles" on the grid"""
+        return (
+            [(obj.x, obj.y) for obj in self.game.rocks],
+            [(obj.x, obj.y) for obj in self.game.ninjas]
+            # TODO: Should enemies be obstacles?
+        )
 
     def add(self, obj: GameObject) -> None:
         """Add a game object to the grid"""
