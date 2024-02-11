@@ -70,6 +70,9 @@ class Enemy(GameObject):
         self.health_bar.remove_object()
         super().remove_object()
 
+        if self.flame:
+            self.flame.remove_object()
+
     def spawn(self) -> None:
         self.spawn_animation()
         self.idle_animation()
