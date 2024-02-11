@@ -60,7 +60,7 @@ class Enemy(GameObject):
             x=self.x,
             y=self.y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1.005
         )
 
         self.stunned = False
