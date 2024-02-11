@@ -580,8 +580,9 @@ class Rage(Effect):
 
     def play(self):
         self.place_object()
-        self.place_sprite('effect_rageattack_anim')
+        self.place_sprite('effect_rageloop_anim')
 
-    def remove(self):
+    def use(self, x: int, y: int):
+        self.move_object(x, y, duration=100)
         self.place_sprite('effect_ragehit_anim')
-        reactor.callLater(0.2, self.remove_object)
+        reactor.callLater(0.5, self.remove_object)
