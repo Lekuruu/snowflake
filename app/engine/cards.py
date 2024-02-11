@@ -53,6 +53,17 @@ class CardObject(Card):
     def y(self):
         return self.object.y
 
+    @property
+    def targets(self) -> List[GameObject]:
+        x_range, y_range = self.pattern_range(self.x, self.y)
+
+        return [
+            self.game.grid[x, y]
+            for x in x_range
+            for y in y_range
+            if self.game.grid[x, y] is not None
+        ]
+
     def place(self, x: int, y: int) -> None:
         self.place_card_sprite(x, y)
         self.place_pattern_sprite(x, y)
@@ -130,7 +141,9 @@ class CardObject(Card):
 
         self.attack_animation()
         self.apply_health()
-        self.apply_effects()
+
+        if is_combo:
+            self.apply_effects()
 
         self.client.update_cards()
         self.game.wait_for_animations()
@@ -187,15 +200,7 @@ class CardObject(Card):
         beam.remove_object()
 
     def apply_health(self) -> None:
-        x_range, y_range = self.pattern_range(self.x, self.y)
-
-        targets = [
-            self.game.grid[x, y]
-            for x in x_range
-            for y in y_range
-        ]
-
-        for target in targets:
+        for target in self.targets:
             if isinstance(target, Ninja) and self.client.element == 'snow':
                 if target.client.disconnected:
                     continue
@@ -208,4 +213,19 @@ class CardObject(Card):
                 Explosion(self.game, target.x, target.y).play()
 
     def apply_effects(self) -> None:
-        ... # TODO
+        if self.element == 's':
+            # Apply shield to all ninjas in targets
+            for target in self.targets:
+                if not isinstance(target, Ninja):
+                    continue
+
+                if target.client.disconnected:
+                    continue
+
+                if target.shield is not None:
+                    continue
+
+                target.shield = Shield(self.game, target.x, target.y)
+                target.shield.play()
+
+        # TODO: Implement other effects

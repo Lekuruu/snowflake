@@ -162,6 +162,11 @@ class Ninja(GameObject):
         self.health_bar.animate_sprite()
 
     def set_health(self, hp: int) -> None:
+        if hp < self.hp and self.shield:
+            self.shield.pop()
+            self.shield = None
+            return
+
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
