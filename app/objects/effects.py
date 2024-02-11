@@ -539,9 +539,9 @@ class Flame(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1.0025
         )
-        self.rounds_left = 3
+        self.rounds_left = 2
 
     def play(self):
         self.place_object()
@@ -555,7 +555,7 @@ class Shield(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1.0015
         )
 
     def play(self):
