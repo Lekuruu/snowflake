@@ -300,6 +300,9 @@ class Enemy(GameObject):
     def hit_animation(self) -> None:
         ...
 
+    def daze_animation(self) -> None:
+        ...
+
     """Sounds"""
 
     def spawn_sound(self) -> None:
@@ -408,6 +411,13 @@ class Sly(Enemy):
         )
         self.idle_animation()
         self.hit_sound()
+
+    def daze_animation(self) -> None:
+        self.animate_object(
+            f'sly_daze_anim',
+            play_style='loop',
+            reset=True
+        )
 
     def move_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_footstepsly_loop')
@@ -526,6 +536,13 @@ class Scrap(Enemy):
             reset=True
         )
         self.idle_animation()
+
+    def daze_animation(self) -> None:
+        self.animate_object(
+            f'scrap_dazed_anim',
+            play_style='loop',
+            reset=True
+        )
 
     def move_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_footstepscrap_loop')
@@ -666,8 +683,6 @@ class Tank(Enemy):
         self.idle_animation()
         time.sleep(0.15)
 
-        # TODO: Swipe effect
-
     def ko_animation(self) -> None:
         self.animate_object(
             f'tank_ko_anim',
@@ -683,6 +698,13 @@ class Tank(Enemy):
             reset=True
         )
         self.idle_animation()
+
+    def daze_animation(self) -> None:
+        self.animate_object(
+            f'tank_daze_anim',
+            play_style='loop',
+            reset=True
+        )
 
     def move_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_footsteptank')
