@@ -563,7 +563,6 @@ class Game:
             else:
                 continue
 
-            ninja.client.update_cards()
             time.sleep(1)
 
     def do_enemy_actions(self) -> None:

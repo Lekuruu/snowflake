@@ -193,4 +193,5 @@ class CardObject(Card):
 
         # TODO: Effects
 
+        self.client.update_cards()
         self.game.wait_for_animations()

@@ -263,6 +263,7 @@ class Ninja(GameObject):
 
         self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
+        self.client.update_cards()
 
     def heal_target(self, target: "Ninja"):
         if self.client.last_tip == TipPhase.HEAL:
@@ -278,6 +279,7 @@ class Ninja(GameObject):
         self.heal_animation()
         time.sleep(0.4)
         target.set_health(target.hp + self.attack)
+        self.client.update_cards()
 
     def movable_tiles(self) -> Iterator[GameObject]:
         for tile in self.game.grid.tiles:
