@@ -13,7 +13,9 @@ from app.objects.target import Target
 from app.objects.effects import (
     SnowProjectile,
     FireProjectile,
-    HealParticles
+    HealParticles,
+    Shield,
+    Rage
 )
 
 from app.objects.enemies import Enemy
@@ -69,6 +71,9 @@ class Ninja(GameObject):
             x_offset=0.5,
             y_offset=1
         )
+
+        self.shield: Shield | None = None
+        self.rage: Rage | None = None
 
     @property
     def selected_target(self) -> "Target" | None:
@@ -360,11 +365,11 @@ class Ninja(GameObject):
 
         self.client.selected_card.place(x, y)
 
-    def use_powercard(self) -> None:
+    def use_powercard(self, is_combo=False) -> None:
         if not self.client.selected_card:
             return
 
-        self.client.selected_card.use()
+        self.client.selected_card.use(is_combo)
 
     """Animations"""
 

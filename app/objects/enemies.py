@@ -20,7 +20,8 @@ from app.objects.effects import (
     ScrapImpact,
     AttackTile,
     Explosion,
-    Effect
+    Effect,
+    Flame
 )
 
 import random
@@ -61,6 +62,9 @@ class Enemy(GameObject):
             x_offset=0.5,
             y_offset=1
         )
+
+        self.stunned = False
+        self.flame: Flame | None = None
 
     def remove_object(self) -> None:
         self.health_bar.remove_object()

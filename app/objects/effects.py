@@ -4,6 +4,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List
 from twisted.internet import reactor
 
+from app.engine.game import Game
+
 if TYPE_CHECKING:
     from app.engine.game import Game
 
@@ -530,3 +532,58 @@ class FirePowerBottle(Effect):
         time.sleep(0.2)
         self.place_object()
         self.place_sprite(self.name)
+
+class Flame(Effect):
+    def __init__(self, game: "Game", x: int, y: int) -> None:
+        super().__init__(
+            game,
+            "effect_resisualfiredamage_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+        self.rounds_left = 3
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+
+class Shield(Effect):
+    def __init__(self, game: "Game", x: int, y: int) -> None:
+        super().__init__(
+            game,
+            "effect_shield",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite('effect_shield_loop')
+
+    def pop(self):
+        self.place_object()
+        self.place_sprite('effect_shieldpop_anim')
+        reactor.callLater(0.2, self.remove_object)
+
+class Rage(Effect):
+    def __init__(self, game: "Game", x: int, y: int) -> None:
+        super().__init__(
+            game,
+            "effect_rage",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite('effect_rageattack_anim')
+
+    def remove(self):
+        self.place_sprite('effect_ragehit_anim')
+        reactor.callLater(0.2, self.remove_object)
