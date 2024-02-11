@@ -188,14 +188,26 @@ class Penguin(MetaplaceProtocol):
         window.layer = 'toolLayer'
         window.load(type=EventType.IMMEDIATE.value)
 
-    def send_error(self, message: str) -> None:
-        window = self.get_window('cardjitsu_snowerrorhandler.swf')
-        window.send_payload(
-            'error',
+    def send_error(self, key: str, code: int = 0, data: str = "", level: str = 'Warning') -> None:
+        error_handler = self.get_window('cardjitsu_snowerrorhandler.swf')
+
+        if not error_handler.loaded:
+            error_handler.layer = 'bottomLayer'
+            error_handler.load(
+                xPercent=0,
+                yPercent=0,
+                loadDescription=""
+            )
+
+            error_handler.on_load = lambda *args: self.send_error(key, code, data)
+            return
+
+        error_handler.send_payload(
+            level,
             {
-                'msg': message,
-                'code': 0, # TODO
-                'data': '' # TODO
+                'msg': key,
+                'code': code, # TODO
+                'data': data # TODO
             }
         )
 
