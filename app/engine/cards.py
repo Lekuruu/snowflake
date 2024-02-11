@@ -12,7 +12,8 @@ from app.objects.effects import (
     SnowPowerBeam,
     FirePowerBottle,
     WaterFishDrop,
-    SnowIgloo
+    SnowIgloo,
+    Explosion
 )
 
 import time
@@ -188,6 +189,7 @@ class CardObject(Card):
 
             if isinstance(target, Enemy):
                 target.set_health(target.hp - self.client.ninja.attack * 2, wait=False)
+                Explosion(self.game, target.x, target.y).play()
 
         # TODO: Effects
 
