@@ -669,13 +669,15 @@ class Game:
             client.update_cards()
 
     def display_round_title(self) -> None:
+        time = ((self.game_start + 300) - time.time()) * 1000
+
         for client in self.clients:
             round_title = client.get_window('cardjitsu_snowrounds.swf')
             round_title.layer = 'bottomLayer'
             round_title.load(
                 {
                     'bonusCriteria': self.bonus_criteria,
-                    'remainingTime': ((self.game_start + 300) - time.time()) * 1000,
+                    'remainingTime': max(0, time),
                     'roundNumber': self.round
                 },
                 loadDescription="",
