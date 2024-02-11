@@ -522,8 +522,9 @@ class FirePowerBottle(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=3,
-            duration=1
+            y_offset=2,
+            duration=1,
+            origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
     def play(self):
