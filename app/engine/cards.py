@@ -32,6 +32,8 @@ class CardObject(Card):
         self.object = GameObject(
             client.game,
             card.name,
+            x=-1,
+            y=-1,
             x_offset=0.5,
             y_offset=1
         )
@@ -128,6 +130,9 @@ class CardObject(Card):
             return
 
         if self.client.selected_card != self:
+            return
+
+        if self.x == -1 and self.y == -1:
             return
 
         # Play card animation
