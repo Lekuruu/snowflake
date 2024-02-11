@@ -17,15 +17,17 @@ def context_handler(client: Penguin, place_name: str, param_string: str):
     params = urllib.parse.parse_qs(param_string)
 
     if not (battle_mode := params.get('battleMode')):
+        client.send_login_error()
         client.close_connection()
         return
 
     if not (asset_url := params.get('base_asset_url')):
+        client.send_login_error()
         client.close_connection()
         return
 
     if not (place := client.server.places.get(place_name)):
-        # TODO: Error message
+        client.send_login_error()
         client.close_connection()
         return
 
@@ -37,19 +39,19 @@ def context_handler(client: Penguin, place_name: str, param_string: str):
 def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     if client.logged_in:
         client.logger.warning('Login attempt failed: Already logged in')
-        client.send_login_error(900)
+        client.send_login_error()
         client.close_connection()
         return
 
     if server_type.upper() != client.server.server_type.name:
         client.logger.warning(f'Login attempt failed: Invalid server type "{server_type}"')
-        client.send_login_error(900)
+        client.send_login_error()
         client.close_connection()
         return
 
     if not (penguin := penguins.fetch_by_id(pid)):
         client.logger.warning('Login attempt failed: Penguin not found')
-        client.send_login_error(900)
+        client.send_login_error()
         client.close_connection()
         return
 
