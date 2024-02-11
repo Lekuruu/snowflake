@@ -575,7 +575,7 @@ class Rage(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1.0025
         )
 
     def play(self):
