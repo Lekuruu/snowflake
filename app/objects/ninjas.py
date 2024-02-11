@@ -309,9 +309,21 @@ class Ninja(GameObject):
             return
 
         self.heal_animation()
-        time.sleep(0.4)
-        target.set_health(target.hp + self.attack)
         self.client.update_cards()
+        time.sleep(0.4)
+
+        if self.rage:
+            self.rage.use(target.x, target.y)
+            self.rage = None
+
+            target.set_health(
+                target.hp + self.attack * 1.5
+            )
+            return
+
+        target.set_health(
+            target.hp + self.attack
+        )
 
     def movable_tiles(self) -> Iterator[GameObject]:
         for tile in self.game.grid.tiles:
