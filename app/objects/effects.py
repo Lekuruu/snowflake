@@ -505,8 +505,9 @@ class WaterFishDrop(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=3.4,
-            duration=1.8
+            y_offset=2.4,
+            duration=1.8,
+            origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
     def play(self):
