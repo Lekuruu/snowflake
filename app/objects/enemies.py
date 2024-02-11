@@ -441,8 +441,13 @@ class Sly(Enemy):
             play_style='play_once',
             reset=True
         )
-        self.idle_animation()
         self.hit_sound()
+
+        if self.stunned:
+            self.daze_animation()
+            return
+
+        self.idle_animation()
 
     def daze_animation(self) -> None:
         self.animate_object(
@@ -568,6 +573,12 @@ class Scrap(Enemy):
             play_style='play_once',
             reset=True
         )
+        self.hit_sound()
+
+        if self.stunned:
+            self.daze_animation()
+            return
+
         self.idle_animation()
 
     def daze_animation(self) -> None:
@@ -731,6 +742,12 @@ class Tank(Enemy):
             play_style='play_once',
             reset=True
         )
+        self.hit_sound()
+
+        if self.stunned:
+            self.daze_animation()
+            return
+
         self.idle_animation()
 
     def daze_animation(self) -> None:
