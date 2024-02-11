@@ -158,7 +158,10 @@ class Enemy(GameObject):
         self.stunned = True
 
         if animation:
-            reactor.callLater(0.8, self.daze_animation)
+            reactor.callLater(
+                0.8,
+                lambda: self.daze_animation() if self.hp > 0 else None
+            )
 
     def check_stun(self) -> None:
         if self.flame:
