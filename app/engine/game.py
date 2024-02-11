@@ -255,6 +255,10 @@ class Game:
                 ninja.targets = []
                 ninja.idle_animation()
 
+            # Update enemy "stunned" status
+            for enemy in self.enemies:
+                enemy.check_stun()
+
             # Wait for any animations to finish
             self.wait_for_animations()
 
@@ -587,6 +591,9 @@ class Game:
             next_move, target = enemy.next_target()
 
             if not next_move:
+                continue
+
+            if enemy.stunned:
                 continue
 
             enemy.move_enemy(next_move.x, next_move.y)

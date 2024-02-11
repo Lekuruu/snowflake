@@ -212,6 +212,9 @@ class CardObject(Card):
                 target.set_health(target.hp - self.client.ninja.attack * 2, wait=False)
                 Explosion(self.game, target.x, target.y).play()
 
+                if self.element == 'f':
+                    target.stun()
+
     def apply_effects(self) -> None:
         if self.element == 's':
             # Apply shield to all ninjas in targets
@@ -243,4 +246,17 @@ class CardObject(Card):
                 target.rage = Rage(self.game, target.x, target.y)
                 target.rage.play()
 
-        # TODO: Implement other effects
+        elif self.element == 'f':
+            # Apply flame to all ninjas in targets
+            for target in self.targets:
+                if not isinstance(target, Enemy):
+                    continue
+
+                if target.hp <= 0:
+                    continue
+
+                if target.flame is not None:
+                    continue
+
+                target.flame = Flame(self.game, target.x, target.y)
+                target.flame.play()

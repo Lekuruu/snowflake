@@ -140,15 +140,42 @@ class Enemy(GameObject):
         if target.hp <= 0:
             return
 
-        if self.stunned:
-            self.stunned = False
-            return
-
         # This seems to fix the mirror mode?
         time.sleep(0.25)
 
         self.attack_animation()
         target.set_health(target.hp - self.attack)
+
+    def stun(self, animation=True) -> None:
+        if self.hp <= 0:
+            return
+
+        self.set_health(self.hp - 3)
+        self.stunned = True
+
+        if animation:
+            reactor.callLater(0.8, self.daze_animation)
+
+    def check_stun(self) -> None:
+        if self.flame:
+            if self.flame.rounds_left <= 0:
+                # Stun enemy one more time before removing flame
+                self.stun(animation=False)
+
+                self.flame.remove_object()
+                self.flame = None
+                self.stunned = False
+
+                # Reset animation
+                reactor.callLater(0.8, self.idle_animation, True)
+
+            else:
+                self.flame.rounds_left -= 1
+                self.stun()
+
+        elif self.stunned:
+            self.stunned = False
+            self.idle_animation(reset=True)
 
     def movable_tiles(self) -> Iterator[GameObject]:
         """Get all tiles that the enemy can move to from its current position"""
@@ -285,7 +312,7 @@ class Enemy(GameObject):
         )
         self.spawn_sound()
 
-    def idle_animation(self) -> None:
+    def idle_animation(self, reset=False) -> None:
         ...
 
     def move_animation(self) -> None:
@@ -352,11 +379,12 @@ class Sly(Enemy):
             target.hp - self.simulate_damage(self.x, self.y, target)
         )
 
-    def idle_animation(self) -> None:
+    def idle_animation(self, reset=False) -> None:
         self.animate_object(
             f'sly_idle_anim',
             play_style='loop',
-            register=False
+            register=False,
+            reset=reset
         )
 
     def move_animation(self) -> None:
@@ -486,11 +514,12 @@ class Scrap(Enemy):
             target.y
         ).play()
 
-    def idle_animation(self) -> None:
+    def idle_animation(self, reset=False) -> None:
         self.animate_object(
             f'scrap_idle_anim',
             play_style='loop',
-            register=False
+            register=False,
+            reset=reset
         )
 
     def move_animation(self) -> None:
@@ -653,11 +682,12 @@ class Tank(Enemy):
         for attack_tile in effects:
             attack_tile.remove_object()
 
-    def idle_animation(self) -> None:
+    def idle_animation(self, reset=False) -> None:
         self.animate_object(
             f'tank_idle_anim',
             play_style='loop',
-            register=False
+            register=False,
+            reset=reset
         )
 
     def move_animation(self) -> None:
