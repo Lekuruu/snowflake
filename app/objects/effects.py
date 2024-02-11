@@ -505,7 +505,7 @@ class WaterFishDrop(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=3,
+            y_offset=3.4,
             duration=1.8
         )
 
