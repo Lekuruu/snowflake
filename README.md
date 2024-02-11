@@ -26,12 +26,12 @@ A work-in-progress card-jitsu snow server emulator, made for houdini.
     - [x] Movement
     - [x] Attacks
     - [x] AI
-- [ ] Powercards
+- [x] Powercards
     - [x] Progressbar
     - [x] Placing
     - [x] Animations
     - [x] Combos
-    - [ ] Effects
+    - [x] Effects
 - [ ] Member Card
 - [ ] EXP/Coins System
 - [x] Payout
