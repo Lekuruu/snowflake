@@ -527,8 +527,17 @@ class Game:
         for ninja in self.ninjas:
             ninja.remove_object()
 
+            if ninja.shield:
+                ninja.shield.remove_object()
+
+            if ninja.rage:
+                ninja.rage.remove_object()
+
         for enemy in self.enemies:
             enemy.remove_object()
+
+            if enemy.flame:
+                enemy.flame.remove_object()
 
         for rock in self.rocks:
             rock.remove_object()
