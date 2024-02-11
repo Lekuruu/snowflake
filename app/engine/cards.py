@@ -209,7 +209,13 @@ class CardObject(Card):
                 continue
 
             if isinstance(target, Enemy):
-                target.set_health(target.hp - self.client.ninja.attack * 2, wait=False)
+                if self.element == 'w':
+                    attack = self.client.ninja.attack * 2
+
+                else:
+                    attack = self.value
+
+                target.set_health(target.hp - attack, wait=False)
                 Explosion(self.game, target.x, target.y).play()
 
                 if self.element == 'f':
