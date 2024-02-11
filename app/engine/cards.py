@@ -187,7 +187,7 @@ class CardObject(Card):
                 continue
 
             if isinstance(target, Enemy):
-                target.set_health(target.hp - self.value, wait=False)
+                target.set_health(target.hp - self.client.ninja.attack * 2, wait=False)
 
         # TODO: Effects
 
