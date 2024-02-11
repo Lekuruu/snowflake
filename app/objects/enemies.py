@@ -334,7 +334,7 @@ class Enemy(GameObject):
     def hit_animation(self) -> None:
         ...
 
-    def daze_animation(self) -> None:
+    def daze_animation(self, reset=True) -> None:
         ...
 
     """Sounds"""
@@ -447,16 +447,16 @@ class Sly(Enemy):
         self.hit_sound()
 
         if self.stunned:
-            self.daze_animation()
+            self.daze_animation(False)
             return
 
         self.idle_animation()
 
-    def daze_animation(self) -> None:
+    def daze_animation(self, reset=True) -> None:
         self.animate_object(
             f'sly_daze_anim',
             play_style='loop',
-            reset=True
+            reset=reset
         )
 
     def move_sound(self) -> None:
@@ -579,16 +579,16 @@ class Scrap(Enemy):
         self.hit_sound()
 
         if self.stunned:
-            self.daze_animation()
+            self.daze_animation(False)
             return
 
         self.idle_animation()
 
-    def daze_animation(self) -> None:
+    def daze_animation(self, reset=True) -> None:
         self.animate_object(
             f'scrap_dazed_anim',
             play_style='loop',
-            reset=True
+            reset=reset
         )
 
     def move_sound(self) -> None:
@@ -748,16 +748,16 @@ class Tank(Enemy):
         self.hit_sound()
 
         if self.stunned:
-            self.daze_animation()
+            self.daze_animation(False)
             return
 
         self.idle_animation()
 
-    def daze_animation(self) -> None:
+    def daze_animation(self, reset=True) -> None:
         self.animate_object(
             f'tank_daze_anim',
             play_style='loop',
-            reset=True
+            reset=reset
         )
 
     def move_sound(self) -> None:
