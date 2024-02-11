@@ -168,3 +168,7 @@ class WindowManager(Dict[str, SWFWindow]):
             self.swf_url,
             'windowmanager.swf'
         )
+
+    def wait_for_window(self, window: SWFWindow, loaded: bool = True):
+        while window.loaded != loaded:
+            pass
