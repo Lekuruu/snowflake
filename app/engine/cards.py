@@ -13,7 +13,10 @@ from app.objects.effects import (
     FirePowerBottle,
     WaterFishDrop,
     SnowIgloo,
-    Explosion
+    Explosion,
+    Shield,
+    Flame,
+    Rage
 )
 
 import time
@@ -116,6 +119,23 @@ class CardObject(Card):
         if self.client.selected_card != self:
             return
 
+        # Play card animation
+        self.consume()
+
+        # Wait for client to consume card
+        self.game.callbacks.wait_for_client('ConsumeCardResponse', self.client)
+
+        # Wait for card animation
+        time.sleep(1.2)
+
+        self.attack_animation()
+        self.apply_health()
+        self.apply_effects()
+
+        self.client.update_cards()
+        self.game.wait_for_animations()
+
+    def consume(self) -> None:
         # Add delay before card gets played
         time.sleep(0.2)
 
@@ -141,12 +161,7 @@ class CardObject(Card):
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload(payload_name, data)
 
-        # Wait for client to consume card
-        self.game.callbacks.wait_for_client('ConsumeCardResponse', self.client)
-
-        # Wait for client to play the animation
-        time.sleep(1.2)
-
+    def attack_animation(self) -> None:
         self.client.ninja.power_animation()
 
         beam_class = {
@@ -171,6 +186,7 @@ class CardObject(Card):
         impact.remove_object()
         beam.remove_object()
 
+    def apply_health(self) -> None:
         x_range, y_range = self.pattern_range(self.x, self.y)
 
         targets = [
@@ -191,7 +207,5 @@ class CardObject(Card):
                 target.set_health(target.hp - self.client.ninja.attack * 2, wait=False)
                 Explosion(self.game, target.x, target.y).play()
 
-        # TODO: Effects
-
-        self.client.update_cards()
-        self.game.wait_for_animations()
+    def apply_effects(self) -> None:
+        ... # TODO
