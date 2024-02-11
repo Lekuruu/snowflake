@@ -288,7 +288,7 @@ class Ninja(GameObject):
             self.rage = None
 
             target.set_health(
-                target.hp - self.attack * 2
+                target.hp - self.attack * 1.5
             )
             return
 
