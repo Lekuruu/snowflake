@@ -215,7 +215,7 @@ class CardObject(Card):
 
             if isinstance(target, Enemy):
                 if self.element == 'w':
-                    attack = self.client.ninja.attack * 2
+                    attack = self.value * 2
 
                 else:
                     attack = self.value
