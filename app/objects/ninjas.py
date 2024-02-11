@@ -284,9 +284,15 @@ class Ninja(GameObject):
             self.rage.use(target.x, target.y)
             self.rage = None
 
+            target.set_health(
+                target.hp - self.attack * 2
+            )
+            return
+
         target.set_health(
-            target.hp - (self.attack if not self.rage else self.attack * 2)
+            target.hp - self.attack
         )
+
 
     def heal_target(self, target: "Ninja"):
         if self.client.last_tip == TipPhase.HEAL:
