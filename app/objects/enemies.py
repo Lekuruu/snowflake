@@ -127,12 +127,13 @@ class Enemy(GameObject):
         if self.hp <= 0:
             self.ko_animation()
 
-            if wait:
-                self.game.wait_for_animations()
-                self.remove_object()
-
-            else:
+            if not wait:
                 reactor.callLater(2, self.remove_object)
+                return
+
+            self.game.wait_for_animations()
+            self.remove_object()
+
         else:
             self.hit_animation()
 
