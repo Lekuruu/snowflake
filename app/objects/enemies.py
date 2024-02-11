@@ -63,8 +63,8 @@ class Enemy(GameObject):
             y_offset=1.005
         )
 
-        self.stunned = False
         self.flame: Flame | None = None
+        self.stunned = False
 
     def remove_object(self) -> None:
         self.health_bar.remove_object()
@@ -138,6 +138,10 @@ class Enemy(GameObject):
 
     def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
+            return
+
+        if self.stunned:
+            self.stunned = False
             return
 
         # This seems to fix the mirror mode?
