@@ -140,7 +140,7 @@ class Game:
         time.sleep(1.6)
 
         self.spawn_enemies()
-        time.sleep(1)
+        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
         self.show_ui()
         self.send_tip(TipPhase.MOVE)
@@ -218,7 +218,7 @@ class Game:
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
-            time.sleep(1)
+            self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
     def run_until_next_round(self) -> None:
         while True:
@@ -709,6 +709,8 @@ class Game:
                 yPercent=1
             )
 
+        self.wait_for_window('cardjitsu_snowui.swf', loaded=True)
+
     def send_tip(self, phase: TipPhase, client: "Penguin" | None = None) -> None:
         clients = [client] if client else self.clients
 
@@ -766,6 +768,8 @@ class Game:
                 yPercent=0.15
             )
 
+        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
+
     def display_combo_title(self, elements: List[str]) -> None:
         for client in self.clients:
             combo_title = client.get_window('cardjitsu_snowcombos.swf')
@@ -777,6 +781,8 @@ class Game:
                 xPercent=0.5,
                 yPercent=0.5
             )
+
+        self.wait_for_window('cardjitsu_snowcombos.swf', loaded=True)
 
     def get_payout_round(self) -> int:
         """Get the round number for the payout screen"""

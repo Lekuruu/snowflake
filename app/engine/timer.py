@@ -68,6 +68,8 @@ class Timer:
                 yPercent=0
             )
 
+        self.game.wait_for_window('cardjitsu_snowtimer.swf', loaded=True)
+
     def update(self) -> None:
         for client in self.game.clients:
             timer = client.get_window('cardjitsu_snowtimer.swf')
