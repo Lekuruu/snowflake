@@ -242,7 +242,7 @@ class Ninja(GameObject):
             client.selected_card.place(object.x, object.y)
             return
 
-        if self.member_card and self.member_card.selected:
+        if self.client.selected_member_card:
             return
 
         self.hide_ghost()
