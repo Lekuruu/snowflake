@@ -436,12 +436,9 @@ class Ninja(GameObject):
         if self.hp <= 0:
             return
 
-        distance = self.game.grid.distance(
-            (self.x, self.y),
-            (x, y)
-        )
+        tile = self.game.grid.get_tile(x, y)
 
-        if distance > self.move:
+        if tile not in self.ghost_tiles_in_range():
             return
 
         self.client.selected_card.place(x, y)
