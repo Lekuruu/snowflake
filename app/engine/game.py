@@ -767,6 +767,8 @@ class Game:
                 yPercent=0.5
             )
 
+        self.wait_for_window('cardjitsu_snowcombos.swf', loaded=True)
+
     def get_payout_round(self) -> int:
         """Get the round number for the payout screen"""
         if self.round > 3:
