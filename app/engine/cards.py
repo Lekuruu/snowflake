@@ -36,7 +36,7 @@ class CardObject(Card):
             x=-1,
             y=-1,
             x_offset=0.5,
-            y_offset=1.002
+            y_offset=1.015
         )
         self.pattern = LocalGameObject(
             client,
@@ -281,7 +281,7 @@ class MemberCard(GameObject):
             x=-1,
             y=-1,
             x_offset=0.5,
-            y_offset=1.002
+            y_offset=1.01
         )
         self.selected = False
         self.client = client
