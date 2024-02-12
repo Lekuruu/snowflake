@@ -584,6 +584,7 @@ class Game:
 
         for ninja in ninjas_with_cards:
             ninja.use_powercard(is_combo)
+            time.sleep(1)
 
     def do_enemy_actions(self) -> None:
         self.wait_for_animations()

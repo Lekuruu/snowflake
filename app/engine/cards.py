@@ -154,9 +154,6 @@ class CardObject(Card):
         self.game.wait_for_animations()
 
     def consume(self) -> None:
-        # Add delay before card gets played
-        time.sleep(0.2)
-
         for client in self.game.clients:
             payload_name = 'consumeCard'
             data = {}
