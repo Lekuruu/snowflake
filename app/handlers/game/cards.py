@@ -33,7 +33,7 @@ def on_card_clicked(client: Penguin, data: dict):
 
     client.selected_card = card
     client.ninja.remove_targets()
-    client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_attack')
+    client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_attack', ignore_objects=True)
 
 @session.framework.register('unselectCard')
 def on_card_deselect(client: Penguin, data: dict):
@@ -49,6 +49,7 @@ def on_card_deselect(client: Penguin, data: dict):
     client.selected_card.remove()
     client.selected_card = None
     client.ninja.show_targets()
+    client.game.grid.hide_tiles_for_client(client)
     client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_move')
 
 @session.framework.register('ConsumeCardResponse')
