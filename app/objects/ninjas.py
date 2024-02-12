@@ -339,8 +339,33 @@ class Ninja(GameObject):
             if distance <= self.move:
                 yield tile
 
+    def ghost_tiles_in_range(self) -> Iterator[GameObject]:
+        if not self.placed_ghost:
+            for tile in self.tiles_in_range():
+                yield tile
+
+        for tile in self.game.grid.tiles:
+            distance = self.game.grid.distance(
+                (self.ghost.x, self.ghost.y),
+                (tile.x, tile.y)
+            )
+
+            if distance <= self.move:
+                yield tile
+
     def movable_tiles(self) -> Iterator[GameObject]:
         for tile in self.tiles_in_range():
+            if not self.game.grid.can_move(tile.x, tile.y):
+                continue
+
+            yield tile
+
+    def movable_ghost_tiles(self) -> Iterator[GameObject]:
+        if not self.placed_ghost:
+            for tile in self.movable_tiles():
+                yield tile
+
+        for tile in self.ghost_tiles_in_range():
             if not self.game.grid.can_move(tile.x, tile.y):
                 continue
 
