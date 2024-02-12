@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from .penguin import Penguin
 
 from app.data import InputModifier, InputTarget, InputType, TipPhase, MirrorMode
-from app.data.repositories import stamps
+from app.data.repositories import stamps, penguins
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
 from app.objects.enemies import Sly, Scrap, Tank, Enemy
@@ -20,6 +20,7 @@ from .cards import MemberCard
 from .timer import Timer
 from .grid import Grid
 
+import app.session
 import logging
 import random
 import config
@@ -761,48 +762,59 @@ class Game:
         return self.round
 
     def display_payout(self) -> None:
-        snow_stamps = stamps.fetch_all_by_group(60)
+        with app.session.database.managed_session() as session:
+            snow_stamps = stamps.fetch_all_by_group(60, session=session)
 
-        # TODO: Update coins in database
+            for client in self.clients:
+                updates = {
+                    'coins': client.object.coins + self.coins
+                    # TODO: EXP
+                    # TODO: Rewards
+                }
 
-        for client in self.clients:
-            payout = client.get_window('cardjitsu_snowpayout.swf')
-            payout.layer = 'bottomLayer'
-            payout.load(
-                {
-                    "coinsEarned": self.coins,
-                    "doubleCoins": False, # TODO
-                    "damage": 0,          # Only important for tusk battle
-                    "isBoss": 0,
-                    "rank": client.object.snow_ninja_rank,
-                    "round": self.get_payout_round(),
-                    "showItems": 0,       # TODO: This will show the unlocked item(s)
-                    "stampList": [
-                        {
-                            "stamp_id": stamp.id,
-                            "name": f'global_content.stamps.{stamp.id}.name',
-                            "description": f'global_content.stamps.{stamp.id}.description',
-                            "rank_token": f'global_content.stamps.{stamp.id}.rank_token',
-                            "rank": stamp.rank,
-                            "is_member": stamp.member,
-                        }
-                        for stamp in snow_stamps
-                    ],
-                    "stamps": [
-                        {
-                            "_id": stamp.id,
-                            "new": False # TODO
-                        }
-                        for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
-                    ],
-                    "xpEnd": client.object.snow_ninja_progress, # TODO: Implement xp system
-                    "xpStart": client.object.snow_ninja_progress,
-                },
-                loadDescription="",
-                assetPath="",
-                xPercent=0.08,
-                yPercent=0.05
-            )
+                penguins.update(
+                    client.pid, updates,
+                    session=session
+                )
+
+                # Display payout swf window
+                payout = client.get_window('cardjitsu_snowpayout.swf')
+                payout.layer = 'bottomLayer'
+                payout.load(
+                    {
+                        "coinsEarned": self.coins,
+                        "doubleCoins": False, # TODO
+                        "damage": 0,          # Only important for tusk battle
+                        "isBoss": 0,
+                        "rank": client.object.snow_ninja_rank,
+                        "round": self.get_payout_round(),
+                        "showItems": 0,       # TODO: This will show the unlocked item(s)
+                        "stampList": [
+                            {
+                                "stamp_id": stamp.id,
+                                "name": f'global_content.stamps.{stamp.id}.name',
+                                "description": f'global_content.stamps.{stamp.id}.description',
+                                "rank_token": f'global_content.stamps.{stamp.id}.rank_token',
+                                "rank": stamp.rank,
+                                "is_member": stamp.member,
+                            }
+                            for stamp in snow_stamps
+                        ],
+                        "stamps": [
+                            {
+                                "_id": stamp.id,
+                                "new": False # TODO
+                            }
+                            for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
+                        ],
+                        "xpEnd": client.object.snow_ninja_progress, # TODO: Implement xp system
+                        "xpStart": client.object.snow_ninja_progress,
+                    },
+                    loadDescription="",
+                    assetPath="",
+                    xPercent=0.08,
+                    yPercent=0.05
+                )
 
     def display_win_sequence(self) -> None:
         time.sleep(2)
