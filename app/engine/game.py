@@ -694,6 +694,8 @@ class Game:
                 yPercent=1
             )
 
+        self.wait_for_window('cardjitsu_snowui.swf', loaded=True)
+
     def send_tip(self, phase: TipPhase, client: "Penguin" | None = None) -> None:
         clients = [client] if client else self.clients
 
