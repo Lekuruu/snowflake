@@ -560,7 +560,11 @@ class Scrap(Enemy):
 
         time.sleep(0.7)
         self.attack_sound()
-        time.sleep(1.1)
+
+        distance = abs(self.x - x) + abs(self.y - y)
+        impact_time = 0.9 + (distance * 0.1)
+
+        time.sleep(impact_time)
         self.impact_sound()
 
         ScrapImpact(self.game, x, y).play()
