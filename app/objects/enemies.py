@@ -88,6 +88,9 @@ class Enemy(GameObject):
         if self.x == x and self.y == y:
             return
 
+        if self.x < x:
+            self.mirror_mode = MirrorMode.X
+
         self.move_animation()
         self.move_object(x, y)
         self.move_sound()

@@ -632,6 +632,8 @@ class Game:
             self.wait_for_animations()
 
             if target is None:
+                # Set sprite to default direction
+                enemy.reset_sprite_settings()
                 continue
 
             target_object = self.grid[target.x, target.y]
@@ -641,6 +643,10 @@ class Game:
 
             if target_object.hp <= 0:
                 continue
+
+            if target_object.x < enemy.x:
+                # Enemy's sprite might be flipped to wrong direction
+                enemy.reset_sprite_settings()
 
             enemy.attack_target(target_object)
             self.wait_for_animations()
