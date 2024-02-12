@@ -487,7 +487,7 @@ class SnowIgloo(Effect):
             y,
             x_offset=0.5,
             y_offset=2,
-            duration=2,
+            duration=2 - 1.2,
             origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
@@ -496,6 +496,8 @@ class SnowIgloo(Effect):
         self.animate_object('snowninja_igloodrop_anim1', reset=True)
         self.animate_object('snowninja_igloodrop_anim2')
         self.animate_object('blank_png', play_style='loop')
+        time.sleep(1.2)
+        self.play_sound('sfx_mg_2013_cjsnow_impactpowercardsnow')
 
 class WaterFishDrop(Effect):
     def __init__(self, game: "Game", x: int, y: int):
