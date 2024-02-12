@@ -140,7 +140,7 @@ class Game:
         time.sleep(1.6)
 
         self.spawn_enemies()
-        time.sleep(1)
+        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
         self.show_ui()
         self.send_tip(TipPhase.MOVE)
@@ -218,7 +218,7 @@ class Game:
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
-            time.sleep(1)
+            self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
     def run_until_next_round(self) -> None:
         while True:
@@ -750,6 +750,8 @@ class Game:
                 xPercent=0.15,
                 yPercent=0.15
             )
+
+        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
 
     def display_combo_title(self, elements: List[str]) -> None:
         for client in self.clients:
