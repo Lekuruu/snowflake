@@ -594,8 +594,8 @@ class Game:
             self.callbacks.wait_for_event('comboScreenComplete')
 
         for ninja in ninjas_with_cards:
-            ninja.use_powercard(is_combo)
             time.sleep(1)
+            ninja.use_powercard(is_combo)
 
         ninjas_with_member_cards = [
             client for client in self.clients
