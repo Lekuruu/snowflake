@@ -175,8 +175,6 @@ class Penguin(MetaplaceProtocol):
                     "value": next_card.value
                 }
 
-                self.game.send_tip(TipPhase.CARD, self)
-
             if len(self.power_card_slots) > 3:
                 update['cycle'] = True
 

@@ -2,7 +2,7 @@
 from __future__ import annotations
 from typing import Tuple, List, TYPE_CHECKING
 
-from app.data import Card
+from app.data import Card, TipPhase
 from app.objects import GameObject, LocalGameObject
 from app.objects.ninjas import Ninja
 from app.objects.enemies import Enemy
@@ -70,6 +70,9 @@ class CardObject(Card):
     def place(self, x: int, y: int) -> None:
         self.place_card_sprite(x, y)
         self.place_pattern_sprite(x, y)
+
+        if self.client.tip_mode and self.client.last_tip == TipPhase.CARD:
+            self.client.hide_tip()
 
     def remove(self) -> None:
         self.object.remove_object()

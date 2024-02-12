@@ -148,9 +148,11 @@ class Game:
             client.ninja.set_health(0)
 
         for client in self.clients:
-            if not client.has_power_cards:
-                snow_ui = client.get_window('cardjitsu_snowui.swf')
-                snow_ui.send_payload('noCards')
+            if client.has_power_cards:
+                continue
+
+            snow_ui = client.get_window('cardjitsu_snowui.swf')
+            snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
         self.run_game_loop()
@@ -222,6 +224,9 @@ class Game:
             for client in self.clients:
                 client.selected_card = None
                 client.is_ready = False
+
+                if client.power_card_slots:
+                    self.send_tip(TipPhase.CARD, client)
 
             self.show_targets()
             self.wait_for_timer()
