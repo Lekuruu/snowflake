@@ -66,16 +66,17 @@ class Target(LocalGameObject):
         if self.type == 'attack':
             self.animate_object('ui_target_green_attack_selected_intro_anim', reset=True)
             self.animate_object('ui_target_green_attack_selected_idle_anim', play_style='loop')
+            self.play_sound('sfx_mg_2013_cjsnow_uitargetselect', self.client)
 
         elif self.type == 'heal':
             self.animate_object('ui_target_green_heal_selected_intro_anim', reset=True)
             self.animate_object('ui_target_green_heal_selected_idle_anim', play_style='loop')
+            self.play_sound('sfx_mg_2013_cjsnow_uiselecttile', self.client)
 
         if self.client.last_tip in (TipPhase.ATTACK, TipPhase.HEAL):
             self.game.hide_tip(self.client)
 
         self.selected = True
-        self.play_sound('sfx_mg_2013_cjsnow_uitargetselect', self.client)
 
     def deselect(self) -> None:
         self.selected = False
