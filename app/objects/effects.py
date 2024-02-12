@@ -103,14 +103,15 @@ class Explosion(Effect):
             "effect_explosion_anim",
             x,
             y,
-            x_offset=0.5,
-            y_offset=1,
+            x_offset=0.50005,
+            y_offset=1.0005,
             duration=0.4
         )
 
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
+        self.animate_sprite(0, 4, duration=self.duration * 260)
         reactor.callLater(self.duration, self.remove_object)
 
 class SnowProjectile(Effect):
