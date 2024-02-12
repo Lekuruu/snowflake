@@ -307,6 +307,8 @@ class Game:
         while self.callbacks.pending_animations:
             pass
 
+        # TODO: This could lead to softlocks
+
     def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
         self.grid.show_tiles()
