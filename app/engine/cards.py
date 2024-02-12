@@ -287,8 +287,13 @@ class MemberCard(GameObject):
         self.client = client
 
     def place(self) -> None:
-        self.x = self.client.ninja.x
-        self.y = self.client.ninja.y
+        if self.client.ninja.placed_ghost:
+            self.x = self.client.ninja.ghost.x
+            self.y = self.client.ninja.ghost.y
+        else:
+            self.x = self.client.ninja.x
+            self.y = self.client.ninja.y
+
         self.place_object()
 
         sprite_name = {
