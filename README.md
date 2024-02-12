@@ -32,7 +32,7 @@ A work-in-progress card-jitsu snow server emulator, made for houdini.
     - [x] Animations
     - [x] Combos
     - [x] Effects
-- [ ] Member Card
+- [x] Member Card
 - [ ] EXP/Coins System
 - [x] Payout
 - [ ] Stamps
