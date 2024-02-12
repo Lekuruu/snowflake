@@ -574,6 +574,7 @@ class Shield(Effect):
     def pop(self):
         self.place_object()
         self.place_sprite('effect_shieldpop_anim')
+        self.animate_sprite(0, 3, duration=200)
         reactor.callLater(0.2, self.remove_object)
 
 class Rage(Effect):
@@ -594,7 +595,8 @@ class Rage(Effect):
     def use(self, x: int, y: int):
         self.move_object(x, y, duration=100)
         self.place_sprite('effect_ragehit_anim')
-        reactor.callLater(0.5, self.remove_object)
+        self.animate_sprite(0, 11, duration=750)
+        reactor.callLater(0.7, self.remove_object)
 
 class MemberReviveBeam(Effect):
     def __init__(self, game: "Game", x: int, y: int) -> None:
