@@ -24,6 +24,9 @@ def on_card_clicked(client: Penguin, data: dict):
     if card.element != element:
         return
 
+    card.object.x = -1
+    card.object.y = -1
+
     client.selected_card = card
     client.ninja.remove_targets()
     client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_attack')
