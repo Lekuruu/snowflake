@@ -75,7 +75,7 @@ class Target(LocalGameObject):
             self.game.hide_tip(self.client)
 
         self.selected = True
-        self.play_sound('sfx_mg_2013_cjsnow_uiselecttile', self.client)
+        self.play_sound('sfx_mg_2013_cjsnow_uitargetselect', self.client)
 
     def deselect(self) -> None:
         self.selected = False
