@@ -73,23 +73,31 @@ class Grid:
         return abs(start[0] - target[0]) + abs(start[1] - target[1])
 
     def distance_with_obstacles(self, start: Tuple[int, int], target: Tuple[int, int]) -> int | float:
-        """Get the manhatten distance between two tiles, and also accounting for obstacles"""
+        """Get the Manhattan distance between two tiles, accounting for obstacles"""
         if target in self.obstacles:
             return math.inf
 
-        distance = self.distance(start, target)
-
         for obstacle in self.obstacles:
-            if (obstacle == start) or (obstacle == target):
-                continue
-
-            if (
-                (start[0] <= obstacle[0] <= target[0] or target[0] <= obstacle[0] <= start[0]) and
-                (start[1] <= obstacle[1] <= target[1] or target[1] <= obstacle[1] <= start[1])
-            ):
+            # Check if the obstacle lies on the line segment between start and target
+            if self.is_obstacle_between(start, target, obstacle):
                 return math.inf
 
+        distance = self.distance(start, target)
         return distance
+
+    def is_obstacle_between(self, start: Tuple[int, int], target: Tuple[int, int], obstacle: Tuple[int, int]) -> bool:
+        """Check if an obstacle lies on the line segment between start and target"""
+        x1, y1 = start
+        x2, y2 = target
+        x3, y3 = obstacle
+
+        # Check if the obstacle is collinear with start and target
+        if (x2 - x1) * (y3 - y1) == (x3 - x1) * (y2 - y1):
+            # Check if the obstacle lies within the rectangle formed by start and target
+            if min(x1, x2) <= x3 <= max(x1, x2) and min(y1, y2) <= y3 <= max(y1, y2):
+                return True
+
+        return False
 
     def enemy_spawn_location(self, max_attempts=100) -> Tuple[int, int]:
         """Get a random enemy spawn location"""
