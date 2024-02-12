@@ -328,6 +328,13 @@ class Ninja(GameObject):
             target.hp + self.attack
         )
 
+    def tiles_in_range(self) -> Iterator[GameObject]:
+        for tile in self.game.grid.tiles:
+            distance = abs(tile.x - self.x) + abs(tile.y - self.y)
+
+            if distance <= self.move:
+                yield tile
+
     def movable_tiles(self) -> Iterator[GameObject]:
         for tile in self.game.grid.tiles:
             if not self.game.grid.can_move(tile.x, tile.y):
