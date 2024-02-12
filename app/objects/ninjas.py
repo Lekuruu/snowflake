@@ -330,35 +330,32 @@ class Ninja(GameObject):
 
     def tiles_in_range(self) -> Iterator[GameObject]:
         for tile in self.game.grid.tiles:
-            distance = abs(tile.x - self.x) + abs(tile.y - self.y)
+            distance = self.game.grid.distance(
+                (self.x, self.y),
+                (tile.x, tile.y)
+            )
 
             if distance <= self.move:
                 yield tile
 
     def movable_tiles(self) -> Iterator[GameObject]:
-        for tile in self.game.grid.tiles:
+        for tile in self.tiles_in_range():
             if not self.game.grid.can_move(tile.x, tile.y):
                 continue
 
-            distance = abs(tile.x - self.x) + abs(tile.y - self.y)
-
-            if distance <= self.move:
-                yield tile
+            yield tile
 
     def attackable_tiles(self, target_x: int, target_y: int) -> Iterator[Enemy]:
         if self.hp <= 0:
             return []
 
-        for tile in self.game.grid.tiles:
+        for tile in self.tiles_in_range():
             target_object = self.game.grid[tile.x, tile.y]
 
             if not isinstance(target_object, Enemy):
                 continue
 
-            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
-
-            if distance <= self.range:
-                yield tile
+            yield tile
 
     def healable_tiles(self, target_x: int, target_y: int) -> Iterator["Ninja"]:
         if self.hp <= 0:
@@ -378,7 +375,10 @@ class Ninja(GameObject):
 
             if ninja.hp > 0 and self.name == 'Snow':
                 # Only snow can heal ninjas that are not dead
-                distance = abs(ninja.x - target_x) + abs(ninja.y - target_y)
+                distance = self.game.grid.distance(
+                    (ninja.x, ninja.y),
+                    (target_x, target_y)
+                )
 
                 if distance <= self.range:
                     yield self.game.grid.get_tile(ninja.x, ninja.y)
@@ -407,7 +407,10 @@ class Ninja(GameObject):
         if self.hp <= 0:
             return
 
-        distance = abs(x - self.x) + abs(y - self.y)
+        distance = self.game.grid.distance(
+            (self.x, self.y),
+            (x, y)
+        )
 
         if distance > self.move:
             return
