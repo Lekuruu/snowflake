@@ -589,3 +589,20 @@ class Rage(Effect):
         self.move_object(x, y, duration=100)
         self.place_sprite('effect_ragehit_anim')
         reactor.callLater(0.5, self.remove_object)
+
+class MemberReviveBeam(Effect):
+    def __init__(self, game: "Game", x: int, y: int) -> None:
+        super().__init__(
+            game,
+            "effect_revivebeam_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1,
+            origin_mode=OriginMode.BOTTOM_MIDDLE
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+        self.animate_sprite(0, 29, duration=1200)
