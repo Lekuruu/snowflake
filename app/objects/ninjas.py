@@ -328,10 +328,13 @@ class Ninja(GameObject):
             target.hp + self.attack
         )
 
-    def tiles_in_range(self) -> Iterator[GameObject]:
+    def tiles_in_range(self, target_x: int | None = None, target_y: int | None = None) -> Iterator[GameObject]:
+        x = target_x or self.x
+        y = target_y or self.y
+
         for tile in self.game.grid.tiles:
             distance = self.game.grid.distance(
-                (self.x, self.y),
+                (x, y),
                 (tile.x, tile.y)
             )
 
@@ -349,7 +352,7 @@ class Ninja(GameObject):
         if self.hp <= 0:
             return []
 
-        for tile in self.tiles_in_range():
+        for tile in self.tiles_in_range(target_x, target_y):
             target_object = self.game.grid[tile.x, tile.y]
 
             if not isinstance(target_object, Enemy):
