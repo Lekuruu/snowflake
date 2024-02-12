@@ -516,6 +516,7 @@ class WaterFishDrop(Effect):
         time.sleep(0.2)
         self.place_object()
         self.place_sprite(self.name)
+        self.animate_sprite(0, 26, duration=1700)
 
 class FirePowerBottle(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -534,6 +535,7 @@ class FirePowerBottle(Effect):
         time.sleep(0.2)
         self.place_object()
         self.place_sprite(self.name)
+        self.animate_sprite(0, 16, duration=1060)
 
 class Flame(Effect):
     def __init__(self, game: "Game", x: int, y: int) -> None:
