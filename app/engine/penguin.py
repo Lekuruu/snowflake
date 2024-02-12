@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.python.failure import Failure
 
+from app.engine.cards import CardObject, MemberCard
 from app.protocols import MetaplaceProtocol
-from app.engine.cards import CardObject
 from app.data import (
     Penguin as PenguinObject,
     EventType,
@@ -43,6 +43,7 @@ class Penguin(MetaplaceProtocol):
         self.displayed_tips: List[TipPhase] = []
 
         self.selected_card: CardObject | None = None
+        self.member_card: MemberCard | None = None
         self.power_card_slots: List[CardObject] = []
         self.power_card_stamina: int = 0
         self.power_cards_all: List[Card] = []
@@ -77,6 +78,10 @@ class Penguin(MetaplaceProtocol):
     @property
     def has_power_cards(self) -> bool:
         return bool(self.power_cards or self.power_card_slots)
+
+    @property
+    def selected_member_card(self) -> bool:
+        return self.member_card and self.member_card.selected
 
     @property
     def power_cards(self) -> List[Card]:

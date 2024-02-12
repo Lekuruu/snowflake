@@ -11,6 +11,10 @@ def on_card_clicked(client: Penguin, data: dict):
     if client.is_ready:
         return
 
+    if client.selected_member_card:
+        client.member_card.selected = False
+        client.member_card.remove()
+
     element = data['element']
     value = data['value']
     id = data['cardId']
@@ -77,13 +81,23 @@ def on_membercard_select(client: Penguin, data: dict):
     if not client.is_member:
         return
 
+    if not client.member_card:
+        return
+
     if not client.game.timer.running:
         return
 
     if client.is_ready:
         return
 
-    # TODO
+    if client.selected_card:
+        client.selected_card.remove()
+        client.selected_card = None
+
+    client.member_card.place()
+    client.ninja.hide_ghost()
+    client.ninja.remove_targets()
+    client.game.grid.hide_tiles_for_client(client)
 
 @session.framework.register('unselectMemberCard')
 def on_membercard_deselect(client: Penguin, data: dict):
@@ -96,7 +110,13 @@ def on_membercard_deselect(client: Penguin, data: dict):
     if client.is_ready:
         return
 
-    # TODO
+    if not client.member_card:
+        return
+
+    client.member_card.selected = False
+    client.member_card.remove()
+    client.ninja.show_targets()
+    client.game.grid.change_tile_sprites_for_client(client, 'ui_tile_move')
 
 @session.framework.register('comboScreenComplete')
 def on_combo_screen_complete(client: Penguin, data: dict):

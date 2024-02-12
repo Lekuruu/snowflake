@@ -10,6 +10,7 @@ from app.objects.effects import (
     WaterPowerBeam,
     FirePowerBeam,
     SnowPowerBeam,
+    MemberReviveBeam,
     FirePowerBottle,
     WaterFishDrop,
     SnowIgloo,
@@ -268,3 +269,62 @@ class CardObject(Card):
 
                 target.flame = Flame(self.game, target.x, target.y)
                 target.flame.play()
+
+class MemberCard(GameObject):
+    def __init__(self, client: "Penguin") -> None:
+        super().__init__(
+            client.game,
+            'ui_card_member',
+            x=-1,
+            y=-1,
+            x_offset=0.5,
+            y_offset=1.002
+        )
+        self.selected = False
+        self.client = client
+
+    def place(self) -> None:
+        self.x = self.client.ninja.x
+        self.y = self.client.ninja.y
+        self.place_object()
+
+        sprite_name = {
+            'fire': 'ui_card_member_fire',
+            'water': 'ui_card_member_water',
+            'snow': 'ui_card_member_snow'
+        }[self.client.element]
+
+        self.place_sprite(sprite_name)
+        self.selected = True
+
+    def remove(self) -> None:
+        self.remove_object()
+        self.x = -1
+        self.y = -1
+
+    def consume(self) -> None:
+        if not self.selected:
+            return
+
+        for client in self.game.clients:
+            payload_name = 'consumeMemberCard'
+
+            if self.client != client:
+                payload_name = 'showCaseMemberCard'
+
+            snow_ui = client.get_window('cardjitsu_snowui.swf')
+            snow_ui.send_payload(payload_name)
+
+        # Wait for card animation
+        time.sleep(2)
+
+        beam = MemberReviveBeam(self.game, self.client.ninja.x, self.client.ninja.y)
+        beam.play()
+
+        self.client.ninja.play_sound('SFX_MG_CJSnow_PowercardReviveStart')
+        self.client.ninja.set_health(self.client.ninja.max_hp)
+        self.client.ninja.revive_membercard_animation()
+        self.client.member_card = None
+
+        time.sleep(1)
+        beam.remove_object()

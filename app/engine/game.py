@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from app.data.constants import InputModifier, InputTarget, InputType, TipPhase
+from app.data import InputModifier, InputTarget, InputType, TipPhase
 from app.data.repositories import stamps
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
@@ -16,6 +16,7 @@ from app.objects.gameobject import GameObject
 from app.objects.sound import Sound
 
 from .callbacks import CallbackHandler
+from .cards import MemberCard
 from .timer import Timer
 from .grid import Grid
 
@@ -83,6 +84,9 @@ class Game:
     def start(self) -> None:
         for client in self.clients:
             client.game = self
+
+            # Initialize member card
+            client.member_card = MemberCard(client)
 
         # Wait for "prepare to battle" screen to end
         time.sleep(3)
@@ -482,6 +486,12 @@ class Game:
 
             client.selected_card.remove()
 
+        for client in self.clients:
+            if not client.selected_member_card:
+                continue
+
+            client.member_card.remove()
+
     def hide_ghosts(self) -> None:
         for ninja in self.ninjas:
             ninja.hide_ghost(reset_positions=False)
@@ -546,6 +556,7 @@ class Game:
         ninjas_without_cards = [
             ninja for ninja in self.ninjas
             if not ninja.client.selected_card
+            and not ninja.client.selected_member_card
         ]
 
         for ninja in ninjas_without_cards:
@@ -584,6 +595,17 @@ class Game:
 
         for ninja in ninjas_with_cards:
             ninja.use_powercard(is_combo)
+            time.sleep(1)
+
+        ninjas_with_member_cards = [
+            client for client in self.clients
+            if client.selected_member_card
+        ]
+
+        # TODO: revive_card_splash_screen.swf
+
+        for ninja in ninjas_with_member_cards:
+            ninja.member_card.consume()
             time.sleep(1)
 
     def do_enemy_actions(self) -> None:
