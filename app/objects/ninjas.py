@@ -242,6 +242,9 @@ class Ninja(GameObject):
             client.selected_card.place(object.x, object.y)
             return
 
+        if self.member_card and self.member_card.selected:
+            return
+
         self.hide_ghost()
         self.show_targets()
 
@@ -442,6 +445,9 @@ class Ninja(GameObject):
     def revive_other_animation_loop(self) -> None:
         ...
 
+    def revive_membercard_animation(self) -> None:
+        ...
+
     def power_animation(self) -> None:
         ...
 
@@ -555,6 +561,20 @@ class WaterNinja(Ninja):
             play_style='loop'
         )
 
+    def revive_other_animation_loop(self) -> None:
+        self.animate_object(
+            'waterninja_revive_other_loop_anim',
+            play_style='loop'
+        )
+
+    def revive_membercard_animation(self) -> None:
+        self.animate_object(
+            'waterninja_member_revive',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+
     def power_animation(self) -> None:
         self.animate_object(
             'waterninja_powercard_summon_anim',
@@ -564,12 +584,6 @@ class WaterNinja(Ninja):
         self.idle_animation()
         self.powercard_sound()
         time.sleep(0.65)
-
-    def revive_other_animation_loop(self) -> None:
-        self.animate_object(
-            'waterninja_revive_other_loop_anim',
-            play_style='loop'
-        )
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackwater')
@@ -699,6 +713,14 @@ class SnowNinja(Ninja):
             play_style='loop'
         )
 
+    def revive_membercard_animation(self) -> None:
+        self.animate_object(
+            'snowninja_member_revive',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
+
     def power_animation(self) -> None:
         self.animate_object(
             'snowninja_powercard_anim',
@@ -826,6 +848,14 @@ class FireNinja(Ninja):
             'fireninja_reviveotherloop_anim',
             play_style='loop'
         )
+
+    def revive_membercard_animation(self) -> None:
+        self.animate_object(
+            'fireninja_member_revive',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
 
     def power_animation(self) -> None:
         self.animate_object(
