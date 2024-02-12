@@ -309,6 +309,19 @@ class Game:
 
         # TODO: This could lead to softlocks
 
+    def wait_for_window(self, name: str, loaded=True) -> None:
+        """Wait for a window to load/close"""
+        for client in self.clients:
+            window = client.get_window(name)
+
+            if client.disconnected:
+                continue
+
+            while window.loaded != loaded:
+                pass
+
+            # TODO: This could lead to softlocks
+
     def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
         self.grid.show_tiles()
