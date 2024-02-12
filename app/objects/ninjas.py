@@ -299,6 +299,7 @@ class Ninja(GameObject):
             target.hp - self.attack
         )
 
+        # TODO: Attack numbers animation
 
     def heal_target(self, target: "Ninja"):
         if self.client.last_tip == TipPhase.HEAL:
