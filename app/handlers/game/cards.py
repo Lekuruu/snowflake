@@ -95,7 +95,6 @@ def on_membercard_select(client: Penguin, data: dict):
         client.selected_card = None
 
     client.member_card.place()
-    client.ninja.hide_ghost()
     client.ninja.remove_targets()
     client.game.grid.hide_tiles_for_client(client)
 
