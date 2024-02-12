@@ -1,5 +1,6 @@
 
 from typing import TYPE_CHECKING
+from app.data import TipPhase
 
 if TYPE_CHECKING:
     from .game import Game
@@ -44,6 +45,13 @@ class Timer:
             if all(client.is_ready for client in self.game.clients if not client.disconnected):
                 self.tick = 0
                 return
+
+            if self.tick == 3:
+                for client in self.game.clients:
+                    if client.is_ready:
+                        continue
+
+                    self.game.send_tip(TipPhase.CONFIRM, client)
 
         self.tick -= 1
         self.update()

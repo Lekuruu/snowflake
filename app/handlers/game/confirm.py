@@ -1,6 +1,7 @@
 
 from app.objects import GameObject
 from app.engine import Penguin
+from app.data import TipPhase
 from app import session
 
 @session.framework.register('confirmClicked')
@@ -25,3 +26,6 @@ def on_confirm_clicked(client: Penguin, data: dict):
 
     snow_ui = client.get_window('cardjitsu_snowui.swf')
     snow_ui.send_payload('disableCards')
+
+    if client.tip_mode and client.last_tip == TipPhase.CONFIRM:
+        client.game.hide_tip(client)
