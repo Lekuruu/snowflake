@@ -74,6 +74,8 @@ class CardObject(Card):
         if self.client.tip_mode and self.client.last_tip == TipPhase.CARD:
             self.client.hide_tip()
 
+        self.object.play_sound('sfx_mg_2013_cjsnow_uiselecttile', self.client)
+
     def remove(self) -> None:
         self.object.remove_object()
         self.pattern.remove_object()
