@@ -409,13 +409,14 @@ class TankSwipeHorizontal(Effect):
             "tank_swipe_horiz_anim",
             x,
             y,
-            x_offset=0.5,
-            y_offset=1
+            x_offset=0.5005,
+            y_offset=1.005
         )
 
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
+        self.animate_sprite(0, 6, duration=400)
 
 class TankSwipeVertical(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -424,13 +425,14 @@ class TankSwipeVertical(Effect):
             "tank_swipe_vert_anim",
             x,
             y,
-            x_offset=0.5,
-            y_offset=1
+            x_offset=0.5005,
+            y_offset=1.005
         )
 
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
+        self.animate_sprite(0, 6, duration=400)
 
 class WaterPowerBeam(Effect):
     def __init__(self, game: "Game", x: int, y: int):
