@@ -329,13 +329,10 @@ class Ninja(GameObject):
             target.hp + self.attack
         )
 
-    def tiles_in_range(self, target_x: int | None = None, target_y: int | None = None) -> Iterator[GameObject]:
-        x = target_x or self.x
-        y = target_y or self.y
-
+    def tiles_in_range(self) -> Iterator[GameObject]:
         for tile in self.game.grid.tiles:
             distance = self.game.grid.distance(
-                (x, y),
+                (self.x, self.y),
                 (tile.x, tile.y)
             )
 
@@ -353,13 +350,16 @@ class Ninja(GameObject):
         if self.hp <= 0:
             return []
 
-        for tile in self.tiles_in_range(target_x, target_y):
+        for tile in self.game.grid.tiles:
             target_object = self.game.grid[tile.x, tile.y]
 
             if not isinstance(target_object, Enemy):
                 continue
 
-            yield tile
+            distance = abs(tile.x - target_x) + abs(tile.y - target_y)
+
+            if distance <= self.range:
+                yield tile
 
     def healable_tiles(self, target_x: int, target_y: int) -> Iterator["Ninja"]:
         if self.hp <= 0:
