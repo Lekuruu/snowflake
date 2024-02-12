@@ -179,16 +179,19 @@ class Grid:
         tile = self.get_tile(x, y)
         tile.place_sprite(sprite)
 
-    def change_tile_sprites(self, name: str) -> None:
+    def change_tiles(self, name: str) -> None:
         """Change the sprites of all tiles to a new sprite"""
         for client in self.game.clients:
             for tile in client.ninja.movable_tiles():
                 tile.place_sprite(name, client)
 
-    def change_tile_sprites_for_client(self, client: "Penguin", name: str, ignore_objects=False) -> None:
+    def change_tiles_for_client(self, client: "Penguin", name: str, ghost=False, ignore_objects=False) -> None:
         """Change the sprites of all tiles to a new sprite for a specific client"""
         if not ignore_objects:
-            for tile in client.ninja.movable_tiles():
+            tiles = client.ninja.movable_tiles() if not ghost else \
+                    client.ninja.movable_ghost_tiles()
+
+            for tile in tiles:
                 tile.place_sprite(name, client)
 
             if client.ninja.placed_ghost:
@@ -196,7 +199,10 @@ class Grid:
                 ghost_tile.place_sprite(name, client)
 
         else:
-            for tile in client.ninja.tiles_in_range():
+            tiles = client.ninja.tiles_in_range() if not ghost else \
+                    client.ninja.ghost_tiles_in_range()
+
+            for tile in tiles:
                 tile.place_sprite(name, client)
 
     def hide_tiles_for_client(self, client: "Penguin") -> None:
