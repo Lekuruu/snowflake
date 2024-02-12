@@ -294,8 +294,8 @@ class GameObject:
             self._x_scale = 1
             self._y_scale = 1
 
-    def hide(self) -> None:
-        self.place_sprite('blank_png')
+    def hide(self, client: "Penguin" | None = None) -> None:
+        self.place_sprite('blank_png', client)
         self.remove_pending_actions()
 
     def play_sound(
