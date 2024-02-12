@@ -182,6 +182,11 @@ class Grid:
         for tile in client.ninja.movable_tiles():
             tile.place_sprite(name, client)
 
+    def hide_tiles_for_client(self, client: "Penguin") -> None:
+        """Hide all tiles for a specific client"""
+        for tile in client.ninja.movable_tiles():
+            tile.hide()
+
     def get_tile(self, x: int, y: int) -> GameObject | None:
         """Get a tile by its coordinates"""
         return next((tile for tile in self.tiles if tile.x == x and tile.y == y), None)
