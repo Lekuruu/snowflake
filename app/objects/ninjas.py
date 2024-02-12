@@ -511,9 +511,6 @@ class WaterNinja(Ninja):
 
         self.idle_animation()
 
-        # TODO: Ninjas face the direction of the attack
-        #       when they get hit
-
     def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
             self.mirror_mode = MirrorMode.X
@@ -636,9 +633,6 @@ class SnowNinja(Ninja):
             return
 
         self.idle_animation()
-
-        # TODO: Ninjas face the direction of the attack
-        #       when they get hit
 
     def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
@@ -782,9 +776,6 @@ class FireNinja(Ninja):
             return
 
         self.idle_animation()
-
-        # TODO: Ninjas face the direction of the attack
-        #       when they get hit
 
     def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:

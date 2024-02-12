@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from app.data import InputModifier, InputTarget, InputType, TipPhase
+from app.data import InputModifier, InputTarget, InputType, TipPhase, MirrorMode
 from app.data.repositories import stamps
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
@@ -76,7 +76,7 @@ class Game:
     @property
     def bonus_criteria_met(self) -> bool:
         return {
-            'no_ko': all(not player.was_ko for player in self.clients),
+            'no_ko': all(not player.was_ko for player in self.clients if not player.disconnected),
             'full_health': all(ninja.hp == ninja.max_hp for ninja in self.ninjas),
             'under_time': (time.time() < self.game_start + 300)
         }[self.bonus_criteria]
@@ -649,7 +649,13 @@ class Game:
                 enemy.reset_sprite_settings()
 
             enemy.attack_target(target_object)
+
+            if target_object.x > enemy.x:
+                # Flip ninja's sprite to face the enemy
+                target_object.mirror_mode = MirrorMode.X
+
             self.wait_for_animations()
+            target_object.reset_sprite_settings()
 
     def show_ui(self) -> None:
         for client in self.clients:
