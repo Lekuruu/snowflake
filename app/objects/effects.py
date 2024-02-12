@@ -496,7 +496,6 @@ class SnowIgloo(Effect):
         self.animate_object('snowninja_igloodrop_anim1', reset=True)
         self.animate_object('snowninja_igloodrop_anim2')
         self.animate_object('blank_png', play_style='loop')
-        # TODO: Change offsets, when card is placed at the edge of the screen
 
 class WaterFishDrop(Effect):
     def __init__(self, game: "Game", x: int, y: int):
