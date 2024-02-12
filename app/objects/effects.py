@@ -85,8 +85,8 @@ class HealParticles(Effect):
             "ui_healfx_anim",
             x,
             y,
-            x_offset=0.5,
-            y_offset=1,
+            x_offset=0.50005,
+            y_offset=1.0005,
             duration=0.737
         )
 
