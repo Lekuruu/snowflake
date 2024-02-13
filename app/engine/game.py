@@ -601,7 +601,7 @@ class Game:
 
         ninjas_with_cards = [
             ninja for ninja in self.ninjas
-            if ninja.client.selected_card
+            if ninja.client.placed_powercard
         ]
 
         is_combo = len(ninjas_with_cards) > 1
