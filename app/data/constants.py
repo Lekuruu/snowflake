@@ -1,6 +1,34 @@
 
 from enum import Enum, IntEnum
 
+SnowRewards = {
+    0: None,
+    1: None,  # Movie 1
+    2: 6163,  # Glacial Sandals
+    3: None,  # Movie 2
+    4: None,  # Movie 3
+    5: 4834,  # Coat of Frost
+    6: None,  # Movie 4
+    7: None,  # Movie 5
+    8: 2119,  # Icy Mask
+    9: None,  # Movie 6
+    10: None, # Movie 7
+    11: 1581, # Blizzard Helmet
+    12: None, # Movie 8
+    13: 7159, # Snow Gem
+    14: 1582, # Black Ice Headband
+    15: 4835, # Frozen Armor
+    16: 5223, # Ice Cap Cuffs
+    17: 4836, # Black Ice Training Plates
+    18: 1583, # The Flurry
+    19: 6164, # Cold Snap Sandals
+    20: 4837, # Snowstorm Gi
+    21: 5224, # Storm Cloud Bracers,
+    22: 5225, # Snow Shuriken
+    23: 5226, # Fire Nunchaku
+    24: 5227  # Water Hammer
+}
+
 class InputType(IntEnum):
     UP                 = 1
     DOWN               = 2
