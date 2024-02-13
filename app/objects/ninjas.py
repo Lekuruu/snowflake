@@ -708,7 +708,7 @@ class SnowNinja(Ninja):
     def win_animation(self) -> None:
         self.animate_object(
             'snowninja_celebrate_anim',
-            play_style='play_once',
+            play_style='loop',
             reset=True
         )
 

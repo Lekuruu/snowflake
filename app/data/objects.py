@@ -87,6 +87,9 @@ class Penguin(Base):
     ninja_matches_won = Column(Integer, nullable=False, server_default=text("0"))
     fire_matches_won = Column(Integer, nullable=False, server_default=text("0"))
     water_matches_won = Column(Integer, nullable=False, server_default=text("0"))
+    snow_progress_fire_wins = Column(Integer, nullable=False, server_default=text("0"))
+    snow_progress_water_wins = Column(Integer, nullable=False, server_default=text("0"))
+    snow_progress_snow_wins = Column(Integer, nullable=False, server_default=text("0"))
     rainbow_adoptability = Column(Boolean, nullable=False, server_default=text("false"))
     has_dug = Column(Boolean, nullable=False, server_default=text("false"))
     puffle_handler = Column(Boolean, nullable=False, server_default=text("false"))
@@ -312,3 +315,7 @@ class PenguinItem(Base):
         primary_key=True,
         nullable=False
     )
+
+    def __init__(self, penguin_id: int, item_id: int):
+        self.penguin_id = penguin_id
+        self.item_id = item_id
