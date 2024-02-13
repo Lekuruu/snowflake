@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from app.data import InputModifier, InputTarget, InputType, TipPhase, MirrorMode
-from app.data.repositories import stamps, penguins
+from app.data import InputModifier, InputTarget, InputType, TipPhase, MirrorMode, SnowRewards
+from app.data.repositories import stamps, penguins, items
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
 from app.objects.enemies import Sly, Scrap, Tank, Enemy
@@ -53,6 +53,11 @@ class Game:
     @property
     def clients(self) -> List["Penguin"]:
         return [self.fire, self.snow, self.water]
+
+    @property
+    def exp(self) -> int:
+        # TODO: I have no idea how to calculate this
+        return round(self.coins * 0.15)
 
     @property
     def disconnected_clients(self) -> List["Penguin"]:
@@ -162,8 +167,8 @@ class Game:
         self.remove_targets()
         self.display_win_sequence()
 
-        self.display_payout()
         self.remove_objects()
+        self.display_payout()
         self.close()
 
     def close(self) -> None:
@@ -397,10 +402,10 @@ class Game:
             return
 
         max_enemies = {
-            0: range(1, 4),
-            1: range(1, 4),
-            2: range(1, 4),
-            3: range(4, 5)
+            0: range(1, 2),
+            1: range(1, 2),
+            2: range(1, 2),
+            3: range(1, 2)
         }[self.round]
 
         amount_enemies = random.choice(max_enemies)
@@ -787,16 +792,44 @@ class Game:
             snow_stamps = stamps.fetch_all_by_group(60, session=session)
 
             for client in self.clients:
+                if client.disconnected:
+                    continue
+
+                # Calculate new rank and exp
+                exp_gained = client.object.snow_ninja_progress + self.exp
+                ranks_gained = exp_gained // 100
+                result_rank = client.object.snow_ninja_rank + ranks_gained
+                result_exp = exp_gained % 100
+
+                if result_rank >= 24:
+                    # Clamp rank to 24
+                    result_rank = 24
+                    result_exp = 100
+
                 updates = {
-                    'coins': client.object.coins + self.coins
-                    # TODO: EXP
-                    # TODO: Rewards
+                    'coins': client.object.coins + self.coins,
+                    'snow_ninja_rank': result_rank,
+                    'snow_ninja_progress': result_exp
                 }
 
+                if len(self.enemies) <= 0:
+                    # Update win count
+                    key = f'snow_progress_{client.element}_wins'
+                    wins = getattr(client.object, key, 0)
+                    updates[key] = wins + 1
+
+                # Update penguin data
                 penguins.update(
                     client.pid, updates,
                     session=session
                 )
+
+                if (item := SnowRewards.get(result_rank)):
+                    # Add reward item
+                    items.add_item(
+                        client.pid, item,
+                        session=session
+                    )
 
                 # Display payout swf window
                 payout = client.get_window('cardjitsu_snowpayout.swf')
@@ -805,11 +838,11 @@ class Game:
                     {
                         "coinsEarned": self.coins,
                         "doubleCoins": False, # TODO
-                        "damage": 0,          # Only important for tusk battle
+                        "damage": 0, # Only important for tusk battle
                         "isBoss": 0,
-                        "rank": client.object.snow_ninja_rank,
+                        "rank": client.object.snow_ninja_rank + 1,
                         "round": self.get_payout_round(),
-                        "showItems": 0,       # TODO: This will show the unlocked item(s)
+                        "showItems": 0, # Only important for tusk battle
                         "stampList": [
                             {
                                 "stamp_id": stamp.id,
@@ -828,8 +861,8 @@ class Game:
                             }
                             for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
                         ],
-                        "xpEnd": client.object.snow_ninja_progress, # TODO: Implement xp system
                         "xpStart": client.object.snow_ninja_progress,
+                        "xpEnd": exp_gained if result_rank < 24 else 100,
                     },
                     loadDescription="",
                     assetPath="",
@@ -849,4 +882,4 @@ class Game:
 
             ninja.win_animation()
 
-        time.sleep(2.5)
+        time.sleep(3.5)
