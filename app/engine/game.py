@@ -832,26 +832,27 @@ class Game:
                     wins = getattr(client.object, key, 0)
                     updates[key] = wins + 1
 
-                # Update penguin data
-                penguins.update(
-                    client.pid, updates,
-                    session=session
-                )
-
-                if result_rank != client.object.snow_ninja_rank:
-                    self.logger.info(f'{client} ranked up from {client.object.snow_ninja_rank} to {result_rank}')
-
-                for rank in range(client.object.snow_ninja_rank + 1, result_rank + 1):
-                    if not (item := SnowRewards.get(rank)):
-                        continue
-
-                    # Add item to inventory
-                    items.add_item(
-                        client.pid, item,
+                if not config.DISABLE_REWARDS:
+                    # Update penguin data
+                    penguins.update(
+                        client.pid, updates,
                         session=session
                     )
 
-                    self.logger.info(f'{client} unlocked item {item}')
+                    if result_rank != client.object.snow_ninja_rank:
+                        self.logger.info(f'{client} ranked up from {client.object.snow_ninja_rank} to {result_rank}')
+
+                    for rank in range(client.object.snow_ninja_rank + 1, result_rank + 1):
+                        if not (item := SnowRewards.get(rank)):
+                            continue
+
+                        # Add item to inventory
+                        items.add_item(
+                            client.pid, item,
+                            session=session
+                        )
+
+                        self.logger.info(f'{client} unlocked item {item}')
 
                 # Display payout swf window
                 payout = client.get_window('cardjitsu_snowpayout.swf')
