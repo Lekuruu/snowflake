@@ -6,8 +6,16 @@ from typing import TYPE_CHECKING, Callable, List
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from app.data import InputModifier, InputTarget, InputType, TipPhase, MirrorMode, SnowRewards
 from app.data.repositories import stamps, penguins, items
+from app.data import (
+    RewardMultipliers,
+    InputModifier,
+    InputTarget,
+    SnowRewards,
+    MirrorMode,
+    InputType,
+    TipPhase
+)
 
 from app.objects.ninjas import WaterNinja, SnowNinja, FireNinja, Ninja
 from app.objects.enemies import Sly, Scrap, Tank, Enemy
@@ -797,6 +805,12 @@ class Game:
 
                 # Calculate new rank and exp
                 exp_gained = client.object.snow_ninja_progress + self.exp
+
+                # Make it harder to gain exp as you progress
+                exp_gained *= RewardMultipliers.get(
+                    client.object.snow_ninja_rank + exp_gained // 100, 1
+                )
+
                 ranks_gained = exp_gained // 100
                 result_rank = client.object.snow_ninja_rank + ranks_gained
                 result_exp = exp_gained % 100
