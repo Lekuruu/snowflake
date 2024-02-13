@@ -84,6 +84,10 @@ class Penguin(MetaplaceProtocol):
         return self.member_card and self.member_card.selected
 
     @property
+    def placed_powercard(self) -> bool:
+        return bool(self.selected_card and self.selected_card.x != -1 and self.selected_card.y != -1)
+
+    @property
     def power_cards(self) -> List[Card]:
         return [
             c for c in self.power_cards_all
