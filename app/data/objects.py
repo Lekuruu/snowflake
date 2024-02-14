@@ -185,6 +185,15 @@ class Stamp(Base):
     rank = Column(SmallInteger, nullable=False, server_default=text("1"))
     description = Column(String(255), nullable=False, server_default=text("''::character varying"))
 
+    @property
+    def rank_token(self) -> str:
+        return {
+            1: 'Easy',
+            2: 'Medium',
+            3: 'Hard',
+            4: 'Extreme'
+        }.get(self.rank, '')
+
 class StampGroup(Base):
     __tablename__ = 'stamp_group'
 
@@ -252,6 +261,10 @@ class PenguinStamp(Base):
         nullable=False,
         server_default=text("true")
     )
+
+    def __init__(self, penguin_id: int, stamp_id: int):
+        self.penguin_id = penguin_id
+        self.stamp_id = stamp_id
 
 class Item(Base):
     __tablename__ = 'item'

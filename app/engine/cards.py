@@ -156,6 +156,9 @@ class CardObject(Card):
         if is_combo:
             self.apply_effects()
 
+        self.client.played_cards += 1
+        self.check_stamps(is_combo)
+
         self.client.update_cards()
         self.game.wait_for_animations()
 
@@ -274,6 +277,46 @@ class CardObject(Card):
 
                 target.flame = Flame(self.game, target.x, target.y)
                 target.flame.play()
+
+    def check_stamps(self, is_combo: bool) -> None:
+        ninja_targets = [
+            target for target in self.targets
+            if isinstance(target, Ninja)
+            and not target.client.disconnected
+        ]
+
+        if self.client.played_cards >= 3:
+            # Unlock "Power Card Pro" stamp
+            self.client.unlock_stamp(484)
+
+        if len(ninja_targets) >= 3 and self.element == 's':
+            # Unlock "Huge Heal" stamp
+            self.client.unlock_stamp(478)
+
+            if is_combo and self.element == 'w':
+                # Unlock "Wave Boost" stamp
+                self.client.unlock_stamp(481)
+
+        if ninja_targets and is_combo and self.element == 's':
+            # Unlock "Snow Shield" stamp
+            self.client.unlock_stamp(479)
+
+        enemy_targets = [
+            target for target in self.targets
+            if isinstance(target, Enemy)
+        ]
+
+        if len(enemy_targets) >= 3 and self.element == 'w':
+            # Unlock "Tidal Wave" stamp
+            self.client.unlock_stamp(480)
+
+        if len(enemy_targets) >= 3 and self.element == 'f':
+            # Unlock "Fire Blast" stamp
+            self.client.unlock_stamp(482)
+
+            if is_combo:
+                # Unlock "Fire Blast Combo" stamp
+                self.client.unlock_stamp(483)
 
 class MemberCard(GameObject):
     def __init__(self, client: "Penguin") -> None:
