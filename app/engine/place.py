@@ -26,3 +26,8 @@ class SnowLobby(Place):
 class SnowBattle(SnowLobby):
     id: int = 10001
     name: str = "snow_battle"
+
+@dataclass
+class TuskBattle(SnowBattle):
+    id: int = 10002
+    name: str = "tusk_battle"
