@@ -229,6 +229,16 @@ class CardObject(Card):
                 if self.element == 'f':
                     target.stun()
 
+        ninja_targets = [
+            target for target in self.targets
+            if isinstance(target, Ninja)
+            and not target.client.disconnected
+        ]
+
+        if len(ninja_targets) >= 3 and self.element == 's':
+            # Unlock "Huge Heal" stamp
+            self.client.unlock_stamp(478)
+
     def apply_effects(self) -> None:
         if self.element == 's':
             # Apply shield to all ninjas in targets
