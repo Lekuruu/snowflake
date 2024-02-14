@@ -253,7 +253,7 @@ class Penguin(MetaplaceProtocol):
         if not (stamp := stamps.fetch_one(id, session=session)):
             return
 
-        if stamps.exists(self.pid, id, session=session):
+        if stamps.exists(id, self.pid, session=session):
             return
 
         self.logger.info(f'{self} unlocked stamp: "{stamp.name}"')
