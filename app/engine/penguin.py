@@ -251,6 +251,9 @@ class Penguin(MetaplaceProtocol):
         infotip.send_payload('disable')
 
     def unlock_stamp(self, id: int, session: Session | None = None) -> None:
+        if config.DISABLE_STAMPS:
+            return
+
         if not (stamp := stamps.fetch_one(id, session=session)):
             return
 
