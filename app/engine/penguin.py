@@ -13,6 +13,7 @@ from twisted.python.failure import Failure
 
 from app.engine.cards import CardObject, MemberCard
 from app.protocols import MetaplaceProtocol
+from app.data import stamps
 from app.data import (
     Penguin as PenguinObject,
     EventType,
@@ -245,3 +246,32 @@ class Penguin(MetaplaceProtocol):
     def hide_tip(self) -> None:
         infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.send_payload('disable')
+
+    def unlock_stamp(self, id: int) -> None:
+        if not (stamp := stamps.fetch_one(id)):
+            return
+
+        self.unlocked_stamps(stamp)
+        stamps.add(self.pid, id)
+
+        window = self.get_window('stampearned.swf')
+
+        # Wait for window to close
+        self.window_manager.wait_for_window(window, loaded=False)
+
+        # Load window
+        window.load(
+            {
+                'stamp':
+                {
+                    'description': stamp.description,
+                    'name': stamp.name,
+                    'is_member': stamp.member,
+                    'parent_group_id': stamp.group_id,
+                    'stampGroupId': stamp.group_id,
+                    'stamp_id': stamp.id,
+                    'rank': stamp.rank,
+                    'rank_token': stamp.rank_token
+                }
+            }
+        )
