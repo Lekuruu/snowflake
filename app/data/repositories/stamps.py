@@ -33,3 +33,37 @@ def fetch_by_penguin_id(
         query = query.filter(Stamp.group_id == group_id)
 
     return query.all()
+
+@session_wrapper
+def add(
+    id: int,
+    penguin_id: int,
+    session: Session | None = None
+) -> None:
+    if exists(id, penguin_id, session=session):
+        return
+
+    penguin_stamp = PenguinStamp(penguin_id=penguin_id, stamp_id=id)
+    session.add(penguin_stamp)
+    session.commit()
+
+@session_wrapper
+def remove(
+    id: int,
+    penguin_id: int,
+    session: Session | None = None
+) -> None:
+    session.query(PenguinStamp) \
+        .filter_by(penguin_id=penguin_id, stamp_id=id) \
+        .delete()
+    session.commit()
+
+@session_wrapper
+def exists(
+    id: int,
+    penguin_id: int,
+    session: Session | None = None
+) -> bool:
+    return session.query(PenguinStamp) \
+        .filter_by(penguin_id=penguin_id, stamp_id=id) \
+        .count() > 0

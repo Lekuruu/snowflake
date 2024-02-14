@@ -253,6 +253,10 @@ class PenguinStamp(Base):
         server_default=text("true")
     )
 
+    def __init__(self, penguin_id: int, stamp_id: int):
+        self.penguin_id = penguin_id
+        self.stamp_id = stamp_id
+
 class Item(Base):
     __tablename__ = 'item'
 
