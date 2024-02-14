@@ -271,7 +271,7 @@ class TuskGame(Game):
                         "stamps": [
                             {
                                 "_id": stamp.id,
-                                "new": False # TODO
+                                "new": stamp.id in client.unlocked_stamps
                             }
                             for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
                         ],
