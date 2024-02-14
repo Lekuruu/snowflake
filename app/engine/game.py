@@ -969,6 +969,9 @@ class Game:
             return
 
         for ninja in self.ninjas:
+            if ninja.client.disconnected:
+                continue
+
             if ninja.hp <= 0:
                 ninja.set_health(1)
 
