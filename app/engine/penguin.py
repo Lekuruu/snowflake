@@ -52,6 +52,7 @@ class Penguin(MetaplaceProtocol):
         self.power_cards_all: List[Card] = []
         self.unlocked_stamps: List[Stamp] = []
         self.power_card_stamina: int = 0
+        self.played_cards: int = 0
 
         self.in_queue: bool = False
         self.is_ready: bool = False

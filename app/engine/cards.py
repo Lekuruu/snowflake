@@ -162,6 +162,12 @@ class CardObject(Card):
             and not target.client.disconnected
         ]
 
+        self.client.played_cards += 1
+
+        if self.client.played_cards >= 3:
+            # Unlock "Power Card Pro" stamp
+            self.client.unlock_stamp(484)
+
         if len(ninja_targets) >= 3 and self.element == 's':
             # Unlock "Huge Heal" stamp
             self.client.unlock_stamp(478)
