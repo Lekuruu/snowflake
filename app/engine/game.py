@@ -239,6 +239,10 @@ class Game:
             self.coins += coins.get(self.round, 0)
             self.round += 1
 
+            if self.round >= 3 and self.bonus_criteria == 'full_health':
+                # Unlock "Full Health" stamp
+                self.unlock_stamp(472)
+
             # Remove any existing enemies
             self.remove_enemies()
 
