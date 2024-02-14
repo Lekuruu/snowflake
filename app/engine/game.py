@@ -188,6 +188,10 @@ class Game:
                 # Unlock "Team Revival" stamp
                 self.unlock_stamp(476)
 
+            if self.round >= 3:
+                # Unlock "Bonus Win" stamp
+                self.unlock_stamp(473)
+
         self.display_payout()
         self.remove_objects()
         self.close()
