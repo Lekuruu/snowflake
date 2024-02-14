@@ -832,6 +832,16 @@ class Game:
                     wins = getattr(client.object, key, 0)
                     updates[key] = wins + 1
 
+                    if updates[key] >= 3:
+                        stamp_ids = {
+                            'fire': 470,
+                            'water': 471,
+                            'snow': 469
+                        }
+
+                        # Unlock stamp
+                        client.unlock_stamp(stamp_ids[client.element])
+
                 if not config.DISABLE_REWARDS:
                     # Update penguin data
                     penguins.update(
