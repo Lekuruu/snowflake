@@ -25,7 +25,13 @@ def on_window_manager_ready(client: Penguin, data: dict):
     wm.send_action('setFontPath', defaultFontPath=f'{config.BASE_URL}/fonts/')
 
     # Set loading screen as "RoomToRoom" transition
-    wm.send_action('skinRoomToRoom', EventType.PLAY_ACTION, url=loading_screen.url, className="", variant=0)
+    wm.send_action(
+        'skinRoomToRoom',
+        EventType.PLAY_ACTION,
+        url=loading_screen.url,
+        className="",
+        variant=client.battle_mode
+    )
 
     # Load error handler
     error_handler = client.get_window('cardjitsu_snowerrorhandler.swf')
