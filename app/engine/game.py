@@ -273,6 +273,16 @@ class Game:
                     ninja.idle_animation()
                     continue
 
+                # Unlock "revive" stamp for every ninja that was reviving this round
+                for client in self.clients:
+                    if client.disconnected:
+                        continue
+
+                    if client.ninja.selected_object != ninja.selected_object:
+                        continue
+
+                    client.unlock_stamp(474)
+
                 self.wait_for_animations()
                 ninja.selected_object.set_health(1)
                 ninja.targets = []
