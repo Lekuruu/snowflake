@@ -17,6 +17,7 @@ from app.data import (
     Penguin as PenguinObject,
     EventType,
     TipPhase,
+    Stamp,
     Card
 )
 
@@ -42,11 +43,12 @@ class Penguin(MetaplaceProtocol):
         self.last_tip: TipPhase | None = None
         self.displayed_tips: List[TipPhase] = []
 
-        self.selected_card: CardObject | None = None
         self.member_card: MemberCard | None = None
+        self.selected_card: CardObject | None = None
         self.power_card_slots: List[CardObject] = []
-        self.power_card_stamina: int = 0
         self.power_cards_all: List[Card] = []
+        self.unlocked_stamps: List[Stamp] = []
+        self.power_card_stamina: int = 0
 
         self.in_queue: bool = False
         self.is_ready: bool = False
