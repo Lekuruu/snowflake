@@ -852,6 +852,10 @@ class Game:
                     'snow_ninja_progress': result_exp
                 }
 
+                if result_rank >= 13:
+                    # Unlock "Snow Pro" stamp
+                    client.unlock_stamp(487, session=session)
+
                 if len(self.enemies) <= 0:
                     # Update win count
                     key = f'snow_progress_{client.element}_wins'
