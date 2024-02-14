@@ -310,6 +310,10 @@ class CardObject(Card):
             # Unlock "Tidal Wave" stamp
             self.client.unlock_stamp(480)
 
+        if len(enemy_targets) >= 3 and self.element == 'f':
+            # Unlock "Fire Blast" stamp
+            self.client.unlock_stamp(482)
+
 class MemberCard(GameObject):
     def __init__(self, client: "Penguin") -> None:
         super().__init__(
