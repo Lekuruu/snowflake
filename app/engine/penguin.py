@@ -254,6 +254,7 @@ class Penguin(MetaplaceProtocol):
         if stamps.exists(self.pid, id):
             return
 
+        self.logger.info(f'{self} unlocked stamp: {stamp.name}')
         self.unlocked_stamps(stamp)
         stamps.add(self.pid, id)
 
