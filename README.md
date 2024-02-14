@@ -37,7 +37,7 @@ A work-in-progress card-jitsu snow server emulator, made for houdini.
 - [x] Coins
 - [x] EXP
 - [x] Rewards
-- [ ] Stamps
+- [x] Stamps
 - [ ] Tusk Battle
 - [ ] Custom Features
     - [ ] Singleplayer Mode

@@ -10,18 +10,22 @@ if TYPE_CHECKING:
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.python.failure import Failure
+from sqlalchemy.orm import Session
 
 from app.engine.cards import CardObject, MemberCard
 from app.protocols import MetaplaceProtocol
+from app.data import stamps
 from app.data import (
     Penguin as PenguinObject,
     EventType,
     TipPhase,
+    Stamp,
     Card
 )
 
 import app.session
 import random
+import config
 
 class Penguin(MetaplaceProtocol):
     def __init__(self, server: "SnowflakeWorld", address: IPv4Address | IPv6Address):
@@ -42,11 +46,13 @@ class Penguin(MetaplaceProtocol):
         self.last_tip: TipPhase | None = None
         self.displayed_tips: List[TipPhase] = []
 
-        self.selected_card: CardObject | None = None
         self.member_card: MemberCard | None = None
+        self.selected_card: CardObject | None = None
         self.power_card_slots: List[CardObject] = []
-        self.power_card_stamina: int = 0
         self.power_cards_all: List[Card] = []
+        self.unlocked_stamps: List[Stamp] = []
+        self.power_card_stamina: int = 0
+        self.played_cards: int = 0
 
         self.in_queue: bool = False
         self.is_ready: bool = False
@@ -243,3 +249,46 @@ class Penguin(MetaplaceProtocol):
     def hide_tip(self) -> None:
         infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.send_payload('disable')
+
+    def unlock_stamp(self, id: int, session: Session | None = None) -> None:
+        if config.DISABLE_STAMPS:
+            return
+
+        if self.disconnected:
+            return
+
+        if not (stamp := stamps.fetch_one(id, session=session)):
+            return
+
+        if stamps.exists(id, self.pid, session=session):
+            return
+
+        self.logger.info(f'{self} unlocked stamp: "{stamp.name}"')
+        self.unlocked_stamps.append(stamp)
+        stamps.add(
+            id, self.pid,
+            session=session
+        )
+
+        window = self.get_window('stampearned.swf')
+
+        # Wait for previous window to close
+        self.window_manager.wait_for_window(window, loaded=False)
+
+        # Load window
+        window.load(
+            {
+                'stamp':
+                {
+                    'stamp_id': stamp.id,
+                    'stampGroupId': stamp.group_id,
+                    'parent_group_id': 8, # TODO
+                    'name': f'global_content.stamps.{stamp.id}.name',
+                    'description': f'global_content.stamps.{stamp.id}.description',
+                    'rank_token': f'global_content.stamps.{stamp.id}.rank_token',
+                    'is_member': stamp.member,
+                    'rank': stamp.rank
+                }
+            },
+            assetPath=f'{config.WINDOW_BASEURL}/'
+        )

@@ -51,6 +51,7 @@ class Ninja(GameObject):
         self.hp = self.__class__.max_hp
         self.client = client
         self.targets: List["Target"] = []
+        self.heals: int = 0
 
         self.ghost = GameObject(
             self.game,
