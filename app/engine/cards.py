@@ -314,6 +314,10 @@ class CardObject(Card):
             # Unlock "Fire Blast" stamp
             self.client.unlock_stamp(482)
 
+            if is_combo:
+                # Unlock "Fire Blast Combo" stamp
+                self.client.unlock_stamp(483)
+
 class MemberCard(GameObject):
     def __init__(self, client: "Penguin") -> None:
         super().__init__(
