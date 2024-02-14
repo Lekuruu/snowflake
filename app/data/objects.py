@@ -185,6 +185,15 @@ class Stamp(Base):
     rank = Column(SmallInteger, nullable=False, server_default=text("1"))
     description = Column(String(255), nullable=False, server_default=text("''::character varying"))
 
+    @property
+    def rank_token(self) -> str:
+        return {
+            1: 'Easy',
+            2: 'Medium',
+            3: 'Hard',
+            4: 'Extreme'
+        }.get(self.rank, '')
+
 class StampGroup(Base):
     __tablename__ = 'stamp_group'
 
