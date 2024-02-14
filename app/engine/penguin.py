@@ -251,6 +251,9 @@ class Penguin(MetaplaceProtocol):
         if not (stamp := stamps.fetch_one(id)):
             return
 
+        if stamps.exists(self.pid, id):
+            return
+
         self.unlocked_stamps(stamp)
         stamps.add(self.pid, id)
 

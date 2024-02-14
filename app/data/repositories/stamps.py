@@ -40,9 +40,6 @@ def add(
     penguin_id: int,
     session: Session | None = None
 ) -> Stamp:
-    if exists(id, penguin_id, session=session):
-        return
-
     penguin_stamp = PenguinStamp(penguin_id=penguin_id, stamp_id=id)
     session.add(penguin_stamp)
     session.commit()
