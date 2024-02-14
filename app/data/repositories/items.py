@@ -33,7 +33,7 @@ def fetch_item_by_penguin_id(
         .first()
 
 @session_wrapper
-def add_item(
+def add(
     penguin_id: int,
     item_id: int,
     session: Session | None = None
@@ -45,7 +45,7 @@ def add_item(
     session.commit()
 
 @session_wrapper
-def remove_item(
+def remove(
     penguin_id: int,
     item_id: int,
     session: Session | None = None

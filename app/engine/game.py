@@ -847,7 +847,7 @@ class Game:
                             continue
 
                         # Add item to inventory
-                        items.add_item(
+                        items.add(
                             client.pid, item,
                             session=session
                         )
