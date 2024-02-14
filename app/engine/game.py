@@ -46,6 +46,7 @@ class Game:
         self.game_start = time.time()
 
         self.map = random.randint(1, 3)
+        self.total_combos = 0
         self.round = 0
         self.coins = 0
 
@@ -175,6 +176,22 @@ class Game:
         self.remove_targets()
         self.display_win_sequence()
 
+        if not self.enemies:
+            for client in self.clients:
+                if not client.was_ko:
+                    continue
+
+                # Unlock "Up and at 'em" stamp
+                client.unlock_stamp(475)
+
+            if all(client.was_ko for client in self.clients):
+                # Unlock "Team Revival" stamp
+                self.unlock_stamp(476)
+
+            if self.round >= 3:
+                # Unlock "Bonus Win" stamp
+                self.unlock_stamp(473)
+
         self.display_payout()
         self.remove_objects()
         self.close()
@@ -221,6 +238,10 @@ class Game:
 
             self.coins += coins.get(self.round, 0)
             self.round += 1
+
+            if self.round >= 3 and self.bonus_criteria == 'full_health':
+                # Unlock "Full Health" stamp
+                self.unlock_stamp(472)
 
             # Remove any existing enemies
             self.remove_enemies()
@@ -272,6 +293,16 @@ class Game:
                     # Ninja disconnected
                     ninja.idle_animation()
                     continue
+
+                # Unlock "revive" stamp for every ninja that was reviving this round
+                for client in self.clients:
+                    if client.disconnected:
+                        continue
+
+                    if client.ninja.selected_object != ninja.selected_object:
+                        continue
+
+                    client.unlock_stamp(474)
 
                 self.wait_for_animations()
                 ninja.selected_object.set_health(1)
@@ -607,6 +638,13 @@ class Game:
                 if isinstance(target, Ninja):
                     ninja.heal_target(target)
 
+                    if ninja.name == 'Snow':
+                        ninja.heals += 1
+
+                if ninja.heals >= 15:
+                    # Unlock "Heal 15" stamp
+                    self.unlock_stamp(477)
+
             else:
                 continue
 
@@ -620,6 +658,16 @@ class Game:
         is_combo = len(ninjas_with_cards) > 1
 
         if is_combo:
+            self.total_combos += 1
+
+            if len(ninjas_with_cards) >= 3:
+                # Unlock "3 Ninja Combo stamp"
+                self.unlock_stamp(467)
+
+            if self.total_combos >= 3:
+                # Unlock "3 Combos" stamp
+                self.unlock_stamp(485)
+
             self.display_combo_title([
                 ninja.client.element
                 for ninja in ninjas_with_cards
@@ -748,6 +796,10 @@ class Game:
         for client in self.clients:
             client.update_cards()
 
+    def unlock_stamp(self, id: int) -> None:
+        for client in self.clients:
+            client.unlock_stamp(id)
+
     def display_round_title(self) -> None:
         round_time = ((self.game_start + 300) - time.time()) * 1000
 
@@ -826,11 +878,28 @@ class Game:
                     'snow_ninja_progress': result_exp
                 }
 
+                if result_rank >= 13:
+                    # Unlock "Snow Pro" stamp
+                    client.unlock_stamp(487, session=session)
+
                 if len(self.enemies) <= 0:
                     # Update win count
                     key = f'snow_progress_{client.element}_wins'
                     wins = getattr(client.object, key, 0)
                     updates[key] = wins + 1
+
+                    if updates[key] >= 3:
+                        stamp_ids = {
+                            'fire': 470,
+                            'water': 471,
+                            'snow': 469
+                        }
+
+                        # Unlock stamp
+                        client.unlock_stamp(
+                            stamp_ids[client.element],
+                            session=session
+                        )
 
                 if not config.DISABLE_REWARDS:
                     # Update penguin data
@@ -880,7 +949,7 @@ class Game:
                         "stamps": [
                             {
                                 "_id": stamp.id,
-                                "new": False # TODO
+                                "new": stamp in client.unlocked_stamps
                             }
                             for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
                         ],
