@@ -46,6 +46,7 @@ class Game:
         self.game_start = time.time()
 
         self.map = random.randint(1, 3)
+        self.total_combos = 0
         self.round = 0
         self.coins = 0
 
@@ -649,9 +650,15 @@ class Game:
         is_combo = len(ninjas_with_cards) > 1
 
         if is_combo:
+            self.total_combos += 1
+
             if len(ninjas_with_cards) >= 3:
                 # Unlock "3 Ninja Combo stamp"
                 self.unlock_stamp(467)
+
+            if self.total_combos >= 3:
+                # Unlock "3 Combos" stamp
+                self.unlock_stamp(485)
 
             self.display_combo_title([
                 ninja.client.element
