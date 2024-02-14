@@ -827,8 +827,8 @@ class Game:
                 )
 
                 ranks_gained = exp_gained // 100
-                result_rank = client.object.snow_ninja_rank + ranks_gained
-                result_exp = exp_gained % 100
+                result_rank = round(client.object.snow_ninja_rank + ranks_gained)
+                result_exp = round(exp_gained % 100)
 
                 if result_rank >= 24:
                     # Clamp rank to 24
