@@ -343,6 +343,7 @@ class Ninja(GameObject):
         if not self.placed_ghost:
             for tile in self.tiles_in_range():
                 yield tile
+            return
 
         for tile in self.game.grid.tiles:
             distance = self.game.grid.distance(
@@ -364,6 +365,7 @@ class Ninja(GameObject):
         if not self.placed_ghost:
             for tile in self.movable_tiles():
                 yield tile
+            return
 
         for tile in self.ghost_tiles_in_range():
             if not self.game.grid.can_move(tile.x, tile.y):
