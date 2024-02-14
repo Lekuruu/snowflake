@@ -27,5 +27,10 @@ def on_confirm_clicked(client: Penguin, data: dict):
     snow_ui = client.get_window('cardjitsu_snowui.swf')
     snow_ui.send_payload('disableCards')
 
+    if TipPhase.CONFIRM not in client.displayed_tips:
+        # No need to display the confirm tip if
+        # the player has clicked on the confirm button before
+        client.displayed_tips.append(TipPhase.CONFIRM)
+
     if client.tip_mode and client.last_tip == TipPhase.CONFIRM:
         client.game.hide_tip(client)
