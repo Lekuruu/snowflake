@@ -840,7 +840,10 @@ class Game:
                         }
 
                         # Unlock stamp
-                        client.unlock_stamp(stamp_ids[client.element])
+                        client.unlock_stamp(
+                            stamp_ids[client.element],
+                            session=session
+                        )
 
                 if not config.DISABLE_REWARDS:
                     # Update penguin data
