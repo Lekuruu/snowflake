@@ -166,6 +166,10 @@ class CardObject(Card):
             # Unlock "Huge Heal" stamp
             self.client.unlock_stamp(478)
 
+            if is_combo and self.element == 'w':
+                # Unlock "Wave Boost" stamp
+                self.client.unlock_stamp(481)
+
         if ninja_targets and is_combo and self.element == 's':
             # Unlock "Snow Shield" stamp
             self.client.unlock_stamp(479)
