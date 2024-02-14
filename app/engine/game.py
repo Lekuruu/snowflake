@@ -175,6 +175,14 @@ class Game:
         self.remove_targets()
         self.display_win_sequence()
 
+        if not self.enemies:
+            for client in self.clients:
+                if not client.was_ko:
+                    continue
+
+                # Unlock "Up and at 'em" stamp
+                client.unlock_stamp(475)
+
         self.display_payout()
         self.remove_objects()
         self.close()
