@@ -630,6 +630,10 @@ class Game:
         is_combo = len(ninjas_with_cards) > 1
 
         if is_combo:
+            if len(ninjas_with_cards) >= 3:
+                # Unlock "3 Ninja Combo stamp"
+                self.unlock_stamp(467)
+
             self.display_combo_title([
                 ninja.client.element
                 for ninja in ninjas_with_cards
@@ -757,6 +761,10 @@ class Game:
     def update_cards(self) -> None:
         for client in self.clients:
             client.update_cards()
+
+    def unlock_stamp(self, id: int) -> None:
+        for client in self.clients:
+            client.unlock_stamp(id)
 
     def display_round_title(self) -> None:
         round_time = ((self.game_start + 300) - time.time()) * 1000
