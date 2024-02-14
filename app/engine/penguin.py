@@ -50,7 +50,7 @@ class Penguin(MetaplaceProtocol):
         self.selected_card: CardObject | None = None
         self.power_card_slots: List[CardObject] = []
         self.power_cards_all: List[Card] = []
-        self.unlocked_stamps: List[Stamp] = []
+        self.unlocked_stamps: List[int] = []
         self.power_card_stamina: int = 0
         self.played_cards: int = 0
 
@@ -264,7 +264,7 @@ class Penguin(MetaplaceProtocol):
             return
 
         self.logger.info(f'{self} unlocked stamp: "{stamp.name}"')
-        self.unlocked_stamps.append(stamp)
+        self.unlocked_stamps.append(stamp.id)
         stamps.add(
             id, self.pid,
             session=session

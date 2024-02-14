@@ -949,7 +949,7 @@ class Game:
                         "stamps": [
                             {
                                 "_id": stamp.id,
-                                "new": stamp in client.unlocked_stamps
+                                "new": stamp.id in client.unlocked_stamps
                             }
                             for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
                         ],
