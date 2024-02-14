@@ -183,6 +183,10 @@ class Game:
                 # Unlock "Up and at 'em" stamp
                 client.unlock_stamp(475)
 
+            if all(client.was_ko for client in self.clients):
+                # Unlock "Team Revival" stamp
+                self.unlock_stamp(476)
+
         self.display_payout()
         self.remove_objects()
         self.close()
