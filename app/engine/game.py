@@ -175,8 +175,8 @@ class Game:
         self.remove_targets()
         self.display_win_sequence()
 
-        self.remove_objects()
         self.display_payout()
+        self.remove_objects()
         self.close()
 
     def close(self) -> None:
