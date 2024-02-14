@@ -202,6 +202,14 @@ class Game:
                 # All ninjas have been defeated
                 break
 
+            if (self.round >= 2) and (not self.bonus_criteria_met):
+                # Bonus criteria not met on round 3
+                break
+
+            if (self.round >= 3):
+                # Bonus round completed
+                break
+
             # NOTE: No idea if these values are correct
             #       May need to change this in the future
             coins = {
@@ -213,14 +221,6 @@ class Game:
 
             self.coins += coins.get(self.round, 0)
             self.round += 1
-
-            if (self.round > 2) and (not self.bonus_criteria_met):
-                # Bonus criteria not met on round 3
-                break
-
-            if (self.round > 3):
-                # Bonus round completed
-                break
 
             # Remove any existing enemies
             self.remove_enemies()
@@ -793,7 +793,7 @@ class Game:
             return 4
 
         # Players have been defeated
-        return self.round
+        return self.round + 1
 
     def display_payout(self) -> None:
         with app.session.database.managed_session() as session:
