@@ -799,7 +799,7 @@ class Game:
 
     def get_payout_round(self) -> int:
         """Get the round number for the payout screen"""
-        if self.round == 3:
+        if self.round >= 3:
             # Players have entered bonus round
             return 9 - len(self.enemies)
 
