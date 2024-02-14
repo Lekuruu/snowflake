@@ -410,10 +410,10 @@ class Game:
             return
 
         max_enemies = {
-            0: range(1, 2),
-            1: range(1, 2),
-            2: range(1, 2),
-            3: range(1, 2)
+            0: range(1, 4),
+            1: range(1, 4),
+            2: range(1, 4),
+            3: range(4, 5)
         }[self.round]
 
         amount_enemies = random.choice(max_enemies)
