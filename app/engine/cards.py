@@ -156,6 +156,20 @@ class CardObject(Card):
         if is_combo:
             self.apply_effects()
 
+        ninja_targets = [
+            target for target in self.targets
+            if isinstance(target, Ninja)
+            and not target.client.disconnected
+        ]
+
+        if len(ninja_targets) >= 3 and self.element == 's':
+            # Unlock "Huge Heal" stamp
+            self.client.unlock_stamp(478)
+
+        if ninja_targets and is_combo and self.element == 's':
+            # Unlock "Snow Shield" stamp
+            self.client.unlock_stamp(479)
+
         self.client.update_cards()
         self.game.wait_for_animations()
 
@@ -228,16 +242,6 @@ class CardObject(Card):
 
                 if self.element == 'f':
                     target.stun()
-
-        ninja_targets = [
-            target for target in self.targets
-            if isinstance(target, Ninja)
-            and not target.client.disconnected
-        ]
-
-        if len(ninja_targets) >= 3 and self.element == 's':
-            # Unlock "Huge Heal" stamp
-            self.client.unlock_stamp(478)
 
     def apply_effects(self) -> None:
         if self.element == 's':
