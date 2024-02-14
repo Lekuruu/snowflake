@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.python.failure import Failure
+from sqlalchemy.orm import Session
 
 from app.engine.cards import CardObject, MemberCard
 from app.protocols import MetaplaceProtocol
@@ -24,6 +25,7 @@ from app.data import (
 
 import app.session
 import random
+import config
 
 class Penguin(MetaplaceProtocol):
     def __init__(self, server: "SnowflakeWorld", address: IPv4Address | IPv6Address):
@@ -247,20 +249,23 @@ class Penguin(MetaplaceProtocol):
         infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.send_payload('disable')
 
-    def unlock_stamp(self, id: int) -> None:
-        if not (stamp := stamps.fetch_one(id)):
+    def unlock_stamp(self, id: int, session: Session | None = None) -> None:
+        if not (stamp := stamps.fetch_one(id, session=session)):
             return
 
-        if stamps.exists(self.pid, id):
+        if stamps.exists(self.pid, id, session=session):
             return
 
-        self.logger.info(f'{self} unlocked stamp: {stamp.name}')
-        self.unlocked_stamps(stamp)
-        stamps.add(self.pid, id)
+        self.logger.info(f'{self} unlocked stamp: "{stamp.name}"')
+        self.unlocked_stamps.append(stamp)
+        stamps.add(
+            id, self.pid,
+            session=session
+        )
 
         window = self.get_window('stampearned.swf')
 
-        # Wait for window to close
+        # Wait for previous window to close
         self.window_manager.wait_for_window(window, loaded=False)
 
         # Load window
@@ -268,14 +273,15 @@ class Penguin(MetaplaceProtocol):
             {
                 'stamp':
                 {
-                    'description': stamp.description,
-                    'name': stamp.name,
-                    'is_member': stamp.member,
-                    'parent_group_id': stamp.group_id,
-                    'stampGroupId': stamp.group_id,
                     'stamp_id': stamp.id,
-                    'rank': stamp.rank,
-                    'rank_token': stamp.rank_token
+                    'stampGroupId': stamp.group_id,
+                    'parent_group_id': 8, # TODO
+                    'name': f'global_content.stamps.{stamp.id}.name',
+                    'description': f'global_content.stamps.{stamp.id}.description',
+                    'rank_token': f'global_content.stamps.{stamp.id}.rank_token',
+                    'is_member': stamp.member,
+                    'rank': stamp.rank
                 }
-            }
+            },
+            assetPath=f'{config.WINDOW_BASEURL}/'
         )
