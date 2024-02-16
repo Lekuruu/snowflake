@@ -346,14 +346,19 @@ class Game:
             while not condition(player) and not self.server.shutting_down:
                 pass
 
-    def wait_for_animations(self) -> None:
+    def wait_for_animations(self, timeout=8) -> None:
         """Wait for all animations to finish"""
+        start_time = time.time()
+
         while self.callbacks.pending_animations:
-            pass
+            if time.time() - start_time > timeout:
+                self.logger.warning(f'Animation Timeout: {self.callbacks.pending_animations}')
+                self.callbacks.reset_animations()
+                break
 
-        # TODO: This could lead to softlocks
+            time.sleep(0.05)
 
-    def wait_for_window(self, name: str, loaded=True) -> None:
+    def wait_for_window(self, name: str, loaded=True, timeout=8) -> None:
         """Wait for a window to load/close"""
         for client in self.clients:
             window = client.get_window(name)
@@ -361,10 +366,14 @@ class Game:
             if client.disconnected:
                 continue
 
-            while window.loaded != loaded:
-                pass
+            start_time = time.time()
 
-            # TODO: This could lead to softlocks
+            while window.loaded != loaded:
+                if time.time() - start_time > timeout:
+                    self.logger.warning(f'Window Timeout: {name}')
+                    break
+
+            time.sleep(0.05)
 
     def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
@@ -462,8 +471,6 @@ class Game:
                 # There can't be more than 3 enemies of the same type
                 if len(existing_enemies) <= 3:
                     break
-
-                # TODO: This could lead to softlocks
 
             enemy = enemy_class(self)
             enemy.place_object()
@@ -673,7 +680,7 @@ class Game:
                 for ninja in ninjas_with_cards
             ])
 
-            self.callbacks.wait_for_event('comboScreenComplete')
+            self.callbacks.wait_for_event('comboScreenComplete', timeout=6)
 
         for ninja in ninjas_with_cards:
             ninja.use_powercard(is_combo)

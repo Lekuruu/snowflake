@@ -145,7 +145,10 @@ class CardObject(Card):
         self.consume()
 
         # Wait for client to consume card
-        self.game.callbacks.wait_for_client('ConsumeCardResponse', self.client)
+        self.game.callbacks.wait_for_client(
+            'ConsumeCardResponse', self.client,
+            timeout=2
+        )
 
         # Wait for card animation
         time.sleep(1.2)
