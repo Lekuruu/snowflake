@@ -108,7 +108,7 @@ class Game:
 
         # Close player select window
         for client in self.clients:
-            player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+            player_select = client.get_window(config.PLAYERSELECT_SWF)
             player_select.close()
 
         # Load assets
@@ -131,7 +131,7 @@ class Game:
 
         for client in self.clients:
             # Close loading screen
-            player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+            player_select = client.get_window(config.PLAYERSELECT_SWF)
             player_select.send_action('closeCjsnowRoomToRoom')
 
             # Load exit button
@@ -167,6 +167,7 @@ class Game:
                 continue
 
             snow_ui = client.get_window('cardjitsu_snowui.swf')
+            snow_ui.send_payload('updateStamina', {'cardData': None, 'cycle': False, 'stamina': 0})
             snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
@@ -346,16 +347,19 @@ class Game:
             while not condition(player) and not self.server.shutting_down:
                 pass
 
-        # TODO: This could lead to softlocks
-
-    def wait_for_animations(self) -> None:
+    def wait_for_animations(self, timeout=8) -> None:
         """Wait for all animations to finish"""
+        start_time = time.time()
+
         while self.callbacks.pending_animations:
-            pass
+            if time.time() - start_time > timeout:
+                self.logger.warning(f'Animation Timeout: {self.callbacks.pending_animations}')
+                self.callbacks.reset_animations()
+                break
 
-        # TODO: This could lead to softlocks
+            time.sleep(0.05)
 
-    def wait_for_window(self, name: str, loaded=True) -> None:
+    def wait_for_window(self, name: str, loaded=True, timeout=8) -> None:
         """Wait for a window to load/close"""
         for client in self.clients:
             window = client.get_window(name)
@@ -363,10 +367,14 @@ class Game:
             if client.disconnected:
                 continue
 
-            while window.loaded != loaded:
-                pass
+            start_time = time.time()
 
-            # TODO: This could lead to softlocks
+            while window.loaded != loaded:
+                if time.time() - start_time > timeout:
+                    self.logger.warning(f'Window Timeout: {name}')
+                    break
+
+            time.sleep(0.05)
 
     def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
@@ -464,8 +472,6 @@ class Game:
                 # There can't be more than 3 enemies of the same type
                 if len(existing_enemies) <= 3:
                     break
-
-                # TODO: This could lead to softlocks
 
             enemy = enemy_class(self)
             enemy.place_object()
@@ -675,7 +681,7 @@ class Game:
                 for ninja in ninjas_with_cards
             ])
 
-            self.callbacks.wait_for_event('comboScreenComplete')
+            self.callbacks.wait_for_event('comboScreenComplete', timeout=6)
 
         for ninja in ninjas_with_cards:
             ninja.use_powercard(is_combo)
@@ -964,7 +970,7 @@ class Game:
                         "stamps": [
                             {
                                 "_id": stamp.id,
-                                "new": stamp in client.unlocked_stamps
+                                "new": stamp.id in client.unlocked_stamps
                             }
                             for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
                         ],
@@ -984,6 +990,9 @@ class Game:
             return
 
         for ninja in self.ninjas:
+            if ninja.client.disconnected:
+                continue
+
             if ninja.hp <= 0:
                 ninja.set_health(1)
 

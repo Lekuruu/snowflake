@@ -7,6 +7,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from enum import IntEnum
 
+import time
+
 if TYPE_CHECKING:
     from app.engine.game import Game
     from app.engine import Penguin
@@ -127,16 +129,36 @@ class CallbackHandler:
         if target in self.pending_events:
             self.pending_events.pop(target, None)
 
-    def wait_for_client(self, event: str, client: "Penguin") -> None:
+    def wait_for_client(self, event: str, client: "Penguin", timeout=8) -> None:
         """Wait for an event to be called by the client"""
         self.register_event(client, event)
 
-        while event in self.pending_events.get(client, []):
-            pass
+        start_time = time.time()
 
-    def wait_for_event(self, event: str) -> None:
+        while event in self.pending_events.get(client, []):
+            if time.time() - start_time > timeout:
+                self.game.logger.warning(f"Event Timeout: {event}")
+                self.remove_events(client)
+                break
+
+            time.sleep(0.05)
+
+    def wait_for_event(self, event: str, timeout=8) -> None:
         """Wait for an event to be called by any of the clients"""
         self.register_event(self.game, event)
 
+        start_time = time.time()
+
         while event in self.pending_events.get(self.game, []):
-            pass
+            if time.time() - start_time > timeout:
+                self.game.logger.warning(f"Event Timeout: {event}")
+                self.reset_events()
+                break
+
+            time.sleep(0.05)
+
+    def reset_animations(self) -> None:
+        self.pending_actions.clear()
+
+    def reset_events(self) -> None:
+        self.pending_events.clear()
