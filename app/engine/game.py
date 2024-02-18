@@ -108,7 +108,7 @@ class Game:
 
         # Close player select window
         for client in self.clients:
-            player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+            player_select = client.get_window(config.PLAYERSELECT_SWF)
             player_select.close()
 
         # Load assets
@@ -131,7 +131,7 @@ class Game:
 
         for client in self.clients:
             # Close loading screen
-            player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+            player_select = client.get_window(config.PLAYERSELECT_SWF)
             player_select.send_action('closeCjsnowRoomToRoom')
 
             # Load exit button
