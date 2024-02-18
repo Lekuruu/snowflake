@@ -60,10 +60,7 @@ class MatchmakingQueue:
         game.server.games.add(game)
 
         for client in game.clients:
-            if not config.ENABLE_BETA:
-                player_select = client.get_window('cardjitsu_snowplayerselect.swf')
-            else:
-                player_select = client.get_window('cardjitsu_snowplayerselectbeta.swf')
+            player_select = client.get_window(config.PLAYERSELECT_SWF)
             player_select.send_payload(
                 'matchFound',
                 {
