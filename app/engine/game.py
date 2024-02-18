@@ -108,7 +108,10 @@ class Game:
 
         # Close player select window
         for client in self.clients:
-            player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+            if not config.ENABLE_BETA:
+                player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+            else:
+                player_select = client.get_window('cardjitsu_snowplayerselectbeta.swf')
             player_select.close()
 
         # Load assets
@@ -131,7 +134,10 @@ class Game:
 
         for client in self.clients:
             # Close loading screen
-            player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+            if not config.ENABLE_BETA:
+                player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+            else:
+                player_select = client.get_window('cardjitsu_snowplayerselectbeta.swf')
             player_select.send_action('closeCjsnowRoomToRoom')
 
             # Load exit button
@@ -192,7 +198,10 @@ class Game:
                 # Unlock "Bonus Win" stamp
                 self.unlock_stamp(473)
 
-        self.display_payout()
+        if not config.ENABLE_BETA:
+            self.display_payout()
+        else:
+            self.display_beta_payout()
         self.remove_objects()
         self.close()
 
@@ -476,19 +485,22 @@ class Game:
             enemy.place_object()
 
     def create_environment(self) -> None:
-        self.backgrounds = {
-            1: [
-                GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
-            ],
-            2: [
-                GameObject(self, 'forest_bg', x=4.5, y=-1.1),
-                GameObject(self, 'forest_fg', x=4.5, y=6.1)
-            ],
-            3: [
-                GameObject(self, 'cragvalley_bg', x=4.5, y=-1.1),
-                GameObject(self, 'cragvalley_fg', x=4.5, y=6)
-            ]
-        }[self.map]
+        if not config.ENABLE_BETA:
+            self.backgrounds = {
+                1: [
+                    GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
+                ],
+                2: [
+                    GameObject(self, 'forest_bg', x=4.5, y=-1.1),
+                    GameObject(self, 'forest_fg', x=4.5, y=6.1)
+                ],
+                3: [
+                    GameObject(self, 'cragvalley_bg', x=4.5, y=-1.1),
+                    GameObject(self, 'cragvalley_fg', x=4.5, y=6)
+                ]
+            }[self.map]
+        else:
+            self.backgrounds = [GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)]
 
         for background in self.backgrounds:
             background.place_object()
@@ -962,6 +974,50 @@ class Game:
                         ],
                         "xpStart": client.object.snow_ninja_progress,
                         "xpEnd": exp_gained if result_rank < 24 else 100,
+                    },
+                    loadDescription="",
+                    assetPath="",
+                    xPercent=0.08,
+                    yPercent=0.05
+                )
+
+    def display_beta_payout(self) -> None:
+        with app.session.database.managed_session() as session:
+
+            for client in self.clients:
+                if client.disconnected:
+                    continue
+
+                # Calculate percentage based on round
+                exp_gained = (self.get_payout_round() * 11) + 1
+
+                if not config.DISABLE_REWARDS:
+                    if exp_gained == 100:
+                        item = 1600
+                        # Add item to inventory
+                        items.add(
+                            client.pid, item,
+                            session=session
+                        )
+
+                        self.logger.info(f'{client} unlocked item {item}')
+
+                # Display payout swf window
+                payout = client.get_window('cardjitsu_snowpayoutbeta.swf')
+                payout.layer = 'bottomLayer'
+                payout.load(
+                    {
+                        "coinsEarned": 0,
+                        "doubleCoins": False, # TODO
+                        "damage": 0, # Only important for tusk battle
+                        "isBoss": 0,
+                        "rank": 24,
+                        "round": self.get_payout_round(),
+                        "showItems": 0, # Only important for tusk battle
+                        "stampList": [],
+                        "stamps": [],
+                        "xpStart": 0,
+                        "xpEnd": exp_gained
                     },
                     loadDescription="",
                     assetPath="",
