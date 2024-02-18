@@ -43,7 +43,10 @@ def on_window_manager_ready(client: Penguin, data: dict):
     )
 
     # Load player select screen
-    player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+    if not config.ENABLE_BETA:
+        player_select = client.get_window('cardjitsu_snowplayerselect.swf')
+    else:
+        player_select = client.get_window('cardjitsu_snowplayerselectbeta.swf')
     player_select.load(
         {
             'game': 'snow',
