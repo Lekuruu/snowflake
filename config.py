@@ -28,6 +28,9 @@ try:
     DISABLE_ENEMY_AI = os.environ.get('DISABLE_ENEMY_AI', 'False').lower() == 'true'
     DISABLE_REWARDS = os.environ.get('DISABLE_REWARDS', 'False').lower() == 'true'
     DISABLE_STAMPS = os.environ.get('DISABLE_STAMPS', 'False').lower() == 'true'
+    ENABLE_BETA = os.environ.get('ENABLE_BETA', 'False').lower() == 'true'
+    if ENABLE_BETA:
+        DISABLE_STAMPS = False
 
     BASE_URL = f'{MEDIA_LOCATION}/game/mpassets/'
     CARDS_ASSET_LOCATION = f'{MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/'

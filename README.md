@@ -1,6 +1,6 @@
 # Snowflake
 
-A work-in-progress card-jitsu snow server emulator, made for houdini.
+A work-in-progress Card-Jitsu Snow server emulator, made for [Houdini](https://github.com/solero/houdini).
 
 ## Progress
 
@@ -42,18 +42,19 @@ A work-in-progress card-jitsu snow server emulator, made for houdini.
 - [ ] Custom Features
     - [ ] Singleplayer Mode
     - [ ] Ninja AI
+    - [x] Beta mode
 
 ## Setup
 
-This setup requires you to have a working installation of houdini with dash, as well as a copy of [python](https://python.org) (3.8 to 3.12).
-There is some necessary configuration to get this working, which I will cover in the following sections.
+This setup requires you to have a working installation of [Houdini](https://github.com/solero/houdini) with [Dash](https://github.com/solero/dash), as well as a copy of [Python](https://python.org) (3.8 to 3.12).
+There is some necessary configuration to get this working, which will be covered in the following sections.
 
-### Changing the wns url
+### Changing the WNS URL
 
-The card-jitsu snow engine needs a special "wns url", to be able to connect to the right server.
-You can find this url inside your `index.html` file, and searching for "wns".
+The Card-Jitsu Snow engine needs a special "WNS URL", to be able to connect to the right server.
+You can find this URL inside your `index.html` file, and searching for "wns".
 
-If you have houdini set up with [wand](https://github.com/solero/wand), it would look something like this:
+If you have Houdini set up with [Wand](https://github.com/solero/wand), it would look something like this:
 
 1. Open the `templates/vanilla-media/play/index.html.template` file in your editor of choice
 
@@ -61,13 +62,13 @@ If you have houdini set up with [wand](https://github.com/solero/wand), it would
 
 3. Restart nginx: `sudo docker-compose restart web`
 
-This may be different for your setup of course. The important part is that the wns url is set to your vanilla play url, i.e. "play.localhost", or "localhost/play/".
+This may be different for your setup of course. The important part is that the WNS URL is set to your vanilla play URL, i.e. "play.localhost", or "localhost/play/".
 
-### Configuring dash
+### Configuring Dash
 
 **This step is not required if you run this project locally!**
 
-Dash will tell the card-jitsu snow client where the game server is located, and thus needs to have the right configuration as well.
+Dash will tell the Card-Jitsu Snow client where the game server is located, and thus needs to have the right configuration as well.
 
 1. Open the `settings.py` file inside the `dash` folder
 
@@ -77,7 +78,7 @@ Dash will tell the card-jitsu snow client where the game server is located, and 
 
 4. Restart dash
 
-### Setting up snowflake
+### Setting up Snowflake
 
 And now, we need to set up the actual repository.
 
@@ -88,6 +89,14 @@ And now, we need to set up the actual repository.
 3. Install the requirements: `pip install -r requirements.txt`
 
 4. Run the server: `python main.py`
+
+### Beta mode
+
+Snowflake includes a recreation of the Card-Jitsu Snow beta as a toggleable option. If you wish to use this feature, you'll need to add a few new SWF files.
+
+[cardjitsu_snowpayoutbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cardjitsu_snowpayoutbeta.swf) and [cardjitsu_snowplayerselectbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cardjitsu_snowpayoutbeta.swf) both need to be in `/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows/`.
+
+[cjsnow_uiassetsbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cjsnow_uiassetsbeta.swf) and [cjsnow_playerselectassetsbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cjsnow_playerselectassetsbeta.swf) both need to be in `/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/assets/`.
 
 ## Troubleshooting
 
