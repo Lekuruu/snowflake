@@ -112,6 +112,7 @@ class Game:
                 player_select = client.get_window('cardjitsu_snowplayerselect.swf')
             else:
                 player_select = client.get_window('cardjitsu_snowplayerselectbeta.swf')
+                
             player_select.close()
 
         # Load assets
@@ -138,6 +139,7 @@ class Game:
                 player_select = client.get_window('cardjitsu_snowplayerselect.swf')
             else:
                 player_select = client.get_window('cardjitsu_snowplayerselectbeta.swf')
+                
             player_select.send_action('closeCjsnowRoomToRoom')
 
             # Load exit button
@@ -202,6 +204,7 @@ class Game:
             self.display_payout()
         else:
             self.display_beta_payout()
+
         self.remove_objects()
         self.close()
 
@@ -499,8 +502,11 @@ class Game:
                     GameObject(self, 'cragvalley_fg', x=4.5, y=6)
                 ]
             }[self.map]
+
         else:
-            self.backgrounds = [GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)]
+            self.backgrounds = [
+                GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
+            ]
 
         for background in self.backgrounds:
             background.place_object()
