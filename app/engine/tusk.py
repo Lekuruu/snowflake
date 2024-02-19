@@ -85,6 +85,7 @@ class TuskGame(Game):
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_tuskthemecaveamb', looping=True).play(self)
 
+        self.initialize_objects()
         self.show_environment()
         self.spawn_ninjas()
 
