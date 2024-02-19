@@ -110,6 +110,25 @@ class MetaplaceProtocol(LineOnlyReceiver):
         encoded_arguments = '|'.join(str(a) for a in args)
         self.sendLine(f'[{tag}]|{encoded_arguments}|'.encode())
 
+    def switch_place(self, place: Place) -> None:
+        self.set_place(place.id)
+
+        # Load sprites
+        for asset in place.assets:
+            self.send_tag(
+                'S_LOADSPRITE',
+                f'0:{asset.index}'
+            )
+
+        # Load sounds
+        for sound in place.sound_assets:
+            self.send_tag(
+                'S_LOADSPRITE',
+                f'0:{sound.index}'
+            )
+
+        self.send_tag('W_ASSETSCOMPLETE')
+
     def get_window(self, name: str | None = None, url: str | None = None):
         return self.window_manager.get_window(name, url)
 
