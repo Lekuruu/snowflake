@@ -1,20 +1,124 @@
 
+from app.engine.place import SnowLobby, SnowBattle, TuskBattle
 from app.objects.asset import Asset
+
 import app.session
 
 # Assets taken from: /game/mpassets/publishdata/r5309/pubdata/spriteList_tokenized.gml.gz
 # TODO: Automatically load assets from the spriteList file
 
-app.session.assets.update([
+common_assets = [
+    Asset(1, "blank_png"),
+    Asset(6740009, "Empty Tile"),
+    Asset(6740010, "open"),
+    Asset(6740011, "enemy"),
+    Asset(6740012, "penguin"),
+    Asset(6740013, "penguin_spawn_occupied"),
+    Asset(6740014, "penguin_spawn_unoccupied"),
+    Asset(6740015, "enemy_spawn_unoccupied"),
+    Asset(6740016, "enemy_spawn_occupied"),
+    Asset(6740017, "obstacle"),
+    Asset(7940001, "water_spawn"),
+    Asset(7940002, "enemy_spawn_unoccupied"),
+    Asset(7940003, "enemy_spawn_occupied"),
+    Asset(7940004, "obstacle"),
+    Asset(7940005, "penguin_spawn_occupied"),
+    Asset(7940006, "Empty Tile"),
+    Asset(7940007, "blankblue"),
+    Asset(7940008, "blankgreen"),
+    Asset(7940009, "blankgrey"),
+    Asset(7940010, "blankpurpl"),
+    Asset(7940011, "blankwhite"),
+    Asset(7940012, "Empty Tile"),
+    Asset(7940013, "open"),
+    Asset(7940014, "enemy"),
+    Asset(7940015, "penguin"),
+    Asset(7940016, "penguin_spawn_occupied"),
+    Asset(7940017, "penguin_spawn_unoccupied"),
+    Asset(7940018, "enemy_spawn_unoccupied"),
+    Asset(7940019, "enemy_spawn_occupied"),
+    Asset(7940020, "obstacle")
+]
+
+ui_assets = [
+    Asset(100395, "reghealthbar_animation"),
+    Asset(100040, "ui_target_red_attack_intro_anim"),
+    Asset(100041, "ui_target_red_attack_idle_anim"),
+    Asset(100042, "ui_target_green_attack_selected_intro_anim"),
+    Asset(100043, "ui_target_green_attack_selected_idle_anim"),
+    Asset(100044, "ui_target_white_heal_intro_anim"),
+    Asset(100045, "ui_target_white_heal_idle_anim"),
+    Asset(100046, "ui_target_green_heal_selected_intro_anim"),
+    Asset(100047, "ui_target_green_heal_selected_idle_anim"),
+    Asset(100048, "ui_healfx_anim"),
+    Asset(100063, "ui_tile_move"),
+    Asset(100064, "ui_tile_attack"),
+    Asset(100065, "ui_tile_heal"),
+    Asset(100067, "ui_attack_numbers_anim"),
+    Asset(100120, "ui_card_fire"),
+    Asset(100121, "ui_card_snow"),
+    Asset(100122, "ui_card_water"),
+    Asset(100195, "ui_confirm"),
+    Asset(100250, "ui_heal_numbers_anim"),
+    Asset(100266, "ui_card_pattern3x3"),
+    Asset(100267, "ui_card_pattern3x2"),
+    Asset(100268, "ui_card_pattern2x3"),
+    Asset(100269, "ui_card_pattern2x2"),
+    Asset(100270, "ui_tile_no_move"),
+    Asset(100300, "ui_tile_frame"),
+    Asset(8740005, "ui_card_member_snow"),
+    Asset(8740006, "ui_card_member_water"),
+    Asset(8740007, "ui_card_member_fire"),
+    Asset(100334, "effect_rageloop_anim"),
+    Asset(100335, "effect_explosion_anim"),
+    Asset(100336, "effect_shield_loop"),
+    Asset(100337, "effect_shieldpop_anim"),
+    Asset(100339, "effect_resisualfiredamage_anim"),
+    Asset(100392, "effect_rageattack_anim"),
+    Asset(100396, "effect_ragehit_anim"),
+    Asset(8740008, "effect_revivebeam_anim"),
+]
+
+background_assets = [
     Asset(100380, "env_mountaintop_bg"),
     Asset(100394, "rock_mountaintop"),
     Asset(6740003, "cragvalley_bg"),
     Asset(6740004, "cragvalley_fg"),
     Asset(6740006, "forest_bg"),
     Asset(6740007, "forest_fg"),
-    Asset(6740008, "crag_rock"),
-    Asset(100395, "reghealthbar_animation"),
+    Asset(6740008, "crag_rock")
+]
+
+enemy_assets = [
     Asset(100379, "snowman_spawn_anim"),
+    Asset(100297, "tank_idle_anim"),
+    Asset(100299, "tank_attack_anim"),
+    Asset(100302, "tank_hit_anim"),
+    Asset(100303, "tank_move_anim"),
+    Asset(100304, "tank_ko_anim"),
+    Asset(100240, "tank_swipe_horiz_anim"),
+    Asset(100241, "tank_swipe_vert_anim"),
+    Asset(100305, "sly_idle_anim"),
+    Asset(100306, "sly_attack_anim"),
+    Asset(100307, "sly_move_anim"),
+    Asset(100308, "sly_hit_anim"),
+    Asset(100309, "sly_ko_anim"),
+    Asset(100310, "sly_projectile_anim"),
+    Asset(1840011, "sly_daze_anim"),
+    Asset(100311, "scrap_idle_anim"),
+    Asset(100312, "scrap_attack_anim"),
+    Asset(100313, "scrap_attackeffect_anim"),
+    Asset(100314, "scrap_attacklittleeffect_anim"),
+    Asset(100315, "scrap_projectileeast_anim"),
+    Asset(100316, "scrap_projectilenorth_anim"),
+    Asset(100317, "scrap_projectilenortheast_anim"),
+    Asset(100318, "scrap_hit_anim"),
+    Asset(100319, "scrap_move_anim"),
+    Asset(100320, "scrap_ko_anim"),
+    Asset(1840012, "scrap_dazed_anim")
+]
+
+ninja_assets = [
     Asset(30044, "waterninja_move_ghost"),
     Asset(30070, "fireninja_move_ghost"),
     Asset(100018, "snowninja_move_ghost"),
@@ -73,72 +177,14 @@ app.session.assets.update([
     Asset(100377, "snowninja_reviveothersloop_anim"),
     Asset(8740003, "snowninja_igloodrop_anim1"),
     Asset(8740004, "snowninja_igloodrop_anim2"),
-    Asset(8740011, "snowninja_member_revive"),
-    Asset(100297, "tank_idle_anim"),
-    Asset(100299, "tank_attack_anim"),
-    Asset(100302, "tank_hit_anim"),
-    Asset(100303, "tank_move_anim"),
-    Asset(100304, "tank_ko_anim"),
-    Asset(100240, "tank_swipe_horiz_anim"),
-    Asset(100241, "tank_swipe_vert_anim"),
-    Asset(100305, "sly_idle_anim"),
-    Asset(100306, "sly_attack_anim"),
-    Asset(100307, "sly_move_anim"),
-    Asset(100308, "sly_hit_anim"),
-    Asset(100309, "sly_ko_anim"),
-    Asset(100310, "sly_projectile_anim"),
-    Asset(1840011, "sly_daze_anim"),
-    Asset(100311, "scrap_idle_anim"),
-    Asset(100312, "scrap_attack_anim"),
-    Asset(100313, "scrap_attackeffect_anim"),
-    Asset(100314, "scrap_attacklittleeffect_anim"),
-    Asset(100315, "scrap_projectileeast_anim"),
-    Asset(100316, "scrap_projectilenorth_anim"),
-    Asset(100317, "scrap_projectilenortheast_anim"),
-    Asset(100318, "scrap_hit_anim"),
-    Asset(100319, "scrap_move_anim"),
-    Asset(100320, "scrap_ko_anim"),
-    Asset(1840012, "scrap_dazed_anim"),
-    Asset(100040, "ui_target_red_attack_intro_anim"),
-    Asset(100041, "ui_target_red_attack_idle_anim"),
-    Asset(100042, "ui_target_green_attack_selected_intro_anim"),
-    Asset(100043, "ui_target_green_attack_selected_idle_anim"),
-    Asset(100044, "ui_target_white_heal_intro_anim"),
-    Asset(100045, "ui_target_white_heal_idle_anim"),
-    Asset(100046, "ui_target_green_heal_selected_intro_anim"),
-    Asset(100047, "ui_target_green_heal_selected_idle_anim"),
-    Asset(100048, "ui_healfx_anim"),
-    Asset(100063, "ui_tile_move"),
-    Asset(100064, "ui_tile_attack"),
-    Asset(100065, "ui_tile_heal"),
-    Asset(100067, "ui_attack_numbers_anim"),
-    Asset(100120, "ui_card_fire"),
-    Asset(100121, "ui_card_snow"),
-    Asset(100122, "ui_card_water"),
-    Asset(100195, "ui_confirm"),
-    Asset(100250, "ui_heal_numbers_anim"),
-    Asset(100266, "ui_card_pattern3x3"),
-    Asset(100267, "ui_card_pattern3x2"),
-    Asset(100268, "ui_card_pattern2x3"),
-    Asset(100269, "ui_card_pattern2x2"),
-    Asset(100270, "ui_tile_no_move"),
+    Asset(8740011, "snowninja_member_revive")
+]
+
+tusk_assets = [
     Asset(100272, "ui_target_red_attack_tusk_intro"),
     Asset(100273, "ui_target_red_attack_idle_tusk_anim"),
     Asset(100291, "ui_target_green_attack_selected_intro_tusk_anim"),
     Asset(100293, "ui_target_green_idle_tusk"),
-    Asset(100300, "ui_tile_frame"),
-    Asset(8740005, "ui_card_member_snow"),
-    Asset(8740006, "ui_card_member_water"),
-    Asset(8740007, "ui_card_member_fire"),
-    Asset(100334, "effect_rageloop_anim"),
-    Asset(100335, "effect_explosion_anim"),
-    Asset(100336, "effect_shield_loop"),
-    Asset(100337, "effect_shieldpop_anim"),
-    Asset(100339, "effect_resisualfiredamage_anim"),
-    Asset(100392, "effect_rageattack_anim"),
-    Asset(100396, "effect_ragehit_anim"),
-    Asset(6740002, "effect_tusk_push"),
-    Asset(8740008, "effect_revivebeam_anim"),
     Asset(100381, "sensei_attackstart_anim"),
     Asset(100382, "sensei_attackloop_anim"),
     Asset(100383, "sensei_idle_anim"),
@@ -163,39 +209,10 @@ app.session.assets.update([
     Asset(6740001, "tusk_stun_anim"),
     Asset(1840001, "tusk_background_under"),
     Asset(6740005, "tusk_background_over"),
-    Asset(6740009, "Empty Tile"),
-    Asset(6740010, "open"),
-    Asset(6740011, "enemy"),
-    Asset(6740012, "penguin"),
-    Asset(6740013, "penguin_spawn_occupied"),
-    Asset(6740014, "penguin_spawn_unoccupied"),
-    Asset(6740015, "enemy_spawn_unoccupied"),
-    Asset(6740016, "enemy_spawn_occupied"),
-    Asset(6740017, "obstacle"),
-    Asset(7940001, "water_spawn"),
-    Asset(7940002, "enemy_spawn_unoccupied"),
-    Asset(7940003, "enemy_spawn_occupied"),
-    Asset(7940004, "obstacle"),
-    Asset(7940005, "penguin_spawn_occupied"),
-    Asset(7940006, "Empty Tile"),
-    Asset(7940007, "blankblue"),
-    Asset(7940008, "blankgreen"),
-    Asset(7940009, "blankgrey"),
-    Asset(7940010, "blankpurpl"),
-    Asset(7940011, "blankwhite"),
-    Asset(7940012, "Empty Tile"),
-    Asset(7940013, "open"),
-    Asset(7940014, "enemy"),
-    Asset(7940015, "penguin"),
-    Asset(7940016, "penguin_spawn_occupied"),
-    Asset(7940017, "penguin_spawn_unoccupied"),
-    Asset(7940018, "enemy_spawn_unoccupied"),
-    Asset(7940019, "enemy_spawn_occupied"),
-    Asset(7940020, "obstacle"),
-    Asset(1, "blank_png"),
-])
+    Asset(6740002, "effect_tusk_push")
+]
 
-app.session.sound_assets.update([
+sound_assets = [
     Asset(1840002, "mus_mg_201303_cjsnow_gamewindamb"),
     Asset(1840003, "sfx_mg_2013_cjsnow_snowmantankhit"),
     Asset(1840004, "sfx_mg_2013_cjsnow_snowmanslyhit"),
@@ -237,5 +254,26 @@ app.session.sound_assets.update([
     Asset(1840041, "mus_mg_201303_cjsnow_tuskthemecaveamb"),
     Asset(1840042, "SFX_MG_2013_CJSnow_UIPlayerReady_VBR8"),
     Asset(1840043, "SFX_MG_CJSnow_PowercardReviveStart"),
-    Asset(1840044, "SFX_MG_CJSnow_PowercardReviveEnd"),
-])
+    Asset(1840044, "SFX_MG_CJSnow_PowercardReviveEnd")
+]
+
+SnowLobby.assets.update(common_assets)
+SnowBattle.assets.update(common_assets)
+SnowBattle.assets.update(ui_assets)
+SnowBattle.assets.update(ninja_assets)
+SnowBattle.assets.update(enemy_assets)
+SnowBattle.assets.update(background_assets)
+SnowBattle.sound_assets.update(sound_assets)
+TuskBattle.assets.update(common_assets)
+TuskBattle.assets.update(ui_assets)
+TuskBattle.assets.update(tusk_assets)
+TuskBattle.assets.update(ninja_assets)
+TuskBattle.sound_assets.update(sound_assets)
+
+app.session.assets.update(common_assets)
+app.session.assets.update(ui_assets)
+app.session.assets.update(ninja_assets)
+app.session.assets.update(enemy_assets)
+app.session.assets.update(background_assets)
+app.session.assets.update(tusk_assets)
+app.session.sound_assets.update(sound_assets)
