@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, Tuple, Iterator
 from app.objects import GameObject, Asset
 from app.objects.ninjas import Ninja
-from app.data.constants import TipPhase
+from app.data import TipPhase
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
@@ -163,7 +163,33 @@ class Grid:
             if client.ninja.hp <= 0:
                 continue
 
-            for tile in client.ninja.movable_tiles():
+            for tile in client.ninja.tiles_in_range():
+                if not self.can_move(tile.x, tile.y):
+                    # Client cannot move to the tile
+                    tile_name = 'ui_tile_no_move'
+
+                    if isinstance((ninja := self[tile.x, tile.y]), Ninja):
+                        if ninja == client.ninja:
+                            tile_name = 'ui_tile_move'
+
+                        elif (
+                            ninja.hp <= 0 and
+                            not ninja.client.disconnected
+                        ):
+                            # Client can revive the ninja
+                            tile_name = 'ui_tile_heal'
+
+                        elif (
+                            ninja.hp < ninja.max_hp and
+                            not ninja.client.disconnected and
+                            client.element == 'snow'
+                        ):
+                            # Client can heal the ninja
+                            tile_name = 'ui_tile_heal'
+
+                    tile.place_sprite(tile_name, client)
+                    continue
+
                 tile.place_sprite('ui_tile_move', client)
 
     def hide_tiles(self) -> None:
