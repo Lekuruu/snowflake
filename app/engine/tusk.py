@@ -2,10 +2,11 @@
 from __future__ import annotations
 from typing import List
 
-from app.objects.ninjas import WaterNinja, FireNinja, SnowNinja
+from app.objects.ninjas import WaterNinja, FireNinja, SnowNinja, Sensei
 from app.objects.collections import ObjectCollection
 from app.objects.gameobject import GameObject
 from app.objects.enemies import Enemy
+from app.objects.ninjas import Ninja
 from app.objects.sound import Sound
 
 from app.data import TipPhase, RewardMultipliers, SnowRewards
@@ -26,6 +27,10 @@ import time
 
 class TuskGame(Game):
     def __init__(self, fire: Penguin, snow: Penguin, water: Penguin) -> None:
+        self.sensei: Sensei | None = None
+        self.tusk: Enemy | None = None
+        # TODO: Add tusk object
+
         self.server = fire.server
         self.water = water
         self.fire = fire
@@ -144,7 +149,6 @@ class TuskGame(Game):
         self.create_ninjas()
 
         # TODO: Tusk
-        # TODO: Sensei
 
     def create_environment(self) -> None:
         self.backgrounds.append(GameObject(self, 'tusk_background_under', x=4.5, y=-1.1))
@@ -174,6 +178,127 @@ class TuskGame(Game):
         snow = SnowNinja(self.snow, **spawn_positions[2])
         snow.place_object()
         self.snow.ninja = snow
+
+        sensei = Sensei(self, x=0, y=2)
+        sensei.place_object()
+        self.sensei = sensei
+
+    def spawn_ninjas(self) -> None:
+        water = self.objects.by_name('Water')
+        water.place_object()
+        water.idle_animation()
+        water.place_healthbar()
+
+        snow = self.objects.by_name('Snow')
+        snow.place_object()
+        snow.idle_animation()
+        snow.place_healthbar()
+
+        fire = self.objects.by_name('Fire')
+        fire.place_object()
+        fire.idle_animation()
+        fire.place_healthbar()
+
+        self.sensei.place_object()
+        self.sensei.idle_animation()
+
+    def do_ninja_actions(self) -> None:
+        ninjas_without_cards = [
+            ninja for ninja in self.ninjas
+            if not ninja.client.selected_card
+            and not ninja.client.selected_member_card
+        ]
+
+        for ninja in ninjas_without_cards:
+            if ninja.selected_target:
+                target = ninja.selected_object
+
+                if target is None:
+                    # Target has been removed/defeated
+                    continue
+
+                if isinstance(target, Enemy):
+                    ninja.attack_target(target)
+
+                if isinstance(target, Ninja):
+                    ninja.heal_target(target)
+
+                    if ninja.name == 'Snow':
+                        ninja.heals += 1
+
+                if ninja.heals >= 15:
+                    # Unlock "Heal 15" stamp
+                    self.unlock_stamp(477)
+
+            else:
+                continue
+
+            time.sleep(1)
+
+        ninjas_with_cards = [
+            ninja for ninja in self.ninjas
+            if ninja.client.placed_powercard
+        ]
+
+        is_combo = len(ninjas_with_cards) > 1
+
+        if is_combo:
+            self.total_combos += 1
+
+            if len(ninjas_with_cards) >= 3:
+                # Unlock "3 Ninja Combo stamp"
+                self.unlock_stamp(467)
+
+            if self.total_combos >= 3:
+                # Unlock "3 Combos" stamp
+                self.unlock_stamp(485)
+
+            elements = [
+                ninja.client.element
+                for ninja in ninjas_with_cards
+            ]
+
+            if self.sensei.power_state == 1:
+                # Sensei is using a powerup
+                elements.append('sensei')
+
+                if len(elements) >= 4:
+                    # Unlock "4 Ninja Combo" stamp
+                    self.unlock_stamp(468)
+
+            self.display_combo_title(elements)
+            self.callbacks.wait_for_event('comboScreenComplete', timeout=6)
+
+        self.sensei.update_state()
+        time.sleep(1)
+
+        for ninja in ninjas_with_cards:
+            ninja.use_powercard(is_combo)
+            time.sleep(1)
+
+        ninjas_with_member_cards = [
+            client for client in self.clients
+            if client.selected_member_card
+        ]
+
+        if ninjas_with_member_cards:
+            for client in self.clients:
+                if client.disconnected:
+                    continue
+
+                revive_splash = client.get_window('cardjitsu_snowrevive.swf')
+                revive_splash.load(
+                    xPercent=0.2,
+                    yPercent=0
+                )
+
+            # Wait for revive splash to load and close
+            self.wait_for_window('cardjitsu_snowrevive.swf', loaded=True)
+            self.wait_for_window('cardjitsu_snowrevive.swf', loaded=False)
+
+            for ninja in ninjas_with_member_cards:
+                ninja.member_card.consume()
+                time.sleep(1)
 
     def display_round_title(self) -> None:
         for client in self.clients:
@@ -286,3 +411,27 @@ class TuskGame(Game):
                     xPercent=0.08,
                     yPercent=0.05
                 )
+
+    def display_win_sequence(self) -> None:
+        time.sleep(2)
+
+        if all(ninja.hp <= 0 for ninja in self.ninjas):
+            self.tusk.win_animation()
+            self.sensei.lose_animation()
+            return
+
+        # Unlock "Final Battle" stamp
+        self.unlock_stamp(486)
+
+        for ninja in self.ninjas:
+            if ninja.client.disconnected:
+                continue
+
+            if ninja.hp <= 0:
+                ninja.set_health(1)
+
+            ninja.win_animation()
+
+        self.sensei.win_animation()
+
+        time.sleep(3.5)
