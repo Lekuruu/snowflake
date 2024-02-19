@@ -1,4 +1,5 @@
 from app.protocols.metaplace.places import Place, MapBlocks, Camera
+from app.objects import AssetCollection
 from dataclasses import dataclass
 
 @dataclass
@@ -21,13 +22,19 @@ class SnowLobby(Place):
     name: str = "snow_lobby"
     mapblocks = SnowMapBlocks()
     camera = SnowCamera()
+    assets = AssetCollection()
+    sound_assets = AssetCollection()
 
 @dataclass
 class SnowBattle(SnowLobby):
     id: int = 10001
     name: str = "snow_battle"
+    assets = AssetCollection()
+    sound_assets = AssetCollection()
 
 @dataclass
-class TuskBattle(SnowBattle):
+class TuskBattle(SnowLobby):
     id: int = 10002
     name: str = "tusk_battle"
+    assets = AssetCollection()
+    sound_assets = AssetCollection()

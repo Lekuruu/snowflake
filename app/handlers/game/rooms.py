@@ -10,7 +10,8 @@ from app.data import (
 
 @session.framework.register('roomToRoomMinTime')
 def on_room_to_room_min_time(client: Penguin, data: dict):
-    client.is_ready = True
+    if not client.in_game:
+        return
 
     # Register /use event
     client.register_input(
@@ -24,7 +25,11 @@ def on_room_to_room_min_time(client: Penguin, data: dict):
 
 @session.framework.register('roomToRoomComplete')
 def on_room_to_room_complete(client: Penguin, data: dict):
-    ...
+    if not client.in_game:
+        return
+
+    # Client has loaded all assets
+    client.is_ready = True
 
 @session.framework.register('roomToRoomScreenClosed')
 def on_room_to_room_screen_closed(client: Penguin, data: dict):

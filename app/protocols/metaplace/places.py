@@ -1,3 +1,5 @@
+
+from app.objects import AssetCollection
 from dataclasses import dataclass
 from app.data import ViewMode
 
@@ -79,5 +81,7 @@ class Place:
     camera = Camera()
     camera3d = Camera3D()
     physics = Physics()
+    assets = AssetCollection()
+    sound_assets = AssetCollection()
     draggable: bool = False
     object_lock: bool = False

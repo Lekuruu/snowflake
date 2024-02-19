@@ -90,8 +90,8 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.send_world_type()
     client.send_world()
 
-    client.send_tag('W_DISPLAYSTATE') # Is probably used for mobile
-    client.send_tag('W_ASSETSCOMPLETE') # This will send the /ready command
+    # Set client to requested place
+    client.switch_place(client.place)
 
     # Server doesn't need to check for policy file requests anymore
     client.dataReceived = super(MetaplaceProtocol, client).dataReceived
