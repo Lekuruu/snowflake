@@ -136,6 +136,10 @@ class CallbackHandler:
         start_time = time.time()
 
         while event in self.pending_events.get(client, []):
+            if client.disconnected:
+                self.remove_events(client)
+                break
+
             if time.time() - start_time > timeout:
                 self.game.logger.warning(f"Event Timeout: {event}")
                 self.remove_events(client)

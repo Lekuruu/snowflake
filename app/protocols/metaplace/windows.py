@@ -174,6 +174,9 @@ class WindowManager(Dict[str, SWFWindow]):
         start_time = time.time()
 
         while window.loaded != loaded:
+            if self.client.disconnected:
+                return
+
             if time.time() - start_time > timeout:
                 self.logger.warning(f'Window Timeout: {window.name}')
                 return
