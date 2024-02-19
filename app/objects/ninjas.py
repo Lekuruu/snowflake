@@ -931,9 +931,6 @@ class Sensei(GameObject):
         }[self.element_state]
 
     def update_state(self) -> None:
-        if not self.game.enemies:
-            return
-
         self.power_state += 1
 
         if self.power_state >= 3:
@@ -950,6 +947,9 @@ class Sensei(GameObject):
         action[self.power_state]()
 
     def do_powerup(self) -> None:
+        if not self.game.enemies:
+            return
+
         self.attack_animation()
         self.attack_sound()
         self.game.wait_for_animations()
