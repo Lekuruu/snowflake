@@ -122,7 +122,7 @@ class Game:
         time.sleep(1)
 
         # Wait for players to finish loading assets
-        self.wait_for_players(lambda player: player.is_ready, timeout=30)
+        self.wait_for_players(lambda player: player.is_ready, timeout=20)
 
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
