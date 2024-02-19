@@ -59,7 +59,10 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.token = token
     client.name = penguin.nickname
     client.object = penguin
-    client.power_cards_all = cards.fetch_by_penguin_id(pid, is_power=True)
+    client.power_cards_all = cards.fetch_by_penguin_id(
+        pid,
+        is_power=True
+    )
 
     # TODO: Check player username approval
 
