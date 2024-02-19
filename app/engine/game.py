@@ -377,7 +377,7 @@ class Game:
 
             while window.loaded != loaded:
                 if client.disconnected:
-                    continue
+                    break
 
                 if time.time() - start_time > timeout:
                     self.logger.warning(f'Window Timeout: {name}')
