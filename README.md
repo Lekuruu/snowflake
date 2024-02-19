@@ -42,7 +42,7 @@ A work-in-progress Card-Jitsu Snow server emulator, made for [Houdini](https://g
     - [x] Matchmaking
     - [x] Basic Game Setup
     - [ ] Sensei
-        - [ ] Animations
+        - [x] Animations
         - [ ] Actions
     - [ ] Tusk
         - [ ] Animations
