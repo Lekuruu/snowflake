@@ -161,8 +161,6 @@ class CardObject(Card):
 
         self.client.played_cards += 1
         self.check_stamps(is_combo)
-
-        self.client.update_cards()
         self.game.wait_for_animations()
 
     def consume(self) -> None:
