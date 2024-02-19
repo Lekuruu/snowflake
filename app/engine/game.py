@@ -490,11 +490,9 @@ class Game:
                 ]
             }[self.map]
         else:
-            self.backgrounds = {
-                1: [
+            self.backgrounds = [
                     GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
-                ]
-            }[0]
+            ]
 
         for background in self.backgrounds:
             background.place_object()
