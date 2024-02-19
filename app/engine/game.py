@@ -475,19 +475,22 @@ class Game:
             enemy.place_object()
 
     def create_environment(self) -> None:
-        self.backgrounds = {
-            1: [
-                GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
-            ],
-            2: [
-                GameObject(self, 'forest_bg', x=4.5, y=-1.1),
-                GameObject(self, 'forest_fg', x=4.5, y=6.1)
-            ],
-            3: [
-                GameObject(self, 'cragvalley_bg', x=4.5, y=-1.1),
-                GameObject(self, 'cragvalley_fg', x=4.5, y=6)
-            ]
-        }[self.map]
+        if not config.ENABLE_BETA:
+            self.backgrounds = {
+                1: [
+                    GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
+                ],
+                2: [
+                    GameObject(self, 'forest_bg', x=4.5, y=-1.1),
+                    GameObject(self, 'forest_fg', x=4.5, y=6.1)
+                ],
+                3: [
+                    GameObject(self, 'cragvalley_bg', x=4.5, y=-1.1),
+                    GameObject(self, 'cragvalley_fg', x=4.5, y=6)
+                ]
+            }[self.map]
+        else:
+            self.backgrounds = GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
 
         for background in self.backgrounds:
             background.place_object()
