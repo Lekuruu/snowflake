@@ -13,6 +13,14 @@ def on_element_selected(client: Penguin, data: dict):
 
     client.server.matchmaking.add(client)
 
+    for card in client.power_cards_all:
+        # Card colors seem to be static for each element
+        card.color = {
+            'snow': 'p',
+            'water': 'b',
+            'fire': 'r'
+        }[client.element]
+
 @session.framework.register('mmCancel')
 def on_matchmaking_cancel(client: Penguin, data: dict):
     client.server.matchmaking.remove(client)
