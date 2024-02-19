@@ -111,21 +111,23 @@ class Game:
             player_select = client.get_window(config.PLAYERSELECT_SWF)
             player_select.close()
 
-        # Load assets
-        self.load_assets()
-
         # Place clients in battle place
         battle_place = self.server.places['snow_battle']
 
         for client in self.clients:
-            client.set_place(battle_place.id)
+            client.switch_place(battle_place)
 
-        self.initialize_objects()
-        self.wait_for_players(lambda player: player.is_ready)
+        # Wait for loading screen to finish
+        self.callbacks.wait_for_event('roomToRoomMinTime')
+        time.sleep(1)
+
+        # Wait for players to finish loading assets
+        self.wait_for_players(lambda player: player.is_ready, timeout=30)
 
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
 
+        self.initialize_objects()
         self.show_environment()
         self.spawn_ninjas()
 
@@ -200,7 +202,6 @@ class Game:
     def close(self) -> None:
         self.logger.info('Game closed')
         self.server.games.remove(self)
-        self.wait_for_players(lambda player: player.disconnected)
         exit()
 
     def run_game_loop(self) -> None:
@@ -341,11 +342,17 @@ class Game:
         for player in self.clients:
             player.send_tag(tag, *args)
 
-    def wait_for_players(self, condition: Callable) -> None:
-        """Wait for all players to finish loading the game"""
+    def wait_for_players(self, condition: Callable, timeout=8) -> None:
+        """Wait for all players to finish a condition"""
+        start_time = time.time()
+
         for player in self.clients:
             while not condition(player) and not self.server.shutting_down:
-                pass
+                if time.time() - start_time > timeout:
+                    self.logger.warning(f'Player Timeout: {player}')
+                    return
+
+                time.sleep(0.05)
 
     def wait_for_animations(self, timeout=8) -> None:
         """Wait for all animations to finish"""
@@ -402,21 +409,6 @@ class Game:
             key_modifier.value,
             command
         )
-
-    def load_assets(self) -> None:
-        # Load sprites
-        for asset in self.server.assets:
-            self.send_tag(
-                'S_LOADSPRITE',
-                f'0:{asset.index}'
-            )
-
-        # Load sounds
-        for sound in self.server.sound_assets:
-            self.send_tag(
-                'S_LOADSPRITE',
-                f'0:{sound.index}'
-            )
 
     def initialize_objects(self) -> None:
         self.grid.initialize_tiles()
