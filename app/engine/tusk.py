@@ -69,17 +69,18 @@ class TuskGame(Game):
             player_select = client.get_window(config.PLAYERSELECT_SWF)
             player_select.close()
 
-        # Load assets
-        self.load_assets()
-
         # Place clients in battle place
-        battle_place = self.server.places['tusk_battle']
+        battle_place = self.server.places['snow_battle']
 
         for client in self.clients:
-            client.set_place(battle_place.id)
+            client.switch_place(battle_place)
 
-        self.initialize_objects()
-        self.wait_for_players(lambda player: player.is_ready)
+        # Wait for loading screen to finish
+        self.callbacks.wait_for_event('roomToRoomMinTime')
+        time.sleep(1)
+
+        # Wait for players to finish loading assets
+        self.wait_for_players(lambda player: player.is_ready, timeout=30)
 
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_tuskthemecaveamb', looping=True).play(self)
