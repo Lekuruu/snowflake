@@ -905,3 +905,128 @@ class FireNinja(Ninja):
 
     def powercard_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackpowercardfire')
+
+class Sensei(GameObject):
+    name: str = 'Sensei'
+
+    def __init__(self, game: Game, x: int, y: int) -> None:
+        super().__init__(
+            game,
+            self.__class__.name,
+            x, y,
+            grid=True,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+        self.element_state = 'snow'
+        self.power_state = 0
+
+    @property
+    def next_element(self) -> str:
+        return {
+            'snow': 'fire',
+            'fire': 'water',
+            'water': 'snow'
+        }[self.element_state]
+
+    def update_state(self) -> None:
+        if not self.game.enemies:
+            return
+
+        self.power_state += 1
+
+        if self.power_state >= 3:
+            # Reset power state
+            self.power_state = 1
+            self.element_state = self.next_element
+
+        action = {
+            0: lambda: self.idle_animation(),
+            1: lambda: self.powerup_animation(),
+            2: lambda: self.do_powerup()
+        }
+
+        action[self.power_state]()
+
+    def do_powerup(self) -> None:
+        self.attack_animation()
+        self.attack_sound()
+        self.game.wait_for_animations()
+        # TODO: Effects & Impacts
+        self.idle_animation()
+
+    def idle_animation(self) -> None:
+        self.animate_object(
+            'sensei_idle_anim',
+            play_style='loop',
+            register=False
+        )
+
+    def win_animation(self) -> None:
+        self.animate_object(
+            'sensei_win_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+    def lose_animation(self) -> None:
+        self.animate_object(
+            'sensei_lose_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+    def attack_animation(self) -> None:
+        self.animate_object(
+            'sensei_attackstart_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_object(
+            'sensei_attackloop_anim',
+            play_style='loop'
+        )
+
+    def powerup_animation(self) -> None:
+        start_animation = {
+            'snow': 'sensei_powerupsnow_anim',
+            'fire': 'sensei_powerupfire_anim',
+            'water': 'sensei_powerupwater_anim'
+        }[self.element_state]
+
+        self.animate_object(
+            start_animation,
+            play_style='play_once',
+            reset=True
+        )
+
+        loop_animation = {
+            'snow': 'sensei_powerupsnowloop_anim',
+            'fire': 'sensei_powerupfireloop_anim',
+            'water': 'sensei_powerupwaterloop_anim'
+        }[self.element_state]
+
+        self.animate_object(
+            loop_animation,
+            play_style='loop'
+        )
+
+        self.animate_sprite(
+            0, 5,
+            play_style='loop',
+            duration=600
+        )
+
+    def attack_sound(self) -> None:
+        self.play_sound({
+            'snow': 'sfx_mg_2013_cjsnow_attacksenseisnow',
+            'fire': 'sfx_mg_2013_cjsnow_attacksenseifire',
+            'water': 'sfx_mg_2013_cjsnow_attacksenseiwater'
+        }[self.element_state])
+
+    def hit_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_hitsensei')
+
+    def snow_impact_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_impactsenseisnow')
