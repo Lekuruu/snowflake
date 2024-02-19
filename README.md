@@ -90,13 +90,13 @@ And now, we need to set up the actual repository.
 
 4. Run the server: `python main.py`
 
-### Beta mode
+### Beta Mode
 
 Snowflake includes a recreation of the Card-Jitsu Snow beta as a toggleable option. If you wish to use this feature, you'll need to add a few new SWF files.
 
-[cardjitsu_snowpayoutbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cardjitsu_snowpayoutbeta.swf) and [cardjitsu_snowplayerselectbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cardjitsu_snowpayoutbeta.swf) both need to be in `/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows/`.
+- [cardjitsu_snowpayoutbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cardjitsu_snowpayoutbeta.swf) and [cardjitsu_snowplayerselectbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cardjitsu_snowpayoutbeta.swf) both need to be in `/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows/`.
 
-[cjsnow_uiassetsbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cjsnow_uiassetsbeta.swf) and [cjsnow_playerselectassetsbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cjsnow_playerselectassetsbeta.swf) both need to be in `/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/assets/`.
+- [cjsnow_uiassetsbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cjsnow_uiassetsbeta.swf) and [cjsnow_playerselectassetsbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cjsnow_playerselectassetsbeta.swf) both need to be in `/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/assets/`.
 
 ## Troubleshooting
 

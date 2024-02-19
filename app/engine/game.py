@@ -692,11 +692,24 @@ class Game:
             if client.selected_member_card
         ]
 
-        # TODO: revive_card_splash_screen.swf
+        if ninjas_with_member_cards:
+            for client in self.clients:
+                if client.disconnected:
+                    continue
 
-        for ninja in ninjas_with_member_cards:
-            ninja.member_card.consume()
-            time.sleep(1)
+                revive_splash = client.get_window('cardjitsu_snowrevive.swf')
+                revive_splash.load(
+                    xPercent=0.2,
+                    yPercent=0
+                )
+
+            # Wait for revive splash to load and close
+            self.wait_for_window('cardjitsu_snowrevive.swf', loaded=True)
+            self.wait_for_window('cardjitsu_snowrevive.swf', loaded=False)
+
+            for ninja in ninjas_with_member_cards:
+                ninja.member_card.consume()
+                time.sleep(1)
 
     def do_enemy_actions(self) -> None:
         self.wait_for_animations()
