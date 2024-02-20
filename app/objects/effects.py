@@ -75,6 +75,9 @@ class HealTile(Effect):
         )
 
     def play(self):
+        if not self.game.grid.is_valid(self.x, self.y):
+            return
+
         self.place_object()
         self.place_sprite(self.name)
 
@@ -95,6 +98,32 @@ class HealParticles(Effect):
         self.place_sprite(self.name)
         self.animate_sprite(0, 10, duration=self.duration * 1000)
         reactor.callLater(self.duration, self.remove_object)
+
+class AttackTileField:
+    def __init__(self, game: "Game", center_x: int, center_y: int):
+        self.game = game
+        self.center_x = center_x
+        self.center_y = center_y
+        self.tiles = []
+
+    def play(self):
+        x_offsets = range(-1, 2)
+        y_offsets = range(-1, 2)
+
+        for x_offset in x_offsets:
+            for y_offset in y_offsets:
+                x = self.center_x + x_offset
+                y = self.center_y + y_offset
+
+                self.tiles.append(tile := AttackTile(self.game, x, y))
+                tile.play()
+
+        time.sleep(0.25)
+        self.remove()
+
+    def remove(self):
+        for tile in self.tiles:
+            tile.remove_object()
 
 class Explosion(Effect):
     def __init__(self, game: "Game", x: int, y: int):
