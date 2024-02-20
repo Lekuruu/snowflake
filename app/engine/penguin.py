@@ -14,12 +14,11 @@ from sqlalchemy.orm import Session
 
 from app.engine.cards import CardObject, MemberCard
 from app.protocols import MetaplaceProtocol
-from app.data import stamps
+from app.data import stamps, cards
 from app.data import (
     Penguin as PenguinObject,
     EventType,
     TipPhase,
-    Stamp,
     Card
 )
 
@@ -116,6 +115,30 @@ class Penguin(MetaplaceProtocol):
         self.server.matchmaking.remove(self)
         self.server.players.remove(self)
         self.disconnected = True
+
+    def initialize_power_cards(self, session=None) -> None:
+        card_color = {
+            'snow': 'p',
+            'water': 'b',
+            'fire': 'r'
+        }[self.element]
+
+        element_name = {
+            'snow': 's',
+            'water': 'w',
+            'fire': 'f'
+        }[self.element]
+
+        power_cards = cards.fetch_power_cards_by_penguin_id(
+            self.pid,
+            element_name,
+            session=session
+        )
+
+        for card in power_cards:
+            card_object = CardObject(card, self)
+            card_object.color = card_color
+            self.power_cards.append(card_object)
 
     def next_power_card(self) -> CardObject | None:
         if not self.power_cards:
