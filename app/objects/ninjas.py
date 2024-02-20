@@ -15,6 +15,7 @@ from app.objects.effects import (
     FireProjectile,
     HealParticles,
     DamageNumbers,
+    HealNumbers,
     AttackTile,
     Shield,
     Rage
@@ -175,6 +176,11 @@ class Ninja(GameObject):
 
         if hp > self.hp:
             # Ninja gained health
+            HealNumbers(
+                self.game,
+                self.x,
+                self.y
+            ).play(hp - self.hp)
             self.revive_animation()
             self.hp = hp
             return
