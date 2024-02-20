@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List
 
 from ..objects import Card, PenguinCard
@@ -33,34 +34,56 @@ def fetch_power_cards(session: Session | None = None) -> List[Card]:
 @session_wrapper
 def fetch_by_penguin_id(
     penguin_id: int,
-    is_power: bool = False,
-    element: str | None = None,
+    element: str,
     session: Session | None = None
 ) -> List[Card]:
-    query = session.query(Card) \
+    return session.query(Card) \
         .join(PenguinCard) \
-        .filter(PenguinCard.penguin_id == penguin_id)
-
-    if element:
-        query = query.filter(Card.element == element)
-
-    if is_power:
-        query = query.filter(Card.power_id > 0)
-
-    return query.all()
+        .filter(PenguinCard.penguin_id == penguin_id) \
+        .filter(Card.element == element) \
+        .all()
 
 @session_wrapper
 def fetch_power_cards_by_penguin_id(
     penguin_id: int,
-    element: str | None = None,
+    element: str,
     session: Session | None = None
 ) -> List[Card]:
-    query = session.query(Card) \
-        .join(PenguinCard) \
+    # Subquery to generate series of cards, based on quantity
+    subquery = session.query(
+            PenguinCard.card_id,
+            func.generate_series(1, PenguinCard.quantity).label('index')
+        ) \
         .filter(PenguinCard.penguin_id == penguin_id) \
-        .filter(Card.power_id > 0)
+        .subquery()
 
-    if element:
-        query = query.filter(Card.element == element)
+    return session.query(Card) \
+        .join(subquery, Card.id == subquery.c.card_id) \
+        .filter(Card.element == element) \
+        .filter(Card.power_id > 0) \
+        .all()
 
-    return query.all()
+@session_wrapper
+def fetch_count(
+    penguin_id: int,
+    element: str,
+    session: Session | None = None
+) -> int:
+    return session.query(func.sum(PenguinCard.quantity)) \
+        .join(Card) \
+        .filter(PenguinCard.penguin_id == penguin_id) \
+        .filter(Card.element == element) \
+        .scalar() or 0
+
+@session_wrapper
+def fetch_power_card_count(
+    penguin_id: int,
+    element: str,
+    session: Session | None = None
+) -> int:
+    return session.query(func.sum(PenguinCard.quantity)) \
+        .join(Card) \
+        .filter(PenguinCard.penguin_id == penguin_id) \
+        .filter(Card.element == element) \
+        .filter(Card.power_id > 0) \
+        .scalar() or 0
