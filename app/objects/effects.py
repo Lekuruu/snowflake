@@ -64,7 +64,7 @@ class AttackTile(Effect):
         self.place_sprite(self.name)
 
         if auto_remove:
-            reactor.callLater(0.15, self.remove_object)
+            reactor.callLater(0.2, self.remove_object)
 
 class HealTile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
