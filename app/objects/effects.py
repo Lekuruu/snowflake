@@ -56,12 +56,15 @@ class AttackTile(Effect):
             y_offset=0.9998
         )
 
-    def play(self):
+    def play(self, auto_remove=False):
         if not self.game.grid.is_valid(self.x, self.y):
             return
 
         self.place_object()
         self.place_sprite(self.name)
+
+        if auto_remove:
+            reactor.callLater(0.15, self.remove_object)
 
 class HealTile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -74,12 +77,15 @@ class HealTile(Effect):
             y_offset=0.9998
         )
 
-    def play(self):
+    def play(self, auto_remove=False):
         if not self.game.grid.is_valid(self.x, self.y):
             return
 
         self.place_object()
         self.place_sprite(self.name)
+
+        if auto_remove:
+            reactor.callLater(0.2, self.remove_object)
 
 class HealParticles(Effect):
     def __init__(self, game: "Game", x: int, y: int):

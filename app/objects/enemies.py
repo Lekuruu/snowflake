@@ -130,6 +130,12 @@ class Enemy(GameObject):
         self.animate_healthbar(self.hp, hp, duration=500)
         self.hp = hp
 
+        AttackTile(
+            self.game,
+            self.x,
+            self.y
+        ).play(auto_remove=True)
+
         if self.hp <= 0:
             self.ko_animation()
 

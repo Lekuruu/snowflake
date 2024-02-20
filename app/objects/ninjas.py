@@ -14,6 +14,7 @@ from app.objects.effects import (
     SnowProjectile,
     FireProjectile,
     HealParticles,
+    AttackTile,
     Shield,
     Rage
 )
@@ -186,12 +187,24 @@ class Ninja(GameObject):
                 self.client.update_cards()
                 self.ko_sound()
 
+            AttackTile(
+                self.game,
+                self.x,
+                self.y
+            ).play(auto_remove=True)
+
             # Check if any ninjas are still in healing state
             for ninja in self.game.ninjas:
                 if ninja.selected_object == self:
                     ninja.targets = []
         else:
             if hp < self.hp:
+                AttackTile(
+                    self.game,
+                    self.x,
+                    self.y
+                ).play(auto_remove=True)
+
                 self.hit_animation()
                 self.client.update_cards()
             else:
