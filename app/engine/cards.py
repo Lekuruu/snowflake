@@ -376,7 +376,8 @@ class MemberCard(GameObject):
         beam.play()
 
         self.client.ninja.play_sound('SFX_MG_CJSnow_PowercardReviveStart')
-        self.client.ninja.set_health(self.client.ninja.max_hp)
+        self.client.ninja.set_health(0)
+        #self.client.ninja.set_health(self.client.ninja.max_hp)
         self.client.ninja.revive_membercard_animation()
         self.client.member_card = None
 

@@ -497,7 +497,7 @@ class Game:
         for background in self.backgrounds:
             background.place_object()
 
-        rock_name = 'crag_rock' if self.map == 3 else 'rock_mountaintop'
+        rock_name = 'crag_rock' if self.map == 3 and not config.ENABLE_BETA else 'rock_mountaintop'
         rock_positions = [(2, 0), (6, 0), (2, 4), (6, 4)]
 
         self.rocks = [
