@@ -430,6 +430,9 @@ class Ninja(GameObject):
         if not self.game.timer.running:
             return
 
+        if self.client.is_ready:
+            return
+
         if isinstance(x, float) or isinstance(y, float):
             return
 
