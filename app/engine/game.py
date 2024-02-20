@@ -195,11 +195,7 @@ class Game:
                 # Unlock "Bonus Win" stamp
                 self.unlock_stamp(473)
 
-        if not config.ENABLE_BETA:
-            self.display_payout()
-        else:
-            self.display_beta_payout()
-
+        self.display_payout()
         self.remove_objects()
         self.close()
 
@@ -475,29 +471,28 @@ class Game:
             enemy.place_object()
 
     def create_environment(self) -> None:
-        if not config.ENABLE_BETA:
-            self.backgrounds = {
-                1: [
-                    GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
-                ],
-                2: [
-                    GameObject(self, 'forest_bg', x=4.5, y=-1.1),
-                    GameObject(self, 'forest_fg', x=4.5, y=6.1)
-                ],
-                3: [
-                    GameObject(self, 'cragvalley_bg', x=4.5, y=-1.1),
-                    GameObject(self, 'cragvalley_fg', x=4.5, y=6)
-                ]
-            }[self.map]
-        else:
-            self.backgrounds = [
-                    GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
+        if config.ENABLE_BETA:
+            # Only one map was available in beta
+            self.map = 1
+
+        self.backgrounds = {
+            1: [
+                GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
+            ],
+            2: [
+                GameObject(self, 'forest_bg', x=4.5, y=-1.1),
+                GameObject(self, 'forest_fg', x=4.5, y=6.1)
+            ],
+            3: [
+                GameObject(self, 'cragvalley_bg', x=4.5, y=-1.1),
+                GameObject(self, 'cragvalley_fg', x=4.5, y=6)
             ]
+        }[self.map]
 
         for background in self.backgrounds:
             background.place_object()
 
-        rock_name = 'crag_rock' if self.map == 3 and not config.ENABLE_BETA else 'rock_mountaintop'
+        rock_name = 'crag_rock' if self.map == 3 else 'rock_mountaintop'
         rock_positions = [(2, 0), (6, 0), (2, 4), (6, 4)]
 
         self.rocks = [
@@ -872,6 +867,10 @@ class Game:
         return self.round + 1
 
     def display_payout(self) -> None:
+        if config.ENABLE_BETA:
+            self.display_beta_payout()
+            return
+
         with app.session.database.managed_session() as session:
             snow_stamps = stamps.fetch_all_by_group(60, session=session)
 
@@ -988,24 +987,26 @@ class Game:
 
     def display_beta_payout(self) -> None:
         with app.session.database.managed_session() as session:
-
             for client in self.clients:
                 if client.disconnected:
                     continue
 
                 # Calculate percentage based on round
                 exp_gained = (self.get_payout_round() * 11) + 1
+                beta_reward_item = 1600
 
                 if not config.DISABLE_REWARDS:
+
                     if exp_gained >= 100:
                         item = 1600
                         # Add item to inventory
                         items.add(
-                            client.pid, item,
+                            client.pid,
+                            item_id=beta_reward_item,
                             session=session
                         )
 
-                        self.logger.info(f'{client} unlocked item {item}')
+                        self.logger.info(f'{client} unlocked item {beta_reward_item}')
 
                 # Display payout swf window
                 payout = client.get_window('cardjitsu_snowpayoutbeta.swf')
