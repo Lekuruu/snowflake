@@ -786,6 +786,8 @@ class Game:
             if not client.tip_mode:
                 continue
 
+            client.displayed_tips.append(phase)
+
             def after_close(client: "Penguin"):
                 client.send_tip(phase)
 
@@ -795,7 +797,6 @@ class Game:
                 infotip.on_close = after_close
                 return
 
-            client.displayed_tips.append(phase)
             client.send_tip(phase)
 
     def hide_tip(self, client: "Penguin") -> None:
