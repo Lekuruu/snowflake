@@ -60,11 +60,15 @@ class TuskGame(Game):
         return False
 
     def start(self) -> None:
-        for client in self.clients:
-            client.game = self
+        with app.session.database.managed_session() as session:
+            for client in self.clients:
+                client.game = self
 
-            # Initialize member card
-            client.member_card = MemberCard(client)
+                # Initialize member card
+                client.member_card = MemberCard(client)
+
+                # Initialize power cards
+                client.initialize_power_cards(session=session)
 
         # Wait for "prepare to battle" screen to end
         time.sleep(3)
