@@ -14,6 +14,9 @@ from app.objects.effects import (
     SnowProjectile,
     FireProjectile,
     HealParticles,
+    DamageNumbers,
+    HealNumbers,
+    AttackTile,
     Shield,
     Rage
 )
@@ -171,33 +174,56 @@ class Ninja(GameObject):
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
-        if hp <= 0:
-            if self.hp <= 0:
-                return
+        if hp > self.hp:
+            # Ninja gained health
+            HealNumbers(
+                self.game,
+                self.x,
+                self.y
+            ).play(hp - self.hp)
+            self.revive_animation()
+            self.hp = hp
+            return
 
-            self.targets = []
-            self.ko_animation()
+        AttackTile(
+            self.game,
+            self.x,
+            self.y
+        ).play(auto_remove=True)
 
-            if self.rage:
-                self.rage.remove_object()
+        DamageNumbers(
+            self.game,
+            self.x,
+            self.y
+        ).play(self.hp - hp)
 
-            if not self.client.disconnected:
-                self.client.was_ko = True
-                self.client.update_cards()
-                self.ko_sound()
+        if hp > 0:
+            self.hit_animation()
+            self.client.update_cards()
+            self.hp = hp
+            return
 
-            # Check if any ninjas are still in healing state
-            for ninja in self.game.ninjas:
-                if ninja.selected_object == self:
-                    ninja.targets = []
-        else:
-            if hp < self.hp:
-                self.hit_animation()
-                self.client.update_cards()
-            else:
-                self.revive_animation()
+        if self.hp <= 0:
+            # Ninja is already KO
+            return
 
+        # Ninja was KO'd
         self.hp = hp
+        self.targets = []
+        self.ko_animation()
+
+        if self.rage:
+            self.rage.remove_object()
+
+        if not self.client.disconnected:
+            self.client.was_ko = True
+            self.client.update_cards()
+            self.ko_sound()
+
+        # Check if any ninjas are still in healing state
+        for ninja in self.game.ninjas:
+            if ninja.selected_object == self:
+                ninja.targets = []
 
     def place_ghost(self, x: int, y: int) -> None:
         if self.client.is_ready:

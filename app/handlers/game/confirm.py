@@ -22,10 +22,12 @@ def on_confirm_clicked(client: Penguin, data: dict):
     confirm.place_object()
     confirm.place_sprite(confirm.name)
     confirm.play_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8')
-    client.is_ready = True
 
     snow_ui = client.get_window('cardjitsu_snowui.swf')
     snow_ui.send_payload('disableCards')
+
+    client.game.grid.hide_tiles_for_client(client)
+    client.is_ready = True
 
     if TipPhase.CONFIRM not in client.displayed_tips:
         # No need to display the confirm tip if

@@ -56,12 +56,15 @@ class AttackTile(Effect):
             y_offset=0.9998
         )
 
-    def play(self):
+    def play(self, auto_remove=False):
         if not self.game.grid.is_valid(self.x, self.y):
             return
 
         self.place_object()
         self.place_sprite(self.name)
+
+        if auto_remove:
+            reactor.callLater(0.2, self.remove_object)
 
 class HealTile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -74,9 +77,15 @@ class HealTile(Effect):
             y_offset=0.9998
         )
 
-    def play(self):
+    def play(self, auto_remove=False):
+        if not self.game.grid.is_valid(self.x, self.y):
+            return
+
         self.place_object()
         self.place_sprite(self.name)
+
+        if auto_remove:
+            reactor.callLater(0.2, self.remove_object)
 
 class HealParticles(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -94,6 +103,102 @@ class HealParticles(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 10, duration=self.duration * 1000)
+        reactor.callLater(self.duration, self.remove_object)
+
+class AttackTileField:
+    def __init__(self, game: "Game", center_x: int, center_y: int):
+        self.game = game
+        self.center_x = center_x
+        self.center_y = center_y
+        self.tiles = []
+
+    def play(self):
+        x_offsets = range(-1, 2)
+        y_offsets = range(-1, 2)
+
+        for x_offset in x_offsets:
+            for y_offset in y_offsets:
+                x = self.center_x + x_offset
+                y = self.center_y + y_offset
+
+                self.tiles.append(tile := AttackTile(self.game, x, y))
+                tile.play()
+
+        time.sleep(0.25)
+        self.remove()
+
+    def remove(self):
+        for tile in self.tiles:
+            tile.remove_object()
+
+class DamageNumbers(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "ui_attack_numbers_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=0.9995,
+            duration=0.5
+        )
+
+    def play(self, damage: int):
+        frames = {
+            3: (0, 4),
+            4: (5, 9),
+            5: (10, 14),
+            6: (15, 19),
+            8: (20, 24),
+            9: (25, 29),
+            10: (30, 34),
+            11: (35, 39),
+            12: (40, 44),
+            15: (45, 49),
+            18: (50, 54),
+            20: (55, 59),
+            22: (60, 64),
+            24: (65, 69)
+        }
+
+        if not (range := frames.get(damage)):
+            return
+
+        self.place_object()
+        self.place_sprite(self.name)
+        self.animate_sprite(*range, duration=self.duration * 1000)
+        reactor.callLater(self.duration, self.remove_object)
+
+class HealNumbers(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "ui_heal_numbers_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=0.9995,
+            duration=0.5
+        )
+
+    def play(self, hp: int):
+        frames = {
+            1: (0, 4),
+            6: (5, 9),
+            9: (10, 14),
+            10: (15, 19),
+            11: (20, 24),
+            12: (25, 29)
+        }
+
+        print(hp)
+
+        if not (range := frames.get(hp)):
+            return
+
+        self.place_object()
+        self.place_sprite(self.name)
+        self.animate_sprite(*range, duration=self.duration * 1000)
         reactor.callLater(self.duration, self.remove_object)
 
 class Explosion(Effect):

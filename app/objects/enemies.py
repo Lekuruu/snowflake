@@ -16,6 +16,7 @@ from app.objects.effects import (
     ScrapProjectileImpact,
     TankSwipeHorizontal,
     TankSwipeVertical,
+    DamageNumbers,
     SlyProjectile,
     ScrapImpact,
     AttackTile,
@@ -128,6 +129,19 @@ class Enemy(GameObject):
     def set_health(self, hp: int, wait=True) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
+
+        AttackTile(
+            self.game,
+            self.x,
+            self.y
+        ).play(auto_remove=True)
+
+        DamageNumbers(
+            self.game,
+            self.x,
+            self.y
+        ).play(self.hp - hp)
+
         self.hp = hp
 
         if self.hp <= 0:
