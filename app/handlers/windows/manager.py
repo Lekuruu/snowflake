@@ -1,8 +1,9 @@
 
+from app.data import EventType, cards
 from app.engine import Penguin
-from app.data import EventType
 from app import session
 
+import app.session
 import config
 
 @session.framework.register('windowManagerReady')
@@ -42,15 +43,20 @@ def on_window_manager_ready(client: Penguin, data: dict):
         loadDescription=""
     )
 
+    with app.session.database.managed_session() as session:
+        fire_count = cards.fetch_power_card_count(client.pid, 'f', session=session)
+        water_count = cards.fetch_power_card_count(client.pid, 'w', session=session)
+        snow_count = cards.fetch_power_card_count(client.pid, 's', session=session)
+
     # Load player select screen
     player_select = client.get_window(config.PLAYERSELECT_SWF)
     player_select.load(
         {
             'game': 'snow',
             'name': client.name,
-            'powerCardsFire': len(client.power_cards_fire),
-            'powerCardsWater': len(client.power_cards_water),
-            'powerCardsSnow': len(client.power_cards_snow),
+            'powerCardsFire': fire_count,
+            'powerCardsWater': water_count,
+            'powerCardsSnow': snow_count,
             'playerSnowRank': client.object.snow_ninja_rank
         },
         loadDescription="",

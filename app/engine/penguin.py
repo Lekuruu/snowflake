@@ -49,7 +49,7 @@ class Penguin(MetaplaceProtocol):
         self.member_card: MemberCard | None = None
         self.selected_card: CardObject | None = None
         self.power_card_slots: List[CardObject] = []
-        self.power_cards_all: List[Card] = []
+        self.power_cards: List[CardObject] = []
         self.unlocked_stamps: List[int] = []
         self.power_card_stamina: int = 0
         self.played_cards: int = 0
@@ -70,18 +70,6 @@ class Penguin(MetaplaceProtocol):
         return self.game is not None
 
     @property
-    def power_cards_water(self) -> List[Card]:
-        return [c for c in self.power_cards_all if c.element == 'w']
-
-    @property
-    def power_cards_fire(self) -> List[Card]:
-        return [c for c in self.power_cards_all if c.element == 'f']
-
-    @property
-    def power_cards_snow(self) -> List[Card]:
-        return [c for c in self.power_cards_all if c.element == 's']
-
-    @property
     def has_power_cards(self) -> bool:
         return bool(self.power_cards or self.power_card_slots)
 
@@ -92,14 +80,6 @@ class Penguin(MetaplaceProtocol):
     @property
     def placed_powercard(self) -> bool:
         return bool(self.selected_card and self.selected_card.x != -1 and self.selected_card.y != -1)
-
-    @property
-    def power_cards(self) -> List[Card]:
-        return [
-            c for c in self.power_cards_all
-            if c not in self.power_card_slots
-            and c.element == self.element[0]
-        ]
 
     def command_received(self, command: str, args: List[Any]):
         try:
@@ -147,10 +127,9 @@ class Penguin(MetaplaceProtocol):
             return
 
         next_card = random.choice(self.power_cards)
-        card_object = CardObject(next_card, self)
-        self.power_card_slots.append(card_object)
-        self.power_cards_all.remove(next_card)
-        return card_object
+        self.power_card_slots.append(next_card)
+        self.power_cards.remove(next_card)
+        return next_card
 
     def power_card_by_id(self, card_id: int) -> Card | None:
         return next((c for c in self.power_card_slots if c.id == card_id), None)
