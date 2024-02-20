@@ -169,6 +169,38 @@ class DamageNumbers(Effect):
         self.animate_sprite(*range, duration=self.duration * 1000)
         reactor.callLater(self.duration, self.remove_object)
 
+class HealNumbers(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "ui_heal_numbers_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=0.9995,
+            duration=0.5
+        )
+
+    def play(self, hp: int):
+        frames = {
+            1: (0, 4),
+            6: (5, 9),
+            9: (10, 14),
+            10: (15, 19),
+            11: (20, 24),
+            12: (25, 29)
+        }
+
+        print(hp)
+
+        if not (range := frames.get(hp)):
+            return
+
+        self.place_object()
+        self.place_sprite(self.name)
+        self.animate_sprite(*range, duration=self.duration * 1000)
+        reactor.callLater(self.duration, self.remove_object)
+
 class Explosion(Effect):
     def __init__(self, game: "Game", x: int, y: int):
         super().__init__(
