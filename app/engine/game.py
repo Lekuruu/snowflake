@@ -471,6 +471,10 @@ class Game:
             enemy.place_object()
 
     def create_environment(self) -> None:
+        if config.ENABLE_BETA:
+            # Only one map was available in beta
+            self.map = 1
+
         self.backgrounds = {
             1: [
                 GameObject(self, 'env_mountaintop_bg', x=4.5, y=-1.1)
@@ -863,6 +867,10 @@ class Game:
         return self.round + 1
 
     def display_payout(self) -> None:
+        if config.ENABLE_BETA:
+            self.display_beta_payout()
+            return
+
         with app.session.database.managed_session() as session:
             snow_stamps = stamps.fetch_all_by_group(60, session=session)
 
@@ -970,6 +978,51 @@ class Game:
                         ],
                         "xpStart": client.object.snow_ninja_progress,
                         "xpEnd": exp_gained if result_rank < 24 else 100,
+                    },
+                    loadDescription="",
+                    assetPath="",
+                    xPercent=0.08,
+                    yPercent=0.05
+                )
+
+    def display_beta_payout(self) -> None:
+        with app.session.database.managed_session() as session:
+            for client in self.clients:
+                if client.disconnected:
+                    continue
+
+                # Calculate percentage based on round
+                exp_gained = (self.get_payout_round() * 11) + 1
+                beta_reward_item = 1600
+
+                if not config.DISABLE_REWARDS:
+
+                    if exp_gained >= 100:
+                        # Add item to inventory
+                        items.add(
+                            client.pid,
+                            item_id=beta_reward_item,
+                            session=session
+                        )
+
+                        self.logger.info(f'{client} unlocked item {beta_reward_item}')
+
+                # Display payout swf window
+                payout = client.get_window('cardjitsu_snowpayoutbeta.swf')
+                payout.layer = 'bottomLayer'
+                payout.load(
+                    {
+                        "coinsEarned": 0,
+                        "doubleCoins": False, # TODO
+                        "damage": 0, # Only important for tusk battle
+                        "isBoss": 0,
+                        "rank": 24,
+                        "round": self.get_payout_round(),
+                        "showItems": 0, # Only important for tusk battle
+                        "stampList": [],
+                        "stamps": [],
+                        "xpStart": 0,
+                        "xpEnd": exp_gained
                     },
                     loadDescription="",
                     assetPath="",
