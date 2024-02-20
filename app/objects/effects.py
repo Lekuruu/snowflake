@@ -131,6 +131,44 @@ class AttackTileField:
         for tile in self.tiles:
             tile.remove_object()
 
+class DamageNumbers(Effect):
+    def __init__(self, game: "Game", x: int, y: int):
+        super().__init__(
+            game,
+            "ui_attack_numbers_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=0.9995,
+            duration=0.5
+        )
+
+    def play(self, damage: int):
+        frames = {
+            3: (0, 4),
+            4: (5, 9),
+            5: (10, 14),
+            6: (15, 19),
+            8: (20, 24),
+            9: (25, 29),
+            10: (30, 34),
+            11: (35, 39),
+            12: (40, 44),
+            15: (45, 49),
+            18: (50, 54),
+            20: (55, 59),
+            22: (60, 64),
+            24: (65, 69)
+        }
+
+        if not (range := frames.get(damage)):
+            return
+
+        self.place_object()
+        self.place_sprite(self.name)
+        self.animate_sprite(*range, duration=self.duration * 1000)
+        reactor.callLater(self.duration, self.remove_object)
+
 class Explosion(Effect):
     def __init__(self, game: "Game", x: int, y: int):
         super().__init__(
