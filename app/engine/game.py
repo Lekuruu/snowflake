@@ -998,7 +998,6 @@ class Game:
                 if not config.DISABLE_REWARDS:
 
                     if exp_gained >= 100:
-                        item = 1600
                         # Add item to inventory
                         items.add(
                             client.pid,
