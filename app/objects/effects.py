@@ -191,8 +191,6 @@ class HealNumbers(Effect):
             12: (25, 29)
         }
 
-        print(hp)
-
         if not (range := frames.get(hp)):
             return
 
