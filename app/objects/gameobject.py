@@ -360,7 +360,11 @@ class LocalGameObject(GameObject):
 
         self.target = client
         self.client = client
-        self.client.local_objects.add(self)
+
+        try:
+            self.client.local_objects.add(self)
+        except AttributeError:
+            pass
 
     def remove_object(self) -> None:
         self.target.send_tag('O_GONE', self.id)
