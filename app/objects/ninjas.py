@@ -8,15 +8,21 @@ if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
-from app.data import MirrorMode, TipPhase
+from app.data import MirrorMode, TipPhase, Card
 from app.objects.target import Target
 from app.objects.effects import (
+    WaterPowerBeam,
+    SnowPowerBeam,
+    FirePowerBeam,
+    FirePowerBottle,
     SnowProjectile,
     FireProjectile,
     HealParticles,
     DamageNumbers,
+    WaterFishDrop,
     HealNumbers,
     AttackTile,
+    SnowIgloo,
     Shield,
     Rage
 )
@@ -24,6 +30,7 @@ from app.objects.effects import (
 from app.objects.enemies import Enemy
 from app.objects import GameObject
 
+import app.engine.cards
 import time
 
 class Ninja(GameObject):
@@ -981,9 +988,73 @@ class Sensei(GameObject):
 
         self.attack_animation()
         self.attack_sound()
-        self.game.wait_for_animations()
-        # TODO: Effects & Impacts
+        time.sleep(0.65)
+
+        beam_class = {
+            'fire': FirePowerBeam,
+            'water': WaterPowerBeam,
+            'snow': SnowPowerBeam
+        }[self.element_state]
+
+        beam_offset = {
+            'fire': (0.6, 0.2),
+            'water': (0.4, 1),
+            'snow': (0.75, 1)
+        }[self.element_state]
+
+        beam = beam_class(self.game, self.x, self.y)
+        beam.x_offset = beam_offset[0]
+        beam.y_offset = beam_offset[1]
+        beam.play()
+
+        positions = [
+            (1, 2),
+            (4, 2),
+            (7, 2)
+        ]
+
+        impacts = []
+        delay = 0.4
+
+        for x, y in positions:
+            impacts.append(self.place_card(x, y))
+            time.sleep(delay)
+
+        if self.element_state == 'snow':
+            self.snow_impact_sound()
+
+        time.sleep(impacts[0][1].duration - 0.5)
+
+        beam.remove_object()
         self.idle_animation()
+
+        for card, impact in impacts:
+            card.apply_health()
+            impact.remove_object()
+            time.sleep(delay)
+            # TODO: Effects
+
+        self.game.wait_for_animations()
+
+    def place_card(self, x: int, y: int):
+        card = app.engine.cards.CardObject(
+            Card(
+                element=self.element_state[0],
+                value=10
+            ), self
+        )
+        card.object.x = x
+        card.object.y = y
+
+        impact_class = {
+            'fire': FirePowerBottle,
+            'water': WaterFishDrop,
+            'snow': SnowIgloo
+        }[self.element_state]
+
+        impact = impact_class(self.game, x, y)
+        impact.play(play_sound=False)
+        return card, impact
 
     def idle_animation(self) -> None:
         self.animate_object(
