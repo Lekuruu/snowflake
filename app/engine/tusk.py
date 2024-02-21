@@ -97,6 +97,7 @@ class TuskGame(Game):
         self.initialize_objects()
         self.show_environment()
         self.spawn_ninjas()
+        self.spawn_enemies()
 
         for client in self.clients:
             # Close loading screen
@@ -147,13 +148,6 @@ class TuskGame(Game):
         self.remove_objects()
         self.close()
 
-    def initialize_objects(self) -> None:
-        self.grid.initialize_tiles()
-        self.create_environment()
-        self.create_ninjas()
-
-        # TODO: Tusk
-
     def create_environment(self) -> None:
         self.backgrounds.append(GameObject(self, 'tusk_background_under', x=4.5, y=-1.1))
         self.backgrounds.append(GameObject(self, 'tusk_background_over', x=4.5, y=6.125))
@@ -187,6 +181,9 @@ class TuskGame(Game):
         sensei.place_object()
         self.sensei = sensei
 
+    def create_enemies(self) -> None:
+        ...
+
     def spawn_ninjas(self) -> None:
         water = self.objects.by_name('Water')
         water.place_object()
@@ -205,6 +202,9 @@ class TuskGame(Game):
 
         self.sensei.place_object()
         self.sensei.idle_animation()
+
+    def spawn_enemies(self) -> None:
+        ...
 
     def do_ninja_actions(self) -> None:
         ninjas_without_cards = [
