@@ -212,6 +212,10 @@ class CardObject(Card):
             'snow': SnowIgloo
         }[self.element_name]
 
+        if self.element != 's':
+            # Wait for attack animation
+            time.sleep(0.2)
+
         impact = impact_class(self.game, self.x, self.y)
         impact.play()
 

@@ -552,7 +552,6 @@ class WaterPowerBeam(Effect):
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
-        reactor.callLater(1, self.remove_object)
 
 class FirePowerBeam(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -593,17 +592,21 @@ class SnowIgloo(Effect):
             y,
             x_offset=0.5,
             y_offset=2,
-            duration=2 - 1.2,
+            duration=2,
             origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
-    def play(self):
+    def play(self, play_sound: bool = True):
         self.place_object()
         self.animate_object('snowninja_igloodrop_anim1', reset=True)
         self.animate_object('snowninja_igloodrop_anim2')
         self.animate_object('blank_png', play_style='loop')
-        time.sleep(1.2)
-        self.play_sound('sfx_mg_2013_cjsnow_impactpowercardsnow')
+
+        if play_sound:
+            reactor.callLater(
+                1.2, self.play_sound,
+                'sfx_mg_2013_cjsnow_impactpowercardsnow'
+            )
 
 class WaterFishDrop(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -618,11 +621,11 @@ class WaterFishDrop(Effect):
             origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
-    def play(self):
-        time.sleep(0.2)
+    def play(self, **kwargs):
         self.place_object()
-        self.place_sprite(self.name)
+        self.animate_object(self.name)
         self.animate_sprite(0, 26, duration=1700)
+        self.animate_object('blank_png')
 
 class FirePowerBottle(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -637,11 +640,11 @@ class FirePowerBottle(Effect):
             origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
-    def play(self):
-        time.sleep(0.2)
+    def play(self, **kwargs):
         self.place_object()
-        self.place_sprite(self.name)
+        self.animate_object(self.name)
         self.animate_sprite(0, 16, duration=1060)
+        self.animate_object('blank_png')
 
 class Flame(Effect):
     def __init__(self, game: "Game", x: int, y: int) -> None:
