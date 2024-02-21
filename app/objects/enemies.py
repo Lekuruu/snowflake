@@ -303,10 +303,14 @@ class Enemy(GameObject):
         #       if the target is behind an obstacle. We should probably
         #       implement a pathfinding algorithm to fix this.
 
-        # Get all enemy tiles
+        if not (tiles := list(self.movable_tiles())):
+            # Enemy can't move
+            return
+
+        # Get all ninja tiles, and sort them by distance to enemy
         tiles = [
             min(
-                self.movable_tiles(),
+                tiles,
                 key=lambda tile: abs(tile.x - ninja.x) + abs(tile.y - ninja.y)
             )
             for ninja in self.game.ninjas
@@ -314,6 +318,7 @@ class Enemy(GameObject):
         ]
 
         if not tiles:
+            # No available tiles
             return
 
         # Return tile that is closest to enemy
