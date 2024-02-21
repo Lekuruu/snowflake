@@ -628,6 +628,12 @@ class Game:
             rock.remove_object()
 
     def do_ninja_actions(self) -> None:
+        self.do_ninja_attacks()
+        self.do_powercard_attacks()
+        self.do_ninja_revive()
+        self.wait_for_animations()
+
+    def do_ninja_attacks(self) -> None:
         ninjas_without_cards = [
             ninja for ninja in self.ninjas
             if not ninja.client.selected_card
@@ -655,11 +661,9 @@ class Game:
                     # Unlock "Heal 15" stamp
                     self.unlock_stamp(477)
 
-            else:
-                continue
+                time.sleep(1)
 
-            time.sleep(1)
-
+    def do_powercard_attacks(self) -> None:
         ninjas_with_cards = [
             ninja for ninja in self.ninjas
             if ninja.client.placed_powercard
@@ -689,6 +693,7 @@ class Game:
             ninja.use_powercard(is_combo)
             time.sleep(1)
 
+    def do_ninja_revive(self) -> None:
         ninjas_with_member_cards = [
             client for client in self.clients
             if client.selected_member_card
