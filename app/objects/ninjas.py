@@ -969,15 +969,16 @@ class Sensei(GameObject):
     def update_state(self) -> None:
         self.power_state += 1
 
-        if self.power_state >= 3:
+        if self.power_state >= 4:
             # Reset power state
             self.power_state = 1
             self.element_state = self.next_element
 
         action = {
             0: lambda: self.idle_animation(),
-            1: lambda: self.powerup_animation(),
-            2: lambda: self.do_powerup()
+            1: lambda: self.idle_animation(),
+            2: lambda: self.powerup_animation(),
+            3: lambda: self.do_powerup()
         }
 
         action[self.power_state]()
