@@ -1023,7 +1023,7 @@ class Sensei(GameObject):
         if self.element_state == 'snow':
             self.snow_impact_sound()
 
-        time.sleep(impacts[0][1].duration - 0.5)
+        time.sleep(impacts[0][1].duration - (delay + 0.1))
 
         beam.remove_object()
         self.idle_animation()
