@@ -57,6 +57,14 @@ class CardObject(Card):
         return self.object.y
 
     @property
+    def element_name(self) -> str:
+        return {
+            'f': 'fire',
+            'w': 'water',
+            's': 'snow'
+        }.get(self.element)
+
+    @property
     def targets(self) -> List[GameObject]:
         x_range, y_range = self.pattern_range(self.x, self.y)
 
@@ -193,7 +201,7 @@ class CardObject(Card):
             'fire': FirePowerBeam,
             'water': WaterPowerBeam,
             'snow': SnowPowerBeam
-        }[self.client.element]
+        }[self.element_name]
 
         beam = beam_class(self.game, self.client.ninja.x, self.client.ninja.y)
         beam.play()
@@ -202,7 +210,7 @@ class CardObject(Card):
             'fire': FirePowerBottle,
             'water': WaterFishDrop,
             'snow': SnowIgloo
-        }[self.client.element]
+        }[self.element_name]
 
         impact = impact_class(self.game, self.x, self.y)
         impact.play()
@@ -213,7 +221,7 @@ class CardObject(Card):
 
     def apply_health(self) -> None:
         for target in self.targets:
-            if isinstance(target, Ninja) and self.client.element == 'snow':
+            if isinstance(target, Ninja) and self.element == 's':
                 if target.client.disconnected:
                     continue
 
@@ -346,7 +354,7 @@ class MemberCard(GameObject):
             'fire': 'ui_card_member_fire',
             'water': 'ui_card_member_water',
             'snow': 'ui_card_member_snow'
-        }[self.client.element]
+        }[self.element_name]
 
         self.place_sprite(sprite_name)
         self.selected = True
