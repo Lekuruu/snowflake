@@ -174,7 +174,7 @@ class Ninja(GameObject):
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
-        if hp > self.hp:
+        if hp >= self.hp:
             # Ninja gained health
             HealNumbers(
                 self.game,
