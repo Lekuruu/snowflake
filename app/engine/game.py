@@ -719,8 +719,6 @@ class Game:
                 time.sleep(1)
 
     def do_enemy_actions(self) -> None:
-        self.wait_for_animations()
-
         if config.DISABLE_ENEMY_AI:
             return
 
@@ -728,18 +726,22 @@ class Game:
             time.sleep(0.5)
 
             if enemy.hp <= 0:
+                # Enemy is dead
                 continue
 
             next_move, target = enemy.next_target()
 
-            if not next_move:
+            if not next_move and not target:
+                # Enemy is stuck
                 continue
 
             if enemy.stunned:
+                # Enemy was stunned by a fire ninja
                 continue
 
-            enemy.move_enemy(next_move.x, next_move.y)
-            self.wait_for_animations()
+            if next_move:
+                enemy.move_enemy(next_move.x, next_move.y)
+                self.wait_for_animations()
 
             if target is None:
                 # Set sprite to default direction
@@ -749,9 +751,11 @@ class Game:
             target_object = self.grid[target.x, target.y]
 
             if target_object is None:
+                # Ninja doesn't exist?
                 continue
 
             if target_object.hp <= 0:
+                # Ninja was ko'd
                 continue
 
             if target_object.x < enemy.x:
