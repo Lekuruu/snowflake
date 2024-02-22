@@ -79,6 +79,9 @@ class Enemy(GameObject):
         self.idle_animation()
 
     def move_object(self, x: int, y: int) -> None:
+        if self.flame:
+            self.flame.move_object(x, y, self.move_duration)
+
         self.health_bar.move_object(x, y, self.move_duration)
         super().move_object(x, y, self.move_duration)
 
