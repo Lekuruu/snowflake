@@ -343,6 +343,10 @@ class MemberCard(GameObject):
         self.selected = False
         self.client = client
 
+    @property
+    def element_name(self) -> str:
+        return self.client.element
+
     def place(self) -> None:
         if self.client.ninja.placed_ghost:
             self.x = self.client.ninja.ghost.x
