@@ -315,9 +315,9 @@ class Game:
                 ninja.targets = []
                 ninja.idle_animation()
 
-            # Update enemy "stunned" status
+            # Update enemy flame
             for enemy in self.enemies:
-                enemy.check_stun()
+                enemy.update_flame()
 
             # Wait for any animations to finish
             self.wait_for_animations()
@@ -770,6 +770,14 @@ class Game:
 
             self.wait_for_animations()
             target_object.reset_sprite_settings()
+
+        # Remove enemy stunned state
+        for enemy in self.enemies:
+            if not enemy.stunned:
+                continue
+
+            enemy.stunned = False
+            enemy.idle_animation()
 
     def show_ui(self) -> None:
         for client in self.clients:
