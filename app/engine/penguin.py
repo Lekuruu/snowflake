@@ -53,6 +53,7 @@ class Penguin(MetaplaceProtocol):
         self.power_card_stamina: int = 0
         self.played_cards: int = 0
 
+        self.mute_sounds: bool = False
         self.in_queue: bool = False
         self.is_ready: bool = False
         self.was_ko: bool = False
@@ -115,6 +116,12 @@ class Penguin(MetaplaceProtocol):
         self.server.matchmaking.remove(self)
         self.server.players.remove(self)
         self.disconnected = True
+
+    def send_tag(self, tag: str, *args) -> None:
+        if tag.startswith('FX') and self.mute_sounds:
+            return
+
+        super().send_tag(tag, *args)
 
     def initialize_power_cards(self, session=None) -> None:
         card_color = {
