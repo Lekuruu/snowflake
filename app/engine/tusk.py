@@ -5,7 +5,7 @@ from typing import List
 from app.objects.ninjas import WaterNinja, FireNinja, SnowNinja, Sensei
 from app.objects.collections import ObjectCollection
 from app.objects.gameobject import GameObject
-from app.objects.enemies import Enemy
+from app.objects.enemies import Enemy, Tusk
 from app.objects.ninjas import Ninja
 from app.objects.sound import Sound
 
@@ -27,15 +27,14 @@ import time
 
 class TuskGame(Game):
     def __init__(self, fire: Penguin, snow: Penguin, water: Penguin) -> None:
-        self.sensei: Sensei | None = None
-        self.tusk: Enemy | None = None
-        # TODO: Add tusk object
-
         self.server = fire.server
         self.water = water
         self.fire = fire
         self.snow = snow
         self.id = -1
+
+        self.sensei: Sensei | None = None
+        self.tusk: Tusk | None = None
 
         self.total_combos = 0
         self.damage = 0
@@ -183,7 +182,9 @@ class TuskGame(Game):
         self.sensei = sensei
 
     def create_enemies(self) -> None:
-        ...
+        tusk = Tusk(self, x=8, y=2)
+        tusk.place_object()
+        self.tusk = tusk
 
     def spawn_ninjas(self) -> None:
         water = self.objects.by_name('Water')
@@ -205,7 +206,9 @@ class TuskGame(Game):
         self.sensei.idle_animation()
 
     def spawn_enemies(self) -> None:
-        ...
+        self.tusk.place_object()
+        self.tusk.idle_animation()
+        self.tusk.place_healthbar()
 
     def do_powercard_attacks(self) -> None:
         ninjas_with_cards = [
