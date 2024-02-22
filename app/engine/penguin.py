@@ -117,6 +117,12 @@ class Penguin(MetaplaceProtocol):
         self.server.players.remove(self)
         self.disconnected = True
 
+    def send_tag(self, tag: str, *args) -> None:
+        if tag.startswith('FX') and self.mute_sounds:
+            return
+
+        super().send_tag(tag, *args)
+
     def initialize_power_cards(self, session=None) -> None:
         card_color = {
             'snow': 'p',

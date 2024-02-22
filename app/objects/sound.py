@@ -71,15 +71,15 @@ class Sound(Asset):
         )
 
     def play(self, target: "Game" | "Penguin", object_id: int = -1, callback: Callable | None = None) -> None:
-        try:
+        handle_id = -1
+
+        if target.__class__.__name__ == "Game":
             handle_id = target.callbacks.register_action(
                 self.name,
                 ActionType.Sound,
                 object_id,
                 callback
             )
-        except AttributeError:
-            handle_id = -1
 
         target.send_tag(
             'FX_PLAYSOUND',
