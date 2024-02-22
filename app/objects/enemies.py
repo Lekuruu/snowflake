@@ -789,6 +789,7 @@ class Tank(Enemy):
         self.play_sound('sfx_mg_2013_cjsnow_attacktank')
 
 class Tusk(Enemy):
+    name: str = 'Tusk'
     max_hp: int = 100
     attack: int = 10
     range: int = 9
