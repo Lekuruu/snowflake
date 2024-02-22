@@ -737,8 +737,6 @@ class Game:
 
             if enemy.stunned:
                 # Enemy was stunned by a fire ninja
-                enemy.stunned = False
-                enemy.idle_animation()
                 continue
 
             if next_move:
@@ -772,6 +770,14 @@ class Game:
 
             self.wait_for_animations()
             target_object.reset_sprite_settings()
+
+        # Remove enemy stunned state
+        for enemy in self.enemies:
+            if not enemy.stunned:
+                continue
+
+            enemy.stunned = False
+            enemy.idle_animation()
 
     def show_ui(self) -> None:
         for client in self.clients:
