@@ -315,9 +315,9 @@ class Game:
                 ninja.targets = []
                 ninja.idle_animation()
 
-            # Update enemy "stunned" status
+            # Update enemy flame
             for enemy in self.enemies:
-                enemy.check_stun()
+                enemy.update_flame()
 
             # Wait for any animations to finish
             self.wait_for_animations()
@@ -737,6 +737,8 @@ class Game:
 
             if enemy.stunned:
                 # Enemy was stunned by a fire ninja
+                enemy.stunned = False
+                enemy.idle_animation()
                 continue
 
             if next_move:

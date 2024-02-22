@@ -156,9 +156,9 @@ class Enemy(GameObject):
 
             self.game.wait_for_animations()
             self.remove_object()
+            return
 
-        else:
-            self.hit_animation()
+        self.hit_animation()
 
     def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
@@ -170,39 +170,29 @@ class Enemy(GameObject):
         self.attack_animation()
         target.set_health(target.hp - self.attack)
 
-    def stun(self, animation=True) -> None:
+    def flame_damage(self) -> None:
         if self.hp <= 0:
             return
 
         self.set_health(self.hp - 3)
-        self.stunned = True
 
-        if animation:
-            reactor.callLater(
-                0.8,
-                lambda: self.daze_animation() if self.hp > 0 else None
-            )
+    def update_flame(self) -> None:
+        if not self.flame:
+            return
 
-    def check_stun(self) -> None:
-        if self.flame:
-            if self.flame.rounds_left <= 0:
-                # Stun enemy one more time before removing flame
-                self.stun(animation=False)
+        if self.flame.rounds_left <= 0:
+            # Stun enemy one more time before removing flame
+            self.flame_damage()
 
-                self.flame.remove_object()
-                self.flame = None
-                self.stunned = False
+            self.flame.remove_object()
+            self.flame = None
 
-                # Reset animation
-                reactor.callLater(0.8, self.idle_animation, True)
+            # Reset animation
+            reactor.callLater(0.8, self.idle_animation, True)
+            return
 
-            else:
-                self.flame.rounds_left -= 1
-                self.stun()
-
-        elif self.stunned:
-            self.stunned = False
-            self.idle_animation(reset=True)
+        self.flame.rounds_left -= 1
+        self.flame_damage()
 
     def movable_tiles(self) -> Iterator[GameObject]:
         """Get all tiles that the enemy can move to from its current position"""

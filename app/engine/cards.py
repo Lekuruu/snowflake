@@ -221,17 +221,16 @@ class CardObject(Card):
                 continue
 
             if isinstance(target, Enemy):
+                attack = self.value
+
                 if self.element == 'w':
                     attack = self.value * 2
 
-                else:
-                    attack = self.value
+                if self.element == 'f':
+                    target.stunned = True
 
                 target.set_health(target.hp - attack, wait=False)
                 Explosion(self.game, target.x, target.y).play()
-
-                if self.element == 'f':
-                    target.stun()
 
     def apply_effects(self) -> None:
         if self.element == 's':
