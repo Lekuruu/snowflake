@@ -341,7 +341,7 @@ class TuskGame(Game):
                     {
                         "coinsEarned": self.coins,
                         "doubleCoins": False, # TODO
-                        "damage": self.damage,
+                        "damage": min(self.damage, 100),
                         "isBoss": 1,
                         "rank": client.object.snow_ninja_rank + 1,
                         "round": self.get_payout_round(),
