@@ -274,6 +274,6 @@ class Grid:
             if (object := self[tile.x, tile.y]) is not None:
                 yield object
 
-    def block_tile(self, x: int, y: int) -> None:
-        """Set a blank pixel on a tile, to block it"""
-        self[x, y] = GameObject(self.game, 'blank_png', x, y)
+    def block_tile(self, x: int, y: int, sprite: str = 'blank_png') -> None:
+        """Set a static object on a tile, to block it"""
+        self[x, y] = GameObject(self.game, sprite, x, y)
