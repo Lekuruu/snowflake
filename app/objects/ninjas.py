@@ -994,6 +994,7 @@ class Sensei(GameObject):
         if not self.game.enemies:
             return
 
+        time.sleep(0.5)
         self.attack_animation()
         self.attack_sound()
         time.sleep(0.5)
