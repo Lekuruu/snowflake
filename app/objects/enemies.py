@@ -817,6 +817,26 @@ class Tusk(Enemy):
         self.game.grid.block_tile(self.x - 1, self.y)
         self.game.grid.block_tile(self.x, self.y + 1)
 
+    def animate_healthbar(self, start_hp: int, end_hp: int, duration: int = 500) -> None:
+        backwards = False
+
+        if end_hp > start_hp:
+            # Health increased, playing backwards
+            backwards = True
+
+            # Swap start and end hp
+            start_hp, end_hp = end_hp, start_hp
+
+        start_frame = 240 - int((start_hp / self.max_hp) * 240)
+        end_frame = 240 - int((end_hp / self.max_hp) * 240)
+
+        self.health_bar.animate_sprite(
+            start_frame-1,
+            end_frame-1,
+            backwards=backwards,
+            duration=duration
+        )
+
     def idle_animation(self, reset=False) -> None:
         self.animate_object(
             'tusk_idle_anim',
