@@ -1037,10 +1037,17 @@ class Sensei(GameObject):
         beam.remove_object()
         self.idle_animation()
 
+        is_combo = len([
+            ninja for ninja in self.game.ninjas
+            if ninja.client.placed_powercard
+        ]) > 0
+
         for card, impact in impacts:
-            card.apply_health()
             impact.remove_object()
-            # TODO: Effects
+            card.apply_health()
+
+            if is_combo:
+                card.apply_effects()
 
         self.game.wait_for_animations()
 
