@@ -794,3 +794,19 @@ class Tusk(Enemy):
     attack: int = 10
     range: int = 9
     move: int = 0
+
+    def __init__(
+        self,
+        game: "Game",
+        x: int = -1,
+        y: int = -1
+    ) -> None:
+        super().__init__(game, x, y)
+        self.health_bar = GameObject(
+            self.game,
+            'tusk_healthbar_animation',
+            x=self.x,
+            y=self.y,
+            x_offset=0.5,
+            y_offset=1.005
+        )
