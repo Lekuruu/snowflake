@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterator, Tuple, List
+from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
@@ -9,7 +10,6 @@ if TYPE_CHECKING:
     from app.engine.game import Game
     from app.engine import Penguin
 
-from twisted.internet import reactor
 from app.data import MirrorMode
 from app.objects import GameObject
 from app.objects.effects import (
@@ -26,6 +26,7 @@ from app.objects.effects import (
     Flame
 )
 
+import itertools
 import random
 import time
 
@@ -812,10 +813,61 @@ class Tusk(Enemy):
             y_offset=1.005
         )
 
-        # Block tiles around Tusk to match sprite's size
-        self.game.grid.block_tile(self.x - 1, self.y + 1)
+        # First attack will either be 'push' or 'icicle_random'
+        self.next_attack = random.choice([
+            'push',
+            'icicle_random'
+        ])
+
+        # Icicle rows used for the 'icicle_paired' attack
+        self.icicle_pairs = itertools.cycle([
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (3, 4)
+        ])
+
+        # Block tiles around tusk to match sprite's size
+
+        # Next to tusk
         self.game.grid.block_tile(self.x - 1, self.y)
+        # Below tusk
+        self.game.grid.block_tile(self.x - 1, self.y + 1)
         self.game.grid.block_tile(self.x, self.y + 1)
+        # Above tusk
+        self.game.grid.block_tile(self.x - 1, self.y - 1)
+        self.game.grid.block_tile(self.x, self.y - 1)
+
+    def attack_target(self, target: "Ninja") -> None:
+        if target.hp <= 0:
+            return
+
+        attacks = {
+            'push': self.push_attack,
+            'icicle_random': self.icicle_attack_random,
+            'icicle_paired': self.icicle_attack_paired
+        }
+
+        attacks[self.next_attack]()
+
+        if self.next_attack in ('icicle_random', 'push'):
+            self.next_attack = 'icicle_paired'
+            return
+
+        # TODO: Decrease chance for "push" attack
+        self.next_attack = random.choice([
+            'push',
+            'icicle_random'
+        ])
+
+    def push_attack(self) -> None:
+        ...
+
+    def icicle_attack_random(self) -> None:
+        ...
+
+    def icicle_attack_paired(self) -> None:
+        ...
 
     def set_health(self, hp: int, wait=True) -> None:
         damage_progress = (hp / self.max_hp) * 100
