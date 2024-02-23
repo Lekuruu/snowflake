@@ -935,6 +935,7 @@ class Tusk(Enemy):
             play_style='play_once',
             reset=True
         )
+        self.hit_sound()
 
         if self.stunned:
             self.daze_animation(False)
@@ -948,3 +949,9 @@ class Tusk(Enemy):
             play_style='loop',
             reset=reset
         )
+
+    def hit_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_hittusk')
+
+    def laugh_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_tusklaugh')
