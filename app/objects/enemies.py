@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Iterator, Tuple, List
 
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
+    from app.engine.tusk import TuskGame
     from app.engine.game import Game
     from app.engine import Penguin
 
@@ -797,7 +798,7 @@ class Tusk(Enemy):
 
     def __init__(
         self,
-        game: "Game",
+        game: "TuskGame",
         x: int = -1,
         y: int = -1
     ) -> None:
