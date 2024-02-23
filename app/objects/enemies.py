@@ -36,6 +36,7 @@ class Enemy(GameObject):
     range: int = 0
     attack: int = 0
     move: int = 0
+    tile_range: int = 0
     move_duration: int = 600
 
     def __init__(
@@ -52,10 +53,13 @@ class Enemy(GameObject):
             x_offset=0.5,
             y_offset=1
         )
-        self.attack = self.__class__.attack
+        self.hp = self.__class__.max_hp
+        self.move = self.__class__.move
         self.range = self.__class__.range
+        self.attack = self.__class__.attack
         self.max_hp = self.__class__.max_hp
-        self.hp = self.max_hp
+        self.tile_range = self.__class__.tile_range
+        self.move_duration = self.__class__.move_duration
 
         self.health_bar = GameObject(
             self.game,
@@ -796,6 +800,7 @@ class Tusk(Enemy):
     attack: int = 10
     range: int = 9
     move: int = 0
+    tile_range: int = 1
 
     def __init__(
         self,

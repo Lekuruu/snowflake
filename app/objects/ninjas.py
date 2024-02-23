@@ -426,7 +426,7 @@ class Ninja(GameObject):
 
             distance = abs(tile.x - target_x) + abs(tile.y - target_y)
 
-            if distance <= self.range:
+            if distance <= self.range + target_object.tile_range:
                 yield tile
 
     def healable_tiles(self, target_x: int, target_y: int) -> Iterator["Ninja"]:
