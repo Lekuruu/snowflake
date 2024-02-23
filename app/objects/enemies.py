@@ -817,6 +817,11 @@ class Tusk(Enemy):
         self.game.grid.block_tile(self.x - 1, self.y)
         self.game.grid.block_tile(self.x, self.y + 1)
 
+    def set_health(self, hp: int, wait=True) -> None:
+        damage_progress = (hp / self.max_hp) * 100
+        self.game.damage = (100 - damage_progress)
+        super().set_health(hp, wait)
+
     def animate_healthbar(self, start_hp: int, end_hp: int, duration: int = 500) -> None:
         backwards = False
 
