@@ -3,8 +3,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.objects.ninjas import Ninja
-
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine import Penguin
@@ -107,7 +105,7 @@ class Target(LocalGameObject):
         self.select()
 
 class TuskTarget(Target):
-    def __init__(self, ninja: Ninja, x: int = -1, y: int = -1) -> None:
+    def __init__(self, ninja: "Ninja", x: int = -1, y: int = -1) -> None:
         super().__init__(ninja, x, y)
         self.attack_intro_sprite = 'ui_target_red_attack_tusk_intro'
         self.attack_idle_sprite = 'ui_target_red_attack_idle_tusk_anim'

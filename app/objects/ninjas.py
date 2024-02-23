@@ -8,8 +8,8 @@ if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
+from app.objects.target import Target, TuskTarget
 from app.data import MirrorMode, TipPhase, Card
-from app.objects.target import Target
 from app.objects.effects import (
     WaterPowerBeam,
     SnowPowerBeam,
@@ -27,7 +27,7 @@ from app.objects.effects import (
     Rage
 )
 
-from app.objects.enemies import Enemy
+from app.objects.enemies import Enemy, Tusk
 from app.objects import GameObject
 
 import app.engine.cards
@@ -300,6 +300,13 @@ class Ninja(GameObject):
         )
 
         for tile in attackable_tiles:
+            target_object = self.game.grid[tile.x, tile.y]
+
+            if isinstance(target_object, Tusk):
+                self.targets.append(target := TuskTarget(self, tile.x, tile.y))
+                target.show_attack()
+                continue
+
             self.targets.append(target := Target(self, tile.x, tile.y))
             target.show_attack()
 
