@@ -370,6 +370,7 @@ class TuskGame(Game):
         if all(ninja.hp <= 0 for ninja in self.ninjas):
             self.tusk.win_animation()
             self.sensei.lose_animation()
+            self.wait_for_animations()
             return
 
         # Unlock "Final Battle" stamp
