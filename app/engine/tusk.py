@@ -325,6 +325,15 @@ class TuskGame(Game):
 
                         self.logger.info(f'{client} unlocked item {item}')
 
+                    if not self.enemies:
+                        # Award "Tusk's Cloak" item
+                        items.add(
+                            client.pid, 3160,
+                            session=session
+                        )
+
+                        self.logger.info(f'{client} unlocked item 3160')
+
                 # Display payout swf window
                 payout = client.get_window('cardjitsu_snowpayout.swf')
                 payout.layer = 'bottomLayer'
