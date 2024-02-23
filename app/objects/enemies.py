@@ -875,9 +875,31 @@ class Tusk(Enemy):
         ...
 
     def set_health(self, hp: int, wait=True) -> None:
-        damage_progress = (hp / self.max_hp) * 100
-        self.game.damage = (100 - damage_progress)
-        super().set_health(hp, wait)
+        hp = max(0, min(hp, self.max_hp))
+        self.animate_healthbar(self.hp, hp, duration=500)
+        self.game.damage = 100 - ((hp / self.max_hp) * 100)
+
+        AttackTile(
+            self.game,
+            self.x,
+            self.y
+        ).play(auto_remove=True)
+
+        DamageNumbers(
+            self.game,
+            self.x,
+            self.y
+        ).play(self.hp - hp)
+
+        self.hp = hp
+
+        if self.hp <= 0:
+            self.ko_animation()
+            self.game.wait_for_animations()
+            self.remove_object()
+            return
+
+        self.hit_animation()
 
     def animate_healthbar(self, start_hp: int, end_hp: int, duration: int = 500) -> None:
         backwards = False
