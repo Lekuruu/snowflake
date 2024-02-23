@@ -811,6 +811,11 @@ class Tusk(Enemy):
             y_offset=1.005
         )
 
+        # Block tiles around Tusk to match sprite's size
+        self.game.grid.block_tile(self.x - 1, self.y + 1)
+        self.game.grid.block_tile(self.x - 1, self.y)
+        self.game.grid.block_tile(self.x, self.y + 1)
+
     def idle_animation(self, reset=False) -> None:
         self.animate_object(
             'tusk_idle_anim',
