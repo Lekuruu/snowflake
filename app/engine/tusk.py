@@ -221,7 +221,7 @@ class TuskGame(Game):
             for ninja in ninjas_with_cards
         ]
 
-        if self.sensei.power_state == 1:
+        if self.sensei.power_state == 2:
             # Sensei is using a powerup
             elements.append('sensei')
 
