@@ -996,7 +996,7 @@ class Sensei(GameObject):
 
         self.attack_animation()
         self.attack_sound()
-        time.sleep(0.65)
+        time.sleep(0.5)
 
         beam_class = {
             'fire': FirePowerBeam,
@@ -1014,6 +1014,7 @@ class Sensei(GameObject):
         beam.x_offset = beam_offset[0]
         beam.y_offset = beam_offset[1]
         beam.play()
+        time.sleep(0.65)
 
         positions = [
             (1, 2),
@@ -1022,7 +1023,7 @@ class Sensei(GameObject):
         ]
 
         impacts = []
-        delay = 0.4
+        delay = 0.35
 
         for x, y in positions:
             impacts.append(self.place_card(x, y))
@@ -1031,7 +1032,7 @@ class Sensei(GameObject):
         if self.element_state == 'snow':
             self.snow_impact_sound()
 
-        time.sleep(impacts[0][1].duration - (delay + 0.1))
+        time.sleep(impacts[0][1].duration - delay)
 
         beam.remove_object()
         self.idle_animation()
@@ -1039,7 +1040,6 @@ class Sensei(GameObject):
         for card, impact in impacts:
             card.apply_health()
             impact.remove_object()
-            time.sleep(delay)
             # TODO: Effects
 
         self.game.wait_for_animations()
@@ -1089,6 +1089,7 @@ class Sensei(GameObject):
         self.animate_object(
             'sensei_attackstart_anim',
             play_style='play_once',
+            duration=500,
             reset=True
         )
         self.animate_object(
