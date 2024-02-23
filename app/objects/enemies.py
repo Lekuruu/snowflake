@@ -411,7 +411,7 @@ class Sly(Enemy):
 
     def move_animation(self) -> None:
         self.animate_object(
-            f'sly_move_anim',
+            'sly_move_anim',
             play_style='loop',
             reset=True
         )
@@ -423,7 +423,7 @@ class Sly(Enemy):
 
         time.sleep(0.25)
         self.animate_object(
-            f'sly_attack_anim',
+            'sly_attack_anim',
             play_style='play_once',
             callback=self.reset_sprite_settings,
             reset=True
@@ -447,7 +447,7 @@ class Sly(Enemy):
 
     def ko_animation(self) -> None:
         self.animate_object(
-            f'sly_ko_anim',
+            'sly_ko_anim',
             play_style='play_once',
             reset=True
         )
@@ -455,7 +455,7 @@ class Sly(Enemy):
 
     def hit_animation(self) -> None:
         self.animate_object(
-            f'sly_hit_anim',
+            'sly_hit_anim',
             play_style='play_once',
             reset=True
         )
@@ -469,7 +469,7 @@ class Sly(Enemy):
 
     def daze_animation(self, reset=True) -> None:
         self.animate_object(
-            f'sly_daze_anim',
+            'sly_daze_anim',
             play_style='loop',
             reset=reset
         )
@@ -543,7 +543,7 @@ class Scrap(Enemy):
 
     def idle_animation(self, reset=False) -> None:
         self.animate_object(
-            f'scrap_idle_anim',
+            'scrap_idle_anim',
             play_style='loop',
             register=False,
             reset=reset
@@ -551,7 +551,7 @@ class Scrap(Enemy):
 
     def move_animation(self) -> None:
         self.animate_object(
-            f'scrap_move_anim',
+            'scrap_move_anim',
             play_style='loop',
             reset=True
         )
@@ -583,7 +583,7 @@ class Scrap(Enemy):
 
     def ko_animation(self) -> None:
         self.animate_object(
-            f'scrap_ko_anim',
+            'scrap_ko_anim',
             play_style='play_once',
             reset=True
         )
@@ -591,7 +591,7 @@ class Scrap(Enemy):
 
     def hit_animation(self) -> None:
         self.animate_object(
-            f'scrap_hit_anim',
+            'scrap_hit_anim',
             play_style='play_once',
             reset=True
         )
@@ -605,7 +605,7 @@ class Scrap(Enemy):
 
     def daze_animation(self, reset=True) -> None:
         self.animate_object(
-            f'scrap_dazed_anim',
+            'scrap_dazed_anim',
             play_style='loop',
             reset=reset
         )
@@ -721,7 +721,7 @@ class Tank(Enemy):
 
     def idle_animation(self, reset=False) -> None:
         self.animate_object(
-            f'tank_idle_anim',
+            'tank_idle_anim',
             play_style='loop',
             register=False,
             reset=reset
@@ -752,7 +752,7 @@ class Tank(Enemy):
 
     def ko_animation(self) -> None:
         self.animate_object(
-            f'tank_ko_anim',
+            'tank_ko_anim',
             play_style='play_once',
             reset=True
         )
@@ -760,7 +760,7 @@ class Tank(Enemy):
 
     def hit_animation(self) -> None:
         self.animate_object(
-            f'tank_hit_anim',
+            'tank_hit_anim',
             play_style='play_once',
             reset=True
         )
@@ -809,4 +809,59 @@ class Tusk(Enemy):
             y=self.y,
             x_offset=0.5,
             y_offset=1.005
+        )
+
+    def idle_animation(self, reset=False) -> None:
+        self.animate_object(
+            'tusk_idle_anim',
+            play_style='loop',
+            register=False,
+            reset=reset
+        )
+
+    def attack_animation(self, type='push') -> None:
+        if type == 'push':
+            self.push_attack_animation()
+            return
+
+        self.icicle_attack_animation()
+
+    def push_attack_animation(self) -> None:
+        ...
+
+    def icicle_attack_animation(self) -> None:
+        ...
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            'tusk_lose_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+    def win_animation(self) -> None:
+        self.animate_object(
+            'tusk_win_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+    def hit_animation(self) -> None:
+        self.animate_object(
+            'tusk_hit_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+        if self.stunned:
+            self.daze_animation(False)
+            return
+
+        self.idle_animation()
+
+    def daze_animation(self, reset=True) -> None:
+        self.animate_object(
+            'tusk_stun_anim',
+            play_style='loop',
+            reset=reset
         )
