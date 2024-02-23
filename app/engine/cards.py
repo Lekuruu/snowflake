@@ -66,14 +66,9 @@ class CardObject(Card):
 
     @property
     def targets(self) -> List[GameObject]:
-        x_range, y_range = self.pattern_range(self.x, self.y)
-
-        return [
-            self.game.grid[x, y]
-            for x in x_range
-            for y in y_range
-            if self.game.grid[x, y] is not None
-        ]
+        return set(self.game.grid.objects_in_range(
+            *self.pattern_range(self.x, self.y)
+        ))
 
     def place(self, x: int, y: int) -> None:
         self.place_card_sprite(x, y)

@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Tuple, Iterator
-from app.objects import GameObject, Asset
+from app.objects.enemies import Enemy
 from app.objects.ninjas import Ninja
+from app.objects import GameObject
 from app.data import TipPhase
 
 if TYPE_CHECKING:
@@ -44,6 +45,15 @@ class Grid:
             [(obj.x, obj.y) for obj in self.game.rocks]
             # TODO: Should ninjas & enemies be obstacles?
         )
+
+    @property
+    def objects(self) -> List[GameObject]:
+        """Get all objects on the grid"""
+        return [
+            obj for row in self.array
+            for obj in row
+            if obj is not None
+        ]
 
     def add(self, obj: GameObject) -> None:
         """Add a game object to the grid"""
@@ -273,6 +283,31 @@ class Grid:
         for tile in tiles:
             if (object := self[tile.x, tile.y]) is not None:
                 yield object
+
+    def objects_in_range(self, x_range: range, y_range: range) -> Iterator[GameObject]:
+        """Get all objects within a x & y range, while accounting for enemy's tile range"""
+        for object in self.objects:
+            if (object.x in x_range) and (object.y in y_range):
+                yield object
+
+            if isinstance(object, Enemy):
+                if object.tile_range <= 0:
+                    continue
+
+                enemy_x_range = range(
+                    object.x - object.tile_range,
+                    object.x + object.tile_range + 1
+                )
+                enemy_y_range = range(
+                    object.y - object.tile_range,
+                    object.y + object.tile_range + 1
+                )
+
+                if any(
+                    (x in enemy_x_range) and (y in enemy_y_range)
+                    for x in x_range for y in y_range
+                ):
+                    yield object
 
     def block_tile(self, x: int, y: int, sprite: str = 'blank_png') -> None:
         """Set a static object on a tile, to block it"""
