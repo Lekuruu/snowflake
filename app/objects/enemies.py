@@ -859,11 +859,19 @@ class Tusk(Enemy):
             self.next_attack = 'icicle_paired'
             return
 
-        # TODO: Decrease chance for "push" attack
-        self.next_attack = random.choice([
-            'push',
-            'icicle_random'
-        ])
+        self.next_attack = 'icicle_random'
+
+        # The closer the ninjas are to tusk, the higher the chance for a "push" attack
+        distance = (
+            abs(self.x - target.x) + abs(self.y - target.y)
+        )
+
+        push_attack_chance = (
+            1 - (distance / 6)
+        )
+
+        if random.random() <= push_attack_chance:
+            self.next_attack = 'push'
 
     def push_attack(self) -> None:
         self.push_attack_animation()
