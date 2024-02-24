@@ -30,9 +30,6 @@ try:
     DISABLE_STAMPS = os.environ.get('DISABLE_STAMPS', 'False').lower() == 'true'
     ENABLE_BETA = os.environ.get('ENABLE_BETA', 'False').lower() == 'true'
 
-    if ENABLE_BETA:
-        DISABLE_STAMPS = True
-
     BASE_URL = f'{MEDIA_LOCATION}/game/mpassets/'
     CARDS_ASSET_LOCATION = f'{MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/'
     WINDOW_MANAGER_LOCATION = f'{MEDIA_LOCATION}/game/mpassets/minigames/cjsnow/en_US/deploy/swf/windowManager/windowmanager.swf'
