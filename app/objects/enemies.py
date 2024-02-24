@@ -871,11 +871,13 @@ class Tusk(Enemy):
 
     def icicle_attack_random(self) -> None:
         self.icicle_attack_animation_start()
+        self.game.wait_for_animations()
         self.icicle_attack_animation_end()
         # TODO
 
     def icicle_attack_paired(self) -> None:
         self.icicle_attack_animation_start()
+        self.game.wait_for_animations()
         self.icicle_attack_animation_end()
         # TODO
 
@@ -940,6 +942,7 @@ class Tusk(Enemy):
             play_style='play_once',
             reset=True
         )
+        self.push_attack_sound()
         self.idle_animation()
 
     def icicle_attack_animation_start(self) -> None:
@@ -948,13 +951,16 @@ class Tusk(Enemy):
             play_style='play_once',
             reset=True
         )
+        self.icicle_attack_sound_start()
 
     def icicle_attack_animation_end(self) -> None:
         self.animate_object(
             'tusk_iciclesummon2_anim',
-            play_style='play_once'
+            play_style='play_once',
+            reset=True
         )
         self.idle_animation()
+        self.icicle_attack_sound_end()
 
     def ko_animation(self) -> None:
         self.animate_object(
@@ -997,3 +1003,12 @@ class Tusk(Enemy):
 
     def laugh_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_tusklaugh')
+
+    def push_attack_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacktuskearthquake')
+
+    def icicle_attack_sound_start(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacktuskicicle01')
+
+    def icicle_attack_sound_end(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacktuskicicle02')
