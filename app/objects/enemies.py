@@ -866,13 +866,18 @@ class Tusk(Enemy):
         ])
 
     def push_attack(self) -> None:
-        ...
+        self.push_attack_animation()
+        # TODO
 
     def icicle_attack_random(self) -> None:
-        ...
+        self.icicle_attack_animation_start()
+        self.icicle_attack_animation_end()
+        # TODO
 
     def icicle_attack_paired(self) -> None:
-        ...
+        self.icicle_attack_animation_start()
+        self.icicle_attack_animation_end()
+        # TODO
 
     def set_health(self, hp: int, wait=True) -> None:
         hp = max(0, min(hp, self.max_hp))
@@ -929,18 +934,27 @@ class Tusk(Enemy):
             reset=reset
         )
 
-    def attack_animation(self, type='push') -> None:
-        if type == 'push':
-            self.push_attack_animation()
-            return
-
-        self.icicle_attack_animation()
-
     def push_attack_animation(self) -> None:
-        ...
+        self.animate_object(
+            'tusk_pushattack_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.idle_animation()
 
-    def icicle_attack_animation(self) -> None:
-        ...
+    def icicle_attack_animation_start(self) -> None:
+        self.animate_object(
+            'tusk_iciclesummon1_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+    def icicle_attack_animation_end(self) -> None:
+        self.animate_object(
+            'tusk_iciclesummon2_anim',
+            play_style='play_once'
+        )
+        self.idle_animation()
 
     def ko_animation(self) -> None:
         self.animate_object(
