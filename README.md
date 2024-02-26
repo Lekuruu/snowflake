@@ -45,7 +45,7 @@ A work-in-progress Card-Jitsu Snow server emulator, made for [Houdini](https://g
         - [x] Animations
         - [x] Actions
     - [ ] Tusk
-        - [ ] Animations
+        - [x] Animations
         - [ ] Actions
     - [x] Payout
 - [ ] Custom Features
