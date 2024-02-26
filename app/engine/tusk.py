@@ -98,6 +98,7 @@ class TuskGame(Game):
         self.show_environment()
         self.spawn_ninjas()
         self.spawn_enemies()
+        self.wait_for_animations()
 
         for client in self.clients:
             # Close loading screen
@@ -134,7 +135,6 @@ class TuskGame(Game):
                 continue
 
             snow_ui = client.get_window('cardjitsu_snowui.swf')
-            snow_ui.send_payload('updateStamina', {'cardData': None, 'cycle': False, 'stamina': 0})
             snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
