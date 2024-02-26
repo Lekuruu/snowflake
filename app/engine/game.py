@@ -173,7 +173,6 @@ class Game:
                 continue
 
             snow_ui = client.get_window('cardjitsu_snowui.swf')
-            snow_ui.send_payload('updateStamina', {'cardData': None, 'cycle': False, 'stamina': 0})
             snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
