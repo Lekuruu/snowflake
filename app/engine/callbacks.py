@@ -32,7 +32,7 @@ class Action:
         return hash(self.handle_id)
 
 class CallbackHandler:
-    """This class manages callbacks for animations and sounds"""
+    """This class manages callbacks for animations, sounds & window events"""
 
     def __init__(self, game: "Game"):
         self.pending_actions: Dict[int, List[Action]] = defaultdict(list)
