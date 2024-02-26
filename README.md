@@ -49,9 +49,10 @@ A work-in-progress Card-Jitsu Snow server emulator, made for [Houdini](https://g
         - [ ] Actions
     - [ ] Payout
 - [ ] Custom Features
-    - [ ] Singleplayer Mode
-    - [ ] Ninja AI
     - [x] Beta mode
+    - [ ] Ninja AI
+    - [ ] Puffles
+    - [ ] Singleplayer Mode
 
 ## Setup
 
