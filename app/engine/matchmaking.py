@@ -60,8 +60,6 @@ class MatchmakingQueue:
         return players
 
     def create_normal_game(self, fire: Penguin, snow: Penguin, water: Penguin) -> None:
-        self.logger.info('Creating game...')
-
         game = Game(fire, snow, water)
         game.server.games.add(game)
 
@@ -83,8 +81,6 @@ class MatchmakingQueue:
         game.server.runThread(game.start)
 
     def create_tusk_game(self, fire: Penguin, snow: Penguin, water: Penguin) -> None:
-        self.logger.info('Creating tusk game...')
-
         game = TuskGame(fire, snow, water)
         game.server.games.add(game)
 
