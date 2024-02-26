@@ -233,35 +233,41 @@ class CardObject(Card):
                 Explosion(self.game, target.x, target.y).play()
 
     def apply_effects(self) -> None:
+        # NOTE: Water & Snow effects seems to apply for *all* ninjas,
+        #       instead of the ones in range of the power card. I am
+        #       not sure if I like this approach, since it makes the
+        #       game easier overall. My goal is to replicate the game
+        #       as close as possible, so I will keep it like this for now.
+
         if self.element == 's':
-            # Apply shield to all ninjas in targets
-            for target in self.targets:
-                if not isinstance(target, Ninja):
+            # Apply shield to all ninjas
+            for ninja in self.game.ninjas:
+                if ninja.client.disconnected:
                     continue
 
-                if target.client.disconnected:
+                if ninja.hp <= 0:
                     continue
 
-                if target.shield is not None:
+                if ninja.shield is not None:
                     continue
 
-                target.shield = Shield(self.game, target.x, target.y)
-                target.shield.play()
+                ninja.shield = Shield(self.game, ninja.x, ninja.y)
+                ninja.shield.play()
 
         elif self.element == 'w':
-            # Apply rage to all ninjas in targets
-            for target in self.targets:
-                if not isinstance(target, Ninja):
+            # Apply rage to all ninjas
+            for ninja in self.game.ninjas:
+                if ninja.client.disconnected:
                     continue
 
-                if target.client.disconnected:
+                if ninja.hp <= 0:
                     continue
 
-                if target.rage is not None:
+                if ninja.rage is not None:
                     continue
 
-                target.rage = Rage(self.game, target.x, target.y)
-                target.rage.play()
+                ninja.rage = Rage(self.game, ninja.x, ninja.y)
+                ninja.rage.play()
 
         elif self.element == 'f':
             # Apply flame to all ninjas in targets
