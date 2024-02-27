@@ -270,7 +270,6 @@ class GameObject:
             origin_mode.value,
             mirror_mode.value
         )
-
         self._mirror_mode = mirror_mode
         self._origin_mode = origin_mode
         self._x_scale = scale_x
@@ -289,10 +288,6 @@ class GameObject:
                 origin_mode=OriginMode.NONE,
                 mirror_mode=MirrorMode.NONE
             )
-            self._mirror_mode = MirrorMode.NONE
-            self._origin_mode = OriginMode.NONE
-            self._x_scale = 1
-            self._y_scale = 1
 
     def hide(self, client: "Penguin" | None = None) -> None:
         self.place_sprite('blank_png', client)
