@@ -396,25 +396,6 @@ class Game:
         self.grid.hide_tiles()
         self.disable_cards()
 
-    def register_input(
-        self,
-        input_id: str,
-        script_id: int,
-        target: InputTarget,
-        event: InputType,
-        key_modifier: InputModifier,
-        command: str
-    ) -> None:
-        self.send_tag(
-            'W_INPUT',
-            input_id,
-            script_id,
-            target.value,
-            event.value,
-            key_modifier.value,
-            command
-        )
-
     def initialize_objects(self) -> None:
         self.grid.initialize_tiles()
         self.create_environment()
