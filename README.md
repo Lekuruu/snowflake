@@ -96,9 +96,11 @@ And now, we need to set up the actual repository.
 
 2. Rename the `.env_example` file to `.env` and **edit it**, to match your setup
 
-3. Install the requirements: `pip install -r requirements.txt`
+3. Add the [cardjitsu_snowrevive.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cardjitsu_snowrevive.swf) file to your media server in `/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/windows/`
 
-4. Run the server: `python main.py`
+4. Install the requirements: `pip install -r requirements.txt`
+
+5. Run the server: `python main.py`
 
 ### Beta Mode
 
