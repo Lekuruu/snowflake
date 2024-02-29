@@ -3,4 +3,4 @@ psycopg2-binary==2.9.9
 python-dotenv==1.0.1
 SQLAlchemy==2.0.27
 Twisted==23.10.0
-redis==5.0.1
+redis==5.0.2
