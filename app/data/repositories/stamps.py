@@ -66,3 +66,21 @@ def exists(
     return session.query(PenguinStamp) \
         .filter_by(penguin_id=penguin_id, stamp_id=id) \
         .count() > 0
+
+@session_wrapper
+def completed_group(
+    penguin_id: int,
+    group_id: int,
+    session: Session | None = None
+) -> bool:
+    total = session.query(Stamp) \
+        .filter(Stamp.group_id == group_id) \
+        .count()
+
+    collected = session.query(Stamp) \
+        .join(PenguinStamp, Stamp.id == PenguinStamp.stamp_id) \
+        .filter(PenguinStamp.penguin_id == penguin_id) \
+        .filter(Stamp.group_id == group_id) \
+        .count()
+
+    return total == collected
