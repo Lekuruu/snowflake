@@ -897,8 +897,12 @@ class Game:
                     result_rank = 24
                     result_exp = 100
 
+                # Enable double coins when player has unlocked all stamps
+                double_coins = stamps.completed_group(client.pid, 60, session=session)
+                coins = self.coins * (2 if double_coins else 1)
+
                 updates = {
-                    'coins': client.object.coins + self.coins,
+                    'coins': client.object.coins + coins,
                     'snow_ninja_rank': result_rank,
                     'snow_ninja_progress': result_exp
                 }
@@ -953,13 +957,13 @@ class Game:
                 payout.layer = 'bottomLayer'
                 payout.load(
                     {
-                        "coinsEarned": self.coins,
-                        "doubleCoins": False, # TODO
-                        "damage": 0, # Only important for tusk battle
+                        "coinsEarned": coins,
+                        "doubleCoins": int(double_coins),
+                        "damage": 0,
                         "isBoss": 0,
                         "rank": client.object.snow_ninja_rank + 1,
                         "round": self.get_payout_round(),
-                        "showItems": 0, # Only important for tusk battle
+                        "showItems": 0,
                         "stampList": [
                             {
                                 "stamp_id": stamp.id,
