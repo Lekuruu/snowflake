@@ -47,6 +47,9 @@ A work-in-progress Card-Jitsu Snow server emulator, made for [Houdini](https://g
     - [ ] Tusk
         - [x] Animations
         - [ ] Actions
+            - [x] Paired Icicle Attack
+            - [x] Random Icicle Attack
+            - [ ] Push Attack
     - [x] Payout
 - [ ] Custom Features
     - [x] Beta mode
