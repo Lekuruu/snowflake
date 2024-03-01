@@ -186,6 +186,16 @@ class TuskGame(Game):
         tusk.place_object()
         self.tusk = tusk
 
+        # Change max hp based on player count
+        max_hp = {
+            1: 300,
+            2: 500,
+            3: 800
+        }[len(self.connected_clients)]
+
+        self.tusk.max_hp = max_hp
+        self.tusk.hp = max_hp
+
     def spawn_ninjas(self) -> None:
         water = self.objects.by_name('Water')
         water.place_object()
