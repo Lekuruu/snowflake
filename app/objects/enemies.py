@@ -886,6 +886,7 @@ class Tusk(Enemy):
         # NOTE: The actual algorithm for this attack is unknown
         #       I am just going to improvise for now
 
+        # Select random tiles to drop icicles on
         random_positions = random.sample(
             [
                 (tile.x, tile.y)
@@ -894,14 +895,20 @@ class Tusk(Enemy):
             random.randint(1, 6 - len(self.game.connected_clients))
         )
 
-        ninja_positions = random.sample(
-            [
-                (ninja.x, ninja.y)
-                for ninja in self.game.ninjas
-                if not ninja.client.disconnected
-            ],
-            random.randint(0, len(self.game.connected_clients))
-        )
+        # Lower the possibility of hitting ninjas
+        ninja_hit_chance = (len(self.game.connected_clients) / 10) + 0.2
+        ninja_positions = []
+
+        if random.random() <= ninja_hit_chance:
+            # Select random ninjas to drop icicles on
+            ninja_positions = random.sample(
+                [
+                    (ninja.x, ninja.y)
+                    for ninja in self.game.ninjas
+                    if not ninja.client.disconnected
+                ],
+                random.randint(1, len(self.game.connected_clients))
+            )
 
         positions = set(random_positions + ninja_positions)
 
