@@ -856,7 +856,9 @@ class Tusk(Enemy):
         }
 
         attacks[self.next_attack]()
+        self.determine_next_attack(target)
 
+    def determine_next_attack(self, closest_target: "Ninja") -> None:
         if self.next_attack in ('icicle_random', 'push'):
             self.next_attack = 'icicle_paired'
             return
@@ -865,7 +867,7 @@ class Tusk(Enemy):
 
         # The closer the ninjas are to tusk, the higher the chance for a "push" attack
         distance = (
-            abs(self.x - target.x) + abs(self.y - target.y)
+            abs(self.x - closest_target.x) + abs(self.y - closest_target.y)
         )
 
         push_attack_chance = (
