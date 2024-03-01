@@ -984,7 +984,7 @@ class Tusk(Enemy):
             play_style='play_once',
             reset=True
         )
-        self.tusk.laugh_sound()
+        self.laugh_sound()
 
     def hit_animation(self) -> None:
         self.animate_object(
