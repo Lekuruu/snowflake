@@ -761,7 +761,10 @@ class TuskIcicleRow:
         self.game = game
 
     def play(self):
-        for x in self.game.grid.x_range:
+        x_range = list(self.game.grid.x_range)
+        x_range.reverse()
+
+        for x in x_range:
             TuskIcicle(self.game, x, self.first_row).play()
             TuskIcicle(self.game, x, self.second_row).play()
             time.sleep(0.09)
