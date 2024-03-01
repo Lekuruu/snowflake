@@ -797,7 +797,7 @@ class Tank(Enemy):
 
 class Tusk(Enemy):
     name: str = 'Tusk'
-    max_hp: int = 240
+    max_hp: int = 800
     attack: int = 10
     range: int = 9
     move: int = 0
