@@ -720,3 +720,34 @@ class MemberReviveBeam(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 29, duration=1200)
+
+class TuskIcicle(Effect):
+    def __init__(self, game: "Game", x: int, y: int) -> None:
+        super().__init__(
+            game,
+            "tusk_icicle_drop_anim",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+        self.animate_sprite(0, 15, duration=800)
+
+class TuskIcicleRow:
+    def __init__(self, game: "Game", row: int) -> None:
+        self.first_row = row[0]
+        self.second_row = row[1]
+        self.game = game
+        self.effects = []
+
+    def play(self):
+        for x in self.game.grid.x_range:
+            self.effects.append(icicle := TuskIcicle(self.game, x, self.first_row))
+            icicle.play()
+            self.effects.append(icicle := TuskIcicle(self.game, x, self.second_row))
+            icicle.play()
+            time.sleep(0.08)
