@@ -21,6 +21,7 @@ from app.objects.effects import (
     TuskIcicleRow,
     SlyProjectile,
     ScrapImpact,
+    TuskIcicle,
     AttackTile,
     Explosion,
     Effect,
@@ -880,7 +881,32 @@ class Tusk(Enemy):
 
     def icicle_attack_random(self) -> None:
         self.icicle_attack_animation()
-        # TODO
+        time.sleep(1.1)
+
+        # NOTE: The actual algorithm for this attack is unknown
+        #       I am just going to improvise for now
+
+        random_positions = random.sample(
+            [
+                (tile.x, tile.y)
+                for tile in self.game.grid.tiles
+            ],
+            random.randint(1, 6 - len(self.game.connected_clients))
+        )
+
+        ninja_positions = random.sample(
+            [
+                (ninja.x, ninja.y)
+                for ninja in self.game.ninjas
+                if not ninja.client.disconnected
+            ],
+            random.randint(0, len(self.game.connected_clients))
+        )
+
+        positions = set(random_positions + ninja_positions)
+
+        for x, y in positions:
+            TuskIcicle(self.game, x, y).play()
 
     def icicle_attack_paired(self) -> None:
         self.icicle_attack_animation()
