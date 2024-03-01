@@ -18,6 +18,7 @@ from app.objects.effects import (
     TankSwipeHorizontal,
     TankSwipeVertical,
     DamageNumbers,
+    TuskIcicleRow,
     SlyProjectile,
     ScrapImpact,
     AttackTile,
@@ -878,16 +879,17 @@ class Tusk(Enemy):
         # TODO
 
     def icicle_attack_random(self) -> None:
-        self.icicle_attack_animation_start()
-        self.game.wait_for_animations()
-        self.icicle_attack_animation_end()
+        self.icicle_attack_animation()
         # TODO
 
     def icicle_attack_paired(self) -> None:
-        self.icicle_attack_animation_start()
-        self.game.wait_for_animations()
-        self.icicle_attack_animation_end()
-        # TODO
+        self.icicle_attack_animation()
+        time.sleep(1.1)
+        effect = TuskIcicleRow(
+            self.game,
+            next(self.icicle_pairs)
+        )
+        effect.play()
 
     def set_health(self, hp: int, wait=True) -> None:
         hp = max(0, min(hp, self.max_hp))
@@ -953,22 +955,21 @@ class Tusk(Enemy):
         self.push_attack_sound()
         self.idle_animation()
 
-    def icicle_attack_animation_start(self) -> None:
+    def icicle_attack_animation(self) -> None:
+        self.icicle_attack_sound_start()
         self.animate_object(
             'tusk_iciclesummon1_anim',
             play_style='play_once',
             reset=True
         )
-        self.icicle_attack_sound_start()
-
-    def icicle_attack_animation_end(self) -> None:
+        self.animate_sprite(0, 25, duration=1300)
+        self.game.wait_for_animations()
+        self.icicle_attack_sound_end()
         self.animate_object(
             'tusk_iciclesummon2_anim',
-            play_style='play_once',
-            reset=True
+            play_style='play_once'
         )
         self.idle_animation()
-        self.icicle_attack_sound_end()
 
     def ko_animation(self) -> None:
         self.animate_object(
