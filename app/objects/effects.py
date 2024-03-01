@@ -739,8 +739,6 @@ class TuskIcicle(Effect):
         reactor.callLater(0.55, self.apply_damage)
 
     def apply_damage(self) :
-        self.remove_object()
-
         target = self.game.grid[self.x, self.y]
 
         if not target:
@@ -753,6 +751,7 @@ class TuskIcicle(Effect):
             return
 
         target.set_health(target.hp - self.game.tusk.attack)
+        reactor.callLater(0.3, self.remove_object)
 
 class TuskIcicleRow:
     def __init__(self, game: "Game", row: int) -> None:
