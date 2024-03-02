@@ -767,3 +767,21 @@ class TuskIcicleRow:
             TuskIcicle(self.game, x, self.first_row).play()
             TuskIcicle(self.game, x, self.second_row).play()
             time.sleep(0.09)
+
+class TuskPushRock(Effect):
+    def __init__(self, game: "Game", x: int, y: int) -> None:
+        super().__init__(
+            game,
+            "effect_tusk_push",
+            x,
+            y,
+            x_offset=0.5,
+            y_offset=1,
+            duration=0.75
+        )
+
+    def play(self):
+        self.place_object()
+        self.place_sprite(self.name)
+        self.animate_sprite(0, 14, duration=self.duration * 1000)
+        reactor.callLater(self.duration, self.remove_object)
