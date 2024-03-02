@@ -1,6 +1,7 @@
 # Snowflake
 
 A Card-Jitsu Snow server emulator, made for [Houdini](https://github.com/solero/houdini).
+
 Please view the [SETUP.md](https://github.com/Lekuruu/snowflake/blob/main/SETUP.md) file for setup instructions.
 
 ## Progress
