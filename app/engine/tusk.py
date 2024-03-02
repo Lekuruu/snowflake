@@ -220,6 +220,11 @@ class TuskGame(Game):
         self.tusk.idle_animation()
         self.tusk.place_healthbar()
 
+    def remove_objects(self) -> None:
+        super().remove_objects()
+        self.tusk.remove_object()
+        self.sensei.remove_object()
+
     def do_powercard_attacks(self) -> None:
         ninjas_with_cards = [
             ninja for ninja in self.ninjas
