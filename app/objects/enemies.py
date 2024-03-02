@@ -1018,7 +1018,9 @@ class Tusk(Enemy):
     def set_health(self, hp: int, wait=True) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
-        self.game.damage = 100 - ((hp / self.max_hp) * 100)
+
+        # Update damage percentage for payout
+        self.game.damage = round(100 - ((hp / self.max_hp) * 100))
 
         AttackTile(
             self.game,
