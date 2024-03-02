@@ -953,6 +953,8 @@ class Tusk(Enemy):
 
             time.sleep((push_duration / len(x_range)) / 2)
 
+        self.game.wait_for_animations()
+
     def icicle_attack_random(self) -> None:
         self.icicle_attack_animation()
         time.sleep(1.1)
@@ -989,6 +991,9 @@ class Tusk(Enemy):
         for x, y in positions:
             TuskIcicle(self.game, x, y).play()
 
+        time.sleep(1.5)
+        self.game.wait_for_animations()
+
     def icicle_attack_paired(self) -> None:
         self.icicle_attack_animation()
         time.sleep(1.1)
@@ -997,6 +1002,9 @@ class Tusk(Enemy):
             next(self.icicle_pairs)
         )
         effect.play()
+
+        time.sleep(1)
+        self.game.wait_for_animations()
 
     def set_health(self, hp: int, wait=True) -> None:
         hp = max(0, min(hp, self.max_hp))
