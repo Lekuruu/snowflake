@@ -914,6 +914,9 @@ class Tusk(Enemy):
                     ninja.hp - self.attack, False
                 )
 
+            if result_x > ninja.x:
+                result_x = ninja.x
+
             ninja_positions.append((result_x, ninja.y))
 
         time.sleep(attack_delay)
