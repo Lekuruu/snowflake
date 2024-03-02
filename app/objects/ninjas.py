@@ -180,6 +180,9 @@ class Ninja(GameObject):
             self.shield = None
             return
 
+        if self.client.disconnected:
+            return
+
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
