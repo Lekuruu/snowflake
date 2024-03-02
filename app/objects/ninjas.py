@@ -180,7 +180,7 @@ class Ninja(GameObject):
             self.shield = None
             return
 
-        if self.client.disconnected:
+        if self.client.disconnected and hp <= 0:
             return
 
         hp = max(0, min(hp, self.max_hp))
