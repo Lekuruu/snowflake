@@ -38,21 +38,19 @@ A work-in-progress Card-Jitsu Snow server emulator, made for [Houdini](https://g
 - [x] EXP
 - [x] Rewards
 - [x] Stamps
-- [ ] Tusk Battle
-    - [ ] Matchmaking
-    - [ ] Basic Game Setup
-    - [ ] Sensei
-        - [ ] Animations
-        - [ ] Actions
-    - [ ] Tusk
-        - [ ] Animations
-        - [ ] Actions
-    - [ ] Payout
-- [ ] Custom Features
-    - [x] Beta mode
-    - [ ] Ninja AI
-    - [ ] Puffles
-    - [ ] Singleplayer Mode
+- [x] Tusk Battle
+    - [x] Matchmaking
+    - [x] Basic Game Setup
+    - [x] Sensei
+        - [x] Animations
+        - [x] Actions
+    - [x] Tusk
+        - [x] Animations
+        - [x] Actions
+            - [x] Paired Icicle Attack
+            - [x] Random Icicle Attack
+            - [x] Push Attack
+    - [x] Payout
 
 ## Setup
 

@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterator, Tuple, List
+from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
+    from app.engine.tusk import TuskGame
     from app.engine.game import Game
     from app.engine import Penguin
 
-from twisted.internet import reactor
 from app.data import MirrorMode
 from app.objects import GameObject
 from app.objects.effects import (
@@ -17,14 +18,18 @@ from app.objects.effects import (
     TankSwipeHorizontal,
     TankSwipeVertical,
     DamageNumbers,
+    TuskIcicleRow,
     SlyProjectile,
+    TuskPushRock,
     ScrapImpact,
+    TuskIcicle,
     AttackTile,
     Explosion,
     Effect,
     Flame
 )
 
+import itertools
 import random
 import time
 
@@ -34,6 +39,7 @@ class Enemy(GameObject):
     range: int = 0
     attack: int = 0
     move: int = 0
+    tile_range: int = 0
     move_duration: int = 600
 
     def __init__(
@@ -50,10 +56,13 @@ class Enemy(GameObject):
             x_offset=0.5,
             y_offset=1
         )
-        self.attack = self.__class__.attack
+        self.hp = self.__class__.max_hp
+        self.move = self.__class__.move
         self.range = self.__class__.range
+        self.attack = self.__class__.attack
         self.max_hp = self.__class__.max_hp
-        self.hp = self.max_hp
+        self.tile_range = self.__class__.tile_range
+        self.move_duration = self.__class__.move_duration
 
         self.health_bar = GameObject(
             self.game,
@@ -322,7 +331,7 @@ class Enemy(GameObject):
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
         """Simulate the damage that the enemy would do to a target"""
-        ...
+        return self.attack
 
     """Animations"""
 
@@ -411,7 +420,7 @@ class Sly(Enemy):
 
     def move_animation(self) -> None:
         self.animate_object(
-            f'sly_move_anim',
+            'sly_move_anim',
             play_style='loop',
             reset=True
         )
@@ -423,7 +432,7 @@ class Sly(Enemy):
 
         time.sleep(0.25)
         self.animate_object(
-            f'sly_attack_anim',
+            'sly_attack_anim',
             play_style='play_once',
             callback=self.reset_sprite_settings,
             reset=True
@@ -447,7 +456,7 @@ class Sly(Enemy):
 
     def ko_animation(self) -> None:
         self.animate_object(
-            f'sly_ko_anim',
+            'sly_ko_anim',
             play_style='play_once',
             reset=True
         )
@@ -455,7 +464,7 @@ class Sly(Enemy):
 
     def hit_animation(self) -> None:
         self.animate_object(
-            f'sly_hit_anim',
+            'sly_hit_anim',
             play_style='play_once',
             reset=True
         )
@@ -469,7 +478,7 @@ class Sly(Enemy):
 
     def daze_animation(self, reset=True) -> None:
         self.animate_object(
-            f'sly_daze_anim',
+            'sly_daze_anim',
             play_style='loop',
             reset=reset
         )
@@ -543,7 +552,7 @@ class Scrap(Enemy):
 
     def idle_animation(self, reset=False) -> None:
         self.animate_object(
-            f'scrap_idle_anim',
+            'scrap_idle_anim',
             play_style='loop',
             register=False,
             reset=reset
@@ -551,7 +560,7 @@ class Scrap(Enemy):
 
     def move_animation(self) -> None:
         self.animate_object(
-            f'scrap_move_anim',
+            'scrap_move_anim',
             play_style='loop',
             reset=True
         )
@@ -583,7 +592,7 @@ class Scrap(Enemy):
 
     def ko_animation(self) -> None:
         self.animate_object(
-            f'scrap_ko_anim',
+            'scrap_ko_anim',
             play_style='play_once',
             reset=True
         )
@@ -591,7 +600,7 @@ class Scrap(Enemy):
 
     def hit_animation(self) -> None:
         self.animate_object(
-            f'scrap_hit_anim',
+            'scrap_hit_anim',
             play_style='play_once',
             reset=True
         )
@@ -605,7 +614,7 @@ class Scrap(Enemy):
 
     def daze_animation(self, reset=True) -> None:
         self.animate_object(
-            f'scrap_dazed_anim',
+            'scrap_dazed_anim',
             play_style='loop',
             reset=reset
         )
@@ -721,7 +730,7 @@ class Tank(Enemy):
 
     def idle_animation(self, reset=False) -> None:
         self.animate_object(
-            f'tank_idle_anim',
+            'tank_idle_anim',
             play_style='loop',
             register=False,
             reset=reset
@@ -752,7 +761,7 @@ class Tank(Enemy):
 
     def ko_animation(self) -> None:
         self.animate_object(
-            f'tank_ko_anim',
+            'tank_ko_anim',
             play_style='play_once',
             reset=True
         )
@@ -760,7 +769,7 @@ class Tank(Enemy):
 
     def hit_animation(self) -> None:
         self.animate_object(
-            f'tank_hit_anim',
+            'tank_hit_anim',
             play_style='play_once',
             reset=True
         )
@@ -787,3 +796,354 @@ class Tank(Enemy):
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attacktank')
+
+class Tusk(Enemy):
+    name: str = 'Tusk'
+    max_hp: int = 800
+    attack: int = 10
+    range: int = 9
+    move: int = 0
+    tile_range: int = 1
+
+    def __init__(
+        self,
+        game: "TuskGame",
+        x: int = -1,
+        y: int = -1
+    ) -> None:
+        super().__init__(game, x, y)
+        self.health_bar = GameObject(
+            self.game,
+            'tusk_healthbar_animation',
+            x=self.x,
+            y=self.y,
+            x_offset=0.5,
+            y_offset=1.005
+        )
+
+        # First attack will either be 'push' or 'icicle_random'
+        self.next_attack = random.choice([
+            'push',
+            'icicle_random'
+        ])
+
+        # Icicle rows used for the 'icicle_paired' attack
+        self.icicle_pairs = itertools.cycle([
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (3, 4)
+        ])
+
+        # Block tiles around tusk to match sprite's size
+
+        # Next to tusk
+        self.game.grid.block_tile(self.x - 1, self.y)
+        # Below tusk
+        self.game.grid.block_tile(self.x - 1, self.y + 1)
+        self.game.grid.block_tile(self.x, self.y + 1)
+        # Above tusk
+        self.game.grid.block_tile(self.x - 1, self.y - 1)
+        self.game.grid.block_tile(self.x, self.y - 1)
+
+    def attack_target(self, target: "Ninja") -> None:
+        if target.hp <= 0:
+            return
+
+        attacks = {
+            'push': self.push_attack,
+            'icicle_random': self.icicle_attack_random,
+            'icicle_paired': self.icicle_attack_paired
+        }
+
+        attacks[self.next_attack]()
+        self.determine_next_attack(target)
+
+    def determine_next_attack(self, closest_target: "Ninja") -> None:
+        if self.next_attack in ('icicle_random', 'push'):
+            self.next_attack = 'icicle_paired'
+            return
+
+        self.next_attack = 'icicle_random'
+
+        # The closer the ninjas are to tusk, the higher the chance for a "push" attack
+        distance = (
+            abs(self.x - closest_target.x) + abs(self.y - closest_target.y)
+        )
+
+        push_attack_chance = abs(
+            1 - ((distance - 1) / 7)
+        )
+
+        if random.random() <= push_attack_chance:
+            self.next_attack = 'push'
+
+    def push_attack(self) -> None:
+        self.push_attack_animation()
+
+        push_duration = 2.25
+        attack_delay = 1.85
+
+        ninjas = self.game.ninjas
+        ninjas.sort(key=lambda ninja: ninja.x)
+        ninja_positions = []
+
+        for ninja in ninjas:
+            # Determine the end position for the push
+            result_x = 0
+
+            while (
+                (result_x, ninja.y) in ninja_positions or
+                not self.game.grid.can_move(result_x, ninja.y)
+            ):
+                result_x += 1
+
+            if result_x < ninja.x:
+                # Move ninja to the left
+                reactor.callLater(
+                    attack_delay, ninja.move_object,
+                    result_x, ninja.y,
+                    push_duration * 1000
+                )
+
+            if ninja.hp > 0:
+                # Apply damage
+                reactor.callLater(
+                    attack_delay + (push_duration / 1.5),
+                    ninja.set_health,
+                    ninja.hp - self.attack, False
+                )
+
+            if result_x > ninja.x:
+                result_x = ninja.x
+
+            ninja_positions.append((result_x, ninja.y))
+
+        time.sleep(attack_delay)
+        x_range = list(self.game.grid.x_range)
+        x_range.reverse()
+
+        # NOTE: This should be a pretty accurate representation of the push attack
+        #       However, the actual algorithm for this attack is unknown
+
+        positions = [
+            (1, 0),
+            (1, 2),
+            (0, 4),
+            (0, 1),
+            (1, 3)
+        ]
+
+        for x in x_range:
+            first_positions = positions[:3]
+            last_positions = positions[2:]
+
+            for base_x, base_y in first_positions:
+                if x - base_x < 0:
+                    continue
+
+                TuskPushRock(
+                    self.game,
+                    x - base_x,
+                    base_y
+                ).play()
+
+            time.sleep((push_duration / len(x_range)) / 2)
+
+            for base_x, base_y in last_positions:
+                if x - base_x < 0:
+                    continue
+
+                TuskPushRock(
+                    self.game,
+                    x - base_x,
+                    base_y
+                ).play()
+
+            time.sleep((push_duration / len(x_range)) / 2)
+
+        self.game.wait_for_animations()
+
+    def icicle_attack_random(self) -> None:
+        self.icicle_attack_animation()
+        time.sleep(1.1)
+
+        # NOTE: The actual algorithm for this attack is unknown
+        #       I am just going to improvise for now
+
+        # Select random tiles to drop icicles on
+        random_positions = random.sample(
+            [
+                (tile.x, tile.y)
+                for tile in self.game.grid.tiles
+            ],
+            random.randint(1, 6 - len(self.game.connected_clients))
+        )
+
+        # Lower the possibility of hitting ninjas
+        ninja_hit_chance = (len(self.game.connected_clients) / 10) + 0.2
+        ninja_positions = []
+
+        if random.random() <= ninja_hit_chance:
+            # Select random ninjas to drop icicles on
+            ninja_positions = random.sample(
+                [
+                    (ninja.x, ninja.y)
+                    for ninja in self.game.ninjas
+                    if not ninja.client.disconnected
+                ],
+                random.randint(1, len(self.game.connected_clients))
+            )
+
+        positions = set(random_positions + ninja_positions)
+
+        for x, y in positions:
+            TuskIcicle(self.game, x, y).play()
+
+        time.sleep(1.5)
+        self.game.wait_for_animations()
+
+    def icicle_attack_paired(self) -> None:
+        self.icicle_attack_animation()
+        time.sleep(1.1)
+        effect = TuskIcicleRow(
+            self.game,
+            next(self.icicle_pairs)
+        )
+        effect.play()
+
+        time.sleep(1)
+        self.game.wait_for_animations()
+
+    def set_health(self, hp: int, wait=True) -> None:
+        hp = max(0, min(hp, self.max_hp))
+        self.animate_healthbar(self.hp, hp, duration=500)
+
+        # Update damage percentage for payout
+        self.game.damage = round(100 - ((hp / self.max_hp) * 100))
+
+        AttackTile(
+            self.game,
+            self.x,
+            self.y
+        ).play(auto_remove=True)
+
+        DamageNumbers(
+            self.game,
+            self.x,
+            self.y
+        ).play(self.hp - hp)
+
+        self.hp = hp
+
+        if self.hp <= 0:
+            self.ko_animation()
+            self.game.wait_for_animations()
+            self.remove_object()
+            return
+
+        self.hit_animation()
+
+    def animate_healthbar(self, start_hp: int, end_hp: int, duration: int = 500) -> None:
+        backwards = False
+
+        if end_hp > start_hp:
+            # Health increased, playing backwards
+            backwards = True
+
+            # Swap start and end hp
+            start_hp, end_hp = end_hp, start_hp
+
+        start_frame = 240 - int((start_hp / self.max_hp) * 240)
+        end_frame = 240 - int((end_hp / self.max_hp) * 240)
+
+        self.health_bar.animate_sprite(
+            start_frame-1,
+            end_frame-1,
+            backwards=backwards,
+            duration=duration
+        )
+
+    def idle_animation(self, reset=False) -> None:
+        self.animate_object(
+            'tusk_idle_anim',
+            play_style='loop',
+            register=False,
+            reset=reset
+        )
+
+    def push_attack_animation(self) -> None:
+        self.animate_object(
+            'tusk_pushattack_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.push_attack_sound()
+        self.idle_animation()
+
+    def icicle_attack_animation(self) -> None:
+        self.icicle_attack_sound_start()
+        self.animate_object(
+            'tusk_iciclesummon1_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.animate_sprite(0, 25, duration=1300)
+        self.game.wait_for_animations()
+        self.icicle_attack_sound_end()
+        self.animate_object(
+            'tusk_iciclesummon2_anim',
+            play_style='play_once'
+        )
+        self.idle_animation()
+
+    def ko_animation(self) -> None:
+        self.animate_object(
+            'tusk_lose_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+    def win_animation(self) -> None:
+        self.animate_object(
+            'tusk_win_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.laugh_sound()
+
+    def hit_animation(self) -> None:
+        self.animate_object(
+            'tusk_hit_anim',
+            play_style='play_once',
+            reset=True
+        )
+        self.hit_sound()
+
+        if self.stunned:
+            self.daze_animation(False)
+            return
+
+        self.idle_animation()
+
+    def daze_animation(self, reset=True) -> None:
+        self.animate_object(
+            'tusk_stun_anim',
+            play_style='loop',
+            reset=reset
+        )
+
+    def hit_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_hittusk')
+
+    def laugh_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_tusklaugh')
+
+    def push_attack_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacktuskearthquake')
+
+    def icicle_attack_sound_start(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacktuskicicle01')
+
+    def icicle_attack_sound_end(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_attacktuskicicle02')

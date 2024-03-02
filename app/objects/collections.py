@@ -66,8 +66,8 @@ class Players(LockedSet["Penguin"]):
     def with_token(self, token: str) -> List["Penguin"]:
         return [player for player in self if player.token == token]
 
-    def with_element(self, element: str) -> List["Penguin"]:
-        return [player for player in self if player.element == element]
+    def with_element(self, element: str, battle_mode: int = 0) -> List["Penguin"]:
+        return [player for player in self if player.element == element and player.battle_mode == battle_mode]
 
 class Games(LockedSet["Game"]):
     def add(self, game: "Game") -> None:

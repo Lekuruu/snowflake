@@ -73,6 +73,11 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
 
     # TODO: Validate token
 
+    if client.battle_mode == 1 and penguin.snow_ninja_rank < 13:
+        client.logger.warning('Login attempt failed: Tried to access tusk battle without snow gem')
+        client.close_connection()
+        return
+
     client.logger.info(f'Logged in as "{penguin.nickname}" ({penguin.id})')
     client.logger = logging.getLogger(client.name)
 

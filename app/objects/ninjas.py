@@ -8,22 +8,29 @@ if TYPE_CHECKING:
     from app.engine.penguin import Penguin
     from app.engine.game import Game
 
-from app.data import MirrorMode, TipPhase
-from app.objects.target import Target
+from app.objects.target import Target, TuskTarget
+from app.data import MirrorMode, TipPhase, Card
 from app.objects.effects import (
+    WaterPowerBeam,
+    SnowPowerBeam,
+    FirePowerBeam,
+    FirePowerBottle,
     SnowProjectile,
     FireProjectile,
     HealParticles,
     DamageNumbers,
+    WaterFishDrop,
     HealNumbers,
     AttackTile,
+    SnowIgloo,
     Shield,
     Rage
 )
 
-from app.objects.enemies import Enemy
+from app.objects.enemies import Enemy, Tusk
 from app.objects import GameObject
 
+import app.engine.cards
 import time
 
 class Ninja(GameObject):
@@ -100,17 +107,19 @@ class Ninja(GameObject):
         self.ghost.remove_object()
         super().remove_object()
 
-    def move_object(self, x: int, y: int) -> None:
-        self.health_bar.move_object(x, y, self.move_duration)
-        super().move_object(x, y, self.move_duration)
+    def move_object(self, x: int, y: int, duration: int | None = None) -> None:
+        duration = duration or self.move_duration
+
+        self.health_bar.move_object(x, y, duration)
+        super().move_object(x, y, duration)
         self.ghost.x = x
         self.ghost.y = y
 
         if self.shield:
-            self.shield.move_object(x, y, self.move_duration)
+            self.shield.move_object(x, y, duration)
 
         if self.rage:
-            self.rage.move_object(x, y, self.move_duration)
+            self.rage.move_object(x, y, duration)
 
     def move_ninja(self, x: int, y: int) -> None:
         if self.hp <= 0 or self.client.disconnected:
@@ -165,7 +174,7 @@ class Ninja(GameObject):
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
 
-    def set_health(self, hp: int) -> None:
+    def set_health(self, hp: int, show_effects=True) -> None:
         if hp < self.hp and self.shield:
             self.shield.pop()
             self.shield = None
@@ -188,17 +197,18 @@ class Ninja(GameObject):
             self.hp = hp
             return
 
-        AttackTile(
-            self.game,
-            self.x,
-            self.y
-        ).play(auto_remove=True)
+        if show_effects:
+            AttackTile(
+                self.game,
+                self.x,
+                self.y
+            ).play(auto_remove=True)
 
-        DamageNumbers(
-            self.game,
-            self.x,
-            self.y
-        ).play(self.hp - hp)
+            DamageNumbers(
+                self.game,
+                self.x,
+                self.y
+            ).play(self.hp - hp)
 
         if hp > 0:
             self.hit_animation()
@@ -296,6 +306,13 @@ class Ninja(GameObject):
         )
 
         for tile in attackable_tiles:
+            target_object = self.game.grid[tile.x, tile.y]
+
+            if isinstance(target_object, Tusk):
+                self.targets.append(target := TuskTarget(self, tile.x, tile.y))
+                target.show_attack()
+                continue
+
             self.targets.append(target := Target(self, tile.x, tile.y))
             target.show_attack()
 
@@ -415,7 +432,7 @@ class Ninja(GameObject):
 
             distance = abs(tile.x - target_x) + abs(tile.y - target_y)
 
-            if distance <= self.range:
+            if distance <= self.range + target_object.tile_range:
                 yield tile
 
     def healable_tiles(self, target_x: int, target_y: int) -> Iterator["Ninja"]:
@@ -937,3 +954,202 @@ class FireNinja(Ninja):
 
     def powercard_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackpowercardfire')
+
+class Sensei(GameObject):
+    name: str = 'Sensei'
+
+    def __init__(self, game: Game, x: int, y: int) -> None:
+        super().__init__(
+            game,
+            self.__class__.name,
+            x, y,
+            grid=True,
+            x_offset=0.5,
+            y_offset=1
+        )
+
+        self.element_state = 'snow'
+        self.power_state = 0
+
+    @property
+    def next_element(self) -> str:
+        return {
+            'snow': 'fire',
+            'fire': 'water',
+            'water': 'snow'
+        }[self.element_state]
+
+    def update_state(self) -> None:
+        self.power_state += 1
+
+        if self.power_state >= 4:
+            # Reset power state
+            self.power_state = 1
+            self.element_state = self.next_element
+
+        action = {
+            0: lambda: self.idle_animation(),
+            1: lambda: self.idle_animation(),
+            2: lambda: self.powerup_animation(),
+            3: lambda: self.do_powerup()
+        }
+
+        action[self.power_state]()
+
+    def do_powerup(self) -> None:
+        if not self.game.enemies:
+            return
+
+        time.sleep(0.5)
+        self.attack_animation()
+        self.attack_sound()
+        time.sleep(0.5)
+
+        beam_class = {
+            'fire': FirePowerBeam,
+            'water': WaterPowerBeam,
+            'snow': SnowPowerBeam
+        }[self.element_state]
+
+        beam_offset = {
+            'fire': (0.6, 0.2),
+            'water': (0.4, 1),
+            'snow': (0.75, 1)
+        }[self.element_state]
+
+        beam = beam_class(self.game, self.x, self.y)
+        beam.x_offset = beam_offset[0]
+        beam.y_offset = beam_offset[1]
+        beam.play()
+        time.sleep(0.65)
+
+        positions = [
+            (1, 2),
+            (4, 2),
+            (7, 2)
+        ]
+
+        impacts = []
+        delay = 0.35
+
+        for x, y in positions:
+            impacts.append(self.place_card(x, y))
+            time.sleep(delay)
+
+        if self.element_state == 'snow':
+            self.snow_impact_sound()
+
+        time.sleep(impacts[0][1].duration - delay)
+
+        beam.remove_object()
+        self.idle_animation()
+
+        is_combo = len([
+            ninja for ninja in self.game.ninjas
+            if ninja.client.placed_powercard
+        ]) > 0
+
+        for card, impact in impacts:
+            impact.remove_object()
+            card.apply_health()
+
+            if is_combo:
+                card.apply_effects()
+
+        self.game.wait_for_animations()
+
+    def place_card(self, x: int, y: int):
+        card = app.engine.cards.CardObject(
+            Card(
+                element=self.element_state[0],
+                value=10
+            ), self
+        )
+        card.object.x = x
+        card.object.y = y
+
+        impact_class = {
+            'fire': FirePowerBottle,
+            'water': WaterFishDrop,
+            'snow': SnowIgloo
+        }[self.element_state]
+
+        impact = impact_class(self.game, x, y)
+        impact.play(play_sound=False)
+        return card, impact
+
+    def idle_animation(self) -> None:
+        self.animate_object(
+            'sensei_idle_anim',
+            play_style='loop',
+            register=False
+        )
+
+    def win_animation(self) -> None:
+        self.animate_object(
+            'sensei_win_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+    def lose_animation(self) -> None:
+        self.animate_object(
+            'sensei_lose_anim',
+            play_style='play_once',
+            reset=True
+        )
+
+    def attack_animation(self) -> None:
+        self.animate_object(
+            'sensei_attackstart_anim',
+            play_style='play_once',
+            duration=500,
+            reset=True
+        )
+        self.animate_object(
+            'sensei_attackloop_anim',
+            play_style='loop'
+        )
+
+    def powerup_animation(self) -> None:
+        start_animation = {
+            'snow': 'sensei_powerupsnow_anim',
+            'fire': 'sensei_powerupfire_anim',
+            'water': 'sensei_powerupwater_anim'
+        }[self.element_state]
+
+        self.animate_object(
+            start_animation,
+            play_style='play_once',
+            reset=True
+        )
+
+        loop_animation = {
+            'snow': 'sensei_powerupsnowloop_anim',
+            'fire': 'sensei_powerupfireloop_anim',
+            'water': 'sensei_powerupwaterloop_anim'
+        }[self.element_state]
+
+        self.animate_object(
+            loop_animation,
+            play_style='loop'
+        )
+
+        self.animate_sprite(
+            0, 5,
+            play_style='loop',
+            duration=600
+        )
+
+    def attack_sound(self) -> None:
+        self.play_sound({
+            'snow': 'sfx_mg_2013_cjsnow_attacksenseisnow',
+            'fire': 'sfx_mg_2013_cjsnow_attacksenseifire',
+            'water': 'sfx_mg_2013_cjsnow_attacksenseiwater'
+        }[self.element_state])
+
+    def hit_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_hitsensei')
+
+    def snow_impact_sound(self) -> None:
+        self.play_sound('sfx_mg_2013_cjsnow_impactsenseisnow')

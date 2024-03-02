@@ -73,6 +73,10 @@ class Game:
         return [client for client in self.clients if client.disconnected]
 
     @property
+    def connected_clients(self) -> List["Penguin"]:
+        return [client for client in self.clients if not client.disconnected]
+
+    @property
     def ninjas(self) -> List[Ninja]:
         return [
             *self.objects.with_name('Fire'),

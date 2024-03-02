@@ -57,15 +57,18 @@ class CardObject(Card):
         return self.object.y
 
     @property
-    def targets(self) -> List[GameObject]:
-        x_range, y_range = self.pattern_range(self.x, self.y)
+    def element_name(self) -> str:
+        return {
+            'f': 'fire',
+            'w': 'water',
+            's': 'snow'
+        }.get(self.element)
 
-        return [
-            self.game.grid[x, y]
-            for x in x_range
-            for y in y_range
-            if self.game.grid[x, y] is not None
-        ]
+    @property
+    def targets(self) -> List[GameObject]:
+        return set(self.game.grid.objects_in_range(
+            *self.pattern_range(self.x, self.y)
+        ))
 
     def place(self, x: int, y: int) -> None:
         self.place_card_sprite(x, y)
@@ -193,7 +196,7 @@ class CardObject(Card):
             'fire': FirePowerBeam,
             'water': WaterPowerBeam,
             'snow': SnowPowerBeam
-        }[self.client.element]
+        }[self.element_name]
 
         beam = beam_class(self.game, self.client.ninja.x, self.client.ninja.y)
         beam.play()
@@ -202,7 +205,11 @@ class CardObject(Card):
             'fire': FirePowerBottle,
             'water': WaterFishDrop,
             'snow': SnowIgloo
-        }[self.client.element]
+        }[self.element_name]
+
+        if self.element != 's':
+            # Wait for attack animation
+            time.sleep(0.2)
 
         impact = impact_class(self.game, self.x, self.y)
         impact.play()
@@ -213,7 +220,7 @@ class CardObject(Card):
 
     def apply_health(self) -> None:
         for target in self.targets:
-            if isinstance(target, Ninja) and self.client.element == 'snow':
+            if isinstance(target, Ninja) and self.element == 's':
                 if target.client.disconnected:
                     continue
 
@@ -337,6 +344,10 @@ class MemberCard(GameObject):
         self.selected = False
         self.client = client
 
+    @property
+    def element_name(self) -> str:
+        return self.client.element
+
     def place(self) -> None:
         if self.client.ninja.placed_ghost:
             self.x = self.client.ninja.ghost.x
@@ -351,7 +362,7 @@ class MemberCard(GameObject):
             'fire': 'ui_card_member_fire',
             'water': 'ui_card_member_water',
             'snow': 'ui_card_member_snow'
-        }[self.client.element]
+        }[self.element_name]
 
         self.place_sprite(sprite_name)
         self.selected = True
