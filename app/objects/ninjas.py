@@ -107,17 +107,19 @@ class Ninja(GameObject):
         self.ghost.remove_object()
         super().remove_object()
 
-    def move_object(self, x: int, y: int) -> None:
-        self.health_bar.move_object(x, y, self.move_duration)
-        super().move_object(x, y, self.move_duration)
+    def move_object(self, x: int, y: int, duration: int | None = None) -> None:
+        duration = duration or self.move_duration
+
+        self.health_bar.move_object(x, y, duration)
+        super().move_object(x, y, duration)
         self.ghost.x = x
         self.ghost.y = y
 
         if self.shield:
-            self.shield.move_object(x, y, self.move_duration)
+            self.shield.move_object(x, y, duration)
 
         if self.rage:
-            self.rage.move_object(x, y, self.move_duration)
+            self.rage.move_object(x, y, duration)
 
     def move_ninja(self, x: int, y: int) -> None:
         if self.hp <= 0 or self.client.disconnected:
@@ -172,7 +174,7 @@ class Ninja(GameObject):
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
 
-    def set_health(self, hp: int) -> None:
+    def set_health(self, hp: int, show_effects=True) -> None:
         if hp < self.hp and self.shield:
             self.shield.pop()
             self.shield = None
@@ -192,17 +194,18 @@ class Ninja(GameObject):
             self.hp = hp
             return
 
-        AttackTile(
-            self.game,
-            self.x,
-            self.y
-        ).play(auto_remove=True)
+        if show_effects:
+            AttackTile(
+                self.game,
+                self.x,
+                self.y
+            ).play(auto_remove=True)
 
-        DamageNumbers(
-            self.game,
-            self.x,
-            self.y
-        ).play(self.hp - hp)
+            DamageNumbers(
+                self.game,
+                self.x,
+                self.y
+            ).play(self.hp - hp)
 
         if hp > 0:
             self.hit_animation()
