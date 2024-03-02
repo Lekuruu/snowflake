@@ -20,6 +20,7 @@ from app.objects.effects import (
     DamageNumbers,
     TuskIcicleRow,
     SlyProjectile,
+    TuskPushRock,
     ScrapImpact,
     TuskIcicle,
     AttackTile,
@@ -879,7 +880,78 @@ class Tusk(Enemy):
 
     def push_attack(self) -> None:
         self.push_attack_animation()
-        # TODO
+
+        push_duration = 2.25
+        attack_delay = 1.85
+
+        ninjas = self.game.ninjas
+        ninjas.sort(key=lambda ninja: ninja.x)
+
+        for ninja in ninjas:
+            # Determine the end position for the push
+            result_x = 0
+
+            while not self.game.grid.can_move(result_x, ninja.y):
+                result_x += 1
+
+            if result_x < ninja.x:
+                # Move ninja to the left
+                reactor.callLater(
+                    attack_delay, ninja.move_object,
+                    result_x, ninja.y,
+                    push_duration * 1000
+                )
+
+            if ninja.hp > 0:
+                # Apply damage
+                reactor.callLater(
+                    attack_delay + (push_duration / 1.5),
+                    ninja.set_health,
+                    ninja.hp - self.attack, False
+                )
+
+        time.sleep(attack_delay)
+        x_range = list(self.game.grid.x_range)
+        x_range.reverse()
+
+        # NOTE: This should be a pretty accurate representation of the push attack
+        #       However, the actual algorithm for this attack is unknown
+
+        positions = [
+            (1, 0),
+            (1, 2),
+            (0, 4),
+            (0, 1),
+            (1, 3)
+        ]
+
+        for x in x_range:
+            first_positions = positions[:3]
+            last_positions = positions[2:]
+
+            for base_x, base_y in first_positions:
+                if x - base_x < 0:
+                    continue
+
+                TuskPushRock(
+                    self.game,
+                    x - base_x,
+                    base_y
+                ).play()
+
+            time.sleep((push_duration / len(x_range)) / 2)
+
+            for base_x, base_y in last_positions:
+                if x - base_x < 0:
+                    continue
+
+                TuskPushRock(
+                    self.game,
+                    x - base_x,
+                    base_y
+                ).play()
+
+            time.sleep((push_duration / len(x_range)) / 2)
 
     def icicle_attack_random(self) -> None:
         self.icicle_attack_animation()
