@@ -263,10 +263,6 @@ class Enemy(GameObject):
                 moves.pop(move)
                 continue
 
-            if not move:
-                # Enemy can't move, but still attack
-                continue
-
             # Sort targets by most damage
             moves[move].sort(
                 key=lambda target: self.simulate_damage(
@@ -335,7 +331,7 @@ class Enemy(GameObject):
 
     def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
         """Simulate the damage that the enemy would do to a target"""
-        ...
+        return self.attack
 
     """Animations"""
 
