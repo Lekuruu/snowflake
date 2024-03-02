@@ -872,7 +872,7 @@ class Tusk(Enemy):
         )
 
         push_attack_chance = abs(
-            1 - ((distance - 1) / 8)
+            1 - ((distance - 1) / 7)
         )
 
         if random.random() <= push_attack_chance:
