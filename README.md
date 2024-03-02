@@ -44,12 +44,12 @@ A work-in-progress Card-Jitsu Snow server emulator, made for [Houdini](https://g
     - [x] Sensei
         - [x] Animations
         - [x] Actions
-    - [ ] Tusk
+    - [x] Tusk
         - [x] Animations
-        - [ ] Actions
+        - [x] Actions
             - [x] Paired Icicle Attack
             - [x] Random Icicle Attack
-            - [ ] Push Attack
+            - [x] Push Attack
     - [x] Payout
 - [ ] Custom Features
     - [x] Beta mode
