@@ -886,12 +886,16 @@ class Tusk(Enemy):
 
         ninjas = self.game.ninjas
         ninjas.sort(key=lambda ninja: ninja.x)
+        ninja_positions = []
 
         for ninja in ninjas:
             # Determine the end position for the push
             result_x = 0
 
-            while not self.game.grid.can_move(result_x, ninja.y):
+            while (
+                (result_x, ninja.y) in ninja_positions or
+                not self.game.grid.can_move(result_x, ninja.y)
+            ):
                 result_x += 1
 
             if result_x < ninja.x:
@@ -909,6 +913,8 @@ class Tusk(Enemy):
                     ninja.set_health,
                     ninja.hp - self.attack, False
                 )
+
+            ninja_positions.append((result_x, ninja.y))
 
         time.sleep(attack_delay)
         x_range = list(self.game.grid.x_range)
