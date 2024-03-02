@@ -263,6 +263,10 @@ class Enemy(GameObject):
                 moves.pop(move)
                 continue
 
+            if not move:
+                # Enemy can't move, but still attack
+                continue
+
             # Sort targets by most damage
             moves[move].sort(
                 key=lambda target: self.simulate_damage(
