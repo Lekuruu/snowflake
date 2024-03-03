@@ -60,7 +60,8 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.name = penguin.nickname
     client.object = penguin
 
-    # TODO: Check player username approval
+    if not penguin.approval_en or penguin.rejection_en:
+        client.name = f'P{pid}'
 
     other_connections = client.server.players.with_id(pid)
     other_connections.remove(client)
