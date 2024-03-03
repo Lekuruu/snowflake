@@ -1,6 +1,6 @@
 # Snowflake
 
-A Card-Jitsu Snow server emulator, made for [Houdini](https://github.com/solero/houdini).
+A game server for the Club Penguin minigame "Card-Jitsu Snow", made to be compatible with [Houdini](https://github.com/solero/houdini).
 
 Please view [this file](https://github.com/Lekuruu/snowflake/blob/main/SETUP.md) for setup instructions, and troubleshooting steps.
 
