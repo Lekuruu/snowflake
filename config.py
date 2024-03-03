@@ -22,7 +22,7 @@ try:
 
     MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION')
     MEDIA_DOMAIN = urlparse(MEDIA_LOCATION).hostname
-    POLICY_DOMAIN = os.environ.get('DOMAIN', '*')
+    POLICY_DOMAIN = os.environ.get('POLICY_DOMAIN', '*')
 
     APPLY_WINDOWMANAGER_OFFSET = os.environ.get('APPLY_WINDOWMANAGER_OFFSET', 'False').lower() == 'true'
     ENABLE_DEBUG_PLAYERS = os.environ.get('ENABLE_DEBUG_PLAYERS', 'False').lower() == 'true'
@@ -44,9 +44,6 @@ try:
         if not ENABLE_BETA else
         'cardjitsu_snowplayerselectbeta.swf'
     )
-
-    if POLICY_DOMAIN != "*" and not POLICY_DOMAIN.startswith("*"):
-        POLICY_DOMAIN = f'*.{POLICY_DOMAIN}'
 except Exception as e:
     print(
         f'Failed to load configuration: {e}\n'
