@@ -11,12 +11,12 @@ import logging
 class SocketPolicyServer(Factory):
     protocol = SocketPolicyHandler
 
-    def __init__(self):
+    def __init__(self, policy_domain: str = "*", policy_port: str = "*"):
         self.logger = logging.getLogger("SocketPolicyServer")
         self.policy = (
-            "<cross-domain-policy>"
-            "<allow-access-from domain='*' to-ports='*' />"
-            "</cross-domain-policy>"
+            f"<cross-domain-policy>"
+            f"<allow-access-from domain='{policy_domain}' to-ports='{policy_port}' />"
+            f"</cross-domain-policy>"
         )
 
     def buildProtocol(self, address: IPv4Address | IPv6Address):

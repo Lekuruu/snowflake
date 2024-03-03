@@ -21,6 +21,8 @@ class MetaplaceWorldServer(Factory):
         world_name: str,
         world_owner: str,
         stylesheet_id: str,
+        policy_domain: str = "*",
+        policy_port: str = "*",
         server_type: ServerType = ServerType.LIVE,
         build_type: BuildType = BuildType.RELEASE
     ) -> None:
@@ -39,9 +41,9 @@ class MetaplaceWorldServer(Factory):
         self.players = Players()
 
         self.policy_file = (
-            "<cross-domain-policy>"
-            "<allow-access-from domain='*' to-ports='*' />"
-            "</cross-domain-policy>"
+            f"<cross-domain-policy>"
+            f"<allow-access-from domain='{policy_domain}' to-ports='{policy_port}' />"
+            f"</cross-domain-policy>"
         )
 
     def get_place(self, place_id: int) -> Place | None:

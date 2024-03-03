@@ -14,6 +14,7 @@ from app.objects import Games
 import app.session
 import logging
 import signal
+import config
 import os
 
 class SnowflakeWorld(MetaplaceWorldServer):
@@ -26,6 +27,7 @@ class SnowflakeWorld(MetaplaceWorldServer):
             world_name='cjsnow_0',
             world_owner='crowdcontrol',
             stylesheet_id='87.5309',
+            policy_domain=config.POLICY_DOMAIN,
             server_type=ServerType.LIVE,
             build_type=BuildType.RELEASE
         )
