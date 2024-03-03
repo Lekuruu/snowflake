@@ -23,4 +23,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # You can add this line, if you don't want to use a volume:
 # COPY . .
 
+STOPSIGNAL SIGINT
+
 ENTRYPOINT ["python", "./main.py"]
