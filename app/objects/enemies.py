@@ -390,14 +390,6 @@ class Sly(Enemy):
     move: int = 3
     move_duration: int = 1200
 
-    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
-        """Simulate the damage that the enemy would do to a target"""
-        distance = abs(x_position - target.x) + abs(y_position - target.y)
-
-        # NOTE: Sly hits harder from a distance. According to the
-        #       Wiki, it does an additional 1 damage per tile
-        return self.attack + round(self.attack_per_tile * (distance - 1))
-
     def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
@@ -405,10 +397,14 @@ class Sly(Enemy):
         # This seems to fix the mirror mode?
         time.sleep(0.25)
 
+        distance = abs(self.x - target.x) + abs(self.y - target.y)
+
+        # NOTE: Sly hits harder from a distance. According to the
+        #       Wiki, it does an additional 1 damage per tile
+        damage = self.attack + round(self.attack_per_tile * (distance - 1))
+
         self.attack_animation(target.x, target.y)
-        target.set_health(
-            target.hp - self.simulate_damage(self.x, self.y, target)
-        )
+        target.set_health(target.hp - damage)
 
     def idle_animation(self, reset=False) -> None:
         self.animate_object(
