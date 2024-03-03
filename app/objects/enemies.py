@@ -460,6 +460,7 @@ class Sly(Enemy):
             play_style='play_once',
             reset=True
         )
+        self.animate_object('blank_png')
         self.ko_sound()
 
     def hit_animation(self) -> None:
@@ -596,6 +597,7 @@ class Scrap(Enemy):
             play_style='play_once',
             reset=True
         )
+        self.animate_object('blank_png')
         self.ko_sound()
 
     def hit_animation(self) -> None:
@@ -765,6 +767,7 @@ class Tank(Enemy):
             play_style='play_once',
             reset=True
         )
+        self.animate_object('blank_png')
         self.ko_sound()
 
     def hit_animation(self) -> None:
