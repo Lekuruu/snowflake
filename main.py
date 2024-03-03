@@ -6,6 +6,7 @@ from app.logging import Console
 
 import traceback
 import logging
+import signal
 import config
 
 logging.basicConfig(
@@ -13,7 +14,18 @@ logging.basicConfig(
     level=logging.DEBUG if config.ENABLE_DEBUG_LOGGING else logging.INFO
 )
 
+def on_shutdown(*args):
+    """Kick all players from the server, before the reactor stops"""
+    for player in world_server.players:
+        player.send_to_room()
+
+    reactor.callLater(0.5, reactor.stop)
+
+signal.signal(signal.SIGINT, on_shutdown)
+
 if __name__ == "__main__":
+    global world_server, policy_server
+
     try:
         policy_server = SocketPolicyServer()
         world_server = SnowflakeWorld()
