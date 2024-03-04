@@ -54,9 +54,6 @@ class SnowflakeWorld(MetaplaceWorldServer):
         self.register_place(TuskBattle())
 
     def stopFactory(self):
-        self.logger.warning("Shutting down...")
-        self.shutting_down = True
-
         def force_exit(signal, frame):
             self.logger.warning("Force exiting...")
             os._exit(0)

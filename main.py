@@ -16,6 +16,9 @@ logging.basicConfig(
 
 def on_shutdown(*args):
     """Kick all players from the server, before the reactor stops"""
+    world_server.logger.warning("Shutting down...")
+    world_server.shutting_down = True
+
     for player in world_server.players:
         player.send_to_room()
 
