@@ -14,6 +14,7 @@ assets = AssetCollection()
 
 database = Postgres(
     config.POSTGRES_USER,
+    config.POSTGRES_DBNAME,
     config.POSTGRES_PASSWORD,
     config.POSTGRES_HOST,
     config.POSTGRES_PORT

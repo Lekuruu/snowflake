@@ -15,6 +15,7 @@ try:
     POSTGRES_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
     POSTGRES_PORT = int(os.environ.get('POSTGRES_PORT', '5432'))
     POSTGRES_USER = os.environ.get('POSTGRES_USER')
+    POSTGRES_DBNAME = os.environ.get('POSTGRES_DBNAME')
     POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
 
     PORT = int(os.environ.get('PORT', '7002'))
