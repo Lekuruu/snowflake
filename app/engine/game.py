@@ -638,9 +638,6 @@ class Game:
                 if isinstance(target, Ninja):
                     ninja.heal_target(target)
 
-                    if ninja.name == 'Snow':
-                        ninja.heals += 1
-
                 if ninja.heals >= 15:
                     # Unlock "Heal 15" stamp
                     self.unlock_stamp(477)
