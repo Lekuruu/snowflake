@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 from typing import Tuple, List, TYPE_CHECKING
+from twisted.internet import reactor
 
 from app.data import Card, TipPhase
 from app.objects import GameObject, LocalGameObject
@@ -214,9 +215,17 @@ class CardObject(Card):
         impact = impact_class(self.game, self.x, self.y)
         impact.play()
 
-        time.sleep(impact.duration)
-        impact.remove_object()
+        if self.element == 'f':
+            time.sleep(impact.duration)
+            impact.remove_object()
+            beam.remove_object()
+            return
+
+        beam_delay = 0.85
+        time.sleep(impact.duration - beam_delay)
         beam.remove_object()
+        time.sleep(beam_delay)
+        impact.remove_object()
 
     def apply_health(self) -> None:
         for target in self.targets:
