@@ -30,11 +30,14 @@ if __name__ == "__main__":
     global world_server, policy_server
 
     try:
-        policy_server = SocketPolicyServer(config.POLICY_DOMAIN, 843)
         world_server = SnowflakeWorld()
         world_server.listen(config.PORT)
 
-        if not config.DISABLE_POLICY_SERVER:
+        if config.ENABLE_POLICY_SERVER:
+            policy_server = SocketPolicyServer(
+                config.POLICY_DOMAIN,
+                config.POLICY_PORT
+            )
             policy_server.listen(843)
 
         reactor.run()

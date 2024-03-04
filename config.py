@@ -22,12 +22,14 @@ try:
 
     MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION')
     MEDIA_DOMAIN = urlparse(MEDIA_LOCATION).hostname
+
     POLICY_DOMAIN = os.environ.get('POLICY_DOMAIN', '*')
+    POLICY_PORT = int(os.environ.get('POLICY_PORT', '*'))
+    ENABLE_POLICY_SERVER = os.environ.get('ENABLE_POLICY_SERVER', 'False').lower() == 'true'
 
     APPLY_WINDOWMANAGER_OFFSET = os.environ.get('APPLY_WINDOWMANAGER_OFFSET', 'False').lower() == 'true'
     ENABLE_DEBUG_PLAYERS = os.environ.get('ENABLE_DEBUG_PLAYERS', 'False').lower() == 'true'
     ENABLE_DEBUG_LOGGING = os.environ.get('ENABLE_DEBUG_LOGGING', 'False').lower() == 'true'
-    DISABLE_POLICY_SERVER = os.environ.get('DISABLE_POLICY_SERVER', 'False').lower() == 'true'
     DISABLE_ENEMY_AI = os.environ.get('DISABLE_ENEMY_AI', 'False').lower() == 'true'
     DISABLE_REWARDS = os.environ.get('DISABLE_REWARDS', 'False').lower() == 'true'
     DISABLE_STAMPS = os.environ.get('DISABLE_STAMPS', 'False').lower() == 'true'
