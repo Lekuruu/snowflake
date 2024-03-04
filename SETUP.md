@@ -63,7 +63,7 @@ If something went wrong, you will most likely see this screen pop up:
 There are many reasons why this could be happening.
 Here are some things to check:
 
-1. Ensure that port 7002 and 843 are accessible from the outside
+1. Ensure that port 7002 is accessible from the outside
 
 2. Check if your `crossdomain.xml` is accessible under `<your_play_url>/crossdomain.xml`
 
