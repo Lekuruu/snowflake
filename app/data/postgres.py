@@ -8,9 +8,9 @@ from .objects import Base
 import logging
 
 class Postgres:
-    def __init__(self, username: str, password: str, host: str, port: int) -> None:
+    def __init__(self, username: str, database_name: str, password: str, host: str, port: int) -> None:
         self.engine = create_engine(
-            f'postgresql://{username}:{password}@{host}:{port}/{username}',
+            f'postgresql://{username}:{password}@{host}:{port}/{database_name}',
             pool_pre_ping=True,
             pool_recycle=900,
             pool_timeout=5,
