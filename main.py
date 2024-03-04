@@ -27,7 +27,7 @@ if __name__ == "__main__":
     global world_server, policy_server
 
     try:
-        policy_server = SocketPolicyServer(config.POLICY_DOMAIN)
+        policy_server = SocketPolicyServer(config.POLICY_DOMAIN, 843)
         world_server = SnowflakeWorld()
         world_server.listen(config.PORT)
 
