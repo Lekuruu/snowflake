@@ -359,6 +359,7 @@ class Ninja(GameObject):
         if self.name != 'Snow':
             return
 
+        self.heals += 1
         self.heal_animation()
         self.client.update_cards()
         time.sleep(0.4)
