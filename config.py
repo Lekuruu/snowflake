@@ -24,7 +24,7 @@ try:
     MEDIA_DOMAIN = urlparse(MEDIA_LOCATION).hostname
 
     POLICY_DOMAIN = os.environ.get('POLICY_DOMAIN', '*')
-    POLICY_PORT = int(os.environ.get('POLICY_PORT', '*'))
+    POLICY_PORT = os.environ.get('POLICY_PORT', '*')
     ENABLE_POLICY_SERVER = os.environ.get('ENABLE_POLICY_SERVER', 'False').lower() == 'true'
 
     APPLY_WINDOWMANAGER_OFFSET = os.environ.get('APPLY_WINDOWMANAGER_OFFSET', 'False').lower() == 'true'
