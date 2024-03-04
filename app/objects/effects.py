@@ -561,7 +561,8 @@ class FirePowerBeam(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1,
+            duration=1.35
         )
 
     def play(self):
@@ -576,7 +577,7 @@ class SnowPowerBeam(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1
+            y_offset=1.55
         )
 
     def play(self):
