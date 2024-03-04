@@ -218,6 +218,7 @@ class CardObject(Card):
         if self.element == 'f':
             time.sleep(impact.duration)
             impact.remove_object()
+            time.sleep(beam.duration - impact.duration)
             beam.remove_object()
             return
 
