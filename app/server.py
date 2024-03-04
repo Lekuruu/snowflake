@@ -28,6 +28,7 @@ class SnowflakeWorld(MetaplaceWorldServer):
             world_owner='crowdcontrol',
             stylesheet_id='87.5309',
             policy_domain=config.POLICY_DOMAIN,
+            policy_port=config.PORT,
             server_type=ServerType.LIVE,
             build_type=BuildType.RELEASE
         )
