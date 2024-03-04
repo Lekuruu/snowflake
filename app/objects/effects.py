@@ -576,7 +576,7 @@ class SnowPowerBeam(Effect):
             x,
             y,
             x_offset=0.5,
-            y_offset=1.15
+            y_offset=1.55
         )
 
     def play(self):
