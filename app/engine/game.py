@@ -640,7 +640,7 @@ class Game:
 
                 if ninja.heals >= 15:
                     # Unlock "Heal 15" stamp
-                    self.unlock_stamp(477)
+                    self.snow.unlock_stamp(477)
 
                 time.sleep(1)
 
