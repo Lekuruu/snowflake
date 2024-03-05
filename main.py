@@ -22,7 +22,7 @@ def on_shutdown(*args):
     for player in world_server.players:
         player.send_to_room()
 
-    reactor.callLater(0.5, reactor.stop)
+    reactor.callLater(0.1, reactor.stop)
 
 signal.signal(signal.SIGINT, on_shutdown)
 
