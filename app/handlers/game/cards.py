@@ -118,8 +118,10 @@ def on_membercard_deselect(client: Penguin, data: dict):
 
     client.member_card.selected = False
     client.member_card.remove()
-    client.ninja.show_targets()
-    client.game.grid.change_tiles_for_client(client, 'ui_tile_move')
+
+    if client.ninja.hp > 0:
+        client.ninja.show_targets()
+        client.game.grid.change_tiles_for_client(client, 'ui_tile_move')
 
 @session.framework.register('comboScreenComplete')
 def on_combo_screen_complete(client: Penguin, data: dict):
