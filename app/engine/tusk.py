@@ -410,7 +410,6 @@ class TuskGame(Game):
 
         # Unlock "Final Battle" stamp
         self.unlock_stamp(486)
-        self.coins += 660
 
         for ninja in self.ninjas:
             if ninja.client.disconnected:
