@@ -290,12 +290,7 @@ class TuskGame(Game):
                 if client.disconnected:
                     continue
 
-                if client.object.snow_ninja_rank >= 24:
-                    # Clamp rank to 24
-                    result_rank = 24
-                    exp_percentage = 100
-
-                else:
+                if client.object.snow_ninja_rank < 24:
                     current_exp = round(
                         (client.object.snow_ninja_progress / 100) *
                         ExpRequirements[client.object.snow_ninja_rank]
@@ -312,6 +307,11 @@ class TuskGame(Game):
                     result_rank = round(
                         client.object.snow_ninja_rank + ranks_gained
                     )
+
+                else:
+                    # Clamp rank to 24
+                    result_rank = 24
+                    exp_percentage = 100
 
                 # Enable double coins when player has unlocked all stamps
                 double_coins = stamps.completed_group(client.pid, 60, session=session)
