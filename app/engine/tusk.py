@@ -40,6 +40,7 @@ class TuskGame(Game):
         self.damage = 0
         self.coins = 0
         self.round = 4
+        self.exp = 0
 
         self.game_start = time.time()
         self.callbacks = CallbackHandler(self)
