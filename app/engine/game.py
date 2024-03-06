@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 from app.data.repositories import stamps, penguins, items
 from app.data import (
-    RewardMultipliers,
+    ExpRequirements,
     InputModifier,
     InputTarget,
     SnowRewards,
@@ -49,6 +49,7 @@ class Game:
         self.total_combos = 0
         self.round = 0
         self.coins = 0
+        self.exp = 0
 
         self.callbacks = CallbackHandler(self)
         self.objects = ObjectCollection(offset=1000)
@@ -62,11 +63,6 @@ class Game:
     @property
     def clients(self) -> List["Penguin"]:
         return [self.fire, self.snow, self.water]
-
-    @property
-    def exp(self) -> int:
-        # TODO: I have no idea how to calculate this
-        return round(self.coins * 0.15)
 
     @property
     def disconnected_clients(self) -> List["Penguin"]:
@@ -236,16 +232,22 @@ class Game:
                 # Bonus round completed
                 break
 
-            # NOTE: No idea if these values are correct
-            #       May need to change this in the future
+            # See: https://github.com/Lekuruu/snowflake/issues/23
             coins = {
                 0: 60,
                 1: 120,
                 2: 120,
-                3: 360
+                3: 120
+            }
+            exp = {
+                0: 100,
+                1: 200,
+                2: 300,
+                3: 180
             }
 
             self.coins += coins.get(self.round, 0)
+            self.exp += exp.get(self.round, 0)
             self.round += 1
 
             if self.round >= 3 and self.bonus_criteria == 'full_health':
@@ -885,22 +887,31 @@ class Game:
                 if client.disconnected:
                     continue
 
-                # Calculate new rank and exp
-                exp_gained = client.object.snow_ninja_progress + self.exp
-
-                # Make it harder to gain exp as you progress
-                exp_gained *= RewardMultipliers.get(
-                    client.object.snow_ninja_rank + exp_gained // 100, 1
-                )
-
-                ranks_gained = exp_gained // 100
-                result_rank = round(client.object.snow_ninja_rank + ranks_gained)
-                result_exp = round(exp_gained % 100)
-
-                if result_rank >= 24:
+                if client.object.snow_ninja_rank >= 24:
                     # Clamp rank to 24
                     result_rank = 24
-                    result_exp = 100
+                    exp_percentage = 100
+
+                else:
+                    current_exp = round(
+                        (client.object.snow_ninja_progress / 100) *
+                        ExpRequirements[client.object.snow_ninja_rank]
+                    )
+
+                    # Calculate new exp
+                    result_exp = current_exp + self.exp
+                    exp_percentage = round(
+                        result_exp / ExpRequirements[client.object.snow_ninja_rank] * 100
+                    )
+
+                    # Calculate new rank
+                    ranks_gained = exp_percentage // 100
+                    result_rank = round(
+                        client.object.snow_ninja_rank + ranks_gained
+                    )
+
+                    # Reset percentage if rank is increased
+                    exp_percentage = exp_percentage % 100
 
                 # Enable double coins when player has unlocked all stamps
                 double_coins = stamps.completed_group(client.pid, 60, session=session)
@@ -909,7 +920,7 @@ class Game:
                 updates = {
                     'coins': client.object.coins + coins,
                     'snow_ninja_rank': result_rank,
-                    'snow_ninja_progress': result_exp
+                    'snow_ninja_progress': exp_percentage
                 }
 
                 if result_rank >= 13:
@@ -988,7 +999,7 @@ class Game:
                             for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
                         ],
                         "xpStart": client.object.snow_ninja_progress,
-                        "xpEnd": exp_gained if result_rank < 24 else 100,
+                        "xpEnd": exp_percentage if result_rank < 24 else 100,
                     },
                     loadDescription="",
                     assetPath="",

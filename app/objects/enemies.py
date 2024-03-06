@@ -163,6 +163,11 @@ class Enemy(GameObject):
                 reactor.callLater(2.5, self.remove_object)
                 return
 
+            if self.game.round >= 3:
+                # Bonus Round awards exp & coins per enemy
+                self.game.coins += 60
+                self.game.exp += 75
+
             self.game.wait_for_animations()
             self.remove_object()
             return
@@ -1034,6 +1039,22 @@ class Tusk(Enemy):
         ).play(self.hp - hp)
 
         self.hp = hp
+
+        # See: https://github.com/Lekuruu/snowflake/issues/23
+        rewards = {
+            0: (2100, 660),
+            2: (1290, 420),
+            15: (1050, 300),
+            33: (90, 60),
+            68: (90, 60),
+            100: (0, 0)
+        }
+
+        for damage, (exp, coins) in rewards.items():
+            if self.hp <= damage:
+                self.game.coins = coins
+                self.game.exp = exp
+                break
 
         if self.hp <= 0:
             self.ko_animation()

@@ -9,7 +9,7 @@ from app.objects.enemies import Enemy, Tusk
 from app.objects.ninjas import Ninja
 from app.objects.sound import Sound
 
-from app.data import TipPhase, RewardMultipliers, SnowRewards
+from app.data import TipPhase, ExpRequirements, SnowRewards
 from app.data import stamps, penguins, items
 
 from .callbacks import CallbackHandler
@@ -289,22 +289,31 @@ class TuskGame(Game):
                 if client.disconnected:
                     continue
 
-                # Calculate new rank and exp
-                exp_gained = client.object.snow_ninja_progress + self.exp
-
-                # Make it harder to gain exp as you progress
-                exp_gained *= RewardMultipliers.get(
-                    client.object.snow_ninja_rank + exp_gained // 100, 1
-                )
-
-                ranks_gained = exp_gained // 100
-                result_rank = round(client.object.snow_ninja_rank + ranks_gained)
-                result_exp = round(exp_gained % 100)
-
-                if result_rank >= 24:
+                if client.object.snow_ninja_rank >= 24:
                     # Clamp rank to 24
                     result_rank = 24
-                    result_exp = 100
+                    exp_percentage = 100
+
+                else:
+                    current_exp = round(
+                        (client.object.snow_ninja_progress / 100) *
+                        ExpRequirements[client.object.snow_ninja_rank]
+                    )
+
+                    # Calculate new exp
+                    result_exp = current_exp + self.exp
+                    exp_percentage = round(
+                        result_exp / ExpRequirements[client.object.snow_ninja_rank] * 100
+                    )
+
+                    # Calculate new rank
+                    ranks_gained = exp_percentage // 100
+                    result_rank = round(
+                        client.object.snow_ninja_rank + ranks_gained
+                    )
+
+                    # Reset percentage if rank is increased
+                    exp_percentage = exp_percentage % 100
 
                 # Enable double coins when player has unlocked all stamps
                 double_coins = stamps.completed_group(client.pid, 60, session=session)
@@ -313,7 +322,7 @@ class TuskGame(Game):
                 updates = {
                     'coins': client.object.coins + coins,
                     'snow_ninja_rank': result_rank,
-                    'snow_ninja_progress': result_exp
+                    'snow_ninja_progress': exp_percentage
                 }
 
                 if len(self.enemies) <= 0:
@@ -384,7 +393,7 @@ class TuskGame(Game):
                             for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
                         ],
                         "xpStart": client.object.snow_ninja_progress,
-                        "xpEnd": exp_gained if result_rank < 24 else 100,
+                        "xpEnd": exp_percentage if result_rank < 24 else 100,
                     },
                     loadDescription="",
                     assetPath="",
