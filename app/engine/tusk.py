@@ -291,22 +291,16 @@ class TuskGame(Game):
                     continue
 
                 if client.object.snow_ninja_rank < 24:
-                    current_exp = round(
-                        (client.object.snow_ninja_progress / 100) *
-                        ExpRequirements[client.object.snow_ninja_rank]
-                    )
+                    required_exp = ExpRequirements.get(client.object.snow_ninja_rank, 3000)
+                    current_exp = round((client.object.snow_ninja_progress / 100) * required_exp)
 
                     # Calculate new exp
                     result_exp = current_exp + self.exp
-                    exp_percentage = round(
-                        result_exp / ExpRequirements[client.object.snow_ninja_rank] * 100
-                    )
+                    exp_percentage = round(result_exp / required_exp * 100)
 
                     # Calculate new rank
                     ranks_gained = exp_percentage // 100
-                    result_rank = round(
-                        client.object.snow_ninja_rank + ranks_gained
-                    )
+                    result_rank = round(client.object.snow_ninja_rank + ranks_gained)
 
                 else:
                     # Clamp rank to 24
