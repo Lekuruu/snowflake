@@ -1043,11 +1043,10 @@ class Tusk(Enemy):
         # See: https://github.com/Lekuruu/snowflake/issues/23
         rewards = {
             0: (2100, 660),
-            2: (1290, 420),
-            15: (1050, 300),
-            33: (90, 60),
-            68: (90, 60),
-            100: (0, 0)
+            10: (1290, 420),
+            20: (1050, 300),
+            30: (340, 180),
+            100: (90, 60)
         }
 
         for damage, (exp, coins) in rewards.items():
