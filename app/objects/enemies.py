@@ -1024,7 +1024,9 @@ class Tusk(Enemy):
         self.animate_healthbar(self.hp, hp, duration=500)
 
         # Update damage percentage for payout
-        self.game.damage = round(100 - ((hp / self.max_hp) * 100))
+        damage_percentage = round((hp / self.max_hp) * 100)
+
+        self.game.damage = (100 - damage_percentage)
 
         AttackTile(
             self.game,
@@ -1050,7 +1052,7 @@ class Tusk(Enemy):
         }
 
         for damage, (exp, coins) in rewards.items():
-            if (100 - self.game.damage) <= damage:
+            if damage_percentage <= damage:
                 self.game.coins = coins
                 self.game.exp = exp
                 break
