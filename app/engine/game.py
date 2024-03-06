@@ -910,9 +910,6 @@ class Game:
                         client.object.snow_ninja_rank + ranks_gained
                     )
 
-                    # Reset percentage if rank is increased
-                    exp_percentage = exp_percentage % 100
-
                 # Enable double coins when player has unlocked all stamps
                 double_coins = stamps.completed_group(client.pid, 60, session=session)
                 coins = self.coins * (2 if double_coins else 1)
@@ -920,7 +917,7 @@ class Game:
                 updates = {
                     'coins': client.object.coins + coins,
                     'snow_ninja_rank': result_rank,
-                    'snow_ninja_progress': exp_percentage
+                    'snow_ninja_progress': exp_percentage  % 100
                 }
 
                 if result_rank >= 13:
