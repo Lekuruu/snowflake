@@ -159,14 +159,14 @@ class Enemy(GameObject):
         if self.hp <= 0:
             self.ko_animation()
 
-            if not wait:
-                reactor.callLater(2.5, self.remove_object)
-                return
-
             if self.game.round >= 3:
                 # Bonus Round awards exp & coins per enemy
                 self.game.coins += 60
                 self.game.exp += 75
+
+            if not wait:
+                reactor.callLater(2.5, self.remove_object)
+                return
 
             self.game.wait_for_animations()
             self.remove_object()
