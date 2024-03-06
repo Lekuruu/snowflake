@@ -224,10 +224,6 @@ class Game:
                 # All ninjas have been defeated
                 break
 
-            if (self.round >= 2) and (not self.bonus_criteria_met):
-                # Bonus criteria not met on round 3
-                break
-
             if (self.round >= 3):
                 # Bonus round completed
                 break
@@ -248,6 +244,11 @@ class Game:
 
             self.coins += coins.get(self.round, 0)
             self.exp += exp.get(self.round, 0)
+
+            if (self.round >= 2) and (not self.bonus_criteria_met):
+                # Bonus criteria not met on round 3
+                break
+
             self.round += 1
 
             if self.round >= 3 and self.bonus_criteria == 'full_health':
