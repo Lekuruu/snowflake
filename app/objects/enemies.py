@@ -1050,7 +1050,7 @@ class Tusk(Enemy):
         }
 
         for damage, (exp, coins) in rewards.items():
-            if self.hp <= damage:
+            if (100 - self.game.damage) <= damage:
                 self.game.coins = coins
                 self.game.exp = exp
                 break
