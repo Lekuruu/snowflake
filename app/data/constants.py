@@ -32,6 +32,7 @@ SnowRewards = {
 ExpRequirements = {
     0: 600,
     1: 600,
+    2: 600,
     3: 1130,
     4: 1130,
     5: 1130,
