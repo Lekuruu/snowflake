@@ -224,10 +224,6 @@ class Game:
                 # All ninjas have been defeated
                 break
 
-            if (self.round >= 3):
-                # Bonus round completed
-                break
-
             # See: https://github.com/Lekuruu/snowflake/issues/23
             coins = {
                 0: 60,
@@ -247,6 +243,10 @@ class Game:
 
             if (self.round >= 2) and (not self.bonus_criteria_met):
                 # Bonus criteria not met on round 3
+                break
+
+            if (self.round >= 3):
+                # Bonus round completed
                 break
 
             self.round += 1
