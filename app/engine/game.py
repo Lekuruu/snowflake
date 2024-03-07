@@ -1027,7 +1027,7 @@ class Game:
                 payout.load(
                     {
                         "coinsEarned": 0,
-                        "doubleCoins": False, # TODO
+                        "doubleCoins": False,
                         "damage": 0, # Only important for tusk battle
                         "isBoss": 0,
                         "rank": 24,
