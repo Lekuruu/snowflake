@@ -49,9 +49,6 @@ Please view [this file](https://github.com/Lekuruu/snowflake/blob/main/SETUP.md)
     - [x] Tusk
         - [x] Animations
         - [x] Actions
-            - [x] Paired Icicle Attack
-            - [x] Random Icicle Attack
-            - [x] Push Attack
     - [x] Payout
 
 ## Screenshots
