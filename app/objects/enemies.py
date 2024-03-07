@@ -249,7 +249,6 @@ class Enemy(GameObject):
         available_moves = list(self.movable_tiles()) + [self.game.grid[self.x, self.y]]
 
         if not available_moves:
-            # TODO: Handle this case properly
             return None, None
 
         # Get move with most available targets

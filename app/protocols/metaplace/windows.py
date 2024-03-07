@@ -135,7 +135,6 @@ class WindowManager(Dict[str, SWFWindow]):
     def get_window(self, name: str | None = None, url: str | None = None):
         assert url or name, 'You must provide either a url or a name for the window.'
 
-        # TODO: Refactor this
         if (name in self):
             return self[name]
 
@@ -158,7 +157,7 @@ class WindowManager(Dict[str, SWFWindow]):
             self.swf_y,
             self.swf_width,
             self.swf_height,
-            0, # TODO: this is some kind of bool, that does nothing ig?
+            0,
             self.swf_url,
             self.command_prefix
         )

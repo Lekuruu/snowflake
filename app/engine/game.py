@@ -272,6 +272,9 @@ class Game:
                 client.selected_card = None
                 client.is_ready = False
 
+                # Reset ninja's rotation, if necessary
+                client.ninja.reset_sprite_settings()
+
                 if client.power_card_slots:
                     self.send_tip(TipPhase.CARD, client)
 
@@ -1027,7 +1030,7 @@ class Game:
                 payout.load(
                     {
                         "coinsEarned": 0,
-                        "doubleCoins": False, # TODO
+                        "doubleCoins": False,
                         "damage": 0, # Only important for tusk battle
                         "isBoss": 0,
                         "rank": 24,
