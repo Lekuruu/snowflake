@@ -889,7 +889,7 @@ class Game:
                     continue
 
                 if client.object.snow_ninja_rank < 24:
-                    required_exp = ExpRequirements.get(client.object.snow_ninja_rank, 3000)
+                    required_exp = ExpRequirements.get(client.object.snow_ninja_rank + 1, 3000)
                     current_exp = round((client.object.snow_ninja_progress / 100) * required_exp)
 
                     # Calculate new exp
