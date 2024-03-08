@@ -616,7 +616,7 @@ class WaterNinja(Ninja):
     def win_animation(self) -> None:
         self.animate_object(
             'waterninja_celebrate_anim',
-            play_style='play_once',
+            play_style='ping_pong',
             reset=True
         )
 
@@ -759,7 +759,7 @@ class SnowNinja(Ninja):
     def win_animation(self) -> None:
         self.animate_object(
             'snowninja_celebrate_anim',
-            play_style='play_once',
+            play_style='ping_pong',
             reset=True
         )
 
