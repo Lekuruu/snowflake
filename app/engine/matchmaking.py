@@ -24,11 +24,12 @@ class MatchmakingQueue:
         if (match := self.find_match(player)):
             self.logger.info(f'Found match: {match}')
 
-            if player.battle_mode != 0:
-                self.create_tusk_game(*match)
-                return
+            match_types = {
+                0: self.create_normal_game,
+                1: self.create_tusk_game
+            }
 
-            self.create_normal_game(*match)
+            match_types[player.battle_mode](*match)
 
         # TODO: Add matchmaking timeout error
 
