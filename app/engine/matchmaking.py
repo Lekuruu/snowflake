@@ -46,9 +46,24 @@ class MatchmakingQueue:
         players = [player]
 
         for element in elements:
-            if (matches := self.players.with_element(element, player.battle_mode)):
-                # TODO: Sort players by different criteria
-                players.append(matches[0])
+            matches = self.players.with_element(
+                element,
+                player.battle_mode
+            )
+
+            if not matches:
+                continue
+
+            # Sort by closest rank
+            players.sort(
+                key=lambda other: abs(
+                    player.object.snow_ninja_rank -
+                    other.object.snow_ninja_rank
+                )
+            )
+
+            # Add closest match
+            players.append(matches[0])
 
         if len(players) != 3:
             if not config.ENABLE_DEBUG_PLAYERS:
