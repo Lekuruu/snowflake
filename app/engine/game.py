@@ -216,6 +216,10 @@ class Game:
 
             self.run_until_next_round()
 
+            for client in self.disconnected_clients:
+                # Hide disconnected ninjas
+                client.ninja.remove_object()
+
             if all(client.disconnected for client in self.clients):
                 # All players have disconnected
                 self.close()
