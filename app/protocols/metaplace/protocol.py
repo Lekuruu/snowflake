@@ -127,7 +127,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
                 f'0:{sound.index}'
             )
 
-        self.send_tag('W_ASSETSCOMPLETE')
+        self.send_tag('W_ASSETSCOMPLETE', self.pid)
 
     def get_window(self, name: str | None = None, url: str | None = None):
         return self.window_manager.get_window(name, url)
