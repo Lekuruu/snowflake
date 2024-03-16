@@ -37,6 +37,8 @@ def context_handler(client: Penguin, place_name: str, param_string: str):
 
 @session.events.register('/login', login_required=False)
 def login_handler(client: Penguin, server_type: str, pid: int, token: str):
+    client.send_login_message('Got /login command from user')
+
     if client.logged_in:
         client.logger.warning('Login attempt failed: Already logged in')
         client.send_login_error()
@@ -79,11 +81,12 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
         client.close_connection()
         return
 
+    client.send_login_message('Successfully verified credentials server-side')
     client.logger.info(f'Logged in as "{penguin.nickname}" ({penguin.id})')
     client.logger = logging.getLogger(client.name)
 
     client.logged_in = True
-    client.send_login_message('Finalizing login')
+    client.send_login_message('Finalizing login, creating final user object')
     client.send_login_reply()
 
     client.set_asset_url(config.MEDIA_DOMAIN)
