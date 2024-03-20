@@ -34,7 +34,7 @@ class SnowBattle(SnowLobby):
 
 @dataclass
 class TuskBattle(SnowLobby):
-    id: int = 10002
+    id: int = 10004
     name: str = "tusk_battle"
     assets = AssetCollection()
     sound_assets = AssetCollection()
