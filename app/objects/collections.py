@@ -107,7 +107,7 @@ class AssetCollection(Set["Asset"]):
     def by_name(self, name: str) -> "Asset" | None:
         return next((asset for asset in self if asset.name == name), None)
 
-class ObjectCollection(Set["GameObject"]):
+class ObjectCollection(LockedSet["GameObject"]):
     def __init__(self, initial_data: List["GameObject"] = [], offset: int = 0) -> None:
         super().__init__()
         super().update(initial_data)
