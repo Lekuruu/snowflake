@@ -15,7 +15,7 @@ SnowRewards = {
     10: None, # Movie 7
     11: 1581, # Blizzard Helmet
     12: None, # Movie 8
-    13: 7159, # Snow Gem
+    13: None, # Snow Gem - NOTE: awarded outside of the game server by a popup within Flash
     14: 1582, # Black Ice Headband
     15: 4835, # Frozen Armor
     16: 5223, # Ice Cap Cuffs
