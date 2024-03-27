@@ -78,7 +78,7 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
         session_token = session.redis.get(f'{pid}.mpsession')
 
         if not session_token:
-            client.logger.warning('Login attempt failed: Session token not found')
+            client.logger.warning('Login attempt failed: Session token expired')
             client.send_login_error()
             client.close_connection()
             return
