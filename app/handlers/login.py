@@ -74,7 +74,20 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
             player.logger.warning('Closing duplicate connection.')
             player.close_connection()
 
-    # TODO: Validate token
+    if not config.DISABLE_AUTHENTICATION:
+        session_token = session.redis.get(f'{pid}.mpsession')
+
+        if not session_token:
+            client.logger.warning('Login attempt failed: Session token not found')
+            client.send_login_error()
+            client.close_connection()
+            return
+
+        if token != session_token.decode():
+            client.logger.warning('Login attempt failed: Invalid session token')
+            client.send_login_error()
+            client.close_connection()
+            return
 
     if client.battle_mode == 1 and penguin.snow_ninja_rank < 13:
         client.logger.warning('Login attempt failed: Tried to access tusk battle without snow gem')
