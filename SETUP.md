@@ -67,6 +67,8 @@ Here are some things to check:
 
 3. Ensure you set the right media url in the `.env`
 
+4. Ensure your copies of houdini and dash are up-to-date
+
 If all of that didn't work, check if your server is `https` only, i.e. only allowing secure ssl connections. If that is the case, you need to replace the `flash_client_base_fp11.swf` inside `/game/mpassets/playclients/r3662/` with [this file](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/flash_client_base_fp11.swf).
 
 Feel free to contact me on Discord (@lekuru), or per E-Mail ([contact@lekuru.xyz](mailto:contact@lekuru.xyz)), for further support.
