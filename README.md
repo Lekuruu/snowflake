@@ -8,12 +8,12 @@ Please view [this file](https://github.com/Lekuruu/snowflake/blob/main/SETUP.md)
 
 - [x] Player Select
 - [x] Matchmaking
-- [x] Base Game Engine
-    - [x] Creating, moving & animating game objects
+- [x] Game Engine
+    - [x] Game Objects
     - [x] SWF Windows
     - [x] Sounds
     - [x] Assets
-- [x] Basic round loop
+- [x] Round loop
     - [x] Timer
     - [x] User Interface
     - [x] Round Title
@@ -42,7 +42,7 @@ Please view [this file](https://github.com/Lekuruu/snowflake/blob/main/SETUP.md)
 - [x] Stamps
 - [x] Tusk Battle
     - [x] Matchmaking
-    - [x] Basic Game Setup
+    - [x] Game Setup
     - [x] Sensei
         - [x] Animations
         - [x] Actions
