@@ -80,7 +80,7 @@ class TuskGame(Game):
             player_select.close()
 
         # Place clients in battle place
-        battle_place = self.server.places['snow_battle']
+        battle_place = self.server.places['tusk_battle']
 
         for client in self.clients:
             client.switch_place(battle_place)
