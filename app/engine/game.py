@@ -462,7 +462,7 @@ class Game:
                 ]
 
                 # There can't be more than 3 enemies of the same type
-                if len(existing_enemies) <= 3:
+                if len(existing_enemies) < 3:
                     break
 
             enemy = enemy_class(self)
