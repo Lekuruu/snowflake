@@ -123,7 +123,7 @@ class Grid:
             if self.can_move(x, y):
                 return (x, y)
 
-        return (-1, -1)
+        return (8, 4)
 
     def is_valid(self, x: int, y: int) -> bool:
         """Check if a tile is valid"""
