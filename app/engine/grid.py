@@ -103,8 +103,11 @@ class Grid:
 
         # Check if the obstacle is collinear with start and target
         if (x2 - x1) * (y3 - y1) == (x3 - x1) * (y2 - y1):
+            min_x, max_x = min(x1, x2), max(x1, x2)
+            min_y, max_y = min(y1, y2), max(y1, y2)
+
             # Check if the obstacle lies within the rectangle formed by start and target
-            if min(x1, x2) <= x3 <= max(x1, x2) and min(y1, y2) <= y3 <= max(y1, y2):
+            if min_x <= x3 <= max_x and min_y <= y3 <= max_y:
                 return True
 
         return False
