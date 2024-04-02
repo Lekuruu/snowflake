@@ -36,10 +36,8 @@ class MatchmakingQueue:
 
             return match_types[player.battle_mode](*match)
 
-        reactor.callLater(
-            config.MATCHMAKING_TIMEOUT,
-            self.fill_queue, player
-        )
+        # TODO: Add timeout for finding match
+        #       Fill queue with AI players
 
     def remove(self, player: Penguin) -> None:
         if player in self.players:
