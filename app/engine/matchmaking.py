@@ -119,7 +119,7 @@ class MatchmakingQueue:
         # Start game loop
         game.server.runThread(game.start)
 
-    def get_debug_players(self, players: List[Penguin]) -> List[Penguin]:
+    def insert_ai_players(self, players: List[Penguin]) -> List[Penguin]:
         elements = ['snow', 'water', 'fire']
         battle_mode = players[0].battle_mode
 
@@ -130,6 +130,7 @@ class MatchmakingQueue:
             debug_player = PenguinAI(player.server, element, battle_mode)
             players.append(debug_player)
 
+        players.sort(key=lambda x: x.element)
         return players
 
     def insert_none_players(self, players: List[Penguin]) -> List[Penguin]:
@@ -168,8 +169,8 @@ class MatchmakingQueue:
                 # Player has not been in queue long enough
                 players.remove(p)
 
-        # Fill up missing players with "None"
-        players = self.insert_none_players(players)
+        # Fill up missing players with bots
+        players = self.insert_ai_players(players)
 
         self.logger.info(f'Found match: {players}')
 
