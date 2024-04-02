@@ -32,7 +32,8 @@ class MatchmakingQueue:
 
             match_types[player.battle_mode](*match)
 
-        # TODO: Add matchmaking timeout error
+        # TODO: Add timeout for finding match
+        #       Fill queue with AI players
 
     def remove(self, player: Penguin) -> None:
         if player in self.players:
