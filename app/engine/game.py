@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable, List
+from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from .penguin import Penguin
@@ -281,6 +282,12 @@ class Game:
 
                 if client.power_card_slots:
                     self.send_tip(TipPhase.CARD, client)
+
+                if client.is_bot:
+                    reactor.callLater(
+                        random.randint(0.5, 3),
+                        client.select_move
+                    )
 
             self.show_targets()
             self.wait_for_timer()
