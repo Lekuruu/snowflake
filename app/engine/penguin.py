@@ -56,6 +56,7 @@ class Penguin(MetaplaceProtocol):
         self.mute_sounds: bool = False
         self.in_queue: bool = False
         self.is_ready: bool = False
+        self.is_bot: bool = False
         self.was_ko: bool = False
 
     def __repr__(self) -> str:
