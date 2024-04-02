@@ -367,6 +367,9 @@ class Game:
             if player.disconnected:
                 continue
 
+            if player.is_bot:
+                continue
+
             while not condition(player) and not self.server.shutting_down:
                 if time.time() - start_time > timeout:
                     self.logger.warning(f'Player Timeout: {player}')
@@ -389,6 +392,9 @@ class Game:
     def wait_for_window(self, name: str, loaded=True, timeout=8) -> None:
         """Wait for a window to load/close"""
         for client in self.clients:
+            if client.is_bot:
+                continue
+
             window = client.get_window(name)
             start_time = time.time()
 
