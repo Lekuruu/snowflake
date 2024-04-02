@@ -158,8 +158,19 @@ class MatchmakingQueue:
             # Player has found a match
             return
 
-        # Fill up missing players with "None"
-        players = self.get_none_players([player])
+        # Find other players in queue
+        players = self.find_match(player)
+
+        for p in players:
+            required_time = config.MATCHMAKING_TIMEOUT / 2
+            time_in_queue = time.time() - p.queue_time
+
+            if time_in_queue < required_time:
+                # Player has not been in queue long enough
+                players.remove(p)
+
+        # Fill up missing players with bots
+        players = self.insert_ai_players(players)
 
         self.logger.info(f'Found match: {players}')
 
