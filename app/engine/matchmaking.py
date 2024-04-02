@@ -5,6 +5,7 @@ from typing import List
 from ..objects.collections import Players
 from .penguin import Penguin
 from .tusk import TuskGame
+from .ai import PenguinAI
 from .game import Game
 
 import logging
@@ -125,16 +126,7 @@ class MatchmakingQueue:
             elements.remove(player.element)
 
         for element in elements:
-            debug_player = Penguin(player.server, player.address)
-            debug_player.pid = -1
-            debug_player.name = f'Debug {element.title()} Player'
-            debug_player.element = element
-            debug_player.battle_mode = battle_mode
-            debug_player.in_queue = True
-            debug_player.is_ready = True
-            debug_player.logged_in = True
-            debug_player.disconnected = True
-            debug_player.object = player.object
+            debug_player = PenguinAI(player.server, element, battle_mode)
             players.append(debug_player)
 
         return players
