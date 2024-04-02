@@ -23,4 +23,5 @@ class PenguinAI(Penguin):
         self.is_bot = True
 
     def select_move(self) -> None:
+        # TODO: Implement move selection
         ...
