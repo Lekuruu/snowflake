@@ -1,5 +1,7 @@
 
 from __future__ import annotations
+
+from twisted.internet import reactor
 from typing import List
 
 from ..objects.collections import Players
@@ -30,10 +32,12 @@ class MatchmakingQueue:
                 1: self.create_tusk_game
             }
 
-            match_types[player.battle_mode](*match)
+            return match_types[player.battle_mode](*match)
 
-        # TODO: Add timeout for finding match
-        #       Fill queue with AI players
+        reactor.callLater(
+            config.MATCHMAKING_TIMEOUT,
+            self.fill_queue, player
+        )
 
     def remove(self, player: Penguin) -> None:
         if player in self.players:
@@ -69,10 +73,7 @@ class MatchmakingQueue:
             players.append(matches[0])
 
         if len(players) != 3:
-            if not config.ENABLE_DEBUG_PLAYERS:
-                return
-
-            players = self.get_debug_players(players)
+            return
 
         players.sort(key=lambda x: x.element)
         return players
@@ -86,9 +87,9 @@ class MatchmakingQueue:
             player_select.send_payload(
                 'matchFound',
                 {
-                    1: fire.name,
-                    2: water.name,
-                    4: snow.name
+                    1: fire.name if fire else None,
+                    2: water.name if water else None,
+                    4: snow.name if snow else None
                 }
             )
 
@@ -107,9 +108,9 @@ class MatchmakingQueue:
             player_select.send_payload(
                 'matchFound',
                 {
-                    1: fire.name,
-                    2: water.name,
-                    4: snow.name
+                    1: fire.name if fire else None,
+                    2: water.name if water else None,
+                    4: snow.name if snow else None
                 }
             )
 
@@ -131,3 +132,40 @@ class MatchmakingQueue:
             players.append(debug_player)
 
         return players
+
+    def get_none_players(self, players: List[Penguin]) -> List[Penguin]:
+        player_dict = {
+            'fire': None,
+            'snow': None,
+            'water': None
+        }
+
+        for player in players:
+            player_dict[player.element] = player
+
+        return list(player_dict.values())
+
+    def fill_queue(self, player: Penguin) -> None:
+        if player.battle_mode == 0 and not config.ALLOW_SINGLEPLAYER_SNOW:
+            # Singleplayer snow is disabled
+            return
+
+        if player.battle_mode == 1 and not config.ALLOW_SINGLEPLAYER_TUSK:
+            # Singleplayer tusk is disabled
+            return
+
+        if player.in_game:
+            # Player has found a match
+            return
+
+        # Fill up missing players with "None"
+        players = self.get_none_players([player])
+
+        self.logger.info(f'Found match: {players}')
+
+        match_types = {
+            0: self.create_normal_game,
+            1: self.create_tusk_game
+        }
+
+        match_types[player.battle_mode](*players)
