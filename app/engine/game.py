@@ -36,7 +36,6 @@ import time
 
 class Game:
     def __init__(self, fire: "Penguin", snow: "Penguin", water: "Penguin") -> None:
-        self.server = fire.server
         self.water = water
         self.fire = fire
         self.snow = snow
@@ -56,13 +55,17 @@ class Game:
         self.grid = Grid(9, 5, self)
         self.timer = Timer(self)
 
+        self.server = self.clients[0].server
         self.logger = logging.getLogger('Game')
         self.backgrounds = []
         self.rocks = []
 
     @property
     def clients(self) -> List["Penguin"]:
-        return [self.fire, self.snow, self.water]
+        return [
+            client for client in [self.fire, self.snow, self.water]
+            if client is not None
+        ]
 
     @property
     def disconnected_clients(self) -> List["Penguin"]:
@@ -423,20 +426,22 @@ class Game:
             {'x': 0, 'y': 4}
         ]
 
+        ninja_classes = {
+            'snow': SnowNinja,
+            'fire': FireNinja,
+            'water': WaterNinja
+        }
+
         # Randomize spawn positions
         random.shuffle(spawn_positions)
 
-        water = WaterNinja(self.water, **spawn_positions[0])
-        water.place_object()
-        self.water.ninja = water
+        for index, client in enumerate(self.clients):
+            element = client.element
+            ninja_class = ninja_classes[element]
 
-        fire = FireNinja(self.fire, **spawn_positions[1])
-        fire.place_object()
-        self.fire.ninja = fire
-
-        snow = SnowNinja(self.snow, **spawn_positions[2])
-        snow.place_object()
-        self.snow.ninja = snow
+            ninja = ninja_class(client, **spawn_positions[index])
+            ninja.place_object()
+            client.ninja = ninja
 
     def create_enemies(self) -> None:
         if self.round > 3:
@@ -509,20 +514,10 @@ class Game:
             rock.place_object()
 
     def spawn_ninjas(self) -> None:
-        water = self.objects.by_name('Water')
-        water.place_object()
-        water.idle_animation()
-        water.place_healthbar()
-
-        snow = self.objects.by_name('Snow')
-        snow.place_object()
-        snow.idle_animation()
-        snow.place_healthbar()
-
-        fire = self.objects.by_name('Fire')
-        fire.place_object()
-        fire.idle_animation()
-        fire.place_healthbar()
+        for ninja in self.ninjas:
+            ninja.place_object()
+            ninja.idle_animation()
+            ninja.place_healthbar()
 
     def spawn_enemies(self) -> None:
         """Spawn enemies for the current round"""

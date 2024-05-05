@@ -53,6 +53,9 @@ class Penguin(MetaplaceProtocol):
         self.power_card_stamina: int = 0
         self.played_cards: int = 0
 
+        self.login_time: int = 0
+        self.queue_time: int = 0
+
         self.mute_sounds: bool = False
         self.in_queue: bool = False
         self.is_ready: bool = False

@@ -7,6 +7,7 @@ from app import session
 import urllib.parse
 import logging
 import config
+import time
 
 @session.events.register('/version', login_required=False)
 def version_handler(client: Penguin):
@@ -99,6 +100,7 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.logger = logging.getLogger(client.name)
 
     client.logged_in = True
+    client.login_time = time.time()
     client.send_login_message('Finalizing login, creating final user object')
     client.send_login_reply()
 

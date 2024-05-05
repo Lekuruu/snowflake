@@ -1,5 +1,7 @@
 
 from __future__ import annotations
+
+from twisted.internet import reactor
 from typing import List
 
 from ..objects.collections import Players
@@ -9,6 +11,7 @@ from .game import Game
 
 import logging
 import config
+import time
 
 class MatchmakingQueue:
     def __init__(self) -> None:
@@ -19,9 +22,10 @@ class MatchmakingQueue:
         self.players.add(player)
 
         player.logger.info(f'Joined matchmaking queue with "{player.element}"')
+        player.queue_time = time.time()
         player.in_queue = True
 
-        if (match := self.find_match(player)):
+        if len(match := self.find_match(player)) >= 3:
             self.logger.info(f'Found match: {match}')
 
             match_types = {
@@ -29,9 +33,12 @@ class MatchmakingQueue:
                 1: self.create_tusk_game
             }
 
-            match_types[player.battle_mode](*match)
+            return match_types[player.battle_mode](*match)
 
-        # TODO: Add matchmaking timeout error
+        reactor.callLater(
+            config.MATCHMAKING_TIMEOUT,
+            self.fill_queue, player
+        )
 
     def remove(self, player: Penguin) -> None:
         if player in self.players:
@@ -66,12 +73,6 @@ class MatchmakingQueue:
             # Add closest match
             players.append(matches[0])
 
-        if len(players) != 3:
-            if not config.ENABLE_DEBUG_PLAYERS:
-                return
-
-            players = self.get_debug_players(players)
-
         players.sort(key=lambda x: x.element)
         return players
 
@@ -84,9 +85,9 @@ class MatchmakingQueue:
             player_select.send_payload(
                 'matchFound',
                 {
-                    1: fire.name,
-                    2: water.name,
-                    4: snow.name
+                    1: fire.name if fire else None,
+                    2: water.name if water else None,
+                    4: snow.name if snow else None
                 }
             )
 
@@ -105,9 +106,9 @@ class MatchmakingQueue:
             player_select.send_payload(
                 'matchFound',
                 {
-                    1: fire.name,
-                    2: water.name,
-                    4: snow.name
+                    1: fire.name if fire else None,
+                    2: water.name if water else None,
+                    4: snow.name if snow else None
                 }
             )
 
@@ -117,24 +118,50 @@ class MatchmakingQueue:
         # Start game loop
         game.server.runThread(game.start)
 
-    def get_debug_players(self, players: List[Penguin]) -> List[Penguin]:
-        elements = ['snow', 'water', 'fire']
-        battle_mode = players[0].battle_mode
+    def insert_none_players(self, players: List[Penguin]) -> List[Penguin]:
+        player_dict = {
+            'fire': None,
+            'snow': None,
+            'water': None
+        }
 
         for player in players:
-            elements.remove(player.element)
+            player_dict[player.element] = player
 
-        for element in elements:
-            debug_player = Penguin(player.server, player.address)
-            debug_player.pid = -1
-            debug_player.name = f'Debug {element.title()} Player'
-            debug_player.element = element
-            debug_player.battle_mode = battle_mode
-            debug_player.in_queue = True
-            debug_player.is_ready = True
-            debug_player.logged_in = True
-            debug_player.disconnected = True
-            debug_player.object = player.object
-            players.append(debug_player)
+        return list(player_dict.values())
 
-        return players
+    def fill_queue(self, player: Penguin) -> None:
+        if player.battle_mode == 0 and not config.ALLOW_FORCESTART_SNOW:
+            # Singleplayer snow is disabled
+            return
+
+        if player.battle_mode == 1 and not config.ALLOW_FORCESTART_TUSK:
+            # Singleplayer tusk is disabled
+            return
+
+        if player.in_game:
+            # Player has found a match
+            return
+
+        # Find other players in queue
+        players = self.find_match(player)
+
+        for p in players:
+            required_time = config.MATCHMAKING_TIMEOUT / 2
+            time_in_queue = time.time() - p.queue_time
+
+            if time_in_queue < required_time:
+                # Player has not been in queue long enough
+                players.remove(p)
+
+        # Fill up missing players with "None"
+        players = self.insert_none_players(players)
+
+        self.logger.info(f'Found match: {players}')
+
+        match_types = {
+            0: self.create_normal_game,
+            1: self.create_tusk_game
+        }
+
+        match_types[player.battle_mode](*players)

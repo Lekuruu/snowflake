@@ -24,12 +24,15 @@ try:
     MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION')
     MEDIA_DOMAIN = urlparse(MEDIA_LOCATION).hostname
 
+    MATCHMAKING_TIMEOUT = int(os.environ.get('MATCHMAKING_TIMEOUT', '30'))
+    ALLOW_FORCESTART_SNOW = os.environ.get('ALLOW_FORCESTART_SNOW', 'False').lower() == 'true'
+    ALLOW_FORCESTART_TUSK = os.environ.get('ALLOW_FORCESTART_TUSK', 'True').lower() == 'true'
+
     POLICY_DOMAIN = os.environ.get('POLICY_DOMAIN', '*')
     POLICY_PORT = os.environ.get('POLICY_PORT', '*')
     ENABLE_POLICY_SERVER = os.environ.get('ENABLE_POLICY_SERVER', 'False').lower() == 'true'
 
     APPLY_WINDOWMANAGER_OFFSET = os.environ.get('APPLY_WINDOWMANAGER_OFFSET', 'False').lower() == 'true'
-    ENABLE_DEBUG_PLAYERS = os.environ.get('ENABLE_DEBUG_PLAYERS', 'False').lower() == 'true'
     ENABLE_DEBUG_LOGGING = os.environ.get('ENABLE_DEBUG_LOGGING', 'False').lower() == 'true'
     DISABLE_AUTHENTICATION = os.environ.get('DISABLE_AUTHENTICATION', 'False').lower() == 'true'
     DISABLE_ENEMY_AI = os.environ.get('DISABLE_ENEMY_AI', 'False').lower() == 'true'
