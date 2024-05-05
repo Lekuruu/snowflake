@@ -119,29 +119,7 @@ class MatchmakingQueue:
         # Start game loop
         game.server.runThread(game.start)
 
-    def get_debug_players(self, players: List[Penguin]) -> List[Penguin]:
-        elements = ['snow', 'water', 'fire']
-        battle_mode = players[0].battle_mode
-
-        for player in players:
-            elements.remove(player.element)
-
-        for element in elements:
-            debug_player = Penguin(player.server, player.address)
-            debug_player.pid = -1
-            debug_player.name = f'Debug {element.title()} Player'
-            debug_player.element = element
-            debug_player.battle_mode = battle_mode
-            debug_player.in_queue = True
-            debug_player.is_ready = True
-            debug_player.logged_in = True
-            debug_player.disconnected = True
-            debug_player.object = player.object
-            players.append(debug_player)
-
-        return players
-
-    def get_none_players(self, players: List[Penguin]) -> List[Penguin]:
+    def insert_none_players(self, players: List[Penguin]) -> List[Penguin]:
         player_dict = {
             'fire': None,
             'snow': None,
@@ -167,7 +145,7 @@ class MatchmakingQueue:
             return
 
         # Fill up missing players with "None"
-        players = self.get_none_players([player])
+        players = self.insert_none_players([player])
 
         self.logger.info(f'Found match: {players}')
 
