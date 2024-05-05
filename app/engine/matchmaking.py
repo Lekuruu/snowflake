@@ -133,7 +133,7 @@ class MatchmakingQueue:
         players.sort(key=lambda x: x.element)
         return players
 
-    def get_none_players(self, players: List[Penguin]) -> List[Penguin]:
+    def insert_none_players(self, players: List[Penguin]) -> List[Penguin]:
         player_dict = {
             'fire': None,
             'snow': None,
