@@ -133,7 +133,7 @@ class MatchmakingQueue:
 
         return players
 
-    def get_none_players(self, players: List[Penguin]) -> List[Penguin]:
+    def insert_none_players(self, players: List[Penguin]) -> List[Penguin]:
         player_dict = {
             'fire': None,
             'snow': None,
@@ -159,7 +159,7 @@ class MatchmakingQueue:
             return
 
         # Fill up missing players with "None"
-        players = self.get_none_players([player])
+        players = self.insert_none_players([player])
 
         self.logger.info(f'Found match: {players}')
 
