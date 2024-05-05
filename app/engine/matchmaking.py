@@ -26,7 +26,7 @@ class MatchmakingQueue:
         player.queue_time = time.time()
         player.in_queue = True
 
-        if (match := self.find_match(player)):
+        if len(match := self.find_match(player)) >= 3:
             self.logger.info(f'Found match: {match}')
 
             match_types = {
@@ -73,9 +73,6 @@ class MatchmakingQueue:
 
             # Add closest match
             players.append(matches[0])
-
-        if len(players) != 3:
-            return
 
         players.sort(key=lambda x: x.element)
         return players
@@ -160,8 +157,19 @@ class MatchmakingQueue:
             # Player has found a match
             return
 
+        # Find other players in queue
+        players = self.find_match(player)
+
+        for p in players:
+            required_time = config.MATCHMAKING_TIMEOUT / 2
+            time_in_queue = time.time() - p.queue_time
+
+            if time_in_queue < required_time:
+                # Player has not been in queue long enough
+                players.remove(p)
+
         # Fill up missing players with "None"
-        players = self.insert_none_players([player])
+        players = self.insert_none_players(players)
 
         self.logger.info(f'Found match: {players}')
 
