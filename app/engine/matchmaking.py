@@ -11,6 +11,7 @@ from .game import Game
 
 import logging
 import config
+import time
 
 class MatchmakingQueue:
     def __init__(self) -> None:
@@ -21,6 +22,7 @@ class MatchmakingQueue:
         self.players.add(player)
 
         player.logger.info(f'Joined matchmaking queue with "{player.element}"')
+        player.queue_time = time.time()
         player.in_queue = True
 
         if (match := self.find_match(player)):
