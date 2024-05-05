@@ -146,11 +146,11 @@ class MatchmakingQueue:
         return list(player_dict.values())
 
     def fill_queue(self, player: Penguin) -> None:
-        if player.battle_mode == 0 and not config.ALLOW_SINGLEPLAYER_SNOW:
+        if player.battle_mode == 0 and not config.ALLOW_FORCESTART_SNOW:
             # Singleplayer snow is disabled
             return
 
-        if player.battle_mode == 1 and not config.ALLOW_SINGLEPLAYER_TUSK:
+        if player.battle_mode == 1 and not config.ALLOW_FORCESTART_TUSK:
             # Singleplayer tusk is disabled
             return
 
