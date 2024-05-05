@@ -285,7 +285,7 @@ class Game:
 
                 if client.is_bot:
                     reactor.callLater(
-                        random.randint(0.5, 3),
+                        random.uniform(0.5, 3),
                         client.select_move
                     )
 
