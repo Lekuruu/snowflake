@@ -59,7 +59,7 @@ If something went wrong, you will most likely see this screen pop up:
 ![image](https://raw.githubusercontent.com/Lekuruu/snowflake/main/.github/screenshots/troubleshooting.png)
 
 There are many reasons why this could be happening.
-Here are some things to check:
+Here are some basic things to check:
 
 1. Ensure that port 7002 is accessible from the outside
 
@@ -69,6 +69,15 @@ Here are some things to check:
 
 4. Ensure your copies of houdini and dash are up-to-date
 
-If all of that didn't work, check if your server is `https` only, i.e. only allowing secure ssl connections. If that is the case, you need to replace the `flash_client_base_fp11.swf` inside `/game/mpassets/playclients/r3662/` with [this file](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/flash_client_base_fp11.swf).
+### Issues with policy file requests
+
+There have been multiple users experiencing issues with flash's policy file requests (e.g. in [here](https://github.com/Lekuruu/snowflake/issues/42)).
+This might be resolved, by setting `ENABLE_POLICY_SERVER` to `True` in your `.env` file.
+
+### HTTPS-only Servers
+
+You might want to check if your server is `https` only, i.e. only allowing secure ssl connections. If that is the case, you need to replace the `flash_client_base_fp11.swf` inside `/game/mpassets/playclients/r3662/` with [this file](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/flash_client_base_fp11.swf).
+
+---
 
 Feel free to contact me on Discord (@lekuru), or per E-Mail ([contact@lekuru.xyz](mailto:contact@lekuru.xyz)), for further support.
