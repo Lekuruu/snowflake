@@ -58,6 +58,25 @@ class PenguinAI(Penguin):
         confirm.play_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8')
         self.is_ready = True
 
+    @delay(0.25, 1.5)
+    def confirm_move(self) -> None:
+        if self.is_ready:
+            return
+
+        confirm = GameObject(
+            self.game,
+            'ui_confirm',
+            x_offset=0.5,
+            y_offset=1.05
+        )
+
+        confirm.x = self.ninja.x
+        confirm.y = self.ninja.y
+        confirm.place_object()
+        confirm.place_sprite(confirm.name)
+        confirm.play_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8')
+        self.is_ready = True
+
     @delay(0.5, 3)
     def select_move(self) -> None:
         if self.ninja.hp <= 0:
