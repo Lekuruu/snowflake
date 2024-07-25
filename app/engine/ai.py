@@ -19,6 +19,16 @@ def delay(min: float, max: float) -> Callable:
         )
     return decorator
 
+import random
+
+def delay(min: int, max: int) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        return lambda *args, **kwargs: reactor.callLater(
+            random.uniform(min, max),
+            func, *args, **kwargs
+        )
+    return decorator
+
 class PenguinAI(Penguin):
     def __init__(self, server, element: str, battle_mode: int) -> None:
         super().__init__(server, IPv4Address('TCP', '127.0.0.1', 69420))
@@ -61,8 +71,8 @@ class PenguinAI(Penguin):
                     break
             else:
                 self.action_strategy()
-        
-        self.confirm_move() 
+
+        self.confirm_move()
 
     def handle_knockout(self) -> None:
         if self.member_card:
@@ -91,7 +101,7 @@ class PenguinAI(Penguin):
         for target in self.ninja.targets:  # enemies and allies appended to "targets" in "ninjas.py" "show_targets"
             if x == target.x and y == target.y:
                 target.select()
-                break  
+                break
 
     def adjusted_move_range(self) -> tuple[int, int, int, int]:
         # constrain moving range within the grid boundaries
@@ -107,7 +117,7 @@ class PenguinAI(Penguin):
     def valid_moves(self) -> list[tuple[int, int]]:  # Return a list of valid moves
         min_x, max_x, min_y, max_y = self.adjusted_move_range()
         valid_positions = []  # Initialize an empty list to store valid positions
-    
+
         for x in range(min_x, max_x + 1):
             for y in range(min_y, max_y + 1):
                 position = (x, y)
@@ -131,7 +141,7 @@ class PenguinAI(Penguin):
             self.cards_queue.append(new_card)
             self.send_message(f"(drawn card) cards queued == {[card.id for card in self.cards_queue]}")
             self.game.pending_cards += 1
-            
+
         return self.cards_queue[0] if self.cards_queue else None
 
     def card_being_placed(self) -> bool:
@@ -146,7 +156,7 @@ class PenguinAI(Penguin):
             obj != self.ninja and self.game.grid.distance_with_obstacles(
                 (self.ninja.x, self.ninja.y), (obj.x, obj.y)
             ) <= query_range
-        )       
+        )
 
     def ninjas_within_range(self) -> Iterator[Ninja]:
         return (
@@ -160,10 +170,10 @@ class PenguinAI(Penguin):
         last_distance = float('inf')
 
         desired_distance = self.get_desired_distance()
-        
+
         selection = None
-        new_position = None 
-        attack_coords = None 
+        new_position = None
+        attack_coords = None
         attacker_name = None
         attacker_health_loss_percent = None
 
@@ -190,15 +200,15 @@ class PenguinAI(Penguin):
         self.handle_ghost_placement(new_position, old_position)
 
         if self.game.enemies and self.game.enemies[0].name == "Tusk":
-            last_distance -= 1  
-        
+            last_distance -= 1
+
         if last_distance <= self.ninja.range:
             selection = attack_coords
             self.send_message(f"is attacking {attacker_name}")
 
         ninja_coords = None
         adjusted_selection = None
-        
+
         if self.element == 'snow':
             healing = self.check_healing(selection)
             if healing:  # Check if the result is not None
@@ -208,7 +218,7 @@ class PenguinAI(Penguin):
         if not selection:
             return
 
-        if not self.handle_card_placement(selection, ninja_coords, attack_coords, attacker_health_loss_percent, adjusted_selection):        
+        if not self.handle_card_placement(selection, ninja_coords, attack_coords, attacker_health_loss_percent, adjusted_selection):
             self.select_target(*selection)
 
 
@@ -260,12 +270,12 @@ class PenguinAI(Penguin):
                 self.logger.info(f"{ninja.name} is {health_lost_percent}% damaged")
                 if 30 <= health_lost_percent < 100:
                     self.logger.info(f"-- {ninja.name} Meets the Damage Threshold for {self.element}")
-                    if health_lost_percent > 70 or not selection or random.choice([True, True, False]):                    
+                    if health_lost_percent > 70 or not selection or random.choice([True, True, False]):
                         if ninja.placed_ghost:
-                            adjusted_selection = (ninja.ghost.x, ninja.ghost.y)                            
-                        self.send_message(f"is healing {ninja.name}")                     
+                            adjusted_selection = (ninja.ghost.x, ninja.ghost.y)
+                        self.send_message(f"is healing {ninja.name}")
                         return ninja_coords, adjusted_selection
-                        
+
 
     def handle_card_placement(self, selection: tuple[int, int], ninja_coords: tuple[int, int], attack_coords: tuple[int, int], attacker_health_loss_percent: int, adjusted_selection):
 
@@ -277,7 +287,7 @@ class PenguinAI(Penguin):
                     card_xy = ninja_coords
                     if adjusted_selection:
                         card_xy = adjusted_selection
-                    
+
             elif attacker_health_loss_percent > 30:
                 self.send_message("attacker meets health requirements for card")
                 card_xy = attack_coords
@@ -287,9 +297,9 @@ class PenguinAI(Penguin):
             self.cards_queue.pop(0)
             self.send_message(f"(place card) -- cards queued == {[card.id for card in self.cards_queue]}")
             return True
-            
-        return False   
-        
+
+        return False
+
 
     def unlock_stamp(self, id: int, session: Session | None = None) -> None:
         pass
