@@ -79,6 +79,7 @@ class PenguinAI(Penguin):
 
     @delay(0.5, 3)
     def select_move(self) -> None:
+        # Check for k.o. state
         if self.ninja.hp <= 0:
             self.handle_knockout()
 
