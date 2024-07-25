@@ -287,10 +287,7 @@ class Game:
                     self.send_tip(TipPhase.CARD, client)
 
                 if client.is_bot:
-                    reactor.callLater(
-                        random.uniform(0.5, 3),
-                        client.select_move
-                    )
+                    client.select_move()
 
             self.show_targets()
             self.wait_for_timer()

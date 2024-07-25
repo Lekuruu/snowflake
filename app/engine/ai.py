@@ -1,8 +1,23 @@
 
+from __future__ import annotations
+from typing import Callable
+
 from twisted.internet.address import IPv4Address
+from twisted.internet import reactor
 
 from app.engine.penguin import Penguin
+from app.objects import GameObject
 from app.data import penguins
+
+import random
+
+def delay(min: int, max: int) -> Callable:
+    def decorator(func: Callable) -> Callable:
+        return lambda *args, **kwargs: reactor.callLater(
+            random.uniform(min, max),
+            func, *args, **kwargs
+        )
+    return decorator
 
 class PenguinAI(Penguin):
     def __init__(
@@ -22,6 +37,6 @@ class PenguinAI(Penguin):
         self.logged_in = True
         self.is_bot = True
 
+    @delay(0.5, 3)
     def select_move(self) -> None:
-        # TODO: Implement move selection
         ...
