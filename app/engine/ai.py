@@ -58,6 +58,7 @@ class PenguinAI(Penguin):
 
     @delay(0.5, 3)
     def select_move(self) -> None:
+        # Check for k.o. state
         if self.ninja.hp <= 0:
             if not self.member_card:
                 self.confirm_move()
@@ -67,5 +68,25 @@ class PenguinAI(Penguin):
             self.confirm_move()
             return
 
-        # TODO: Moving, Attacking, Powercards
-        self.confirm_move()
+        actions = {
+            'snow': self.snow_actions,
+            'water': self.water_actions,
+            'fire': self.fire_actions
+        }
+
+        actions[self.element]()
+
+    def snow_actions(self) -> None:
+        # Snow should keep a distance from all enemies
+        # and focus on healing their allies
+        ...
+
+    def fire_actions(self) -> None:
+        # Fire should keep a distance from all enemies
+        # and focus on attacking their enemies
+        ...
+
+    def water_actions(self) -> None:
+        # Water needs to move as close as possible to their
+        # enemies and focus on attacking them
+        ...
