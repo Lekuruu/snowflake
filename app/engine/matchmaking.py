@@ -127,8 +127,8 @@ class MatchmakingQueue:
             elements.remove(player.element)
 
         for element in elements:
-            debug_player = PenguinAI(player.server, element, battle_mode)
-            players.append(debug_player)
+            ai_player = PenguinAI(player.server, element, battle_mode)
+            players.append(ai_player)
 
         players.sort(key=lambda x: x.element)
         return players
@@ -146,11 +146,11 @@ class MatchmakingQueue:
         return list(player_dict.values())
 
     def fill_queue(self, player: Penguin) -> None:
-        if player.battle_mode == 0 and not config.ALLOW_SINGLEPLAYER_SNOW:
+        if player.battle_mode == 0 and not config.ALLOW_FORCESTART_SNOW:
             # Singleplayer snow is disabled
             return
 
-        if player.battle_mode == 1 and not config.ALLOW_SINGLEPLAYER_TUSK:
+        if player.battle_mode == 1 and not config.ALLOW_FORCESTART_TUSK:
             # Singleplayer tusk is disabled
             return
 
