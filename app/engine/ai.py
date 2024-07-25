@@ -58,4 +58,14 @@ class PenguinAI(Penguin):
 
     @delay(0.5, 3)
     def select_move(self) -> None:
-        ...
+        if self.ninja.hp <= 0:
+            if not self.member_card:
+                self.confirm_move()
+                return
+
+            self.member_card.place()
+            self.confirm_move()
+            return
+
+        # TODO: Moving, Attacking, Powercards
+        self.confirm_move()
