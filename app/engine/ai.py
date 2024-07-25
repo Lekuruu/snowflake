@@ -74,8 +74,8 @@ class PenguinAI(Penguin):
             if not ninja.hp <= 0:
                 continue
 
-            # if ninja.client.member_card:
-            #     continue
+            if ninja.client.member_card:
+                continue
 
             if self.is_ninja_getting_revived(ninja):
                 continue
