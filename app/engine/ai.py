@@ -6,6 +6,7 @@ from twisted.internet.address import IPv4Address
 from twisted.internet import reactor
 
 from app.engine.penguin import Penguin
+from app.objects.ninjas import Ninja
 from app.objects import GameObject
 from app.data import penguins
 
@@ -68,6 +69,24 @@ class PenguinAI(Penguin):
             self.confirm_move()
             return
 
+        # Check for k.o. allies
+        for ninja in self.game.ninjas:
+            if not ninja.hp <= 0:
+                continue
+
+            # if ninja.client.member_card:
+            #     continue
+
+            if self.is_ninja_getting_revived(ninja):
+                continue
+
+            if not self.can_heal_ninja(ninja):
+                continue
+
+            self.select_target(ninja.x, ninja.y)
+            self.confirm_move()
+            return
+
         actions = {
             'snow': self.snow_actions,
             'water': self.water_actions,
@@ -75,6 +94,19 @@ class PenguinAI(Penguin):
         }
 
         actions[self.element]()
+        self.confirm_move()
+
+    def select_target(self, x: int, y: int) -> None:
+        target = next(
+            (target for target in self.ninja.targets
+            if target.x == x and target.y == y),
+            None
+        )
+
+        if not target:
+            return
+
+        target.select()
 
     def snow_actions(self) -> None:
         # Snow should keep a distance from all enemies
@@ -90,3 +122,40 @@ class PenguinAI(Penguin):
         # Water needs to move as close as possible to their
         # enemies and focus on attacking them
         ...
+
+    def is_ninja_getting_revived(self, ninja: Ninja) -> bool:
+        for ninja in self.game.ninjas:
+            if ninja.selected_object == ninja:
+                return True
+
+        return False
+
+    def can_heal_ninja(self, target: Ninja) -> bool:
+        tiles = self.game.grid.surrounding_tiles(
+            target.x,
+            target.y
+        )
+
+        for tile in tiles:
+            can_move = self.game.grid.can_move_to_tile(
+                self.ninja,
+                tile.x,
+                tile.y
+            )
+
+            if not can_move:
+                continue
+
+            self.ninja.place_ghost(tile.x, tile.y)
+            return True
+
+        current_tile = self.game.grid[self.ninja.x, self.ninja.y]
+
+        if current_tile in tiles:
+            return True
+
+        return False
+
+    def unlock_stamp(self, id, session) -> None:
+        # Bots don't have an account for stamps
+        pass
