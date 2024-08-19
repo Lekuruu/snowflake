@@ -431,8 +431,28 @@ class Ninja(GameObject):
 
             distance = abs(tile.x - target_x) + abs(tile.y - target_y)
 
-            if distance <= self.range + target_object.tile_range:
+            if distance <= self.range:
                 yield tile
+
+            if target_object.tile_range <= 0:
+                continue
+
+            # Enemy has a bigger tile range to be attacked from
+            # Check if the ninja can attack in that range
+            surrounding_tiles = self.game.grid.surrounding_tiles(
+                center_x=tile.x,
+                center_y=tile.y,
+                distance=target_object.tile_range
+            )
+
+            for surrounding_tile in surrounding_tiles:
+                distance = (
+                    abs(surrounding_tile.x - target_x) +
+                    abs(surrounding_tile.y - target_y)
+                )
+
+                if distance <= self.range:
+                    yield tile
 
     def healable_tiles(self, target_x: int, target_y: int) -> Iterator["Ninja"]:
         if self.hp <= 0:
@@ -464,7 +484,7 @@ class Ninja(GameObject):
                 if ninja.hp > 0:
                     continue
 
-                # Ninja is dead, limit range to sorrounding tiles
+                # Ninja is dead, limit range to surrounding tiles
                 tiles = self.game.grid.surrounding_tiles(ninja.x, ninja.y)
                 current_tile = self.game.grid.get_tile(target_x, target_y)
 
