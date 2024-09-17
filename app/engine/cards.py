@@ -1,12 +1,11 @@
 
 from __future__ import annotations
 from typing import Tuple, List, TYPE_CHECKING
-from twisted.internet import reactor
 
 from app.data import Card, TipPhase
 from app.objects import GameObject, LocalGameObject
-from app.objects.ninjas import Ninja
 from app.objects.enemies import Enemy
+from app.objects.ninjas import Ninja
 from app.objects.effects import (
     WaterPowerBeam,
     FirePowerBeam,
@@ -58,6 +57,12 @@ class CardObject(Card):
         return self.object.y
 
     @property
+    def targets(self) -> List[GameObject]:
+        return set(self.game.grid.objects_in_range(
+            *self.pattern_range(self.x, self.y)
+        ))
+
+    @property
     def element_name(self) -> str:
         return {
             'f': 'fire',
@@ -66,10 +71,19 @@ class CardObject(Card):
         }.get(self.element)
 
     @property
-    def targets(self) -> List[GameObject]:
-        return set(self.game.grid.objects_in_range(
-            *self.pattern_range(self.x, self.y)
-        ))
+    def card_data(self) -> dict:
+        return {
+            "card_id": self.id,
+            "color": self.color,
+            "description": self.description,
+            "element": self.element,
+            "label": self.name,
+            "name": self.name,
+            "power_id": self.power_id,
+            "prompt": self.name,
+            "set_id": self.set_id,
+            "value": self.value
+        }
 
     def place(self, x: int, y: int) -> None:
         self.place_card_sprite(x, y)
@@ -150,7 +164,8 @@ class CardObject(Card):
 
         # Wait for client to consume card
         self.game.callbacks.wait_for_client(
-            'ConsumeCardResponse', self.client,
+            'ConsumeCardResponse',
+            client=self.client,
             timeout=2
         )
 
@@ -174,18 +189,7 @@ class CardObject(Card):
 
             if self.client != client:
                 payload_name = 'showCaseOthersCard'
-                data["cardData"] = {
-                    "card_id": self.id,
-                    "color": self.color,
-                    "description": self.description,
-                    "element": self.element,
-                    "label": self.name,
-                    "name": self.name,
-                    "power_id": self.power_id,
-                    "prompt": self.name,
-                    "set_id": self.set_id,
-                    "value": self.value
-                }
+                data["cardData"] = self.card_data
 
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload(payload_name, data)
@@ -250,12 +254,6 @@ class CardObject(Card):
                 Explosion(self.game, target.x, target.y).play()
 
     def apply_effects(self) -> None:
-        # NOTE: Water & Snow effects seems to apply for *all* ninjas,
-        #       instead of the ones in range of the power card. I am
-        #       not sure if I like this approach, since it makes the
-        #       game easier overall. My goal is to replicate the game
-        #       as close as possible, so I will keep it like this for now.
-
         if self.element == 's':
             # Apply shield to all ninjas
             for ninja in self.game.ninjas:

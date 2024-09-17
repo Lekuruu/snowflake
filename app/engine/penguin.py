@@ -184,18 +184,7 @@ class Penguin(MetaplaceProtocol):
             update['stamina'] = 0
 
             if next_card := self.next_power_card():
-                update['cardData'] = {
-                    "card_id": next_card.id,
-                    "color": next_card.color,
-                    "description": next_card.description,
-                    "element": next_card.element,
-                    "label": next_card.name,
-                    "name": next_card.name,
-                    "power_id": next_card.power_id,
-                    "prompt": next_card.name,
-                    "set_id": next_card.set_id,
-                    "value": next_card.value
-                }
+                update['cardData'] = next_card.card_data
 
             if len(self.power_card_slots) > 3:
                 update['cycle'] = True
