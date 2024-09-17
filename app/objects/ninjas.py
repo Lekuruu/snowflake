@@ -766,7 +766,7 @@ class SnowNinja(Ninja):
 
         projectile = SnowProjectile(self.game, self.x, self.y)
         projectile.play(x, y)
-        reactor.callLater(0.2, projectile.remove_object)
+        self.do_later(0.2, projectile.remove_object)
 
     def heal_animation(self) -> None:
         self.animate_object(
@@ -903,7 +903,7 @@ class FireNinja(Ninja):
     def projectile_animation(self, x: int, y: int) -> None:
         projectile = FireProjectile(self.game, self.x, self.y)
         projectile.play(x, y)
-        reactor.callLater(0.25, projectile.remove_object)
+        self.do_later(0.25, projectile.remove_object)
 
     def win_animation(self) -> None:
         self.animate_object(

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
+from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
@@ -114,6 +115,9 @@ class GameObject:
             mirror_mode=self._mirror_mode
         )
 
+    def do_later(self, seconds: int, func: Callable, *args) -> None:
+        reactor.callLater(seconds, func, *args)
+
     def place_object(self) -> None:
         x = self.x
         y = self.y
@@ -136,6 +140,7 @@ class GameObject:
             0       # TODO
         )
 
+        # Apply sprite settings if they are not default
         if (
             self.origin_mode != OriginMode.NONE or
             self.mirror_mode != MirrorMode.NONE or
@@ -277,10 +282,10 @@ class GameObject:
 
     def reset_sprite_settings(self, *args) -> None:
         if any([
-            self._mirror_mode != MirrorMode.NONE,
-            self._origin_mode != OriginMode.NONE,
-            self._x_scale != 1,
-            self._y_scale != 1
+            self.mirror_mode != MirrorMode.NONE,
+            self.origin_mode != OriginMode.NONE,
+            self.x_scale != 1,
+            self.y_scale != 1
         ]):
             self.sprite_settings(
                 scale_x=1,

@@ -1,18 +1,12 @@
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, List
-from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.engine.game import Game
 
 from app.data import MirrorMode, OriginMode
-from app.objects import (
-    AssetCollection,
-    GameObject,
-    Asset
-)
+from app.objects import GameObject
 
 import time
 
@@ -41,7 +35,7 @@ class Effect(GameObject):
         )
         self.duration = duration
 
-    def play(self):
+    def play(self) -> None:
         self.place_object()
         self.place_sprite(self.name)
 
@@ -64,7 +58,7 @@ class AttackTile(Effect):
         self.place_sprite(self.name)
 
         if auto_remove:
-            reactor.callLater(0.2, self.remove_object)
+            self.do_later(0.2, self.remove_object)
 
 class HealTile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -85,7 +79,7 @@ class HealTile(Effect):
         self.place_sprite(self.name)
 
         if auto_remove:
-            reactor.callLater(0.2, self.remove_object)
+            self.do_later(0.2, self.remove_object)
 
 class HealParticles(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -103,7 +97,7 @@ class HealParticles(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 10, duration=self.duration * 1000)
-        reactor.callLater(self.duration, self.remove_object)
+        self.do_later(self.duration, self.remove_object)
 
 class AttackTileField:
     def __init__(self, game: "Game", center_x: int, center_y: int):
@@ -167,7 +161,7 @@ class DamageNumbers(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(*range, duration=self.duration * 1000)
-        reactor.callLater(self.duration, self.remove_object)
+        self.do_later(self.duration, self.remove_object)
 
 class HealNumbers(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -197,7 +191,7 @@ class HealNumbers(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(*range, duration=self.duration * 1000)
-        reactor.callLater(self.duration, self.remove_object)
+        self.do_later(self.duration, self.remove_object)
 
 class Explosion(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -215,7 +209,7 @@ class Explosion(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 4, duration=self.duration * 260)
-        reactor.callLater(self.duration, self.remove_object)
+        self.do_later(self.duration, self.remove_object)
 
 class SnowProjectile(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -377,7 +371,7 @@ class ScrapImpact(Effect):
     def play(self):
         self.place_object()
         self.place_sprite(self.name)
-        reactor.callLater(self.duration, self.remove_object)
+        self.do_later(self.duration, self.remove_object)
 
 class ScrapImpactLittle(Effect):
     def __init__(self, game: "Game", x: int, y: int):
@@ -604,7 +598,7 @@ class SnowIgloo(Effect):
         self.animate_object('blank_png', play_style='loop')
 
         if play_sound:
-            reactor.callLater(
+            self.do_later(
                 1.2, self.play_sound,
                 'sfx_mg_2013_cjsnow_impactpowercardsnow'
             )
@@ -682,7 +676,7 @@ class Shield(Effect):
         self.place_object()
         self.place_sprite('effect_shieldpop_anim')
         self.animate_sprite(0, 3, duration=200)
-        reactor.callLater(0.2, self.remove_object)
+        self.do_later(0.2, self.remove_object)
 
 class Rage(Effect):
     def __init__(self, game: "Game", x: int, y: int) -> None:
@@ -703,7 +697,7 @@ class Rage(Effect):
         self.move_object(x, y, duration=100)
         self.place_sprite('effect_ragehit_anim')
         self.animate_sprite(0, 11, duration=750)
-        reactor.callLater(0.7, self.remove_object)
+        self.do_later(0.7, self.remove_object)
 
 class MemberReviveBeam(Effect):
     def __init__(self, game: "Game", x: int, y: int) -> None:
@@ -737,7 +731,7 @@ class TuskIcicle(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 15, duration=800)
-        reactor.callLater(0.8, self.apply_damage)
+        self.do_later(0.8, self.apply_damage)
 
     def apply_damage(self) :
         target = self.game.grid[self.x, self.y]
@@ -785,4 +779,4 @@ class TuskPushRock(Effect):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 14, duration=self.duration * 1000)
-        reactor.callLater(self.duration, self.remove_object)
+        self.do_later(self.duration, self.remove_object)

@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine.tusk import TuskGame
     from app.engine.game import Game
-    from app.engine import Penguin
 
 from app.data import MirrorMode
 from app.objects import GameObject
@@ -165,7 +164,7 @@ class Enemy(GameObject):
                 self.game.exp += 75
 
             if not wait:
-                reactor.callLater(2.5, self.remove_object)
+                self.do_later(2.5, self.remove_object)
                 return
 
             self.game.wait_for_animations()
@@ -202,7 +201,7 @@ class Enemy(GameObject):
             self.flame = None
 
             # Reset animation
-            reactor.callLater(0.8, self.idle_animation, True)
+            self.do_later(0.8, self.idle_animation, True)
             return
 
         self.flame.rounds_left -= 1
@@ -903,7 +902,7 @@ class Tusk(Enemy):
 
             if result_x < ninja.x:
                 # Move ninja to the left
-                reactor.callLater(
+                self.do_later(
                     attack_delay, ninja.move_object,
                     result_x, ninja.y,
                     push_duration * 1000
@@ -911,7 +910,7 @@ class Tusk(Enemy):
 
             if ninja.hp > 0:
                 # Apply damage
-                reactor.callLater(
+                self.do_later(
                     attack_delay + (push_duration / 1.5),
                     ninja.set_health,
                     ninja.hp - self.attack, False
