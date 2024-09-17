@@ -9,7 +9,7 @@ def session_wrapper(func):
     Example usage:
     ```
     @session_wrapper
-    def fetch_one(id: int, session: Session | None = None) -> YourModel:
+    def fetch_one(id: int, session: Session = ...) -> YourModel:
         return session.query(YourModel).all()
 
     fetch_one(1)                   # Will use a new session

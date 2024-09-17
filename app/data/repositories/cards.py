@@ -9,24 +9,24 @@ from ..objects import Card, PenguinCard
 from .wrapper import session_wrapper
 
 @session_wrapper
-def fetch_one(id: int, session: Session | None = None) -> Card:
+def fetch_one(id: int, session: Session = ...) -> Card:
     return session.query(Card) \
         .filter(Card.id == id) \
         .first()
 
 @session_wrapper
-def fetch_all(session: Session | None = None) -> List[Card]:
+def fetch_all(session: Session = ...) -> List[Card]:
     return session.query(Card) \
         .all()
 
 @session_wrapper
-def fetch_by_element(element: str, session: Session | None = None) -> List[Card]:
+def fetch_by_element(element: str, session: Session = ...) -> List[Card]:
     return session.query(Card) \
         .filter(Card.element == element) \
         .all()
 
 @session_wrapper
-def fetch_power_cards(session: Session | None = None) -> List[Card]:
+def fetch_power_cards(session: Session = ...) -> List[Card]:
     return session.query(Card) \
         .filter(Card.power_id > 0) \
         .all()
@@ -35,7 +35,7 @@ def fetch_power_cards(session: Session | None = None) -> List[Card]:
 def fetch_by_penguin_id(
     penguin_id: int,
     element: str,
-    session: Session | None = None
+    session: Session = ...
 ) -> List[Card]:
     return session.query(Card) \
         .join(PenguinCard) \
@@ -47,7 +47,7 @@ def fetch_by_penguin_id(
 def fetch_power_cards_by_penguin_id(
     penguin_id: int,
     element: str,
-    session: Session | None = None
+    session: Session = ...
 ) -> List[Card]:
     # Subquery to generate series of cards, based on quantity
     subquery = session.query(
@@ -67,7 +67,7 @@ def fetch_power_cards_by_penguin_id(
 def fetch_count(
     penguin_id: int,
     element: str,
-    session: Session | None = None
+    session: Session = ...
 ) -> int:
     return session.query(func.sum(PenguinCard.quantity)) \
         .join(Card) \
@@ -79,7 +79,7 @@ def fetch_count(
 def fetch_power_card_count(
     penguin_id: int,
     element: str,
-    session: Session | None = None
+    session: Session = ...
 ) -> int:
     return session.query(func.sum(PenguinCard.quantity)) \
         .join(Card) \
