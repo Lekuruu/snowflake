@@ -8,13 +8,13 @@ from ..objects import Stamp, PenguinStamp
 from .wrapper import session_wrapper
 
 @session_wrapper
-def fetch_one(id: int, session: Session | None = None) -> Stamp | None:
+def fetch_one(id: int, session: Session = ...) -> Stamp | None:
     return session.query(Stamp) \
         .filter(Stamp.id == id) \
         .first()
 
 @session_wrapper
-def fetch_all_by_group(group_id: int, session: Session | None = None) -> List[Stamp]:
+def fetch_all_by_group(group_id: int, session: Session = ...) -> List[Stamp]:
     return session.query(Stamp) \
         .filter(Stamp.group_id == group_id) \
         .all()
@@ -23,7 +23,7 @@ def fetch_all_by_group(group_id: int, session: Session | None = None) -> List[St
 def fetch_by_penguin_id(
     penguin_id: int,
     group_id: int | None = None,
-    session: Session | None = None
+    session: Session = ...
 ) -> List[Stamp]:
     query = session.query(Stamp) \
         .join(PenguinStamp, Stamp.id == PenguinStamp.stamp_id) \
@@ -38,7 +38,7 @@ def fetch_by_penguin_id(
 def add(
     id: int,
     penguin_id: int,
-    session: Session | None = None
+    session: Session = ...
 ) -> Stamp:
     penguin_stamp = PenguinStamp(penguin_id=penguin_id, stamp_id=id)
     session.add(penguin_stamp)
@@ -49,7 +49,7 @@ def add(
 def remove(
     id: int,
     penguin_id: int,
-    session: Session | None = None
+    session: Session = ...
 ) -> int:
     rows = session.query(PenguinStamp) \
         .filter_by(penguin_id=penguin_id, stamp_id=id) \
@@ -61,7 +61,7 @@ def remove(
 def exists(
     id: int,
     penguin_id: int,
-    session: Session | None = None
+    session: Session = ...
 ) -> bool:
     return session.query(PenguinStamp) \
         .filter_by(penguin_id=penguin_id, stamp_id=id) \
@@ -71,7 +71,7 @@ def exists(
 def completed_group(
     penguin_id: int,
     group_id: int,
-    session: Session | None = None
+    session: Session = ...
 ) -> bool:
     total = session.query(Stamp) \
         .filter(Stamp.group_id == group_id) \
