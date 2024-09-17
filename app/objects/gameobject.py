@@ -282,10 +282,10 @@ class GameObject:
 
     def reset_sprite_settings(self, *args) -> None:
         if any([
-            self.mirror_mode != MirrorMode.NONE,
-            self.origin_mode != OriginMode.NONE,
-            self.x_scale != 1,
-            self.y_scale != 1
+            self._mirror_mode != MirrorMode.NONE,
+            self._origin_mode != OriginMode.NONE,
+            self._x_scale != 1,
+            self._y_scale != 1
         ]):
             self.sprite_settings(
                 scale_x=1,
