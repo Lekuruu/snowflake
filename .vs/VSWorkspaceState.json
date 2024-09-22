@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\app",
+    "\\app\\data",
+    "\\app\\data\\repositories",
+    "\\app\\engine",
+    "\\app\\handlers",
+    "\\app\\handlers\\game",
+    "\\app\\objects",
+    "\\app\\protocols",
+    "\\app\\protocols\\metaplace"
+  ],
+  "SelectedNode": "\\app\\engine\\ai.py",
+  "PreviewInSolutionExplorer": false
+}

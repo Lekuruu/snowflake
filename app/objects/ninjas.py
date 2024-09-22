@@ -492,13 +492,15 @@ class Ninja(GameObject):
         if tile not in self.ghost_tiles_in_range():
             return
 
-        self.client.selected_card.place(x, y)
+        self.client.selected_card.place(x, y)    
 
     def use_powercard(self, is_combo=False) -> None:
         if not self.client.selected_card:
             return
 
         self.client.selected_card.use(is_combo)
+
+        self.game.pending_cards = max(self.game.pending_cards - 1, 0)
 
     """Animations"""
 

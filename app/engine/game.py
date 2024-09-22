@@ -48,6 +48,7 @@ class Game:
         self.map = random.randint(1, 3)
         self.total_combos = 0
         self.round = 0
+        self.turns = 0
         self.coins = 0
         self.exp = 0
 
@@ -60,6 +61,14 @@ class Game:
         self.logger = logging.getLogger('Game')
         self.backgrounds = []
         self.rocks = []
+
+        self.debugging = False
+
+        self.ai_elements = []
+        self.healing_ninja = None
+
+        self.pending_cards = 0
+
 
     @property
     def clients(self) -> List["Penguin"]:
@@ -176,8 +185,8 @@ class Game:
             if client.has_power_cards:
                 continue
 
-            snow_ui = client.get_window('cardjitsu_snowui.swf')
-            snow_ui.send_payload('noCards')
+            snow_ui = client.get_window('cardjitsu_snowui.swf') 
+            snow_ui.send_payload('noCards') # THIS
 
         # Run game loop until game ends
         self.run_game_loop()
@@ -275,20 +284,35 @@ class Game:
             self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
     def run_until_next_round(self) -> None:
+
         while True:
+
+            self.pending_cards = 0
+
             for client in self.clients:
                 client.selected_card = None
                 client.is_ready = False
-
                 # Reset ninja's rotation, if necessary
                 client.ninja.reset_sprite_settings()
 
-                if client.power_card_slots:
+                if client.has_power_cards: # otherwise --> snow_ui.send_payload('noCards') # THIS
+
                     self.send_tip(TipPhase.CARD, client)
+
+                    if client.is_bot: 
+                        self.ai_elements.append(client.element)
+                        cards = len(client.cards_queue)
+                    else:
+                        cards = client.cards_placed 
+
+                    self.pending_cards += cards
 
                 if client.is_bot:
                     client.select_move()
 
+            self.logger.info(f'new round : cards queued {self.pending_cards}')
+
+            self.assign_healing_ninja()
             self.show_targets()
             self.wait_for_timer()
 
@@ -301,8 +325,8 @@ class Game:
             self.hide_targets()
             self.remove_ui()
 
-            self.move_ninjas()
             self.do_ninja_actions()
+            self.move_ninjas()
             self.do_enemy_actions()
 
             # Check if any ninja is getting revived
@@ -345,11 +369,16 @@ class Game:
             if self.check_round_completion():
                 break
 
+    def assign_healing_ninja(self):
+        if self.ai_elements and not self.healing_ninja:                  
+            self.healing_ninja = "snow" if "snow" in self.ai_elements else random.choice(self.ai_elements)
+            self.logger.info(f'healing ninja assigned == : {self.healing_ninja}')
+
     def check_round_completion(self) -> bool:
         if self.server.shutting_down:
             self.close()
 
-        if all(client.disconnected for client in self.clients):
+        if all(client.disconnected for client in self.clients if not client.is_bot):
             self.close()
 
         if not self.enemies:
@@ -554,7 +583,7 @@ class Game:
         for object in self.objects.with_name('ui_confirm'):
             object.remove_object()
 
-        for client in self.clients:
+        for client in self.clients: 
             if not client.selected_card:
                 continue
 

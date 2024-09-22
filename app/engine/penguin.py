@@ -47,8 +47,8 @@ class Penguin(MetaplaceProtocol):
 
         self.member_card: MemberCard | None = None
         self.selected_card: CardObject | None = None
-        self.power_card_slots: List[CardObject] = []
-        self.power_cards: List[CardObject] = []
+        self.cards_available: List[CardObject] = []
+        self.cards_placed: int = 0
         self.unlocked_stamps: List[int] = []
         self.power_card_stamina: int = 0
         self.played_cards: int = 0
@@ -75,7 +75,7 @@ class Penguin(MetaplaceProtocol):
 
     @property
     def has_power_cards(self) -> bool:
-        return bool(self.power_cards or self.power_card_slots)
+        return bool(self.cards_available)
 
     @property
     def selected_member_card(self) -> bool:
@@ -149,60 +149,71 @@ class Penguin(MetaplaceProtocol):
         for card in power_cards:
             card_object = CardObject(card, self)
             card_object.color = card_color
-            self.power_cards.append(card_object)
+            self.cards_available.append(card_object)
 
     def next_power_card(self) -> CardObject | None:
-        if not self.power_cards:
+        
+        if not self.has_power_cards:
             # Client has no more power cards
+            self.logger.info(f'{self.name} has no more power cards')
             return
 
-        if len(self.power_card_slots) >= 4:
-            # Client cannot hold more than 4 power cards
-            return
+        next_card = random.choice(self.cards_available)
+        self.cards_available.append(next_card)
+        self.cards_available.remove(next_card)
 
-        next_card = random.choice(self.power_cards)
-        self.power_card_slots.append(next_card)
-        self.power_cards.remove(next_card)
         return next_card
 
     def power_card_by_id(self, card_id: int) -> Card | None:
-        return next((c for c in self.power_card_slots if c.id == card_id), None)
+        return next((c for c in self.cards_available if c.id == card_id), None)
 
     def update_cards(self) -> None:
         if self.disconnected:
             return
 
-        self.power_card_stamina += 2
+        if self.is_bot:
+            return
 
-        update = {
-            'cardData': None,
-            'cycle': False,
-            'stamina': self.power_card_stamina
-        }
+        if self.has_power_cards:
 
-        if self.power_card_stamina >= 10:
-            self.power_card_stamina = 0
-            update['stamina'] = 0
+            self.power_card_stamina += 2
 
-            if next_card := self.next_power_card():
-                update['cardData'] = {
-                    "card_id": next_card.id,
-                    "color": next_card.color,
-                    "description": next_card.description,
-                    "element": next_card.element,
-                    "label": next_card.name,
-                    "name": next_card.name,
-                    "power_id": next_card.power_id,
-                    "prompt": next_card.name,
-                    "set_id": next_card.set_id,
-                    "value": next_card.value
-                }
+            update = {
+                'cardData': None,
+                'cycle': False,
+                'stamina': self.power_card_stamina
+            }
 
-            if len(self.power_card_slots) > 3:
-                update['cycle'] = True
+            if self.power_card_stamina >= 10: # add a new card
+                self.power_card_stamina = 0
 
-        snow_ui = self.get_window('cardjitsu_snowui.swf')
-        snow_ui.send_payload('updateStamina', update)
+                update['stamina'] = 0
+
+                if next_card := self.next_power_card():
+                    update['cardData'] = {
+                        "card_id": next_card.id,
+                        "color": next_card.color,
+                        "description": next_card.description,
+                        "element": next_card.element,
+                        "label": next_card.name,
+                        "name": next_card.name,
+                        "power_id": next_card.power_id,
+                        "prompt": next_card.name,
+                        "set_id": next_card.set_id,
+                        "value": next_card.value
+                    }
+
+                if update['cardData'] is not None:
+                    self.cards_placed += 1
+                    self.logger.info(f'{self.name} added card {update['cardData']['card_id']}')
+
+                if len(self.cards_available) > 3:
+                    update['cycle'] = True
+
+            self.logger.info(f'{self.name} stamina : {self.power_card_stamina}')
+
+            snow_ui = self.get_window('cardjitsu_snowui.swf')
+            snow_ui.send_payload('updateStamina', update)
 
     def consume_card(self, is_combo=False) -> None:
         if not self.selected_card:

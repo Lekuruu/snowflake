@@ -57,8 +57,9 @@ def on_card_deselect(client: Penguin, data: dict):
 @session.framework.register('ConsumeCardResponse')
 def on_card_consumed(client: Penguin, data: dict):
     try:
-        client.power_card_slots.remove(client.selected_card)
-        client.selected_card = None
+        client.cards_available.remove(client.selected_card)
+        client.selected_card = None        
+
     except ValueError:
         pass
 

@@ -164,8 +164,9 @@ class CardObject(Card):
             self.apply_effects()
 
         self.client.played_cards += 1
+        self.client.cards_placed = max(self.client.cards_placed - 1, 0)
         self.check_stamps(is_combo)
-        self.game.wait_for_animations()
+        self.game.wait_for_animations()       
 
     def consume(self) -> None:
         for client in self.game.clients:
