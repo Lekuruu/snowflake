@@ -52,6 +52,13 @@ class TuskGame(Game):
         self.backgrounds = []
         self.rocks = []
 
+        self.debugging = False
+
+        self.ai_elements = []
+        self.healing_ninja = None
+
+        self.pending_cards = 0
+
     @property
     def enemies(self) -> List[Enemy]:
         return self.objects.with_name('Tusk')
