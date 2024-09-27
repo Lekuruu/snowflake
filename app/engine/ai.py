@@ -32,13 +32,15 @@ class PenguinAI(Penguin):
         self.is_ready = True
         self.logged_in = True
         self.is_bot = True
-        self.powermetre = 0 # stamina
         self.cards_queue = []
+
+    def send_message(self, message: str) -> None:
+        self.logger.info(f'{self.element} {message}')
 
     @delay(0.25, 1.5)
     def confirm_move(self) -> None:
         if self.is_ready:
-            self.logger.info(f'{self.element} is already ready, skipping confirm_move.')
+            self.send_message("skipping confirm_move.")
             return
         confirm = GameObject(self.game, 'ui_confirm', x_offset=0.5, y_offset=1.05)
         confirm.x, confirm.y = self.ninja.x, self.ninja.y
@@ -53,7 +55,7 @@ class PenguinAI(Penguin):
             self.handle_knockout()
         for ninja in self.game.ninjas:
             if self.should_revive_ally(ninja):
-                self.logger.info(f'{self.element} is reviving ally at position: ({ninja.x}, {ninja.y}).')
+                self.send_message(f"reviving ally at position: ({ninja.x}, {ninja.y}")
                 self.select_target(ninja.x, ninja.y)
                 break  
         else: # no break in loop / no allies to revive
@@ -63,91 +65,33 @@ class PenguinAI(Penguin):
 
     def handle_knockout(self) -> None:
         if self.member_card:
-            self.logger.info(f'{self.element} is using a member card to revive themselves.')
+            self.send_message("is using a member card for revival.")
             self.member_card.place()
 
-    def is_ninja_getting_revived(self, ninja: Ninja) -> bool:
+    def is_ninja_selected(self, ninja: Ninja) -> bool:
         return any(ninja.selected_object == ninja for ninja in self.game.ninjas)
 
     def should_revive_ally(self, ninja: Ninja) -> bool:
         return (
             ninja.hp <= 0 and
             not ninja.client.member_card and
-            not self.is_ninja_getting_revived(ninja) and
-            self.can_heal_ninja(ninja)
+            not self.is_ninja_selected(ninja) and
+            self.within_range(ninja)
         )
 
+    def gain_stamina(self) -> None:
+        self.power_card_stamina += 2
+        self.send_message(f"stamina {self.power_card_stamina}")
+
     def action_strategy(self) -> None:
-        action_strategies = {
-            'snow': self.snow_strategy,
-            'water': self.water_strategy,
-            'fire': self.fire_strategy
-        }
-        strategy = action_strategies[self.element]
-        self.selection(strategy())
+        self.do_strategy()
+        self.gain_stamina()
 
     def select_target(self, x: int, y: int) -> None:
-        for target in self.ninja.targets: # enemies and allies appended to "targets" in "ninjas.py" "show_targets"
+        for target in self.ninja.targets:  # enemies and allies appended to "targets" in "ninjas.py" "show_targets"
             if x == target.x and y == target.y:
                 target.select()
-                break
-
-    def selection(self, position: tuple[int, int]) -> None:   
-        self.powermetre = min(self.powermetre + random.randint(1, 3), 10)
-
-        self.logger.info(f'{self.element} stamina {self.powermetre}')
-
-        if self.game.grid[position] is None: # pass tuple to grid
-            self.logger.info(f'{self.element} position >> : {position}')
-            self.ninja.place_ghost(*position) # "hide ghosts" and "move ninjas" in "run_until_next_round"   
-            
-        elif self.is_placing_power_card(position): 
-            return         
-
-        else:
-            self.select_target(*position)
-
-    def is_placing_power_card(self, position : tuple[int, int]) -> bool:
-        
-        if self.cards_available:
-            drawn_card = self.draw_card()
-
-            if drawn_card:           
-                self.selected_card = drawn_card
-
-                if self.game.pending_cards >= 3:
-                    self.selected_card.place(*position) 
-                    self.logger.info(f'{self.element} placed card {drawn_card.id}')
-                    self.cards_queue.pop(0)
-                    self.logger.info(f'{self.element} queue == {[card.id for card in self.cards_queue]}')
-                    return True      
-
-            return False
-
-    def draw_card(self):         
-        new_card = None
-        if self.powermetre == 10:
-            self.powermetre = 0
-            new_card = random.choice(self.cards_available)
-            self.cards_queue.append(new_card)
-            self.logger.info(f'{self.element} added card {new_card.id}')
-            self.logger.info(f'{self.element} queue == {[card.id for card in self.cards_queue]}')
-            self.logger.info(f'{self.element} stamina {self.powermetre}')
-            self.game.pending_cards += 1
-            self.logger.info(f'cards queued {self.game.pending_cards}')
-            
-        if len(self.cards_queue) >= 1:
-            new_card = self.cards_queue[0]
-        return new_card
-
-    def water_strategy(self) -> tuple[int, int]:
-        return self.ai_strategy() # range 1
-
-    def fire_strategy(self) -> tuple[int, int]:
-        return self.ai_strategy() # range 2
-
-    def snow_strategy(self) -> tuple[int, int]:
-        return self.ai_strategy() # healing | range 3
+                break  
 
     def adjusted_move_range(self) -> tuple[int, int, int, int]:
         # constrain moving range within the grid boundaries
@@ -160,90 +104,128 @@ class PenguinAI(Penguin):
             min(max_grid_y, ninja_y + move_range)
         )
 
-    def valid_moves(self) -> Iterator[tuple[int, int]]: # computes each value only when needed rather than all at once
+    def valid_moves(self) -> list[tuple[int, int]]:  # Return a list of valid moves
         min_x, max_x, min_y, max_y = self.adjusted_move_range()
+        valid_positions = []  # Initialize an empty list to store valid positions
     
         for x in range(min_x, max_x + 1):
             for y in range(min_y, max_y + 1):
                 position = (x, y)
                 ninja_position = (self.ninja.x, self.ninja.y)
 
-                if self.game.grid[x, y] is not None: # unobstructed / empty cell
+                if self.game.grid[x, y] is not None:  # Check if cell is obstructed
                     continue
 
                 distance = self.game.grid.distance_with_obstacles(ninja_position, position)
-                if distance > self.ninja.move: # distance within move range
+                if distance > self.ninja.move:  # Check if the position is within move range
                     continue
 
-                yield position
+                valid_positions.append(position)  # Append the valid position to the list
 
-    def can_heal_ninja(self, target: Ninja) -> bool:
-        ninja_area = self.game.grid.surrounding_tiles(target.x, target.y)
-        can_heal = any(self.game.grid.can_move_to_tile(self.ninja, tile.x, tile.y) for tile in ninja_area)
-        # obstacles are ignored in healing
-        return can_heal
+        return valid_positions  # Return the list of valid positions
 
-    def ninja_is_healable(self):
+    def drawn_card(self):
+        if self.power_card_stamina == 10:
+            self.power_card_stamina = 0
+            new_card = random.choice(self.owned_cards)
+            self.cards_queue.append(new_card)
+            self.send_message(f"added card {new_card.id}")
+            self.send_message(f"queue == {[card.id for card in self.cards_queue]}")
+            self.send_message(f"stamina {self.power_card_stamina}")
+            self.game.pending_cards += 1
+            self.send_message(f"game pending {self.game.pending_cards}")
+            
+        return self.cards_queue[0] if self.cards_queue else None
+
+    def card_being_placed(self) -> bool:
+        if self.owned_cards:
+            self.selected_card = self.drawn_card()
+            if self.selected_card and self.game.pending_cards >= 3:
+                return True
+        return False
+
+    def within_range(self, ninja: Ninja) -> bool:
+        ninja_area = self.game.grid.surrounding_tiles(ninja.x, ninja.y)
+        return any(self.game.grid.can_move_to_tile(self.ninja, tile.x, tile.y) for tile in ninja_area)
+
+    def ninjas_within_range(self)  -> Iterator[Ninja]:
         for ninja in self.game.ninjas:
-            if ninja.hp < ninja.max_hp * 0.60 and ninja != self.ninja: 
-                if self.can_heal_ninja(ninja):
-                    return ninja
+            if ninja != self.ninja:
+                if self.within_range(ninja):
+                    yield ninja
         return None
 
-    def ai_strategy(self) -> tuple[int, int]:
-        grid_selection = (self.ninja.x, self.ninja.y)
-
+    def do_strategy(self) -> tuple[int, int]:
+        selection = None
+        old_position = (self.ninja.x, self.ninja.y)
+        ninja_coords = old_position
         enemies = list(self.game.enemies)
+        old_distance = float('inf')
 
-        injured_ninja = self.ninja_is_healable()
-        if injured_ninja and self.element == self.game.healing_ninja:  # if a healable ninja is found
-            self.logger.info(f'{self.element} healing: {injured_ninja.name}')
-            return injured_ninja.x, injured_ninja.y
+        desired_distance = self.ninja.move
+        new_position, attack_coords = None, None
 
-        closest_enemy_distance, closest_enemy = float('inf'), None
-        previous_distance = float('inf')
+        # Iterate over valid positions
+        for position in [old_position] + self.valid_moves():
 
-        for position in self.valid_moves():
+            if self.element == "snow":
+                distance_allies, _ = min(
+                [(self.game.grid.distance(position, (ninja.x, ninja.y)), ninja) for ninja in self.game.ninjas],
+                key=lambda item: item[0]
+                )
+                if distance_allies >= self.ninja.move:
+                    continue  # Skip this position if too far from allies
 
-            better_position = False
-
-            enemy_distance, enemy = min(
+            # Calculate the minimum distance to enemies
+            min_distance, enemy_obj = min(
                 [(self.game.grid.distance_with_obstacles(position, (enemy.x, enemy.y)), enemy) for enemy in enemies],
-                key=lambda item: item[0]  # nearest enemy distance
+                key=lambda item: item[0]
             )
 
-            if self.element == self.game.healing_ninja:
+            is_valid = (
+                position == old_position or  # initialize 
+                min_distance == desired_distance or # maintain distance
+                min_distance < old_distance # closer distance
+            )
+        
+            # Skip if new position is no better or too close to enemies
+            if not is_valid or min_distance < desired_distance or min_distance == old_distance:
+                continue
+
+            # Update the new position and attack coordinates
+            new_position, attack_coords = position, (enemy_obj.x, enemy_obj.y)
+            old_distance = min_distance
+
+        # Place the ghost ninja if a valid new position was found
+        if new_position and new_position != old_position:
+            self.ninja.place_ghost(*new_position)
+
+        # Update selection for attack or card placement
+        if old_distance <= self.ninja.move:
+            selection = attack_coords
             
-                allies_distance, injured_ninja = max(
-                    [(self.game.grid.distance(position, (ninja.x, ninja.y)), ninja) for ninja in self.game.ninjas],
-                    key=lambda item: item[0]  
-                )  # furthest ally distance
+        previous_hp = 100
+        ninja_coords = None
 
-                if allies_distance < enemy_distance: 
-                    previous_distance = allies_distance  
-                    better_position = True
+        for ninja in self.ninjas_within_range():
 
+            if ninja.hp < previous_hp:
+                previous_hp = ninja.hp
+                ninja_coords = (ninja.x, ninja.y)
+
+            if 0 < ninja.hp < ninja.max_hp * (0.70 if self.element == "snow" else 0.50) and not self.is_ninja_selected(ninja):
+                selection = (ninja.x, ninja.y)
+
+        if selection:
+            if self.card_being_placed():
+                selection = ninja_coords if (self.element == 'snow' and ninja_coords) else attack_coords or selection
+                self.selected_card.place(*selection)
+                self.cards_queue.pop(0)
+                self.send_message(f"placed card {self.selected_card.id}")
+                self.send_message(f"queue == {[card.id for card in self.cards_queue]}")
             else:
-                if enemy_distance < previous_distance:
-                    previous_distance = enemy_distance
-                    better_position = True
+                self.select_target(*selection)
 
-            if better_position:
-                grid_selection = position
-                closest_enemy_distance, closest_enemy = enemy_distance, enemy
 
-            if self.game.debugging:   
-                tile = self.game.grid.get_tile(*grid_selection) 
-                tile.place_sprite(f"ui_card_{self.element}", self) # client
 
-        if closest_enemy_distance <= self.ninja.move:  # within range
-            self.logger.info(f'{self.element} attacking: {closest_enemy.name}')
-            return closest_enemy.x, closest_enemy.y  
-
-        else:  # reposition if out of range
-            return grid_selection
-
-    def unlock_stamp(self, id) -> None:
-        # bots have no stamps
-        pass
 

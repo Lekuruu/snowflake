@@ -3,8 +3,32 @@
   "WorkspaceRootPath": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\ai.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\ai.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\tusk.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\tusk.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\game.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\game.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\penguin.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\penguin.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\objects\\ninjas.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\objects\\ninjas.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\grid.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\grid.py||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\handlers\\game\\cards.py||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\handlers\\game\\cards.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\objects\\gameobject.py||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -15,36 +39,16 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\cards.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\game.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\game.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Games\\SoleroHoudini\\wand\\snowflake\\main.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:main.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\ai.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\ai.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\penguin.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\engine\\penguin.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\data\\repositories\\cards.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\data\\repositories\\cards.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\objects\\ninjas.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\objects\\ninjas.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\protocols\\metaplace\\windows.py||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\protocols\\metaplace\\windows.py||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\handlers\\game\\cards.py||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\handlers\\game\\cards.py||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\data\\assets.py||{8B382828-6202-11D1-8870-0000F87579D2}",
@@ -66,19 +70,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "tusk.py",
-              "DocumentMoniker": "c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\tusk.py",
-              "RelativeDocumentMoniker": "app\\engine\\tusk.py",
-              "ToolTip": "c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\tusk.py",
-              "RelativeToolTip": "app\\engine\\tusk.py",
-              "ViewState": "AgIAACkAAAAAAAAAAAAswDkAAAAhAAAAAAAAAA==",
+              "DocumentIndex": 5,
+              "Title": "grid.py",
+              "DocumentMoniker": "c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\grid.py",
+              "RelativeDocumentMoniker": "app\\engine\\grid.py",
+              "ToolTip": "c:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\grid.py",
+              "RelativeToolTip": "app\\engine\\grid.py",
+              "ViewState": "AgIAAEgAAAAAAAAAAAASwFgAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-22T07:52:58.209Z",
+              "WhenOpened": "2024-09-26T23:51:43.493Z",
               "EditorCaption": ""
             },
             {
@@ -87,20 +91,59 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 1,
+              "Title": "tusk.py",
+              "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\tusk.py",
+              "RelativeDocumentMoniker": "app\\engine\\tusk.py",
+              "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\tusk.py",
+              "RelativeToolTip": "app\\engine\\tusk.py",
+              "ViewState": "AgIAABUAAAAAAAAAAAAqwCYAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-09-22T07:52:58.209Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ai.py",
+              "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\ai.py",
+              "RelativeDocumentMoniker": "app\\engine\\ai.py",
+              "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\ai.py",
+              "RelativeToolTip": "app\\engine\\ai.py",
+              "ViewState": "AgIAAKsAAAAAAAAAAAAiwMQAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-09-17T22:07:41.713Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "game.py",
+              "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\game.py",
+              "RelativeDocumentMoniker": "app\\engine\\game.py",
+              "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\game.py",
+              "RelativeToolTip": "app\\engine\\game.py",
+              "ViewState": "AgIAAKMDAAAAAAAAAAAqwLQDAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-09-20T17:05:15.495Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "ninjas.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\objects\\ninjas.py",
               "RelativeDocumentMoniker": "app\\objects\\ninjas.py",
               "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\objects\\ninjas.py",
               "RelativeToolTip": "app\\objects\\ninjas.py",
-              "ViewState": "AgIAACsCAAAAAAAAAAAswEICAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAO4AAAAAAAAAAAASwPgAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2024-09-22T05:40:11.583Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "windows.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\protocols\\metaplace\\windows.py",
               "RelativeDocumentMoniker": "app\\protocols\\metaplace\\windows.py",
@@ -108,35 +151,38 @@
               "RelativeToolTip": "app\\protocols\\metaplace\\windows.py",
               "ViewState": "AgIAACMAAAAAAAAAAAAswDAAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-22T04:59:51.609Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "cards.py",
-              "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\data\\repositories\\cards.py",
-              "RelativeDocumentMoniker": "app\\data\\repositories\\cards.py",
-              "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\data\\repositories\\cards.py",
-              "RelativeToolTip": "app\\data\\repositories\\cards.py",
-              "ViewState": "AgIAACcAAAAAAAAAAAAAADMAAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-21T21:37:27.167Z"
+              "WhenOpened": "2024-09-22T04:59:51.609Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 10,
               "Title": "cards.py",
+              "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\data\\repositories\\cards.py",
+              "RelativeDocumentMoniker": "app\\data\\repositories\\cards.py",
+              "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\data\\repositories\\cards.py",
+              "RelativeToolTip": "app\\data\\repositories\\cards.py",
+              "ViewState": "AgIAACQAAAAAAAAAAIBJwDMAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2024-09-21T21:37:27.167Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "cards.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\handlers\\game\\cards.py",
               "RelativeDocumentMoniker": "app\\handlers\\game\\cards.py",
               "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\handlers\\game\\cards.py",
               "RelativeToolTip": "app\\handlers\\game\\cards.py",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAABUAAAAdAAAAAAAAAA==",
+              "ViewState": "AgIAAEMAAAAAAAAAAAAAAEMAAABZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-21T21:26:18.898Z"
+              "WhenOpened": "2024-09-21T21:26:18.898Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 7,
               "Title": "gameobject.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\objects\\gameobject.py",
               "RelativeDocumentMoniker": "app\\objects\\gameobject.py",
@@ -149,7 +195,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 8,
               "Title": "cards.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\cards.py",
               "RelativeDocumentMoniker": "app\\engine\\cards.py",
@@ -162,45 +208,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "game.py",
-              "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\game.py",
-              "RelativeDocumentMoniker": "app\\engine\\game.py",
-              "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\game.py",
-              "RelativeToolTip": "app\\engine\\game.py",
-              "ViewState": "AgIAAC8AAAAAAAAAAAAswEAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-20T17:05:15.495Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ai.py",
-              "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\ai.py",
-              "RelativeDocumentMoniker": "app\\engine\\ai.py",
-              "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\ai.py",
-              "RelativeToolTip": "app\\engine\\ai.py",
-              "ViewState": "AgIAADQAAAAAAAAAAAAmwHwAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-17T22:07:41.713Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "assets.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\data\\assets.py",
               "RelativeDocumentMoniker": "app\\data\\assets.py",
               "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\data\\assets.py",
               "RelativeToolTip": "app\\data\\assets.py",
-              "ViewState": "AgIAACcAAAAAAAAAAAAAADkAAAAgAAAAAAAAAA==",
+              "ViewState": "AgIAACQAAAAAAAAAAIBJwDkAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-21T15:50:32.851Z"
+              "WhenOpened": "2024-09-21T15:50:32.851Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "main.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\main.py",
               "RelativeDocumentMoniker": "main.py",
@@ -213,31 +234,33 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "enemies.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\objects\\enemies.py",
               "RelativeDocumentMoniker": "app\\objects\\enemies.py",
               "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\objects\\enemies.py",
               "RelativeToolTip": "app\\objects\\enemies.py",
-              "ViewState": "AgIAABsAAAAAAAAAAIBJwAMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABgAAAAAAAAAAIBZwAMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-18T01:18:59.101Z"
+              "WhenOpened": "2024-09-18T01:18:59.101Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 3,
               "Title": "penguin.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\penguin.py",
               "RelativeDocumentMoniker": "app\\engine\\penguin.py",
               "ToolTip": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\penguin.py",
               "RelativeToolTip": "app\\engine\\penguin.py",
-              "ViewState": "AgIAACUAAAAAAAAAAAAswDIAAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAC0AAAAAAAAAAAASwEQAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-18T01:17:07.125Z"
+              "WhenOpened": "2024-09-18T01:17:07.125Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "matchmaking.py",
               "DocumentMoniker": "C:\\Games\\SoleroHoudini\\wand\\snowflake\\app\\engine\\matchmaking.py",
               "RelativeDocumentMoniker": "app\\engine\\matchmaking.py",
@@ -245,7 +268,8 @@
               "RelativeToolTip": "app\\engine\\matchmaking.py",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAJsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-18T03:22:55.271Z"
+              "WhenOpened": "2024-09-18T03:22:55.271Z",
+              "EditorCaption": ""
             }
           ]
         }

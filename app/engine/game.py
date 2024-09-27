@@ -62,11 +62,6 @@ class Game:
         self.backgrounds = []
         self.rocks = []
 
-        self.debugging = False
-
-        self.ai_elements = []
-        self.healing_ninja = None
-
         self.pending_cards = 0
 
 
@@ -300,7 +295,6 @@ class Game:
                     self.send_tip(TipPhase.CARD, client)
 
                     if client.is_bot: 
-                        self.ai_elements.append(client.element)
                         cards = len(client.cards_queue)
                     else:
                         cards = client.cards_placed 
@@ -312,7 +306,6 @@ class Game:
 
             self.logger.info(f'new round : cards queued {self.pending_cards}')
 
-            self.assign_healing_ninja()
             self.show_targets()
             self.wait_for_timer()
 
@@ -368,11 +361,6 @@ class Game:
 
             if self.check_round_completion():
                 break
-
-    def assign_healing_ninja(self):
-        if self.ai_elements and not self.healing_ninja:                  
-            self.healing_ninja = "snow" if "snow" in self.ai_elements else random.choice(self.ai_elements)
-            self.logger.info(f'healing ninja assigned == : {self.healing_ninja}')
 
     def check_round_completion(self) -> bool:
         if self.server.shutting_down:

@@ -47,7 +47,7 @@ class Penguin(MetaplaceProtocol):
 
         self.member_card: MemberCard | None = None
         self.selected_card: CardObject | None = None
-        self.cards_available: List[CardObject] = []
+        self.owned_cards: List[CardObject] = []
         self.cards_placed: int = 0
         self.unlocked_stamps: List[int] = []
         self.power_card_stamina: int = 0
@@ -75,7 +75,7 @@ class Penguin(MetaplaceProtocol):
 
     @property
     def has_power_cards(self) -> bool:
-        return bool(self.cards_available)
+        return bool(self.owned_cards)
 
     @property
     def selected_member_card(self) -> bool:
@@ -149,7 +149,7 @@ class Penguin(MetaplaceProtocol):
         for card in power_cards:
             card_object = CardObject(card, self)
             card_object.color = card_color
-            self.cards_available.append(card_object)
+            self.owned_cards.append(card_object)
 
     def next_power_card(self) -> CardObject | None:
         
@@ -158,14 +158,21 @@ class Penguin(MetaplaceProtocol):
             self.logger.info(f'{self.name} has no more power cards')
             return
 
-        next_card = random.choice(self.cards_available)
-        self.cards_available.append(next_card)
-        self.cards_available.remove(next_card)
+        next_card = random.choice(self.owned_cards)
+        self.owned_cards.append(next_card)
+        self.owned_cards.remove(next_card)
 
         return next_card
 
     def power_card_by_id(self, card_id: int) -> Card | None:
-        return next((c for c in self.cards_available if c.id == card_id), None)
+        return next((c for c in self.owned_cards if c.id == card_id), None)
+
+    def update_cards(self) -> None:
+        if self.disconnected:
+            return
+
+        if self.is_bot:
+            return
 
     def update_cards(self) -> None:
         if self.disconnected:
@@ -207,7 +214,7 @@ class Penguin(MetaplaceProtocol):
                     self.cards_placed += 1
                     self.logger.info(f'{self.name} added card {update['cardData']['card_id']}')
 
-                if len(self.cards_available) > 3:
+                if len(self.owned_cards) > 3:
                     update['cycle'] = True
 
             self.logger.info(f'{self.name} stamina : {self.power_card_stamina}')
@@ -275,6 +282,10 @@ class Penguin(MetaplaceProtocol):
         infotip.send_payload('disable')
 
     def unlock_stamp(self, id: int, session: Session | None = None) -> None:
+        
+        if self.is_bot:
+            return
+        
         if config.DISABLE_STAMPS:
             return
 
