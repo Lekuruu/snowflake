@@ -44,30 +44,32 @@
               "$type": "Document",
               "DocumentIndex": 4,
               "Title": "cards.py",
-              "DocumentMoniker": "C:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\data\\repositories\\cards.py",
+              "DocumentMoniker": "c:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\data\\repositories\\cards.py",
               "RelativeDocumentMoniker": "app\\data\\repositories\\cards.py",
-              "ToolTip": "C:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\data\\repositories\\cards.py",
+              "ToolTip": "c:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\data\\repositories\\cards.py",
               "RelativeToolTip": "app\\data\\repositories\\cards.py",
               "ViewState": "AgIAAEUAAAAAAAAAAAAuwE4AAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2024-09-29T22:35:39.276Z",
-              "IsPinned": true
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+              "IsPinned": true,
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
               "Title": "manager.py",
-              "DocumentMoniker": "C:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\handlers\\windows\\manager.py",
+              "DocumentMoniker": "c:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\handlers\\windows\\manager.py",
               "RelativeDocumentMoniker": "app\\handlers\\windows\\manager.py",
-              "ToolTip": "C:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\handlers\\windows\\manager.py",
+              "ToolTip": "c:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\handlers\\windows\\manager.py",
               "RelativeToolTip": "app\\handlers\\windows\\manager.py",
               "ViewState": "AgIAABkAAAAAAAAAAAAqwCQAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-29T22:42:06.052Z"
+              "WhenOpened": "2024-09-29T22:42:06.052Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
@@ -79,7 +81,8 @@
               "RelativeToolTip": "app\\engine\\penguin.py",
               "ViewState": "AgIAAIYAAAAAAAAAAAAawKQAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-29T21:01:27.569Z"
+              "WhenOpened": "2024-09-29T21:01:27.569Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -91,7 +94,8 @@
               "RelativeToolTip": "app\\engine\\cards.py",
               "ViewState": "AgIAAEwBAAAAAAAAAAAuwFkBAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-29T21:00:33.744Z"
+              "WhenOpened": "2024-09-29T21:00:33.744Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -103,7 +107,8 @@
               "RelativeToolTip": "app\\objects\\ninjas.py",
               "ViewState": "AgIAABUAAAAAAAAAAAAAAFcEAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-29T20:59:14.979Z"
+              "WhenOpened": "2024-09-29T20:59:14.979Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -115,7 +120,8 @@
               "RelativeToolTip": "app\\engine\\game.py",
               "ViewState": "AgIAABsBAAAAAAAAAAAawCsBAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2024-09-29T20:44:23.853Z"
+              "WhenOpened": "2024-09-29T20:44:23.853Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -125,7 +131,7 @@
               "RelativeDocumentMoniker": "app\\engine\\ai.py",
               "ToolTip": "C:\\Users\\6smit\\Documents\\Games\\Solero\\wand\\snowflake\\app\\engine\\ai.py",
               "RelativeToolTip": "app\\engine\\ai.py",
-              "ViewState": "AgIAAN8AAAAAAAAAAAD4v+8AAAAWAAAAAAAAAA==",
+              "ViewState": "AgIAAIIAAAAAAAAAAAAuwJcAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2024-09-29T20:44:15.47Z",
               "EditorCaption": ""

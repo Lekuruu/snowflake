@@ -35,8 +35,7 @@ class PenguinAI(Penguin):
         self.cards_queue = []
 
     def send_message(self, message: str) -> None:
-        if self.element == "snow":
-            self.logger.info(f'{self.element} {message}') # use 'info' for filtering these logs
+        self.logger.info(f'{self.element} {message}') # use 'info' for filtering these logs
 
     @delay(0.25, 1.5)
     def confirm_move(self) -> None:
@@ -234,14 +233,11 @@ class PenguinAI(Penguin):
 
                     if not self.is_ninja_selected(ninja):
 
-                        if random.choice([True, False]):
-
+                        if not attack_coords or percentage > 85 or random.choice([True, False]):
                             selection = ninja_coords
-                            self.send_message(f"{ninja.name} is healable!")      
+                            self.send_message(f"{ninja.name} is healable!")
 
-        if selection:
-
-            self.send_message(f"has made a selection!")    
+        if selection: 
 
             card_xy = None  
 
