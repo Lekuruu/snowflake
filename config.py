@@ -24,8 +24,8 @@ try:
     MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION')
     MEDIA_DOMAIN = urlparse(MEDIA_LOCATION).hostname
 
-    MATCHMAKING_TIMEOUT = int(os.environ.get('MATCHMAKING_TIMEOUT', '30'))
-    ALLOW_FORCESTART_SNOW = os.environ.get('ALLOW_FORCESTART_SNOW', 'False').lower() == 'true'
+    MATCHMAKING_TIMEOUT = int(os.environ.get('MATCHMAKING_TIMEOUT', '0'))
+    ALLOW_FORCESTART_SNOW = os.environ.get('ALLOW_FORCESTART_SNOW', 'True').lower() == 'true'
     ALLOW_FORCESTART_TUSK = os.environ.get('ALLOW_FORCESTART_TUSK', 'True').lower() == 'true'
 
     POLICY_DOMAIN = os.environ.get('POLICY_DOMAIN', '*')

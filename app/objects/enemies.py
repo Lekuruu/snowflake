@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine.tusk import TuskGame
     from app.engine.game import Game
+    from app.engine import Penguin
 
 from app.data import MirrorMode
 from app.objects import GameObject
@@ -164,7 +165,7 @@ class Enemy(GameObject):
                 self.game.exp += 75
 
             if not wait:
-                self.do_later(2.5, self.remove_object)
+                reactor.callLater(2.5, self.remove_object)
                 return
 
             self.game.wait_for_animations()
@@ -201,7 +202,7 @@ class Enemy(GameObject):
             self.flame = None
 
             # Reset animation
-            self.do_later(0.8, self.idle_animation, True)
+            reactor.callLater(0.8, self.idle_animation, True)
             return
 
         self.flame.rounds_left -= 1
@@ -210,15 +211,15 @@ class Enemy(GameObject):
     def movable_tiles(self) -> Iterator[GameObject]:
         """Get all tiles that the enemy can move to from its current position"""
         for tile in self.game.grid.tiles:
-            if not self.game.grid.can_move(tile.x, tile.y):
+            if not self.game.grid.can_move(tile.x, tile.y): # check if the tile is on the grid and empty
                 continue
 
             distance = self.game.grid.distance_with_obstacles(
                 (self.x, self.y),
                 (tile.x, tile.y)
-            )
+            ) # check if the route is unobstructed
 
-            if distance <= self.move:
+            if distance <= self.move: # check if the move is within range of the enemy
                 yield tile
 
     def attackable_tiles(self, target_x: int, target_y: int, range: int | None = None) -> Iterator[GameObject]:
@@ -902,7 +903,7 @@ class Tusk(Enemy):
 
             if result_x < ninja.x:
                 # Move ninja to the left
-                self.do_later(
+                reactor.callLater(
                     attack_delay, ninja.move_object,
                     result_x, ninja.y,
                     push_duration * 1000
@@ -910,7 +911,7 @@ class Tusk(Enemy):
 
             if ninja.hp > 0:
                 # Apply damage
-                self.do_later(
+                reactor.callLater(
                     attack_delay + (push_duration / 1.5),
                     ninja.set_health,
                     ninja.hp - self.attack, False

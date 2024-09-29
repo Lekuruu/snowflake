@@ -1,6 +1,8 @@
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Callable, List
+from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from .penguin import Penguin
@@ -8,8 +10,11 @@ if TYPE_CHECKING:
 from app.data.repositories import stamps, penguins, items
 from app.data import (
     ExpRequirements,
+    InputModifier,
+    InputTarget,
     SnowRewards,
     MirrorMode,
+    InputType,
     TipPhase
 )
 
@@ -43,6 +48,7 @@ class Game:
         self.map = random.randint(1, 3)
         self.total_combos = 0
         self.round = 0
+        self.turns = 0
         self.coins = 0
         self.exp = 0
 
@@ -55,6 +61,9 @@ class Game:
         self.logger = logging.getLogger('Game')
         self.backgrounds = []
         self.rocks = []
+
+        self.pending_cards = 0
+
 
     @property
     def clients(self) -> List["Penguin"]:
@@ -171,8 +180,8 @@ class Game:
             if client.has_power_cards:
                 continue
 
-            snow_ui = client.get_window('cardjitsu_snowui.swf')
-            snow_ui.send_payload('noCards')
+            snow_ui = client.get_window('cardjitsu_snowui.swf') 
+            snow_ui.send_payload('noCards') # THIS
 
         # Run game loop until game ends
         self.run_game_loop()
@@ -270,16 +279,32 @@ class Game:
             self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
     def run_until_next_round(self) -> None:
+
         while True:
+
+            self.pending_cards = 0
+
             for client in self.clients:
                 client.selected_card = None
                 client.is_ready = False
-
                 # Reset ninja's rotation, if necessary
                 client.ninja.reset_sprite_settings()
 
-                if client.power_card_slots:
+                if client.has_power_cards: # otherwise --> snow_ui.send_payload('noCards') # THIS
+
                     self.send_tip(TipPhase.CARD, client)
+
+                    if client.is_bot: 
+                        cards = len(client.cards_queue)
+                    else:
+                        cards = client.cards_placed 
+
+                    self.pending_cards += cards
+
+                if client.is_bot:
+                    client.select_move()
+
+            self.logger.info(f'new round : cards queued {self.pending_cards}')
 
             self.show_targets()
             self.wait_for_timer()
@@ -341,7 +366,7 @@ class Game:
         if self.server.shutting_down:
             self.close()
 
-        if all(client.disconnected for client in self.clients):
+        if all(client.disconnected for client in self.clients if not client.is_bot):
             self.close()
 
         if not self.enemies:
@@ -366,6 +391,9 @@ class Game:
             if player.disconnected:
                 continue
 
+            if player.is_bot:
+                continue
+
             while not condition(player) and not self.server.shutting_down:
                 if time.time() - start_time > timeout:
                     self.logger.warning(f'Player Timeout: {player}')
@@ -388,6 +416,9 @@ class Game:
     def wait_for_window(self, name: str, loaded=True, timeout=8) -> None:
         """Wait for a window to load/close"""
         for client in self.clients:
+            if client.is_bot:
+                continue
+
             window = client.get_window(name)
             start_time = time.time()
 
@@ -540,7 +571,7 @@ class Game:
         for object in self.objects.with_name('ui_confirm'):
             object.remove_object()
 
-        for client in self.clients:
+        for client in self.clients: 
             if not client.selected_card:
                 continue
 

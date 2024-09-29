@@ -52,6 +52,8 @@ class TuskGame(Game):
         self.backgrounds = []
         self.rocks = []
 
+        self.pending_cards = 0
+
     @property
     def enemies(self) -> List[Enemy]:
         return self.objects.with_name('Tusk')
@@ -191,9 +193,9 @@ class TuskGame(Game):
 
         # Change max hp based on player count
         max_hp = {
-            1: 300,
-            2: 500,
-            3: 800
+            1: 200,
+            2: 300,
+            3: 400
         }[len(self.connected_clients)]
 
         self.tusk.max_hp = max_hp
