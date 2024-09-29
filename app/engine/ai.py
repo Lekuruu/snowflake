@@ -35,7 +35,8 @@ class PenguinAI(Penguin):
         self.cards_queue = []
 
     def send_message(self, message: str) -> None:
-        self.logger.info(f'{self.element} {message}')
+        if self.element == "snow":
+            self.logger.info(f'{self.element} {message}') # use 'info' for filtering these logs
 
     @delay(0.25, 1.5)
     def confirm_move(self) -> None:
@@ -78,11 +79,11 @@ class PenguinAI(Penguin):
             ninja.hp <= 0 and
             not ninja.client.member_card and
             not self.is_ninja_selected(ninja) and
-            self.game.grid.distance_with_obstacles((self.ninja.x, self.ninja.y), (ninja.x, ninja.y)) == 1
+            self.obj_within_range(ninja, 1)
         )
 
     def gain_stamina(self) -> None:
-        self.power_card_stamina += 2
+        self.power_card_stamina = min(self.power_card_stamina + 2, 10)
         self.send_message(f"stamina {self.power_card_stamina}")
 
     def action_strategy(self) -> None:
@@ -127,9 +128,10 @@ class PenguinAI(Penguin):
         return valid_positions  # Return the list of valid positions
 
     def drawn_card(self):
-        if self.power_card_stamina == 10:
+        if self.power_card_stamina >= 10:
             self.power_card_stamina = 0
             new_card = random.choice(self.owned_cards)
+            self.send_message(f"cards owned {len(self.owned_cards)}")
             self.cards_queue.append(new_card)
             self.send_message(f"added card {new_card.id}")
             self.send_message(f"queue == {[card.id for card in self.cards_queue]}")
@@ -146,25 +148,27 @@ class PenguinAI(Penguin):
                 return True
         return False
 
-    def within_range(self, ninja: Ninja) -> bool:
-        ninja_area = self.game.grid.surrounding_tiles(ninja.x, ninja.y)
-        return any(self.game.grid.can_move_to_tile(self.ninja, tile.x, tile.y) for tile in ninja_area)
+    def obj_within_range(self, obj, query_range):
+        return (
+            obj != self.ninja and self.game.grid.distance_with_obstacles(
+                (self.ninja.x, self.ninja.y), (obj.x, obj.y)
+            ) <= query_range
+        )       
 
-    def ninjas_within_range(self)  -> Iterator[Ninja]:
-        for ninja in self.game.ninjas:
-            if ninja != self.ninja:
-                if self.within_range(ninja):
-                    yield ninja
-        return None
+    def ninjas_within_range(self) -> Iterator[Ninja]:
+        return (
+            ninja for ninja in self.game.ninjas
+            if self.obj_within_range(ninja, self.ninja.move)
+        )
 
     def do_strategy(self) -> tuple[int, int]:
         selection = None
         old_position = (self.ninja.x, self.ninja.y)
         ninja_coords = old_position
         enemies = list(self.game.enemies)
-        old_distance = float('inf')
+        last_distance = float('inf')
 
-        desired_distance = self.ninja.move
+        desired_distance = {'water': 0, 'snow': 3, 'fire': 2}.get(self.element, 1)
         new_position, attack_coords = None, None
 
         # Iterate over valid positions
@@ -187,46 +191,80 @@ class PenguinAI(Penguin):
             is_valid = (
                 position == old_position or  # initialize 
                 min_distance == desired_distance or # maintain distance
-                min_distance < old_distance # closer distance
+                min_distance < last_distance # closer distance
             )
         
             # Skip if new position is no better or too close to enemies
-            if not is_valid or min_distance < desired_distance or min_distance == old_distance:
+            if not is_valid or min_distance < desired_distance or min_distance == last_distance:
                 continue
 
             # Update the new position and attack coordinates
             new_position, attack_coords = position, (enemy_obj.x, enemy_obj.y)
-            old_distance = min_distance
+            last_distance = min_distance
 
         # Place the ghost ninja if a valid new position was found
         if new_position and new_position != old_position:
             self.ninja.place_ghost(*new_position)
 
         # Update selection for attack or card placement
-        if old_distance <= self.ninja.move:
+        if last_distance <= self.ninja.move:
             selection = attack_coords
             
-        previous_hp = 100
+        max_damage = 0
         ninja_coords = None
 
         for ninja in self.ninjas_within_range():
+            damage = ninja.max_hp - ninja.hp
 
-            if ninja.hp < previous_hp:
-                previous_hp = ninja.hp
+            # Check if the current ninja has taken more damage than the current max_damage
+            if max_damage < damage <= ninja.max_hp:
+
+                max_damage = damage
                 ninja_coords = (ninja.x, ninja.y)
 
-            if 0 < ninja.hp < ninja.max_hp * (0.70 if self.element == "snow" else 0.50) and not self.is_ninja_selected(ninja):
-                selection = (ninja.x, ninja.y)
+                # Check if the ninja's damage reaches a threshold for healing
+                percentage = int((damage * 100) / ninja.max_hp)
+                threshold = 30 if self.element == "snow" else 50
+
+                self.logger.info(f"{ninja.name} is {percentage}% damaged")
+
+                if threshold <= percentage <= 100:
+
+                    self.logger.info(f" -- {self.element} Meets the Damage Threshold %")
+
+                    if not self.is_ninja_selected(ninja):
+
+                        if random.choice([True, False]):
+
+                            selection = ninja_coords
+                            self.send_message(f"{ninja.name} is healable!")      
 
         if selection:
+
+            self.send_message(f"has made a selection!")    
+
+            card_xy = None  
+
             if self.card_being_placed():
-                selection = ninja_coords if (self.element == 'snow' and ninja_coords) else attack_coords or selection
-                self.selected_card.place(*selection)
+                self.send_message("has recieved a new card - resetting stamina")
+                card_xy = attack_coords                 
+                if self.element == 'snow' and ninja_coords:
+                    self.send_message("is eligible to place snow card")
+                    card_xy = ninja_coords 
+
+            if card_xy:
+                self.selected_card.place(*card_xy)
                 self.cards_queue.pop(0)
                 self.send_message(f"placed card {self.selected_card.id}")
                 self.send_message(f"queue == {[card.id for card in self.cards_queue]}")
+
             else:
                 self.select_target(*selection)
+
+
+    def unlock_stamp(self, id: int, session: Session | None = None) -> None:
+        self.logger.info(f"{self.element} has unlocked the {random.choice(['Ancient Sensei', 'Epic Saga', 'Ninja Siesta'])} award")
+        pass
 
 
 

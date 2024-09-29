@@ -297,7 +297,7 @@ class Game:
                     if client.is_bot: 
                         cards = len(client.cards_queue)
                     else:
-                        cards = client.cards_placed 
+                        cards = client.cards_ready 
 
                     self.pending_cards += cards
 

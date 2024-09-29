@@ -37,11 +37,6 @@ def fetch_by_penguin_id(
     element: str,
     session: Session | None = None
 ) -> List[Card]:
-    if penguin_id == -1:
-        return session.query(Card) \
-            .filter(Card.element == element) \
-            .all()
-    
     return session.query(Card) \
         .join(PenguinCard) \
         .filter(PenguinCard.penguin_id == penguin_id) \
@@ -54,16 +49,13 @@ def fetch_power_cards_by_penguin_id(
     element: str,
     session: Session | None = None
 ) -> List[Card]:
-    def create_subquery():
-        query = session.query(
+    # Subquery to generate series of cards, based on quantity
+    subquery = session.query(
             PenguinCard.card_id,
             func.generate_series(1, PenguinCard.quantity).label('index')
-        )
-        if penguin_id != -1:
-            query = query.filter(PenguinCard.penguin_id == penguin_id)
-        return query.subquery()
-
-    subquery = create_subquery()
+        ) \
+        .filter(PenguinCard.penguin_id == penguin_id) \
+        .subquery()
 
     return session.query(Card) \
         .join(subquery, Card.id == subquery.c.card_id) \
@@ -77,14 +69,11 @@ def fetch_count(
     element: str,
     session: Session | None = None
 ) -> int:
-    query = session.query(func.sum(PenguinCard.quantity)) \
+    return session.query(func.sum(PenguinCard.quantity)) \
         .join(Card) \
-        .filter(Card.element == element)
-    
-    if penguin_id != -1:
-        query = query.filter(PenguinCard.penguin_id == penguin_id)
-    
-    return query.scalar() or 0
+        .filter(PenguinCard.penguin_id == penguin_id) \
+        .filter(Card.element == element) \
+        .scalar() or 0
 
 @session_wrapper
 def fetch_power_card_count(
@@ -92,12 +81,9 @@ def fetch_power_card_count(
     element: str,
     session: Session | None = None
 ) -> int:
-    query = session.query(func.sum(PenguinCard.quantity)) \
+    return session.query(func.sum(PenguinCard.quantity)) \
         .join(Card) \
+        .filter(PenguinCard.penguin_id == penguin_id) \
         .filter(Card.element == element) \
-        .filter(Card.power_id > 0)
-    
-    if penguin_id != -1:
-        query = query.filter(PenguinCard.penguin_id == penguin_id)
-    
-    return query.scalar() or 0
+        .filter(Card.power_id > 0) \
+        .scalar() or 0
