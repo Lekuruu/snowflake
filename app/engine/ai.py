@@ -82,7 +82,7 @@ class PenguinAI(Penguin):
         )
 
     def gain_stamina(self) -> None:
-        self.power_card_stamina = min(self.power_card_stamina + 2, 10)
+        self.power_card_stamina = min(self.power_card_stamina + 2.5, 10)
         self.send_message(f"stamina {self.power_card_stamina}")
 
     def action_strategy(self) -> None:
@@ -143,7 +143,7 @@ class PenguinAI(Penguin):
     def card_being_placed(self) -> bool:
         if self.owned_cards:
             self.selected_card = self.drawn_card()
-            if self.selected_card and self.game.pending_cards >= 3:
+            if self.selected_card and self.game.pending_cards >= random.choice([2, 3]):
                 return True
         return False
 
@@ -168,7 +168,7 @@ class PenguinAI(Penguin):
         last_distance = float('inf')
 
         desired_distance = {'water': 0, 'snow': 3, 'fire': 2}.get(self.element, 1)
-        new_position, attack_coords = None, None
+        new_position, attack_coords, attacker_hp_prpn = None, None, None
 
         # Iterate over valid positions
         for position in [old_position] + self.valid_moves():
@@ -199,6 +199,7 @@ class PenguinAI(Penguin):
 
             # Update the new position and attack coordinates
             new_position, attack_coords = position, (enemy_obj.x, enemy_obj.y)
+            attacker_hp_prpn = int((100 * enemy_obj.hp) / enemy_obj.max_hp)
             last_distance = min_distance
 
         # Place the ghost ninja if a valid new position was found
@@ -243,7 +244,9 @@ class PenguinAI(Penguin):
 
             if self.card_being_placed():
                 self.send_message("has recieved a new card - resetting stamina")
-                card_xy = attack_coords                 
+                self.send_message(f"attacker is now {attacker_hp_prpn}% of max hp")
+                if attacker_hp_prpn > 30:
+                    card_xy = attack_coords                 
                 if self.element == 'snow' and ninja_coords:
                     self.send_message("is eligible to place snow card")
                     card_xy = ninja_coords 
