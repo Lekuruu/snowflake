@@ -197,15 +197,18 @@ class PenguinAI(Penguin):
             self.send_message(f"is attacking {attacker_name}")
 
         ninja_coords = None
-
+        adjusted_selection = None
+        
         if self.element == 'snow':
-            ninja_coords = self.check_healing(selection)
+            healing = self.check_healing(selection)
+            if healing:  # Check if the result is not None
+                ninja_coords, adjusted_selection = healing
             selection = ninja_coords or selection
 
         if not selection:
             return
 
-        if not self.handle_card_placement(selection, ninja_coords, attack_coords, attacker_health_loss_percent):        
+        if not self.handle_card_placement(selection, ninja_coords, attack_coords, attacker_health_loss_percent, adjusted_selection):        
             self.select_target(*selection)
 
 
@@ -261,10 +264,10 @@ class PenguinAI(Penguin):
                         if ninja.placed_ghost:
                             adjusted_selection = (ninja.ghost.x, ninja.ghost.y)                            
                         self.send_message(f"is healing {ninja.name}")                     
-                        return ninja_coords
+                        return ninja_coords, adjusted_selection
                         
 
-    def handle_card_placement(self, selection: tuple[int, int], ninja_coords: tuple[int, int], attack_coords: tuple[int, int], attacker_health_loss_percent: int):
+    def handle_card_placement(self, selection: tuple[int, int], ninja_coords: tuple[int, int], attack_coords: tuple[int, int], attacker_health_loss_percent: int, adjusted_selection):
 
         card_xy = None
         if self.card_being_placed():
@@ -272,6 +275,9 @@ class PenguinAI(Penguin):
                 if selection == ninja_coords:
                     self.send_message("is placing down a snow card")
                     card_xy = ninja_coords
+                    if adjusted_selection:
+                        card_xy = adjusted_selection
+                    
             elif attacker_health_loss_percent > 30:
                 self.send_message("attacker meets health requirements for card")
                 card_xy = attack_coords
