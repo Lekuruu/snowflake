@@ -198,10 +198,16 @@ class PenguinAI(Penguin):
             new_position, attack_coords, attack_name = position, (enemy_obj.x, enemy_obj.y), enemy_obj.name
             attacker_health_loss_percent = int((100 * enemy_obj.hp) / enemy_obj.max_hp)
             last_distance = min_distance
+            self.send_message(f"has found a valid distance {last_distance}")
 
         # Place the ghost ninja if a valid new position was found
         if new_position and new_position != old_position:
             self.ninja.place_ghost(*new_position)
+
+        self.send_message(f"{self.game.enemies[0].name}")
+
+        if self.game.enemies[0].name == "Tusk":
+            last_distance -= 1    
 
         # Update selection for attack or card placement
         if last_distance <= self.ninja.range:
