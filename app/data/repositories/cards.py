@@ -21,8 +21,11 @@ def fetch_all(session: Session | None = None) -> List[Card]:
 
 @session_wrapper
 def fetch_by_element(element: str, session: Session | None = None) -> List[Card]:
+    # Query to fetch all unique cards of the given element
     return session.query(Card) \
         .filter(Card.element == element) \
+        .filter(Card.power_id > 0) \
+        .distinct(Card.id) \
         .all()
 
 @session_wrapper
