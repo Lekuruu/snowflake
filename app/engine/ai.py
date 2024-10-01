@@ -257,7 +257,7 @@ class PenguinAI(Penguin):
                 self.logger.info(f"{ninja.name} is {health_lost_percent}% damaged")
                 if 30 <= health_lost_percent < 100:
                     self.logger.info(f"-- {ninja.name} Meets the Damage Threshold for {self.element}")
-                    if health_lost_percent > 80 or not selection or random.choice([True, True, False]):
+                    if health_lost_percent > 70 or not selection or random.choice([True, True, False]):
                         selection = ninja_coords
                         if ninja.placed_ghost:
                             adjusted_selection = (ninja.ghost.x, ninja.ghost.y)
