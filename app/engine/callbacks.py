@@ -140,6 +140,10 @@ class CallbackHandler:
                 self.remove_events(client)
                 break
 
+            if client.is_bot:
+                self.remove_events(client)
+                break
+
             if time.time() - start_time > timeout:
                 self.game.logger.warning(f"Event Timeout: {event}")
                 self.remove_events(client)

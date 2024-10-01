@@ -499,6 +499,7 @@ class Ninja(GameObject):
             return
 
         self.client.selected_card.use(is_combo)
+        self.game.pending_cards = max(self.game.pending_cards - 1, 0)
 
     """Animations"""
 

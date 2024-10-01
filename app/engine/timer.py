@@ -38,7 +38,7 @@ class Timer:
                 self.game.close()
                 return
 
-            if all(client.disconnected for client in self.game.clients):
+            if all(client.disconnected for client in self.game.clients if not client.is_bot):
                 self.game.close()
                 return
 

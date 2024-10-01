@@ -46,8 +46,10 @@ class Game:
         self.game_start = time.time()
 
         self.map = random.randint(1, 3)
+        self.pending_cards = 0
         self.total_combos = 0
         self.round = 0
+        self.turns = 0
         self.coins = 0
         self.exp = 0
 
@@ -176,7 +178,7 @@ class Game:
             if client.has_power_cards:
                 continue
 
-            snow_ui = client.get_window('cardjitsu_snowui.swf')
+            snow_ui = client.get_window('cardjitsu_snowui.swf') 
             snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
@@ -224,7 +226,7 @@ class Game:
                 # Hide disconnected ninjas
                 client.ninja.remove_object()
 
-            if all(client.disconnected for client in self.clients):
+            if all(client.disconnected for client in self.clients if not client.is_bot):
                 # All players have disconnected
                 self.close()
 
@@ -276,6 +278,8 @@ class Game:
 
     def run_until_next_round(self) -> None:
         while True:
+            self.pending_cards = 0
+
             for client in self.clients:
                 client.selected_card = None
                 client.is_ready = False
@@ -283,11 +287,19 @@ class Game:
                 # Reset ninja's rotation, if necessary
                 client.ninja.reset_sprite_settings()
 
-                if client.power_card_slots:
+                if client.has_power_cards:
                     self.send_tip(TipPhase.CARD, client)
+                    cards = client.cards_ready
+
+                    if client.is_bot:
+                        cards = len(client.cards_queue)
+
+                    self.pending_cards += cards
 
                 if client.is_bot:
                     client.select_move()
+
+            self.logger.info(f'cards queued {self.pending_cards}')
 
             self.show_targets()
             self.wait_for_timer()
@@ -349,7 +361,7 @@ class Game:
         if self.server.shutting_down:
             self.close()
 
-        if all(client.disconnected for client in self.clients):
+        if all(client.disconnected for client in self.clients if not client.is_bot):
             self.close()
 
         if not self.enemies:
@@ -554,7 +566,7 @@ class Game:
         for object in self.objects.with_name('ui_confirm'):
             object.remove_object()
 
-        for client in self.clients:
+        for client in self.clients: 
             if not client.selected_card:
                 continue
 

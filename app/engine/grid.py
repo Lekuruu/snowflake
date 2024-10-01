@@ -22,6 +22,13 @@ class Grid:
         self.y_range = range(y_range)
         self.game = game
 
+        self.min_x, self.max_x = 0, x_range - 1
+        self.min_y, self.max_y = 0, y_range - 1
+
+    @property
+    def grid_range(self) -> Tuple[int, int, int, int]:
+        return self.min_x, self.max_x, self.min_y, self.max_y
+
     def __repr__(self) -> str:
         return f"<Grid ({self.array})>"
 
@@ -126,7 +133,7 @@ class Grid:
         return (8, 4)
 
     def is_valid(self, x: int, y: int) -> bool:
-        """Check if a tile is valid"""
+        """Check if the tile is on the grid"""
         return x in self.x_range and y in self.y_range
 
     def can_move(self, x: int, y: int) -> bool:
