@@ -198,7 +198,7 @@ class PenguinAI(Penguin):
 
 
     def get_desired_distance(self) -> int:
-        return {'water': 0, 'snow': 2, 'fire': 1}.get(self.element, 1)
+        return {'water': 0, 'snow': 3, 'fire': 2}.get(self.element, 1)
 
 
     def should_skip_position(self, position: tuple[int, int]) -> bool:
