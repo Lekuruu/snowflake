@@ -46,6 +46,7 @@ class Game:
         self.game_start = time.time()
 
         self.map = random.randint(1, 3)
+        self.pending_cards = 0
         self.total_combos = 0
         self.round = 0
         self.turns = 0
@@ -61,9 +62,6 @@ class Game:
         self.logger = logging.getLogger('Game')
         self.backgrounds = []
         self.rocks = []
-
-        self.pending_cards = 0
-
 
     @property
     def clients(self) -> List["Penguin"]:
@@ -181,7 +179,7 @@ class Game:
                 continue
 
             snow_ui = client.get_window('cardjitsu_snowui.swf') 
-            snow_ui.send_payload('noCards') # THIS
+            snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
         self.run_game_loop()
@@ -279,25 +277,22 @@ class Game:
             self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
     def run_until_next_round(self) -> None:
-
         while True:
-
             self.pending_cards = 0
 
             for client in self.clients:
                 client.selected_card = None
                 client.is_ready = False
+
                 # Reset ninja's rotation, if necessary
                 client.ninja.reset_sprite_settings()
 
-                if client.has_power_cards: # otherwise --> snow_ui.send_payload('noCards') # THIS
-
+                if client.has_power_cards:
                     self.send_tip(TipPhase.CARD, client)
+                    cards = client.cards_ready
 
-                    if client.is_bot: 
+                    if client.is_bot:
                         cards = len(client.cards_queue)
-                    else:
-                        cards = client.cards_ready 
 
                     self.pending_cards += cards
 

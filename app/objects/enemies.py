@@ -211,15 +211,15 @@ class Enemy(GameObject):
     def movable_tiles(self) -> Iterator[GameObject]:
         """Get all tiles that the enemy can move to from its current position"""
         for tile in self.game.grid.tiles:
-            if not self.game.grid.can_move(tile.x, tile.y): # check if the tile is on the grid and empty
+            if not self.game.grid.can_move(tile.x, tile.y):
                 continue
 
             distance = self.game.grid.distance_with_obstacles(
                 (self.x, self.y),
                 (tile.x, tile.y)
-            ) # check if the route is unobstructed
+            )
 
-            if distance <= self.move: # check if the move is within range of the enemy
+            if distance <= self.move:
                 yield tile
 
     def attackable_tiles(self, target_x: int, target_y: int, range: int | None = None) -> Iterator[GameObject]:

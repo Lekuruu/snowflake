@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any, List
 
 if TYPE_CHECKING:
@@ -163,7 +162,6 @@ class Penguin(MetaplaceProtocol):
         self.logger.info(f"Initializing {len(self.owned_cards)} cards for {self.element}")
 
     def next_power_card(self) -> CardObject | None:
-        
         if not self.has_power_cards:
             # Client has no more power cards
             self.logger.info(f'{self.name} has no more power cards')
@@ -192,52 +190,51 @@ class Penguin(MetaplaceProtocol):
         if self.is_bot:
             return
 
-        if self.has_power_cards:
-
-            if self.cards_ready >= 4:
-                self.logger.info(f'{self.name} needs to place a card before queuing a new one!')
-                return
-
-            self.power_card_stamina += 2
-
-            update = {
-                'cardData': None,
-                'cycle': False,
-                'stamina': self.power_card_stamina
-            }
-
-            if self.power_card_stamina >= 10: # add a new card
-                self.power_card_stamina = 0
-
-                update['stamina'] = 0
-
-                if next_card := self.next_power_card():
-                    update['cardData'] = {
-                        "card_id": next_card.id,
-                        "color": next_card.color,
-                        "description": next_card.description,
-                        "element": next_card.element,
-                        "label": next_card.name,
-                        "name": next_card.name,
-                        "power_id": next_card.power_id,
-                        "prompt": next_card.name,
-                        "set_id": next_card.set_id,
-                        "value": next_card.value
-                    }
-
-                if update['cardData'] is not None:
-                    self.cards_ready += 1
-                    self.logger.info(f'{self.name} has added card {update['cardData']['card_id']}')
-                    self.logger.info(f'{self.name} has {self.cards_ready} cards in their UI')
-                    
-                if len(self.owned_cards) > 3:
-                    update['cycle'] = True
-
-            snow_ui = self.get_window('cardjitsu_snowui.swf')
-            snow_ui.send_payload('updateStamina', update)
-
-        else:
+        if not self.has_power_cards:
             self.logger.info(f'{self.name} needs to purchase more cards from the catalogue!')
+            return
+
+        if self.cards_ready >= 4:
+            self.logger.info(f'{self.name} needs to place a card before queuing a new one!')
+            return
+
+        self.power_card_stamina += 2
+
+        update = {
+            'cardData': None,
+            'cycle': False,
+            'stamina': self.power_card_stamina
+        }
+
+        if self.power_card_stamina >= 10:
+            self.power_card_stamina = 0
+
+            update['stamina'] = 0
+
+            if next_card := self.next_power_card():
+                update['cardData'] = {
+                    "card_id": next_card.id,
+                    "color": next_card.color,
+                    "description": next_card.description,
+                    "element": next_card.element,
+                    "label": next_card.name,
+                    "name": next_card.name,
+                    "power_id": next_card.power_id,
+                    "prompt": next_card.name,
+                    "set_id": next_card.set_id,
+                    "value": next_card.value
+                }
+
+            if update['cardData'] is not None:
+                self.cards_ready += 1
+                self.logger.info(f'{self.name} has added card {update['cardData']['card_id']}')
+                self.logger.info(f'{self.name} has {self.cards_ready} cards in their UI')
+
+            if len(self.owned_cards) > 3:
+                update['cycle'] = True
+
+        snow_ui = self.get_window('cardjitsu_snowui.swf')
+        snow_ui.send_payload('updateStamina', update)
 
     def consume_card(self, is_combo=False) -> None:
         if not self.selected_card:
@@ -299,10 +296,6 @@ class Penguin(MetaplaceProtocol):
         infotip.send_payload('disable')
 
     def unlock_stamp(self, id: int, session: Session | None = None) -> None:
-        
-        if self.is_bot:
-            return
-        
         if config.DISABLE_STAMPS:
             return
 
