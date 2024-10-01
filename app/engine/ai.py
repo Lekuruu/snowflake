@@ -186,14 +186,19 @@ class PenguinAI(Penguin):
             # Get closest enemy and their distance
             min_distance, enemy_obj = self.get_closest_enemy(position, enemies)
 
-            if not self.is_valid_position(position, min_distance, last_distance, desired_distance):
+            is_valid_position = self.is_valid_position(
+                position, min_distance,
+                last_distance, desired_distance
+            )
+
+            if not is_valid_position:
                 continue
 
             if min_distance < desired_distance:
                 continue
 
             # Update attack information
-            attack_coords, attacker_name, attacker_health_loss_percent = self.update_attack_info(enemy_obj)
+            attack_coords, attacker_name, attacker_health_loss_percent = self.get_attack_info(enemy_obj)
             last_distance = min_distance
             new_position = position
 
@@ -260,7 +265,7 @@ class PenguinAI(Penguin):
             or min_distance < last_distance
         )
 
-    def update_attack_info(self, enemy_obj: object) -> tuple:
+    def get_attack_info(self, enemy_obj: object) -> tuple:
         attack_coords = (enemy_obj.x, enemy_obj.y)
         attacker_name = enemy_obj.name
         attacker_health_loss_percent = int((100 * enemy_obj.hp) / enemy_obj.max_hp)
