@@ -156,12 +156,16 @@ class PenguinAI(Penguin):
 
     def do_strategy(self) -> tuple[int, int]:
         old_position = (self.ninja.x, self.ninja.y)
-        ninja_coords = old_position
         enemies = list(self.game.enemies)
         last_distance = float('inf')
 
         desired_distance = self.get_desired_distance()
-        new_position, attack_coords, attack_name, attacker_health_loss_percent = None, None, None, None
+        
+        selection = None
+        new_position = None 
+        attack_coords = None 
+        attacker_name = None
+        attacker_health_loss_percent = None
 
         # Evaluate all valid positions including current one
         for position in [old_position] + self.valid_moves():
@@ -178,7 +182,7 @@ class PenguinAI(Penguin):
                 continue
 
             # Update the new position and potential attack information
-            new_position, attack_coords, attack_name, attacker_health_loss_percent = self.update_attack_position(
+            new_position, attack_coords, attacker_name, attacker_health_loss_percent = self.update_attack_position(
                 position, enemy_obj, min_distance
             )
             last_distance = min_distance
@@ -186,9 +190,17 @@ class PenguinAI(Penguin):
         self.handle_ghost_placement(new_position, old_position)
 
         if self.game.enemies and self.game.enemies[0].name == "Tusk":
-            last_distance -= 1  # Specific rule for enemy "Tusk"
+            last_distance -= 1  
+        
+        if last_distance <= self.ninja.range:
+            selection = attack_coords
+            self.send_message(f"is attacking {attacker_name}")
 
-        selection = self.determine_attack_or_heal(last_distance, attack_coords, attack_name)
+        ninja_coords = None
+
+        if self.element == 'snow':
+            ninja_coords = self.check_healing(selection)
+            selection = ninja_coords or selection
 
         if not selection:
             return
@@ -224,26 +236,14 @@ class PenguinAI(Penguin):
 
     def update_attack_position(self, position: tuple[int, int], enemy_obj: object, min_distance: int) -> tuple:
         attack_coords = (enemy_obj.x, enemy_obj.y)
-        attack_name = enemy_obj.name
+        attacker_name = enemy_obj.name
         attacker_health_loss_percent = int((100 * enemy_obj.hp) / enemy_obj.max_hp)
-        return position, attack_coords, attack_name, attacker_health_loss_percent
+        return position, attack_coords, attacker_name, attacker_health_loss_percent
 
 
     def handle_ghost_placement(self, new_position: tuple[int, int], old_position: tuple[int, int]):
         if new_position and new_position != old_position:
             self.ninja.place_ghost(*new_position)
-
-
-    def determine_attack_or_heal(self, last_distance: int, attack_coords: tuple[int, int], attack_name: str) -> tuple[int, int]:
-        selection = None
-        if last_distance <= self.ninja.range:
-            selection = attack_coords
-            self.send_message(f"is attacking {attack_name}")
-
-        if self.element == 'snow':
-            selection = self.check_healing(selection)
-        
-        return selection
 
 
     def check_healing(self, selection: tuple[int, int]) -> tuple[int, int]:
@@ -257,16 +257,12 @@ class PenguinAI(Penguin):
                 self.logger.info(f"{ninja.name} is {health_lost_percent}% damaged")
                 if 30 <= health_lost_percent < 100:
                     self.logger.info(f"-- {ninja.name} Meets the Damage Threshold for {self.element}")
-                    if health_lost_percent > 70 or not selection or random.choice([True, True, False]):
-                        selection = ninja_coords
+                    if health_lost_percent > 70 or not selection or random.choice([True, True, False]):                    
                         if ninja.placed_ghost:
-                            adjusted_selection = (ninja.ghost.x, ninja.ghost.y)
-                        self.send_message(f"is healing {ninja.name}")
-                    else:
-                        self.send_message("chose not to heal")
+                            adjusted_selection = (ninja.ghost.x, ninja.ghost.y)                            
+                        self.send_message(f"is healing {ninja.name}")                     
+                        return ninja_coords
                         
-        return selection
-
 
     def handle_card_placement(self, selection: tuple[int, int], ninja_coords: tuple[int, int], attack_coords: tuple[int, int], attacker_health_loss_percent: int):
 
