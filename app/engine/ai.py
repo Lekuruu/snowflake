@@ -81,7 +81,7 @@ class PenguinAI(Penguin):
         )
 
     def gain_stamina(self) -> None:
-        self.power_card_stamina = min(self.power_card_stamina + 2.2, 10)
+        self.power_card_stamina = min(self.power_card_stamina + 3, 10)
 
     def action_strategy(self) -> None:
         self.do_strategy()
