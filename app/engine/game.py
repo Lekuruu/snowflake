@@ -304,7 +304,7 @@ class Game:
                 if client.is_bot:
                     client.select_move()
 
-            self.logger.info(f'new round : cards queued {self.pending_cards}')
+            self.logger.info(f'cards queued {self.pending_cards}')
 
             self.show_targets()
             self.wait_for_timer()

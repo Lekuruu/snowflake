@@ -233,8 +233,6 @@ class Penguin(MetaplaceProtocol):
                 if len(self.owned_cards) > 3:
                     update['cycle'] = True
 
-            self.logger.info(f'{self.name} stamina : {self.power_card_stamina}')
-
             snow_ui = self.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload('updateStamina', update)
 
