@@ -192,12 +192,10 @@ class PenguinAI(Penguin):
             if min_distance < desired_distance:
                 continue
 
-            # Update the new position and potential attack information
-            new_position, attack_coords, attacker_name, attacker_health_loss_percent = self.update_attack_position(
-                position, enemy_obj, min_distance
-            )
-
+            # Update attack information
+            attack_coords, attacker_name, attacker_health_loss_percent = self.update_attack_info(enemy_obj)
             last_distance = min_distance
+            new_position = position
 
         self.handle_ghost_placement(new_position, old_position)
 
@@ -262,11 +260,11 @@ class PenguinAI(Penguin):
             or min_distance < last_distance
         )
 
-    def update_attack_position(self, position: Tuple[int, int], enemy_obj: object, min_distance: int) -> tuple:
+    def update_attack_info(self, enemy_obj: object) -> tuple:
         attack_coords = (enemy_obj.x, enemy_obj.y)
         attacker_name = enemy_obj.name
         attacker_health_loss_percent = int((100 * enemy_obj.hp) / enemy_obj.max_hp)
-        return position, attack_coords, attacker_name, attacker_health_loss_percent
+        return attack_coords, attacker_name, attacker_health_loss_percent
 
     def handle_ghost_placement(self, new_position: Tuple[int, int], old_position: Tuple[int, int]):
         if new_position and new_position != old_position:
