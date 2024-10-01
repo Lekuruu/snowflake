@@ -198,7 +198,7 @@ class PenguinAI(Penguin):
 
 
     def get_desired_distance(self) -> int:
-        return {'water': 0, 'snow': 3, 'fire': 2}.get(self.element, 1)
+        return {'water': 0, 'snow': 2, 'fire': 1}.get(self.element, 1)
 
 
     def should_skip_position(self, position: tuple[int, int]) -> bool:
@@ -206,7 +206,7 @@ class PenguinAI(Penguin):
             closest_ally_distance = min(
                 self.game.grid.distance(position, (ninja.x, ninja.y)) for ninja in self.game.ninjas
             )
-            if closest_ally_distance >= self.ninja.range:
+            if closest_ally_distance > self.ninja.range:
                 return True  # Too far from allies
         return False
 
