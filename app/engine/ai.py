@@ -214,6 +214,8 @@ class PenguinAI(Penguin):
         max_loss = 0
         ninja_coords, adjusted_selection = None, None
 
+        # "ninjas.py" condition means Only snow can heal ninjas that are not dead
+
         for ninja in self.ninjas_within_range():
             health_loss = ninja.max_hp - ninja.hp
 
