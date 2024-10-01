@@ -22,6 +22,14 @@ class Grid:
         self.y_range = range(y_range)
         self.game = game
 
+        self.min_x, self.max_x = 0, x_range - 1
+        self.min_y, self.max_y = 0, y_range - 1
+
+    @property
+    def grid_range(self) -> Tuple[int, int, int, int]:
+        return self.min_x, self.max_x, self.min_y, self.max_y
+
+
     def __repr__(self) -> str:
         return f"<Grid ({self.array})>"
 
@@ -126,27 +134,26 @@ class Grid:
         return (8, 4)
 
     def is_valid(self, x: int, y: int) -> bool:
-        """Check if a tile is valid"""
+        """Check if the tile is on the grid"""
         return x in self.x_range and y in self.y_range
 
     def can_move(self, x: int, y: int) -> bool:
-        """Check if a tile is empty"""
         if not self.is_valid(x, y):
             return False
-
+        """Check if a tile is empty"""
         return self[x, y] is None
 
     def can_move_to_tile(self, ninja: Ninja, x: int, y: int) -> bool:
-        """Check if a ninja can move to a tile"""
-        if not self.is_valid(x, y):
+
+        if not self.is_valid(x, y): 
             return False
 
-        if not self.can_move(x, y):
+        if not self.can_move(x, y): 
             return False
 
         distance = abs(x - ninja.x) + abs(y - ninja.y)
 
-        return distance <= ninja.move
+        return distance <= ninja.move # Check if the tile is within the ninja's move range
 
     def initialize_tiles(self) -> None:
         """Initialize the tiles, and the tile frame"""

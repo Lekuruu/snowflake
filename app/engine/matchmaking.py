@@ -7,6 +7,7 @@ from typing import List
 from ..objects.collections import Players
 from .penguin import Penguin
 from .tusk import TuskGame
+from .ai import PenguinAI
 from .game import Game
 
 import logging
@@ -118,7 +119,21 @@ class MatchmakingQueue:
         # Start game loop
         game.server.runThread(game.start)
 
-    def insert_none_players(self, players: List[Penguin]) -> List[Penguin]:
+    def insert_ai_players(self, players: List[Penguin]) -> List[Penguin]:
+        elements = ['snow', 'water', 'fire']
+        battle_mode = players[0].battle_mode
+
+        for player in players:
+            elements.remove(player.element)
+
+        for element in elements:
+            ai_player = PenguinAI(player.server, element, battle_mode)
+            players.append(ai_player)
+
+        players.sort(key=lambda x: x.element)
+        return players
+
+    def get_none_players(self, players: List[Penguin]) -> List[Penguin]:
         player_dict = {
             'fire': None,
             'snow': None,
@@ -154,8 +169,8 @@ class MatchmakingQueue:
                 # Player has not been in queue long enough
                 players.remove(p)
 
-        # Fill up missing players with "None"
-        players = self.insert_none_players(players)
+        # Fill up missing players with bots
+        players = self.insert_ai_players(players)
 
         self.logger.info(f'Found match: {players}')
 
