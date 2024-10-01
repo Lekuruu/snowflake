@@ -48,7 +48,7 @@ class Penguin(MetaplaceProtocol):
         self.member_card: MemberCard | None = None
         self.selected_card: CardObject | None = None
         self.owned_cards: List[CardObject] = []
-        self.cards_placed: int = 0
+        self.cards_ready: int = 0
         self.unlocked_stamps: List[int] = []
         self.power_card_stamina: int = 0
         self.played_cards: int = 0
@@ -140,16 +140,27 @@ class Penguin(MetaplaceProtocol):
             'fire': 'f'
         }[self.element]
 
-        power_cards = cards.fetch_power_cards_by_penguin_id(
-            self.pid,
-            element_name,
-            session=session
-        )
+        power_cards = None
+
+        if self.is_bot:
+            power_cards = cards.fetch_by_element(
+                element_name, 
+                session=session
+            )
+
+        else:
+            power_cards = cards.fetch_power_cards_by_penguin_id(
+                self.pid,
+                element_name,
+                session=session
+            )
 
         for card in power_cards:
             card_object = CardObject(card, self)
             card_object.color = card_color
             self.owned_cards.append(card_object)
+
+        self.logger.info(f"Initializing {len(self.owned_cards)} cards for {self.element}")
 
     def next_power_card(self) -> CardObject | None:
         
@@ -183,6 +194,10 @@ class Penguin(MetaplaceProtocol):
 
         if self.has_power_cards:
 
+            if self.cards_ready >= 4:
+                self.logger.info(f'{self.name} needs to place a card before queuing a new one!')
+                return
+
             self.power_card_stamina += 2
 
             update = {
@@ -211,9 +226,10 @@ class Penguin(MetaplaceProtocol):
                     }
 
                 if update['cardData'] is not None:
-                    self.cards_placed += 1
-                    self.logger.info(f'{self.name} added card {update['cardData']['card_id']}')
-
+                    self.cards_ready += 1
+                    self.logger.info(f'{self.name} has added card {update['cardData']['card_id']}')
+                    self.logger.info(f'{self.name} has {self.cards_ready} cards in their UI')
+                    
                 if len(self.owned_cards) > 3:
                     update['cycle'] = True
 
@@ -221,6 +237,9 @@ class Penguin(MetaplaceProtocol):
 
             snow_ui = self.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload('updateStamina', update)
+
+        else:
+            self.logger.info(f'{self.name} needs to purchase more cards from the catalogue!')
 
     def consume_card(self, is_combo=False) -> None:
         if not self.selected_card:

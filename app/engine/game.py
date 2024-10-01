@@ -228,7 +228,7 @@ class Game:
                 # Hide disconnected ninjas
                 client.ninja.remove_object()
 
-            if all(client.disconnected for client in self.clients):
+            if all(client.disconnected for client in self.clients if not client.is_bot):
                 # All players have disconnected
                 self.close()
 
@@ -297,7 +297,7 @@ class Game:
                     if client.is_bot: 
                         cards = len(client.cards_queue)
                     else:
-                        cards = client.cards_placed 
+                        cards = client.cards_ready 
 
                     self.pending_cards += cards
 
@@ -318,8 +318,8 @@ class Game:
             self.hide_targets()
             self.remove_ui()
 
-            self.do_ninja_actions()
             self.move_ninjas()
+            self.do_ninja_actions()
             self.do_enemy_actions()
 
             # Check if any ninja is getting revived
