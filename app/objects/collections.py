@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -17,8 +18,6 @@ import logging
 T = TypeVar('T')
 
 class LockedSet(Set, Generic[T]):
-    """A thread-safe set implementation."""
-
     def __init__(self):
         self.lock = Lock()
         super().__init__()

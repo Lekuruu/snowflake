@@ -19,16 +19,6 @@ def delay(min: float, max: float) -> Callable:
         )
     return decorator
 
-import random
-
-def delay(min: int, max: int) -> Callable:
-    def decorator(func: Callable) -> Callable:
-        return lambda *args, **kwargs: reactor.callLater(
-            random.uniform(min, max),
-            func, *args, **kwargs
-        )
-    return decorator
-
 class PenguinAI(Penguin):
     def __init__(self, server, element: str, battle_mode: int) -> None:
         super().__init__(server, IPv4Address('TCP', '127.0.0.1', 69420))
@@ -61,17 +51,10 @@ class PenguinAI(Penguin):
     @delay(0.25, 1.5)
     def confirm_move(self) -> None:
         if self.is_ready:
+            self.send_message("skipping confirm_move.")
             return
-
-        confirm = GameObject(
-            self.game,
-            'ui_confirm',
-            x_offset=0.5,
-            y_offset=1.05
-        )
-
-        confirm.x = self.ninja.x
-        confirm.y = self.ninja.y
+        confirm = GameObject(self.game, 'ui_confirm', x_offset=0.5, y_offset=1.05)
+        confirm.x, confirm.y = self.ninja.x, self.ninja.y
         confirm.place_object()
         confirm.place_sprite(confirm.name)
         confirm.play_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8')
@@ -79,7 +62,6 @@ class PenguinAI(Penguin):
 
     @delay(0.5, 3)
     def select_move(self) -> None:
-        # Check for k.o. state
         if self.ninja.hp <= 0:
             self.handle_knockout()
 
