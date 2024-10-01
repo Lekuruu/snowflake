@@ -26,13 +26,13 @@ def fetch_by_nickname(nickname: str, session: Session | None = None) -> Penguin 
         .first()
 
 @session_wrapper
-def fetch_random(session: Session = ...) -> Penguin | None:
+def fetch_random(session: Session | None = None) -> Penguin | None:
     return session.query(Penguin) \
         .order_by(func.random()) \
         .first()
 
 @session_wrapper
-def update(id: int, updates: dict, session: Session = ...) -> int:
+def update(id: int, updates: dict, session: Session | None = None) -> int:
     rows = session.query(Penguin) \
         .filter(Penguin.id == id) \
         .update(updates)
