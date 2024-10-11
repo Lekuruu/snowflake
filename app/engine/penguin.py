@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Any, List
 
 if TYPE_CHECKING:
@@ -47,8 +46,8 @@ class Penguin(MetaplaceProtocol):
 
         self.member_card: MemberCard | None = None
         self.selected_card: CardObject | None = None
-        self.power_card_slots: List[CardObject] = []
-        self.power_cards: List[CardObject] = []
+        self.owned_cards: List[CardObject] = []
+        self.cards_ready: int = 0
         self.unlocked_stamps: List[int] = []
         self.power_card_stamina: int = 0
         self.played_cards: int = 0
@@ -75,7 +74,7 @@ class Penguin(MetaplaceProtocol):
 
     @property
     def has_power_cards(self) -> bool:
-        return bool(self.power_cards or self.power_card_slots)
+        return bool(self.owned_cards)
 
     @property
     def selected_member_card(self) -> bool:
@@ -140,36 +139,63 @@ class Penguin(MetaplaceProtocol):
             'fire': 'f'
         }[self.element]
 
-        power_cards = cards.fetch_power_cards_by_penguin_id(
-            self.pid,
-            element_name,
-            session=session
-        )
+        power_cards = None
+
+        if self.is_bot:
+            power_cards = cards.fetch_by_element(
+                element_name, 
+                session=session
+            )
+
+        else:
+            power_cards = cards.fetch_power_cards_by_penguin_id(
+                self.pid,
+                element_name,
+                session=session
+            )
 
         for card in power_cards:
             card_object = CardObject(card, self)
             card_object.color = card_color
-            self.power_cards.append(card_object)
+            self.owned_cards.append(card_object)
+
+        self.logger.info(f"Initializing {len(self.owned_cards)} cards for {self.element}")
 
     def next_power_card(self) -> CardObject | None:
-        if not self.power_cards:
+        if not self.has_power_cards:
             # Client has no more power cards
+            self.logger.info(f'{self.name} has no more power cards')
             return
 
-        if len(self.power_card_slots) >= 4:
-            # Client cannot hold more than 4 power cards
-            return
+        next_card = random.choice(self.owned_cards)
+        self.owned_cards.append(next_card)
+        self.owned_cards.remove(next_card)
 
-        next_card = random.choice(self.power_cards)
-        self.power_card_slots.append(next_card)
-        self.power_cards.remove(next_card)
         return next_card
 
     def power_card_by_id(self, card_id: int) -> Card | None:
-        return next((c for c in self.power_card_slots if c.id == card_id), None)
+        return next((c for c in self.owned_cards if c.id == card_id), None)
 
     def update_cards(self) -> None:
         if self.disconnected:
+            return
+
+        if self.is_bot:
+            return
+
+    def update_cards(self) -> None:
+        if self.disconnected:
+            return
+
+        if self.is_bot:
+            return
+
+        if not self.has_power_cards:
+            self.logger.info(f'{self.name} needs to purchase more cards from the catalogue!')
+            return
+
+        if self.cards_ready >= 4:
+            self.logger.info(f'{self.name} needs to place a card before queuing a new one!')
             return
 
         self.power_card_stamina += 2
@@ -182,6 +208,7 @@ class Penguin(MetaplaceProtocol):
 
         if self.power_card_stamina >= 10:
             self.power_card_stamina = 0
+
             update['stamina'] = 0
 
             if next_card := self.next_power_card():
@@ -198,7 +225,12 @@ class Penguin(MetaplaceProtocol):
                     "value": next_card.value
                 }
 
-            if len(self.power_card_slots) > 3:
+            if update['cardData'] is not None:
+                self.cards_ready += 1
+                self.logger.info(f'{self.name} has added card {update['cardData']['card_id']}')
+                self.logger.info(f'{self.name} has {self.cards_ready} cards in their UI')
+
+            if len(self.owned_cards) > 3:
                 update['cycle'] = True
 
         snow_ui = self.get_window('cardjitsu_snowui.swf')
