@@ -191,9 +191,9 @@ class TuskGame(Game):
 
         # Change max hp based on player count
         max_hp = {
-            1: 200,
-            2: 300,
-            3: 400
+            1: 300,
+            2: 500,
+            3: 800
         }[len(self.connected_clients)]
 
         self.tusk.max_hp = max_hp
