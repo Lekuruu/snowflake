@@ -1,4 +1,4 @@
-service-identity==24.1.0; python_version >= "3.12"
+service-identity==24.2.0; python_version >= "3.12"
 psycopg2-binary==2.9.10
 python-dotenv==1.0.1
 SQLAlchemy==2.0.36
