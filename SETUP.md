@@ -1,6 +1,6 @@
 # Setup
 
-This setup requires you to have a working installation of [Houdini](https://github.com/solero/houdini) with [Dash](https://github.com/solero/dash), as well as a copy of [Python](https://python.org) (3.8 to 3.12).
+This setup requires you to have a working installation of [Houdini](https://github.com/solero/houdini) with [Dash](https://github.com/solero/dash), as well as a copy of [Python](https://python.org) (3.8 to 3.13).
 There is some necessary configuration to get this working, which will be covered in the following sections.
 
 ## Changing the WNS URL
