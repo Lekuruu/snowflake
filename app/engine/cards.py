@@ -404,5 +404,6 @@ class MemberCard(GameObject):
         self.client.ninja.revive_membercard_animation()
         self.client.member_card = None
 
-        time.sleep(1)
+        time.sleep(1.2)
+        self.client.ninja.play_sound('SFX_MG_CJSnow_PowercardReviveEnd')
         beam.remove_object()
