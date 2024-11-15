@@ -311,7 +311,7 @@ class Ninja(GameObject):
             if isinstance(target_object, Tusk):
                 self.targets.append(target := TuskTarget(self, tile.x, tile.y))
                 target.show_attack()
-                continue
+                return
 
             self.targets.append(target := Target(self, tile.x, tile.y))
             target.show_attack()
