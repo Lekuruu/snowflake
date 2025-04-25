@@ -1,7 +1,8 @@
 
+from config import WEBSOCKET_SSL_ENABLED, WEBSOCKET_SSL_CERTFILE, WEBSOCKET_SSL_KEYFILE
 from txwebsocket.txws import WebSocketFactory, WebSocketProtocol
 from app.protocols.metaplace import MetaplaceWorldServer
-from twisted.internet import reactor
+from twisted.internet import reactor, ssl
 
 class WebSocketWrapper(WebSocketFactory):
     def __init__(self, world: MetaplaceWorldServer):
@@ -28,7 +29,16 @@ class WebSocketWrapper(WebSocketFactory):
 
     def listen(self, port: int) -> None:
         self.logger.info(f'Starting websocket world server "{self.world_name}" ({port})')
-        reactor.listenTCP(port, self)
+
+        if not WEBSOCKET_SSL_ENABLED:
+            reactor.listenTCP(port, self)
+            return
+
+        ssl_context = ssl.DefaultOpenSSLContextFactory(
+            WEBSOCKET_SSL_KEYFILE,
+            WEBSOCKET_SSL_CERTFILE
+        )
+        reactor.listenSSL(port, self, ssl_context)
 
     def buildProtocol(self, addr):
         protocol: WebSocketProtocol = super().buildProtocol(addr)

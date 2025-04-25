@@ -23,6 +23,9 @@ try:
 
     WEBSOCKET_ENABLED = os.environ.get('WEBSOCKET_ENABLED', 'False').lower() == 'true'
     WEBSOCKET_PORT = int(os.environ.get('WEBSOCKET_PORT', '7003'))
+    WEBSOCKET_SSL_ENABLED = os.environ.get('WEBSOCKET_SSL_ENABLED', 'False').lower() == 'true'
+    WEBSOCKET_SSL_KEYFILE = os.environ.get('WEBSOCKET_SSL_KEYFILE')
+    WEBSOCKET_SSL_CERTFILE = os.environ.get('WEBSOCKET_SSL_CERTFILE')
 
     MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION')
     MEDIA_DOMAIN = urlparse(MEDIA_LOCATION).hostname
