@@ -22,7 +22,7 @@ try:
     VERSION = os.environ.get('VERSION', 'FY15-20150206 (4954)r')
 
     WEBSOCKET_ENABLED = os.environ.get('WEBSOCKET_ENABLED', 'False').lower() == 'true'
-    WEBSOCKET_PORT = int(os.environ.get('WEBSOCKET_PORT', '7003'))
+    WEBSOCKET_PORT = int(os.environ.get('WEBSOCKET_PORT', '8002'))
     WEBSOCKET_SSL_ENABLED = os.environ.get('WEBSOCKET_SSL_ENABLED', 'False').lower() == 'true'
     WEBSOCKET_SSL_KEYFILE = os.environ.get('WEBSOCKET_SSL_KEYFILE')
     WEBSOCKET_SSL_CERTFILE = os.environ.get('WEBSOCKET_SSL_CERTFILE')
