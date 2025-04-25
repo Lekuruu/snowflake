@@ -21,6 +21,9 @@ try:
     PORT = int(os.environ.get('PORT', '7002'))
     VERSION = os.environ.get('VERSION', 'FY15-20150206 (4954)r')
 
+    WEBSOCKET_ENABLED = os.environ.get('WEBSOCKET_ENABLED', 'False').lower() == 'true'
+    WEBSOCKET_PORT = int(os.environ.get('WEBSOCKET_PORT', '7003'))
+
     MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION')
     MEDIA_DOMAIN = urlparse(MEDIA_LOCATION).hostname
 
