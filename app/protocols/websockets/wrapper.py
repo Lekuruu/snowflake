@@ -1,6 +1,6 @@
 
+from txwebsocket.txws import WebSocketFactory, WebSocketProtocol
 from app.protocols.metaplace import MetaplaceWorldServer
-from txwebsocket.txws import WebSocketFactory
 from twisted.internet import reactor
 
 class WebSocketWrapper(WebSocketFactory):
@@ -29,3 +29,8 @@ class WebSocketWrapper(WebSocketFactory):
     def listen(self, port: int) -> None:
         self.logger.info(f'Starting websocket world server "{self.world_name}" ({port})')
         reactor.listenTCP(port, self)
+
+    def buildProtocol(self, addr):
+        protocol: WebSocketProtocol = super().buildProtocol(addr)
+        protocol.setBinaryMode(True)
+        return protocol
