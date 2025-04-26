@@ -1,6 +1,6 @@
 
 from twisted.internet import reactor
-from app.protocols import SocketPolicyServer
+from app.protocols import SocketPolicyServer, WebSocketWrapper
 from app.server import SnowflakeWorld
 from app.logging import Console
 
@@ -39,6 +39,11 @@ if __name__ == "__main__":
                 config.POLICY_PORT
             )
             policy_server.listen(843)
+
+        if config.WEBSOCKET_ENABLED:
+            # Use txws to wrap tcp factory
+            ws_factory = WebSocketWrapper(world_server)
+            ws_factory.listen(config.WEBSOCKET_PORT)
 
         reactor.run()
     except Exception as e:

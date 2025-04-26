@@ -21,6 +21,12 @@ try:
     PORT = int(os.environ.get('PORT', '7002'))
     VERSION = os.environ.get('VERSION', 'FY15-20150206 (4954)r')
 
+    WEBSOCKET_ENABLED = os.environ.get('WEBSOCKET_ENABLED', 'False').lower() == 'true'
+    WEBSOCKET_PORT = int(os.environ.get('WEBSOCKET_PORT', '8002'))
+    WEBSOCKET_SSL_ENABLED = os.environ.get('WEBSOCKET_SSL_ENABLED', 'False').lower() == 'true'
+    WEBSOCKET_SSL_KEYFILE = os.environ.get('WEBSOCKET_SSL_KEYFILE')
+    WEBSOCKET_SSL_CERTFILE = os.environ.get('WEBSOCKET_SSL_CERTFILE')
+
     MEDIA_LOCATION = os.environ.get('MEDIA_LOCATION')
     MEDIA_DOMAIN = urlparse(MEDIA_LOCATION).hostname
 
