@@ -2,15 +2,27 @@
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import create_engine
 from contextlib import contextmanager
+from urllib.parse import quote_plus
 
 from .objects import Base
 
 import logging
 
 class Postgres:
-    def __init__(self, username: str, database_name: str, password: str, host: str, port: int) -> None:
+    def __init__(
+        self,
+        username: str,
+        database_name: str,
+        password: str,
+        host: str,
+        port: int
+    ) -> None:
+        safe_username = quote_plus(username)
+        safe_password = quote_plus(password)
+        safe_database_name = quote_plus(database_name)
+
         self.engine = create_engine(
-            f'postgresql://{username}:{password}@{host}:{port}/{database_name}',
+            f'postgresql://{safe_username}:{safe_password}@{host}:{port}/{safe_database_name}',
             pool_pre_ping=True,
             pool_recycle=900,
             pool_timeout=5,
