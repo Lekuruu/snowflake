@@ -3,7 +3,7 @@ psycopg2-binary==2.9.10
 python-dotenv==1.1.0
 SQLAlchemy==2.0.40
 Twisted==24.11.0
-redis==5.2.1
+redis==6.1.0
 txwebsocket==1.1.1
 six==1.17.0
 pyopenssl==25.0.0
