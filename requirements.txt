@@ -1,7 +1,7 @@
 service-identity==24.2.0; python_version >= "3.12"
 psycopg2-binary==2.9.11
 python-dotenv==1.2.1
-SQLAlchemy==2.0.45
+SQLAlchemy==2.0.46
 Twisted==25.5.0
 redis==7.1.0
 txwebsocket==1.1.1
