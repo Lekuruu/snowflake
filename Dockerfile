@@ -1,4 +1,4 @@
-FROM python:3.12-alpine
+FROM python:3.13-alpine
 ARG TARGETARCH
 
 RUN apk add \
@@ -24,5 +24,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 # COPY . .
 
 STOPSIGNAL SIGINT
-
 ENTRYPOINT ["python", "./main.py"]
