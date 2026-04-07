@@ -220,7 +220,7 @@ class Game:
                 # Hide disconnected ninjas
                 client.ninja.remove_object()
 
-            if all(client.disconnected for client in self.clients):
+            if all(client.disconnected or client.is_bot for client in self.clients):
                 # All players have disconnected
                 self.close()
 
