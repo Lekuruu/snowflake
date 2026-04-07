@@ -259,15 +259,15 @@ sound_assets = [
 
 SnowLobby.assets.update(common_assets)
 SnowBattle.assets.update(common_assets)
+SnowBattle.assets.update(background_assets)
 SnowBattle.assets.update(ui_assets)
 SnowBattle.assets.update(ninja_assets)
 SnowBattle.assets.update(enemy_assets)
-SnowBattle.assets.update(background_assets)
 SnowBattle.sound_assets.update(sound_assets)
 TuskBattle.assets.update(common_assets)
 TuskBattle.assets.update(ui_assets)
-TuskBattle.assets.update(tusk_assets)
 TuskBattle.assets.update(ninja_assets)
+TuskBattle.assets.update(tusk_assets)
 TuskBattle.sound_assets.update(sound_assets)
 
 app.session.assets.update(common_assets)

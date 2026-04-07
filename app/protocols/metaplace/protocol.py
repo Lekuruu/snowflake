@@ -58,16 +58,26 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def lineReceived(self, line: bytes) -> None:
         self.last_action = time.time()
 
+        if len(line) > 5*1024:
+            self.logger.warning(f'Request too long: "{line[:50]}... (truncated)"')
+            self.close_connection()
+            return
+
         try:
             data = line.decode("utf-8")
+            data = data.strip()
         except UnicodeDecodeError:
             self.logger.warning(f'Invalid request: "{line}"')
             self.close_connection()
             return
 
+        if not data:
+            return
+
         try:
-            parsed = data.split(' ')
-            command, args = parsed[0], parsed[1:]
+            # TODO: Add argument length validation
+            parsed = data.split()
+            command, *args = parsed
         except (ValueError, UnicodeDecodeError):
             self.logger.warning(f'Invalid request: "{data}"')
             self.close_connection()

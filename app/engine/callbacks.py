@@ -25,11 +25,13 @@ class Action:
     type: ActionType
     callback: Callable | None = None
 
-    def __eq__(self, action: "Action") -> bool:
-        return self.handle_id == action.handle_id
-
     def __hash__(self) -> int:
         return hash(self.handle_id)
+
+    def __eq__(self, action: object) -> bool:
+        if not isinstance(action, Action):
+            return False
+        return self.handle_id == action.handle_id
 
 class CallbackHandler:
     """This class manages callbacks for animations, sounds & window events"""
@@ -72,10 +74,10 @@ class CallbackHandler:
         ]
 
     def by_id(self, id: int) -> Action | None:
-        return next([action for action in self.actions if action.handle_id == id], None)
+        return next((action for action in self.actions if action.handle_id == id), None)
 
     def by_name(self, name: str) -> Action | None:
-        return next([action for action in self.actions if action.name == name], None)
+        return next((action for action in self.actions if action.name == name), None)
 
     def remove(self, object_id: int) -> None:
         if object_id in self.pending_actions:
@@ -110,7 +112,7 @@ class CallbackHandler:
                 continue
 
             if action.callback is not None:
-                reactor.callInThread(
+                reactor.callInThread(  # type: ignore
                     action.callback,
                     target_object
                 )

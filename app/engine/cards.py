@@ -1,12 +1,11 @@
 
 from __future__ import annotations
-from typing import Tuple, List, TYPE_CHECKING
-from twisted.internet import reactor
+from typing import Iterable, List, Tuple, TYPE_CHECKING
 
 from app.data import Card, TipPhase
 from app.objects import GameObject, LocalGameObject
-from app.objects.ninjas import Ninja
 from app.objects.enemies import Enemy
+from app.objects.ninjas import Ninja
 from app.objects.effects import (
     WaterPowerBeam,
     FirePowerBeam,
@@ -29,8 +28,11 @@ if TYPE_CHECKING:
 class CardObject(Card):
     def __init__(self, card: Card, client: "Penguin") -> None:
         self.__dict__.update(card.__dict__)
+
+        assert client.game, "Client must be in a game to create a CardObject"
         self.game = client.game
         self.client = client
+
         self.object = GameObject(
             client.game,
             card.name,
@@ -58,18 +60,33 @@ class CardObject(Card):
         return self.object.y
 
     @property
+    def targets(self) -> Iterable[GameObject]:
+        return set(self.game.grid.objects_in_range(
+            *self.pattern_range(self.x, self.y)
+        ))
+
+    @property
     def element_name(self) -> str:
         return {
             'f': 'fire',
             'w': 'water',
             's': 'snow'
-        }.get(self.element)
+        }.get(self.element, 'unknown')
 
     @property
-    def targets(self) -> List[GameObject]:
-        return set(self.game.grid.objects_in_range(
-            *self.pattern_range(self.x, self.y)
-        ))
+    def card_data(self) -> dict:
+        return {
+            "card_id": self.id,
+            "color": self.color,
+            "description": self.description,
+            "element": self.element,
+            "label": self.name,
+            "name": self.name,
+            "power_id": self.power_id,
+            "prompt": self.name,
+            "set_id": self.set_id,
+            "value": self.value
+        }
 
     def place(self, x: int, y: int) -> None:
         self.place_card_sprite(x, y)
@@ -106,7 +123,7 @@ class CardObject(Card):
         self.pattern.place_object()
         self.pattern.place_sprite(f'ui_card_pattern{len(x_range)}x{len(y_range)}')
 
-    def pattern_range(self, x: int, y: int) -> Tuple[List[int], List[int]]:
+    def pattern_range(self, x: int, y: int) -> Tuple[range[int], range[int]]:
         max_x = max(*self.game.grid.x_range)
         min_x = min(*self.game.grid.x_range)
         max_y = max(*self.game.grid.y_range)
@@ -136,6 +153,8 @@ class CardObject(Card):
         return x_range, y_range
 
     def use(self, is_combo=False) -> None:
+        assert self.client.ninja, "Client must have a ninja to use a card"
+
         if self.client.ninja.hp <= 0:
             return
 
@@ -150,7 +169,8 @@ class CardObject(Card):
 
         # Wait for client to consume card
         self.game.callbacks.wait_for_client(
-            'ConsumeCardResponse', self.client,
+            'ConsumeCardResponse',
+            client=self.client,
             timeout=2
         )
 
@@ -174,18 +194,7 @@ class CardObject(Card):
 
             if self.client != client:
                 payload_name = 'showCaseOthersCard'
-                data["cardData"] = {
-                    "card_id": self.id,
-                    "color": self.color,
-                    "description": self.description,
-                    "element": self.element,
-                    "label": self.name,
-                    "name": self.name,
-                    "power_id": self.power_id,
-                    "prompt": self.name,
-                    "set_id": self.set_id,
-                    "value": self.value
-                }
+                data["cardData"] = self.card_data
 
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload(payload_name, data)
@@ -250,12 +259,6 @@ class CardObject(Card):
                 Explosion(self.game, target.x, target.y).play()
 
     def apply_effects(self) -> None:
-        # NOTE: Water & Snow effects seems to apply for *all* ninjas,
-        #       instead of the ones in range of the power card. I am
-        #       not sure if I like this approach, since it makes the
-        #       game easier overall. My goal is to replicate the game
-        #       as close as possible, so I will keep it like this for now.
-
         if self.element == 's':
             # Apply shield to all ninjas
             for ninja in self.game.ninjas:
@@ -315,7 +318,7 @@ class CardObject(Card):
         if len(ninja_targets) >= 3 and self.element == 's':
             # Unlock "Huge Heal" stamp
             self.client.unlock_stamp(478)
-        
+
         if ninja_targets and is_combo and self.element == 'w':
             # Unlock "Wave Boost" stamp
             self.client.unlock_stamp(481)
@@ -343,6 +346,7 @@ class CardObject(Card):
 
 class MemberCard(GameObject):
     def __init__(self, client: "Penguin") -> None:
+        assert client.game, "Client must be in a game to create a MemberCard"
         super().__init__(
             client.game,
             'ui_card_member',
@@ -359,6 +363,8 @@ class MemberCard(GameObject):
         return self.client.element
 
     def place(self) -> None:
+        assert self.client.ninja, "Client must have a ninja to place a MemberCard"
+
         if self.client.ninja.placed_ghost:
             self.x = self.client.ninja.ghost.x
             self.y = self.client.ninja.ghost.y
@@ -383,6 +389,8 @@ class MemberCard(GameObject):
         self.y = -1
 
     def consume(self) -> None:
+        assert self.client.ninja, "Client must have a ninja to consume a MemberCard"
+
         if not self.selected:
             return
 
@@ -406,5 +414,6 @@ class MemberCard(GameObject):
         self.client.ninja.revive_membercard_animation()
         self.client.member_card = None
 
-        time.sleep(1)
+        time.sleep(1.2)
+        self.client.ninja.play_sound('SFX_MG_CJSnow_PowercardReviveEnd')
         beam.remove_object()

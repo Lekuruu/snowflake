@@ -1,6 +1,5 @@
 
 from __future__ import annotations
-
 from typing import TYPE_CHECKING, Callable, List
 from twisted.internet import reactor
 
@@ -10,11 +9,8 @@ if TYPE_CHECKING:
 from app.data.repositories import stamps, penguins, items
 from app.data import (
     ExpRequirements,
-    InputModifier,
-    InputTarget,
     SnowRewards,
     MirrorMode,
-    InputType,
     TipPhase
 )
 
