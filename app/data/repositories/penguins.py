@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from .wrapper import SessionProvider, session_wrapper
 from ..objects import Penguin
@@ -25,6 +26,11 @@ def fetch_by_nickname(nickname: str, session: Session = SessionProvider) -> Peng
         .first()
 
 @session_wrapper
+def fetch_random(session: Session = SessionProvider) -> Penguin | None:
+    return session.query(Penguin) \
+        .order_by(func.random()) \
+        .first()
+
 def update(id: int, updates: dict, session: Session = SessionProvider) -> int:
     rows = session.query(Penguin) \
         .filter(Penguin.id == id) \

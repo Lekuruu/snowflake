@@ -1,6 +1,7 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, List
+from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from .penguin import Penguin
@@ -219,7 +220,7 @@ class Game:
                 # Hide disconnected ninjas
                 client.ninja.remove_object()
 
-            if all(client.disconnected for client in self.clients):
+            if all(client.disconnected or client.is_bot for client in self.clients):
                 # All players have disconnected
                 self.close()
 
@@ -280,6 +281,9 @@ class Game:
 
                 if client.power_card_slots:
                     self.send_tip(TipPhase.CARD, client)
+
+                if client.is_bot:
+                    client.select_move()
 
             self.show_targets()
             self.wait_for_timer()
@@ -366,6 +370,9 @@ class Game:
             if player.disconnected:
                 continue
 
+            if player.is_bot:
+                continue
+
             while not condition(player) and not self.server.shutting_down:
                 if time.time() - start_time > timeout:
                     self.logger.warning(f'Player Timeout: {player}')
@@ -388,6 +395,9 @@ class Game:
     def wait_for_window(self, name: str, loaded=True, timeout=8) -> None:
         """Wait for a window to load/close"""
         for client in self.clients:
+            if client.is_bot:
+                continue
+
             window = client.get_window(name)
             start_time = time.time()
 

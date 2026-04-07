@@ -40,6 +40,8 @@ try:
 
     APPLY_WINDOWMANAGER_OFFSET = os.environ.get('APPLY_WINDOWMANAGER_OFFSET', 'False').lower() == 'true'
     ENABLE_DEBUG_LOGGING = os.environ.get('ENABLE_DEBUG_LOGGING', 'False').lower() == 'true'
+    ENABLE_NINJA_AI = os.environ.get('ENABLE_NINJA_AI', 'False').lower() == 'true'
+    ENABLE_NINJA_AI_DEBUG_LOGGING = os.environ.get('ENABLE_NINJA_AI_DEBUG_LOGGING', 'False').lower() == 'true'
     DISABLE_AUTHENTICATION = os.environ.get('DISABLE_AUTHENTICATION', 'False').lower() == 'true'
     DISABLE_ENEMY_AI = os.environ.get('DISABLE_ENEMY_AI', 'False').lower() == 'true'
     DISABLE_REWARDS = os.environ.get('DISABLE_REWARDS', 'False').lower() == 'true'
