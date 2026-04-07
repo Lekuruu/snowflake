@@ -15,6 +15,7 @@ import logging
 import random
 import config
 
+
 def delay(minimum: int, maximum: int) -> Callable:
     def decorator(func: Callable) -> Callable:
         return lambda *args, **kwargs: reactor.callLater(
@@ -22,6 +23,10 @@ def delay(minimum: int, maximum: int) -> Callable:
             func, *args, **kwargs
         )
     return decorator
+
+def manhatten_distance(x1: int, y1: int, x2: int, y2: int) -> int:
+    return abs(x1 - x2) + abs(y1 - y2)
+
 
 class PenguinAI(Penguin):
     def __init__(
@@ -302,7 +307,7 @@ class PenguinAI(Penguin):
 
     def nearest_enemy_distance(self, tile: GameObject, enemies: Iterable[Enemy]) -> int:
         return min(
-            abs(tile.x - enemy.x) + abs(tile.y - enemy.y)
+            manhatten_distance(tile.x, tile.y, enemy.x, enemy.y)
             for enemy in enemies
         )
 
@@ -322,7 +327,12 @@ class PenguinAI(Penguin):
             return None
 
         def score(enemy: Enemy):
-            distance = abs(enemy.x - from_tile.x) + abs(enemy.y - from_tile.y)
+            distance = manhatten_distance(
+                enemy.x,
+                enemy.y,
+                from_tile.x,
+                from_tile.y
+            )
 
             if prefer_closest:
                 return (enemy.hp, distance)
@@ -523,13 +533,13 @@ class PenguinAI(Penguin):
         best_tile = min(
             tiles,
             key=lambda tile: (
-                sum(abs(tile.x - ally.x) + abs(tile.y - ally.y) for ally in allies) / len(allies),
+                sum(manhatten_distance(tile.x, tile.y, ally.x, ally.y) for ally in allies) / len(allies),
                 0 if (current_tile and tile != current_tile) else 1
             )
         )
 
         avg_distance = sum(
-            abs(best_tile.x - ally.x) + abs(best_tile.y - ally.y)
+            manhatten_distance(best_tile.x, best_tile.y, ally.x, ally.y)
             for ally in allies
         ) / len(allies)
 
