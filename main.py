@@ -24,7 +24,7 @@ def on_shutdown(*args):
     for player in world_server.players:
         player.send_to_room()
 
-    reactor.callLater(0.1, reactor.stop)
+    reactor.callLater(0.1, reactor.stop)  # type: ignore
 
 def main():
     global world_server, policy_server
@@ -44,7 +44,7 @@ def main():
         ws_factory = WebSocketWrapper(world_server)
         ws_factory.listen(config.WEBSOCKET_PORT)
 
-    reactor.run()
+    reactor.run()  # type: ignore
 
 if __name__ == "__main__":
     # Handle shutdown signals to kick players before the reactor stops

@@ -23,7 +23,7 @@ class WebSocketWrapper(WebSocketFactory):
 
     def get_place(self, place_id: int):
         return self.wrappedFactory.get_place(place_id)
-    
+
     def register_place(self, place):
         self.wrappedFactory.register_place(place)
 
@@ -31,14 +31,14 @@ class WebSocketWrapper(WebSocketFactory):
         self.logger.info(f'Starting websocket world server "{self.world_name}" ({port})')
 
         if not WEBSOCKET_SSL_ENABLED:
-            reactor.listenTCP(port, self)
+            reactor.listenTCP(port, self)  # type: ignore
             return
 
         ssl_context = ssl.DefaultOpenSSLContextFactory(
             WEBSOCKET_SSL_KEYFILE,
             WEBSOCKET_SSL_CERTFILE
         )
-        reactor.listenSSL(port, self, ssl_context)
+        reactor.listenSSL(port, self, ssl_context)  # type: ignore
 
     def buildProtocol(self, addr):
         protocol: WebSocketProtocol = super().buildProtocol(addr)

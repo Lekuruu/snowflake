@@ -116,7 +116,7 @@ class GameObject:
         )
 
     def do_later(self, seconds: int, func: Callable, *args) -> None:
-        reactor.callLater(seconds, func, *args)
+        reactor.callLater(seconds, func, *args)  # type: ignore
 
     def place_object(self) -> None:
         x = self.x

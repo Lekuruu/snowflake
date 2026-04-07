@@ -35,7 +35,7 @@ class MatchmakingQueue:
 
             return match_types[player.battle_mode](*match)
 
-        reactor.callLater(
+        reactor.callLater(  # type: ignore
             config.MATCHMAKING_TIMEOUT,
             self.fill_queue, player
         )

@@ -55,7 +55,7 @@ class MetaplaceWorldServer(Factory):
 
     def listen(self, port: int) -> None:
         self.logger.info(f'Starting world server "{self.world_name}" ({port})')
-        reactor.listenTCP(port, self)
+        reactor.listenTCP(port, self)  # type: ignore
 
     def buildProtocol(self, address: IPv4Address | IPv6Address) -> MetaplaceProtocol:
         self.logger.debug(f'-> "{address.host}:{address.port}"')

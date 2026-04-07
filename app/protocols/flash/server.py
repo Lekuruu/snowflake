@@ -25,4 +25,4 @@ class SocketPolicyServer(Factory):
 
     def listen(self, port: int):
         self.logger.info(f"Starting policy server ({port})")
-        reactor.listenTCP(port, self)
+        reactor.listenTCP(port, self)  # type: ignore

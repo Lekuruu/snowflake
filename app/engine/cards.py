@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from typing import Tuple, List, TYPE_CHECKING
+from typing import Iterable, List, Tuple, TYPE_CHECKING
 
 from app.data import Card, TipPhase
 from app.objects import GameObject, LocalGameObject
@@ -28,8 +28,11 @@ if TYPE_CHECKING:
 class CardObject(Card):
     def __init__(self, card: Card, client: "Penguin") -> None:
         self.__dict__.update(card.__dict__)
+
+        assert client.game, "Client must be in a game to create a CardObject"
         self.game = client.game
         self.client = client
+
         self.object = GameObject(
             client.game,
             card.name,
@@ -57,7 +60,7 @@ class CardObject(Card):
         return self.object.y
 
     @property
-    def targets(self) -> List[GameObject]:
+    def targets(self) -> Iterable[GameObject]:
         return set(self.game.grid.objects_in_range(
             *self.pattern_range(self.x, self.y)
         ))
@@ -68,7 +71,7 @@ class CardObject(Card):
             'f': 'fire',
             'w': 'water',
             's': 'snow'
-        }.get(self.element)
+        }.get(self.element, 'unknown')
 
     @property
     def card_data(self) -> dict:
@@ -120,7 +123,7 @@ class CardObject(Card):
         self.pattern.place_object()
         self.pattern.place_sprite(f'ui_card_pattern{len(x_range)}x{len(y_range)}')
 
-    def pattern_range(self, x: int, y: int) -> Tuple[List[int], List[int]]:
+    def pattern_range(self, x: int, y: int) -> Tuple[range[int], range[int]]:
         max_x = max(*self.game.grid.x_range)
         min_x = min(*self.game.grid.x_range)
         max_y = max(*self.game.grid.y_range)
@@ -150,6 +153,8 @@ class CardObject(Card):
         return x_range, y_range
 
     def use(self, is_combo=False) -> None:
+        assert self.client.ninja, "Client must have a ninja to use a card"
+
         if self.client.ninja.hp <= 0:
             return
 
@@ -313,7 +318,7 @@ class CardObject(Card):
         if len(ninja_targets) >= 3 and self.element == 's':
             # Unlock "Huge Heal" stamp
             self.client.unlock_stamp(478)
-        
+
         if ninja_targets and is_combo and self.element == 'w':
             # Unlock "Wave Boost" stamp
             self.client.unlock_stamp(481)
@@ -341,6 +346,7 @@ class CardObject(Card):
 
 class MemberCard(GameObject):
     def __init__(self, client: "Penguin") -> None:
+        assert client.game, "Client must be in a game to create a MemberCard"
         super().__init__(
             client.game,
             'ui_card_member',
@@ -357,6 +363,8 @@ class MemberCard(GameObject):
         return self.client.element
 
     def place(self) -> None:
+        assert self.client.ninja, "Client must have a ninja to place a MemberCard"
+
         if self.client.ninja.placed_ghost:
             self.x = self.client.ninja.ghost.x
             self.y = self.client.ninja.ghost.y
@@ -381,6 +389,8 @@ class MemberCard(GameObject):
         self.y = -1
 
     def consume(self) -> None:
+        assert self.client.ninja, "Client must have a ninja to consume a MemberCard"
+
         if not self.selected:
             return
 
