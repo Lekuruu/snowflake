@@ -48,7 +48,7 @@ class MatchmakingQueue:
             player.logger.info('Left matchmaking queue')
             player.in_queue = False
 
-    def find_match(self, player: Penguin) -> List[Penguin] | None:
+    def find_match(self, player: Penguin) -> List[Penguin]:
         elements = ['snow', 'water', 'fire']
         elements.remove(player.element)
 
@@ -64,7 +64,7 @@ class MatchmakingQueue:
                 continue
 
             # Sort by closest rank
-            players.sort(
+            matches.sort(
                 key=lambda other: abs(
                     player.object.snow_ninja_rank -
                     other.object.snow_ninja_rank
@@ -77,7 +77,76 @@ class MatchmakingQueue:
         players.sort(key=lambda x: x.element)
         return players
 
-    def create_normal_game(self, fire: Penguin, snow: Penguin, water: Penguin) -> None:
+    def get_none_players(self, players: List[Penguin]) -> List[Penguin | None]:
+        player_dict = {
+            'fire': None,
+            'snow': None,
+            'water': None
+        }
+
+        for player in players:
+            player_dict[player.element] = player
+
+        return list(player_dict.values())
+
+    def insert_ai_players(self, players: List[Penguin]) -> List[Penguin]:
+        if not players:
+            return players
+
+        elements = ['snow', 'water', 'fire']
+        battle_mode = players[0].battle_mode
+        server = players[0].server
+
+        for player in players:
+            elements.remove(player.element)
+
+        for element in elements:
+            ai_player = PenguinAI(server, element, battle_mode)
+            players.append(ai_player)
+
+        players.sort(key=lambda x: x.element)
+        return players
+
+    def fill_queue(self, player: Penguin) -> None:
+        if player.battle_mode == 0 and not config.ALLOW_FORCESTART_SNOW:
+            # Singleplayer snow is disabled
+            return
+
+        if player.battle_mode == 1 and not config.ALLOW_FORCESTART_TUSK:
+            # Singleplayer tusk is disabled
+            return
+
+        if player.in_game:
+            # Player has found a match
+            return
+
+        # Find other players in queue
+        players = self.find_match(player)
+
+        required_time = (
+            config.MATCHMAKING_TIMEOUT / 2
+        )
+        players = [
+            p for p in players
+            if (time.time() - p.queue_time) >= required_time
+        ]
+
+        if config.ENABLE_NINJA_AI:
+            # Fill up missing players with bots
+            players = self.insert_ai_players(players)
+        else:
+            # Fill up missing players with empty slots
+            players = self.get_none_players(players)
+
+        self.logger.info(f'Found match: {players}')
+
+        match_types = {
+            0: self.create_normal_game,
+            1: self.create_tusk_game
+        }
+        match_types[player.battle_mode](*players)
+
+    def create_normal_game(self, fire: Penguin | None, snow: Penguin | None, water: Penguin | None) -> None:
         game = Game(fire, snow, water)
         game.server.games.add(game)
 
@@ -98,7 +167,7 @@ class MatchmakingQueue:
         # Start game loop
         game.server.runThread(game.start)
 
-    def create_tusk_game(self, fire: Penguin, snow: Penguin, water: Penguin) -> None:
+    def create_tusk_game(self, fire: Penguin | None, snow: Penguin | None, water: Penguin | None) -> None:
         game = TuskGame(fire, snow, water)
         game.server.games.add(game)
 
@@ -118,65 +187,3 @@ class MatchmakingQueue:
 
         # Start game loop
         game.server.runThread(game.start)
-
-    def insert_ai_players(self, players: List[Penguin]) -> List[Penguin]:
-        elements = ['snow', 'water', 'fire']
-        battle_mode = players[0].battle_mode
-
-        for player in players:
-            elements.remove(player.element)
-
-        for element in elements:
-            ai_player = PenguinAI(player.server, element, battle_mode)
-            players.append(ai_player)
-
-        players.sort(key=lambda x: x.element)
-        return players
-
-    def get_none_players(self, players: List[Penguin]) -> List[Penguin]:
-        player_dict = {
-            'fire': None,
-            'snow': None,
-            'water': None
-        }
-
-        for player in players:
-            player_dict[player.element] = player
-
-        return list(player_dict.values())
-
-    def fill_queue(self, player: Penguin) -> None:
-        if player.battle_mode == 0 and not config.ALLOW_FORCESTART_SNOW:
-            # Singleplayer snow is disabled
-            return
-
-        if player.battle_mode == 1 and not config.ALLOW_FORCESTART_TUSK:
-            # Singleplayer tusk is disabled
-            return
-
-        if player.in_game:
-            # Player has found a match
-            return
-
-        # Find other players in queue
-        players = self.find_match(player)
-
-        for p in players:
-            required_time = config.MATCHMAKING_TIMEOUT / 2
-            time_in_queue = time.time() - p.queue_time
-
-            if time_in_queue < required_time:
-                # Player has not been in queue long enough
-                players.remove(p)
-
-        # Fill up missing players with bots
-        players = self.insert_ai_players(players)
-
-        self.logger.info(f'Found match: {players}')
-
-        match_types = {
-            0: self.create_normal_game,
-            1: self.create_tusk_game
-        }
-
-        match_types[player.battle_mode](*players)
