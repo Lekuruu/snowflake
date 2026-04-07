@@ -52,6 +52,9 @@ Snowflake includes a recreation of the Card-Jitsu Snow beta as a toggleable opti
 
 - [cjsnow_uiassetsbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cjsnow_uiassetsbeta.swf) and [cjsnow_playerselectassetsbeta.swf](https://github.com/Lekuruu/snowflake/raw/main/.github/swf/cjsnow_playerselectassetsbeta.swf) both need to be in `/game/mpassets/minigames/cjsnow/en_US/deploy/swf/ui/assets/`.
 
+Additionally, if you want to use the beta background music, you may replace:
+- `/game/mpassets/minigames/cjsnow/en_US/deploy/sound/gameplay/mus_mg_201303_cjsnow_gamewindamb.mp3` with [this file](https://raw.githubusercontent.com/Lekuruu/snowflake/refs/heads/main/.github/sound/mus_mg_cjsnow_game_128k.mp3)
+
 ## Troubleshooting
 
 If something went wrong, you will most likely see this screen pop up:
