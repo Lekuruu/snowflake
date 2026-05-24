@@ -11,10 +11,6 @@ def on_card_clicked(client: Penguin, data: dict):
     if client.is_ready:
         return
 
-    if client.selected_member_card:
-        client.member_card.selected = False
-        client.member_card.remove()
-
     element = data['element']
     value = data['value']
     id = data['cardId']
@@ -27,6 +23,13 @@ def on_card_clicked(client: Penguin, data: dict):
 
     if card.element != element:
         return
+
+    if client.selected_member_card:
+        client.member_card.selected = False
+        client.member_card.remove()
+
+    if client.selected_card:
+        client.selected_card.remove()
 
     card.object.x = -1
     card.object.y = -1
