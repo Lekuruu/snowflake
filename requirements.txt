@@ -6,4 +6,4 @@ Twisted==26.4.0
 redis==8.0.0
 txwebsocket==1.1.1
 six==1.17.0
-pyopenssl==26.2.0
+pyopenssl==26.3.0
