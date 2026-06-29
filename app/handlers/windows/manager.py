@@ -7,7 +7,7 @@ import app.session
 import config
 
 @session.framework.register('windowManagerReady')
-def on_window_manager_ready(client: Penguin, data: dict):
+async def on_window_manager_ready(client: Penguin, data: dict):
     client.window_manager.ready = True
 
     loading_screen = client.get_window(

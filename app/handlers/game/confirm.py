@@ -5,7 +5,7 @@ from app.data import TipPhase
 from app import session
 
 @session.framework.register('confirmClicked')
-def on_confirm_clicked(client: Penguin, data: dict):
+async def on_confirm_clicked(client: Penguin, data: dict):
     """Sent by the client after clicking on the confirm button"""
     if client.is_ready:
         return

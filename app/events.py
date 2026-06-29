@@ -10,21 +10,21 @@ class EventHandler:
         self.handlers: Dict[str, Callable] = {}
         self.logger = logging.getLogger("Events")
 
-    def call(self, client: "Penguin", type: str, args: List[str]) -> None:
+    async def call(self, client: "Penguin", type: str, args: List[str]) -> None:
         if type != '/framework':
             self.logger.debug(f'{type}: {args}')
 
         if type in self.handlers:
-            self.handlers[type](client, *args)
+            await self.handlers[type](client, *args)
             return
 
         self.logger.warning(f'Unknown event: "{type}"')
 
     def register(self, type: str, login_required: bool = True) -> Callable:
         def wrapper(handler: Callable) -> Callable:
-            def login_wrapper(client: "Penguin", *args):
+            async def login_wrapper(client: "Penguin", *args):
                 if not client.logged_in: return
-                handler(client, *args)
+                await handler(client, *args)
 
             if login_required:
                 # Add wrapper function that checks for login
@@ -41,7 +41,7 @@ class FrameworkHandler:
         self.handlers: Dict[str, Callable] = {}
         self.logger = logging.getLogger("Framework")
 
-    def call(self, trigger: str, client: "Penguin", data: dict) -> None:
+    async def call(self, trigger: str, client: "Penguin", data: dict) -> None:
         if not client.window_manager.loaded:
             return
 
@@ -52,7 +52,7 @@ class FrameworkHandler:
             client.game.callbacks.event_done(trigger, client)
 
         if trigger in self.handlers:
-            self.handlers[trigger](client, data)
+            await self.handlers[trigger](client, data)
             return
 
         self.logger.warning(f'Unknown event: "{trigger}"')

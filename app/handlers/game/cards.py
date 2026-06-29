@@ -4,7 +4,7 @@ from app.data import TipPhase
 from app import session
 
 @session.framework.register('cardClick')
-def on_card_clicked(client: Penguin, data: dict):
+async def on_card_clicked(client: Penguin, data: dict):
     if not client.game.timer.running:
         return
 
@@ -38,7 +38,7 @@ def on_card_clicked(client: Penguin, data: dict):
     client.ninja.play_sound('sfx_mg_2013_cjsnow_uitargetred', client)
 
 @session.framework.register('unselectCard')
-def on_card_deselect(client: Penguin, data: dict):
+async def on_card_deselect(client: Penguin, data: dict):
     if not client.game.timer.running:
         return
 
@@ -55,7 +55,7 @@ def on_card_deselect(client: Penguin, data: dict):
     client.game.grid.change_tiles_for_client(client, 'ui_tile_move')
 
 @session.framework.register('ConsumeCardResponse')
-def on_card_consumed(client: Penguin, data: dict):
+async def on_card_consumed(client: Penguin, data: dict):
     try:
         client.power_card_slots.remove(client.selected_card)
         client.selected_card = None
@@ -68,12 +68,12 @@ def on_card_consumed(client: Penguin, data: dict):
         snow_ui.send_payload('noCards')
 
 @session.framework.register('cardCount')
-def on_card_count(client: Penguin, data: dict):
+async def on_card_count(client: Penguin, data: dict):
     card_amount = data['numCards']
     # TODO
 
 @session.framework.register('ShowMemberCardInfoTip')
-def on_membercard_info_clicked(client: Penguin, data: dict):
+async def on_membercard_info_clicked(client: Penguin, data: dict):
     if client.last_tip == TipPhase.MEMBER_CARD:
         client.hide_tip()
         return
@@ -81,7 +81,7 @@ def on_membercard_info_clicked(client: Penguin, data: dict):
     client.send_tip(TipPhase.MEMBER_CARD)
 
 @session.framework.register('memberCardClick')
-def on_membercard_select(client: Penguin, data: dict):
+async def on_membercard_select(client: Penguin, data: dict):
     if not client.is_member:
         return
 
@@ -103,7 +103,7 @@ def on_membercard_select(client: Penguin, data: dict):
     client.game.grid.hide_tiles_for_client(client)
 
 @session.framework.register('unselectMemberCard')
-def on_membercard_deselect(client: Penguin, data: dict):
+async def on_membercard_deselect(client: Penguin, data: dict):
     if not client.is_member:
         return
 
@@ -124,9 +124,9 @@ def on_membercard_deselect(client: Penguin, data: dict):
         client.game.grid.change_tiles_for_client(client, 'ui_tile_move')
 
 @session.framework.register('comboScreenComplete')
-def on_combo_screen_complete(client: Penguin, data: dict):
+async def on_combo_screen_complete(client: Penguin, data: dict):
     ...
 
 @session.framework.register('RewardCardResponse')
-def on_card_loaded(client: Penguin, data: dict):
+async def on_card_loaded(client: Penguin, data: dict):
     ...

@@ -10,11 +10,11 @@ import config
 import time
 
 @session.events.register('/version', login_required=False)
-def version_handler(client: Penguin):
+async def version_handler(client: Penguin):
     client.send_version(config.VERSION)
 
 @session.events.register("/place_context", login_required=False)
-def context_handler(client: Penguin, place_name: str, param_string: str):
+async def context_handler(client: Penguin, place_name: str, param_string: str):
     params = urllib.parse.parse_qs(param_string)
 
     if not (battle_mode := params.get('battleMode')):
@@ -37,7 +37,7 @@ def context_handler(client: Penguin, place_name: str, param_string: str):
     client.place = place
 
 @session.events.register('/login', login_required=False)
-def login_handler(client: Penguin, server_type: str, pid: int, token: str):
+async def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.send_login_message('Got /login command from user')
 
     if client.logged_in:

@@ -5,7 +5,7 @@ from app.engine.penguin import Penguin
 from app import session
 
 @session.events.register('/ready')
-def ready_handler(client: Penguin):
+async def ready_handler(client: Penguin):
     if not client.window_manager.loaded:
         # Initialize window manager
         client.window_manager.load()
@@ -45,7 +45,7 @@ def ready_handler(client: Penguin):
     client.send_tag('P_ASSETSCOMPLETE')
 
 @session.events.register('/place_ready')
-def on_place_ready(client: Penguin):
+async def on_place_ready(client: Penguin):
     client.setup_camera(*client.place.camera.position)
     client.set_zoom(client.place.camera.zoom)
     client.lock_camera(client.place.camera.lock_view)

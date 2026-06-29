@@ -86,8 +86,11 @@ class Penguin(MetaplaceProtocol):
         return bool(self.selected_card and self.selected_card.x != -1 and self.selected_card.y != -1)
 
     def command_received(self, command: str, args: List[Any]):
+        self.server.runCoroutine(self.handle_command(command, args))
+
+    async def handle_command(self, command: str, args: List[Any]):
         try:
-            app.session.events.call(
+            await app.session.events.call(
                 self,
                 command,
                 args
