@@ -5,6 +5,7 @@ from app.data import TipPhase
 if TYPE_CHECKING:
     from .game import Game
 
+import asyncio
 import time
 
 class Timer:
@@ -29,9 +30,9 @@ class Timer:
         self.tick = 10
         self.hide()
 
-    def update_tick(self, seconds: int = 1, interval: int = 0.25) -> None:
+    async def update_tick(self, seconds: int = 1, interval: int = 0.25) -> None:
         while seconds > 0:
-            time.sleep(interval)
+            await asyncio.sleep(interval)
             seconds -= interval
 
             if self.game.server.shutting_down:

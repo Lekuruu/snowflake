@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 from app.data import MirrorMode, OriginMode
 from app.objects import GameObject
 
+import asyncio
 import time
 
 class Effect(GameObject):
@@ -106,7 +107,7 @@ class AttackTileField:
         self.center_y = center_y
         self.tiles = []
 
-    def play(self):
+    async def play(self):
         x_offsets = range(-1, 2)
         y_offsets = range(-1, 2)
 
@@ -118,7 +119,7 @@ class AttackTileField:
                 self.tiles.append(tile := AttackTile(self.game, x, y))
                 tile.play()
 
-        time.sleep(0.25)
+        await asyncio.sleep(0.25)
         self.remove()
 
     def remove(self):
@@ -395,7 +396,7 @@ class ScrapImpactSurroundings:
         self.center_y = center_y
         self.effects: List[Effect] = []
 
-    def play(self):
+    async def play(self):
         x_offsets = range(-1, 2)
         y_offsets = range(-1, 2)
 
@@ -412,7 +413,7 @@ class ScrapImpactSurroundings:
                 impact.play()
                 tile.play()
 
-        time.sleep(0.35)
+        await asyncio.sleep(0.35)
         self.remove()
 
     def remove(self):
@@ -471,7 +472,7 @@ class ScrapProjectileImpact:
         self.effects: List[ScrapProjectile] = []
         self.duration = 0.4
 
-    def play(self):
+    async def play(self):
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
         projectile.play_east(self.center_x + 1, self.center_y)
 
@@ -496,7 +497,7 @@ class ScrapProjectileImpact:
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
         projectile.play_northeast(self.center_x - 1, self.center_y + 0.8)
 
-        time.sleep(self.duration)
+        await asyncio.sleep(self.duration)
         for effect in self.effects:
             effect.remove_object()
 
@@ -754,14 +755,14 @@ class TuskIcicleRow:
         self.second_row = row[1]
         self.game = game
 
-    def play(self):
+    async def play(self):
         x_range = list(self.game.grid.x_range)
         x_range.reverse()
 
         for x in x_range:
             TuskIcicle(self.game, x, self.first_row).play()
             TuskIcicle(self.game, x, self.second_row).play()
-            time.sleep(0.09)
+            await asyncio.sleep(0.09)
 
 class TuskPushRock(Effect):
     def __init__(self, game: "Game", x: int, y: int) -> None:

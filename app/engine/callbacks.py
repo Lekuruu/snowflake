@@ -7,6 +7,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from enum import IntEnum
 
+import asyncio
 import time
 
 if TYPE_CHECKING:
@@ -131,7 +132,7 @@ class CallbackHandler:
         if target in self.pending_events:
             self.pending_events.pop(target, None)
 
-    def wait_for_client(self, event: str, client: "Penguin", timeout=8) -> None:
+    async def wait_for_client(self, event: str, client: "Penguin", timeout=8) -> None:
         """Wait for an event to be called by the client"""
         self.register_event(client, event)
 
@@ -147,9 +148,9 @@ class CallbackHandler:
                 self.remove_events(client)
                 break
 
-            time.sleep(0.05)
+            await asyncio.sleep(0.05)
 
-    def wait_for_event(self, event: str, timeout=8) -> None:
+    async def wait_for_event(self, event: str, timeout=8) -> None:
         """Wait for an event to be called by any of the clients"""
         self.register_event(self.game, event)
 
@@ -161,7 +162,7 @@ class CallbackHandler:
                 self.reset_events()
                 break
 
-            time.sleep(0.05)
+            await asyncio.sleep(0.05)
 
     def reset_animations(self) -> None:
         self.pending_actions.clear()

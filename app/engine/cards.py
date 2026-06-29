@@ -20,6 +20,7 @@ from app.objects.effects import (
     Rage
 )
 
+import asyncio
 import time
 
 if TYPE_CHECKING:
@@ -152,7 +153,7 @@ class CardObject(Card):
 
         return x_range, y_range
 
-    def use(self, is_combo=False) -> None:
+    async def use(self, is_combo=False) -> None:
         assert self.client.ninja, "Client must have a ninja to use a card"
 
         if self.client.ninja.hp <= 0:
@@ -175,7 +176,7 @@ class CardObject(Card):
         )
 
         # Wait for card animation
-        time.sleep(1.2)
+        await asyncio.sleep(1.2)
 
         self.attack_animation()
         self.apply_health()
@@ -199,7 +200,7 @@ class CardObject(Card):
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload(payload_name, data)
 
-    def attack_animation(self) -> None:
+    async def attack_animation(self) -> None:
         self.client.ninja.power_animation()
 
         beam_class = {
@@ -219,22 +220,22 @@ class CardObject(Card):
 
         if self.element != 's':
             # Wait for attack animation
-            time.sleep(0.2)
+            await asyncio.sleep(0.2)
 
         impact = impact_class(self.game, self.x, self.y)
         impact.play()
 
         if self.element == 'f':
-            time.sleep(impact.duration)
+            await asyncio.sleep(impact.duration)
             impact.remove_object()
-            time.sleep(beam.duration - impact.duration)
+            await asyncio.sleep(beam.duration - impact.duration)
             beam.remove_object()
             return
 
         beam_delay = 0.85
-        time.sleep(impact.duration - beam_delay)
+        await asyncio.sleep(impact.duration - beam_delay)
         beam.remove_object()
-        time.sleep(beam_delay)
+        await asyncio.sleep(beam_delay)
         impact.remove_object()
 
     def apply_health(self) -> None:
@@ -388,7 +389,7 @@ class MemberCard(GameObject):
         self.x = -1
         self.y = -1
 
-    def consume(self) -> None:
+    async def consume(self) -> None:
         assert self.client.ninja, "Client must have a ninja to consume a MemberCard"
 
         if not self.selected:
@@ -404,7 +405,7 @@ class MemberCard(GameObject):
             snow_ui.send_payload(payload_name)
 
         # Wait for card animation
-        time.sleep(2)
+        await asyncio.sleep(2)
 
         beam = MemberReviveBeam(self.game, self.client.ninja.x, self.client.ninja.y)
         beam.play()
@@ -414,6 +415,6 @@ class MemberCard(GameObject):
         self.client.ninja.revive_membercard_animation()
         self.client.member_card = None
 
-        time.sleep(1.2)
+        await asyncio.sleep(1.2)
         self.client.ninja.play_sound('SFX_MG_CJSnow_PowercardReviveEnd')
         beam.remove_object()

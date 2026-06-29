@@ -23,6 +23,7 @@ import app.session
 import logging
 import random
 import config
+import asyncio
 import time
 
 class TuskGame(Game):
@@ -60,7 +61,7 @@ class TuskGame(Game):
     def bonus_criteria_met(self) -> bool:
         return False
 
-    def start(self) -> None:
+    async def start(self) -> None:
         with app.session.database.managed_session() as session:
             for client in self.clients:
                 client.game = self
@@ -72,7 +73,7 @@ class TuskGame(Game):
                 client.initialize_power_cards(session=session)
 
         # Wait for "prepare to battle" screen to end
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         # Close player select window
         for client in self.clients:
@@ -87,7 +88,7 @@ class TuskGame(Game):
 
         # Wait for loading screen to finish
         self.callbacks.wait_for_event('roomToRoomMinTime')
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         # Wait for players to finish loading assets
         self.wait_for_players(lambda player: player.is_ready, timeout=20)
@@ -117,7 +118,7 @@ class TuskGame(Game):
             )
 
         # Wait for windows
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         # Reset game time
         self.game_start = time.time() + 1
@@ -214,7 +215,7 @@ class TuskGame(Game):
         self.tusk.remove_object()
         self.sensei.remove_object()
 
-    def do_powercard_attacks(self) -> None:
+    async def do_powercard_attacks(self) -> None:
         ninjas_with_cards = [
             ninja for ninja in self.ninjas
             if ninja.client.placed_powercard
@@ -250,11 +251,11 @@ class TuskGame(Game):
             self.callbacks.wait_for_event('comboScreenComplete', timeout=6)
 
         self.sensei.update_state()
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         for ninja in ninjas_with_cards:
             ninja.use_powercard(is_combo)
-            time.sleep(1)
+            await asyncio.sleep(1)
 
     def display_round_title(self) -> None:
         for client in self.clients:
@@ -381,8 +382,8 @@ class TuskGame(Game):
                     yPercent=0.05
                 )
 
-    def display_win_sequence(self) -> None:
-        time.sleep(2)
+    async def display_win_sequence(self) -> None:
+        await asyncio.sleep(2)
 
         if all(ninja.hp <= 0 for ninja in self.ninjas):
             self.tusk.win_animation()
@@ -404,4 +405,4 @@ class TuskGame(Game):
 
         self.sensei.win_animation()
 
-        time.sleep(3.5)
+        await asyncio.sleep(3.5)

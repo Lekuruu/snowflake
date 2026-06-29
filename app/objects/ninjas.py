@@ -31,6 +31,7 @@ from app.objects.enemies import Enemy, Tusk
 from app.objects import GameObject
 
 import app.engine.cards
+import asyncio
 import time
 
 class Ninja(GameObject):
@@ -326,9 +327,9 @@ class Ninja(GameObject):
 
         self.targets = []
 
-    def attack_target(self, target: Enemy):
+    async def attack_target(self, target: Enemy):
         # This delay seems to fix the mirror mode?
-        time.sleep(0.25)
+        await asyncio.sleep(0.25)
 
         self.attack_animation(target.x, target.y)
         self.client.update_cards()
@@ -346,7 +347,7 @@ class Ninja(GameObject):
             target.hp - self.attack
         )
 
-    def heal_target(self, target: "Ninja"):
+    async def heal_target(self, target: "Ninja"):
         if self.client.last_tip == TipPhase.HEAL:
             self.game.hide_tip(self.client)
 
@@ -360,7 +361,7 @@ class Ninja(GameObject):
         self.heals += 1
         self.heal_animation()
         self.client.update_cards()
-        time.sleep(0.4)
+        await asyncio.sleep(0.4)
 
         if self.rage:
             self.rage.use(target.x, target.y)
@@ -618,7 +619,7 @@ class WaterNinja(Ninja):
 
         self.idle_animation()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
             self.mirror_mode = MirrorMode.X
 
@@ -630,7 +631,7 @@ class WaterNinja(Ninja):
         )
         self.idle_animation()
 
-        time.sleep(0.45)
+        await asyncio.sleep(0.45)
         self.attack_sound()
 
     def win_animation(self) -> None:
@@ -679,7 +680,7 @@ class WaterNinja(Ninja):
         )
         self.idle_animation()
 
-    def power_animation(self) -> None:
+    async def power_animation(self) -> None:
         self.animate_object(
             'waterninja_powercard_summon_anim',
             play_style='play_once',
@@ -687,7 +688,7 @@ class WaterNinja(Ninja):
         )
         self.idle_animation()
         self.powercard_sound()
-        time.sleep(0.65)
+        await asyncio.sleep(0.65)
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackwater')
@@ -741,7 +742,7 @@ class SnowNinja(Ninja):
 
         self.idle_animation()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
             self.mirror_mode = MirrorMode.X
 
@@ -754,14 +755,14 @@ class SnowNinja(Ninja):
         )
         self.idle_animation()
 
-        time.sleep(0.3)
+        await asyncio.sleep(0.3)
         self.projectile_animation(x, y)
 
-    def projectile_animation(self, x: int, y: int) -> None:
+    async def projectile_animation(self, x: int, y: int) -> None:
         # This is kinda jank lol
         projectile = SnowProjectile(self.game, self.x, self.y)
         projectile.play(x, y)
-        time.sleep(0.2)
+        await asyncio.sleep(0.2)
         projectile.remove_object()
 
         projectile = SnowProjectile(self.game, self.x, self.y)
@@ -822,7 +823,7 @@ class SnowNinja(Ninja):
         )
         self.idle_animation()
 
-    def power_animation(self) -> None:
+    async def power_animation(self) -> None:
         self.animate_object(
             'snowninja_powercard_anim',
             play_style='play_once',
@@ -830,7 +831,7 @@ class SnowNinja(Ninja):
         )
         self.idle_animation()
         self.powercard_sound()
-        time.sleep(0.45)
+        await asyncio.sleep(0.45)
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attacksnow')
@@ -884,7 +885,7 @@ class FireNinja(Ninja):
 
         self.idle_animation()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
             self.mirror_mode = MirrorMode.X
 
@@ -897,7 +898,7 @@ class FireNinja(Ninja):
         )
         self.idle_animation()
 
-        time.sleep(1.45)
+        await asyncio.sleep(1.45)
         self.projectile_animation(x, y)
 
     def projectile_animation(self, x: int, y: int) -> None:
@@ -955,7 +956,7 @@ class FireNinja(Ninja):
         )
         self.idle_animation()
 
-    def power_animation(self) -> None:
+    async def power_animation(self) -> None:
         self.animate_object(
             'fireninja_power_anim',
             play_style='play_once',
@@ -963,7 +964,7 @@ class FireNinja(Ninja):
         )
         self.idle_animation()
         self.powercard_sound()
-        time.sleep(1)
+        await asyncio.sleep(1)
 
     def move_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_footsteppenguinfire')
@@ -1015,14 +1016,14 @@ class Sensei(GameObject):
 
         action[self.power_state]()
 
-    def do_powerup(self) -> None:
+    async def do_powerup(self) -> None:
         if not self.game.enemies:
             return
 
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
         self.attack_animation()
         self.attack_sound()
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
 
         beam_class = {
             'fire': FirePowerBeam,
@@ -1040,7 +1041,7 @@ class Sensei(GameObject):
         beam.x_offset = beam_offset[0]
         beam.y_offset = beam_offset[1]
         beam.play()
-        time.sleep(0.65)
+        await asyncio.sleep(0.65)
 
         positions = [
             (1, 2),
@@ -1053,12 +1054,12 @@ class Sensei(GameObject):
 
         for x, y in positions:
             impacts.append(self.place_card(x, y))
-            time.sleep(delay)
+            await asyncio.sleep(delay)
 
         if self.element_state == 'snow':
             self.snow_impact_sound()
 
-        time.sleep(impacts[0][1].duration - delay)
+        await asyncio.sleep(impacts[0][1].duration - delay)
 
         beam.remove_object()
         self.idle_animation()

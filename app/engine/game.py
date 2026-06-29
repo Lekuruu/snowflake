@@ -29,6 +29,7 @@ import app.session
 import logging
 import random
 import config
+import asyncio
 import time
 
 class Game:
@@ -96,7 +97,7 @@ class Game:
             'under_time': (time.time() < self.game_start + 300)
         }[self.bonus_criteria]
 
-    def start(self) -> None:
+    async def start(self) -> None:
         with app.session.database.managed_session() as session:
             for client in self.clients:
                 client.game = self
@@ -108,7 +109,7 @@ class Game:
                 client.initialize_power_cards(session=session)
 
         # Wait for "prepare to battle" screen to end
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         # Close player select window
         for client in self.clients:
@@ -123,7 +124,7 @@ class Game:
 
         # Wait for loading screen to finish
         self.callbacks.wait_for_event('roomToRoomMinTime')
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         # Wait for players to finish loading assets
         self.wait_for_players(lambda player: player.is_ready, timeout=20)
@@ -151,13 +152,13 @@ class Game:
             )
 
         # Wait for windows
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         # Reset game time
         self.game_start = time.time() + 1
 
         self.display_round_title()
-        time.sleep(1.6)
+        await asyncio.sleep(1.6)
 
         self.spawn_enemies()
         self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
@@ -207,7 +208,7 @@ class Game:
         self.server.games.remove(self)
         exit()
 
-    def run_game_loop(self) -> None:
+    async def run_game_loop(self) -> None:
         while True:
             self.logger.info(
                 f'Starting round {self.round + 1} '
@@ -263,14 +264,14 @@ class Game:
             self.remove_enemies()
 
             self.display_round_title()
-            time.sleep(1.6)
+            await asyncio.sleep(1.6)
 
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
             self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
-    def run_until_next_round(self) -> None:
+    async def run_until_next_round(self) -> None:
         while True:
             for client in self.clients:
                 client.selected_card = None
@@ -291,7 +292,7 @@ class Game:
             self.hide_ghosts()
             self.remove_ui()
             self.hide_targets()
-            time.sleep(1.25)
+            await asyncio.sleep(1.25)
 
             # Sometimes the targets are still visible?
             self.hide_targets()
@@ -362,7 +363,7 @@ class Game:
         for player in self.clients:
             player.send_tag(tag, *args)
 
-    def wait_for_players(self, condition: Callable, timeout=8) -> None:
+    async def wait_for_players(self, condition: Callable, timeout=8) -> None:
         """Wait for all players to finish a condition"""
         start_time = time.time()
 
@@ -378,9 +379,9 @@ class Game:
                     self.logger.warning(f'Player Timeout: {player}')
                     return
 
-                time.sleep(0.05)
+                await asyncio.sleep(0.05)
 
-    def wait_for_animations(self, timeout=8) -> None:
+    async def wait_for_animations(self, timeout=8) -> None:
         """Wait for all animations to finish"""
         start_time = time.time()
 
@@ -390,9 +391,9 @@ class Game:
                 self.callbacks.reset_animations()
                 break
 
-            time.sleep(0.05)
+            await asyncio.sleep(0.05)
 
-    def wait_for_window(self, name: str, loaded=True, timeout=8) -> None:
+    async def wait_for_window(self, name: str, loaded=True, timeout=8) -> None:
         """Wait for a window to load/close"""
         for client in self.clients:
             if client.is_bot:
@@ -409,7 +410,7 @@ class Game:
                     self.logger.warning(f'Window Timeout: {name}')
                     break
 
-            time.sleep(0.05)
+            await asyncio.sleep(0.05)
 
     def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
@@ -628,7 +629,7 @@ class Game:
         self.do_ninja_revive()
         self.wait_for_animations()
 
-    def do_ninja_attacks(self) -> None:
+    async def do_ninja_attacks(self) -> None:
         ninjas_without_cards = [
             ninja for ninja in self.ninjas
             if not ninja.client.selected_card
@@ -653,9 +654,9 @@ class Game:
                     # Unlock "Heal 15" stamp
                     self.snow.unlock_stamp(477)
 
-                time.sleep(1)
+                await asyncio.sleep(1)
 
-    def do_powercard_attacks(self) -> None:
+    async def do_powercard_attacks(self) -> None:
         ninjas_with_cards = [
             ninja for ninja in self.ninjas
             if ninja.client.placed_powercard
@@ -683,9 +684,9 @@ class Game:
 
         for ninja in ninjas_with_cards:
             ninja.use_powercard(is_combo)
-            time.sleep(1)
+            await asyncio.sleep(1)
 
-    def do_ninja_revive(self) -> None:
+    async def do_ninja_revive(self) -> None:
         ninjas_with_member_cards = [
             client for client in self.clients
             if client.selected_member_card
@@ -708,14 +709,14 @@ class Game:
 
             for ninja in ninjas_with_member_cards:
                 ninja.member_card.consume()
-                time.sleep(1)
+                await asyncio.sleep(1)
 
-    def do_enemy_actions(self) -> None:
+    async def do_enemy_actions(self) -> None:
         if config.DISABLE_ENEMY_AI:
             return
 
         for enemy in self.enemies:
-            time.sleep(0.5)
+            await asyncio.sleep(0.5)
 
             if enemy.hp <= 0:
                 # Enemy is dead
@@ -1052,8 +1053,8 @@ class Game:
                     yPercent=0.05
                 )
 
-    def display_win_sequence(self) -> None:
-        time.sleep(2)
+    async def display_win_sequence(self) -> None:
+        await asyncio.sleep(2)
 
         if all(ninja.hp <= 0 for ninja in self.ninjas):
             return
@@ -1067,4 +1068,4 @@ class Game:
 
             ninja.win_animation()
 
-        time.sleep(3.5)
+        await asyncio.sleep(3.5)

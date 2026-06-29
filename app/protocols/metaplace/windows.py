@@ -7,6 +7,7 @@ from app import protocols
 
 import config
 import json
+import asyncio
 import time
 
 class SWFWindow:
@@ -169,7 +170,7 @@ class WindowManager(Dict[str, SWFWindow]):
             'windowmanager.swf'
         )
 
-    def wait_for_window(self, window: SWFWindow, loaded: bool = True, timeout: int = 8):
+    async def wait_for_window(self, window: SWFWindow, loaded: bool = True, timeout: int = 8):
         start_time = time.time()
 
         while window.loaded != loaded:
@@ -180,4 +181,4 @@ class WindowManager(Dict[str, SWFWindow]):
                 self.logger.warning(f'Window Timeout: {window.name}')
                 return
 
-            time.sleep(0.05)
+            await asyncio.sleep(0.05)

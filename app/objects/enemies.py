@@ -30,6 +30,7 @@ from app.objects.effects import (
 
 import itertools
 import random
+import asyncio
 import time
 
 class Enemy(GameObject):
@@ -173,12 +174,12 @@ class Enemy(GameObject):
 
         self.hit_animation()
 
-    def attack_target(self, target: "Ninja") -> None:
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
         # This seems to fix the mirror mode?
-        time.sleep(0.25)
+        await asyncio.sleep(0.25)
 
         self.attack_animation()
         target.set_health(target.hp - self.attack)
@@ -393,12 +394,12 @@ class Sly(Enemy):
     move: int = 3
     move_duration: int = 1200
 
-    def attack_target(self, target: "Ninja") -> None:
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
         # This seems to fix the mirror mode?
-        time.sleep(0.25)
+        await asyncio.sleep(0.25)
 
         distance = abs(self.x - target.x) + abs(self.y - target.y)
 
@@ -425,11 +426,11 @@ class Sly(Enemy):
         )
         self.idle_animation()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x < x:
             self.mirror_mode = MirrorMode.X
 
-        time.sleep(0.25)
+        await asyncio.sleep(0.25)
         self.animate_object(
             'sly_attack_anim',
             play_style='play_once',
@@ -439,11 +440,11 @@ class Sly(Enemy):
         self.idle_animation()
         self.attack_sound()
 
-        time.sleep(1.45)
+        await asyncio.sleep(1.45)
         projectile = SlyProjectile(self.game, self.x, self.y)
         projectile.play(x, y)
 
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
         self.impact_sound()
         projectile.remove_object()
 
@@ -510,12 +511,12 @@ class Scrap(Enemy):
 
         return self.attack + (self.attack / 2) * len(surrounding_targets)
 
-    def attack_target(self, target: "Ninja") -> None:
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
         # This seems to fix the mirror mode?
-        time.sleep(0.25)
+        await asyncio.sleep(0.25)
 
         self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
@@ -567,7 +568,7 @@ class Scrap(Enemy):
         self.idle_animation()
         self.move_sound()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x < x:
             self.mirror_mode = MirrorMode.X
 
@@ -579,13 +580,13 @@ class Scrap(Enemy):
         )
         self.idle_animation()
 
-        time.sleep(0.7)
+        await asyncio.sleep(0.7)
         self.attack_sound()
 
         distance = abs(self.x - x) + abs(self.y - y)
         impact_time = 0.9 + (distance * 0.1)
 
-        time.sleep(impact_time)
+        await asyncio.sleep(impact_time)
         self.impact_sound()
 
         ScrapImpact(self.game, x, y).play()
@@ -675,12 +676,12 @@ class Tank(Enemy):
         # This should never happen, unless range is greater than 1
         return self.attack
 
-    def attack_target(self, target: "Ninja") -> None:
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
         # This seems to fix the mirror mode?
-        time.sleep(0.25)
+        await asyncio.sleep(0.25)
 
         self.attack_animation(target.x, target.y)
         target.set_health(target.hp - self.attack)
@@ -724,7 +725,7 @@ class Tank(Enemy):
         for attack_tile in effects:
             attack_tile.play()
 
-        time.sleep(0.25)
+        await asyncio.sleep(0.25)
 
         for attack_tile in effects:
             attack_tile.remove_object()
@@ -746,7 +747,7 @@ class Tank(Enemy):
         self.idle_animation()
         self.move_sound()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x < x:
             self.mirror_mode = MirrorMode.X
 
@@ -758,7 +759,7 @@ class Tank(Enemy):
             reset=True
         )
         self.idle_animation()
-        time.sleep(0.15)
+        await asyncio.sleep(0.15)
 
     def ko_animation(self) -> None:
         self.animate_object(
@@ -880,7 +881,7 @@ class Tusk(Enemy):
         if random.random() <= push_attack_chance:
             self.next_attack = 'push'
 
-    def push_attack(self) -> None:
+    async def push_attack(self) -> None:
         self.push_attack_animation()
 
         push_duration = 2.25
@@ -921,7 +922,7 @@ class Tusk(Enemy):
 
             ninja_positions.append((result_x, ninja.y))
 
-        time.sleep(attack_delay)
+        await asyncio.sleep(attack_delay)
         x_range = list(self.game.grid.x_range)
         x_range.reverse()
 
@@ -950,7 +951,7 @@ class Tusk(Enemy):
                     base_y
                 ).play()
 
-            time.sleep((push_duration / len(x_range)) / 2)
+            await asyncio.sleep((push_duration / len(x_range)) / 2)
 
             for base_x, base_y in last_positions:
                 if x - base_x < 0:
@@ -962,13 +963,13 @@ class Tusk(Enemy):
                     base_y
                 ).play()
 
-            time.sleep((push_duration / len(x_range)) / 2)
+            await asyncio.sleep((push_duration / len(x_range)) / 2)
 
         self.game.wait_for_animations()
 
-    def icicle_attack_random(self) -> None:
+    async def icicle_attack_random(self) -> None:
         self.icicle_attack_animation()
-        time.sleep(1.1)
+        await asyncio.sleep(1.1)
 
         # NOTE: The actual algorithm for this attack is unknown
         #       I am just going to improvise for now
@@ -1002,19 +1003,19 @@ class Tusk(Enemy):
         for x, y in positions:
             TuskIcicle(self.game, x, y).play()
 
-        time.sleep(1.5)
+        await asyncio.sleep(1.5)
         self.game.wait_for_animations()
 
-    def icicle_attack_paired(self) -> None:
+    async def icicle_attack_paired(self) -> None:
         self.icicle_attack_animation()
-        time.sleep(1.1)
+        await asyncio.sleep(1.1)
         effect = TuskIcicleRow(
             self.game,
             next(self.icicle_pairs)
         )
         effect.play()
 
-        time.sleep(1)
+        await asyncio.sleep(1)
         self.game.wait_for_animations()
 
     def set_health(self, hp: int, wait=True) -> None:
