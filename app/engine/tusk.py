@@ -123,8 +123,8 @@ class TuskGame(Game):
         # Reset game time
         self.game_start = time.time() + 1
 
-        self.display_round_title()
-        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
+        await self.display_round_title()
+        await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
         self.show_ui()
         self.send_tip(TipPhase.MOVE)
@@ -247,7 +247,7 @@ class TuskGame(Game):
                 # Unlock "4 Ninja Combo" stamp
                 self.unlock_stamp(468)
 
-            self.display_combo_title(elements)
+            await self.display_combo_title(elements)
             self.callbacks.wait_for_event('comboScreenComplete', timeout=6)
 
         self.sensei.update_state()
@@ -257,7 +257,7 @@ class TuskGame(Game):
             ninja.use_powercard(is_combo)
             await asyncio.sleep(1)
 
-    def display_round_title(self) -> None:
+    async def display_round_title(self) -> None:
         for client in self.clients:
             round_title = client.get_window('cardjitsu_snowrounds.swf')
             round_title.layer = 'bottomLayer'
@@ -269,7 +269,7 @@ class TuskGame(Game):
                 yPercent=0.15
             )
 
-        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
+        await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
 
     def display_payout(self) -> None:
         with app.session.database.managed_session() as session:

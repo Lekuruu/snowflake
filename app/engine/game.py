@@ -411,7 +411,7 @@ class Game:
                     self.logger.warning(f'Window Timeout: {name}')
                     break
 
-            await asyncio.sleep(0.05)
+                await asyncio.sleep(0.05)
 
     async def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
@@ -676,7 +676,7 @@ class Game:
                 # Unlock "3 Combos" stamp
                 self.unlock_stamp(485)
 
-            self.display_combo_title([
+            await self.display_combo_title([
                 ninja.client.element
                 for ninja in ninjas_with_cards
             ])
@@ -705,8 +705,8 @@ class Game:
                 )
 
             # Wait for revive splash to load and close
-            self.wait_for_window('cardjitsu_snowrevive.swf', loaded=True)
-            self.wait_for_window('cardjitsu_snowrevive.swf', loaded=False)
+            await self.wait_for_window('cardjitsu_snowrevive.swf', loaded=True)
+            await self.wait_for_window('cardjitsu_snowrevive.swf', loaded=False)
 
             for ninja in ninjas_with_member_cards:
                 ninja.member_card.consume()
@@ -855,7 +855,7 @@ class Game:
 
         await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
 
-    def display_combo_title(self, elements: List[str]) -> None:
+    async def display_combo_title(self, elements: List[str]) -> None:
         for client in self.clients:
             combo_title = client.get_window('cardjitsu_snowcombos.swf')
             combo_title.layer = 'bottomLayer'
@@ -867,7 +867,7 @@ class Game:
                 yPercent=0.5
             )
 
-        self.wait_for_window(
+        await self.wait_for_window(
             'cardjitsu_snowcombos.swf',
             loaded=True,
             timeout=4

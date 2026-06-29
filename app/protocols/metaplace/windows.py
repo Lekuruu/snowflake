@@ -178,7 +178,7 @@ class WindowManager(Dict[str, SWFWindow]):
                 return
 
             if time.time() - start_time > timeout:
-                self.logger.warning(f'Window Timeout: {window.name}')
+                self.client.logger.warning(f'Window Timeout: {window.name}')
                 return
 
             await asyncio.sleep(0.05)
