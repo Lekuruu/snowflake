@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Callable, List
 from twisted.internet import reactor
 
 if TYPE_CHECKING:
+    from ..server import SnowflakeWorld
     from .penguin import Penguin
 
 from app.data.repositories import stamps, penguins, items
@@ -53,7 +54,7 @@ class Game:
         self.grid = Grid(9, 5, self)
         self.timer = Timer(self)
 
-        self.server = self.clients[0].server
+        self.server: "SnowflakeWorld" = self.clients[0].server # type: ignore
         self.logger = logging.getLogger('Game')
         self.backgrounds = []
         self.rocks = []

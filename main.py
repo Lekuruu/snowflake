@@ -1,4 +1,11 @@
 
+from twisted.internet import asyncioreactor
+import asyncio
+
+# Run Twisted on top of the asyncio event loop, so the
+# game engine can be driven as asyncio coroutines
+asyncioreactor.install(asyncio.new_event_loop())
+
 from twisted.internet import reactor
 from app.protocols import SocketPolicyServer, WebSocketWrapper
 from app.server import SnowflakeWorld

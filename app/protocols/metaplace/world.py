@@ -22,7 +22,7 @@ class MetaplaceWorldServer(Factory):
         world_owner: str,
         stylesheet_id: str,
         policy_domain: str = "*",
-        policy_port: str = "*",
+        policy_port: str | int = "*",
         server_type: ServerType = ServerType.LIVE,
         build_type: BuildType = BuildType.RELEASE
     ) -> None:

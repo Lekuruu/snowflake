@@ -165,7 +165,7 @@ class MatchmakingQueue:
             self.remove(client)
 
         # Start game loop
-        game.server.runThread(game.start)
+        game.server.runCoroutine(game.start())
 
     def create_tusk_game(self, fire: Penguin | None, snow: Penguin | None, water: Penguin | None) -> None:
         game = TuskGame(fire, snow, water)
@@ -186,4 +186,4 @@ class MatchmakingQueue:
             self.remove(client)
 
         # Start game loop
-        game.server.runThread(game.start)
+        game.server.runCoroutine(game.start())
