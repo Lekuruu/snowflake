@@ -756,7 +756,7 @@ class Game:
                 # Enemy's sprite might be flipped to wrong direction
                 enemy.reset_sprite_settings()
 
-            enemy.attack_target(target_object)
+            await enemy.attack_target(target_object)
 
             if target_object.x > enemy.x:
                 # Flip ninja's sprite to face the enemy
