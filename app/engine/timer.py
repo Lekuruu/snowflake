@@ -15,16 +15,16 @@ class Timer:
         self.loaded = False
         self.running = False
 
-    def run(self) -> None:
+    async def run(self) -> None:
         if not self.loaded:
-            self.load()
+            await self.load()
             self.loaded = True
 
         self.running = True
         self.show()
 
         while self.tick > 0:
-            self.update_tick()
+            await self.update_tick()
 
         self.running = False
         self.tick = 10
@@ -57,7 +57,7 @@ class Timer:
         self.tick -= 1
         self.update()
 
-    def load(self) -> None:
+    async def load(self) -> None:
         for client in self.game.clients:
             timer = client.get_window('cardjitsu_snowtimer.swf')
             timer.layer = 'bottomLayer'
@@ -69,7 +69,7 @@ class Timer:
                 yPercent=0
             )
 
-        self.game.wait_for_window('cardjitsu_snowtimer.swf', loaded=True)
+        await self.game.wait_for_window('cardjitsu_snowtimer.swf', loaded=True)
 
     def update(self) -> None:
         for client in self.game.clients:

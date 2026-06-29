@@ -178,8 +178,8 @@ class CardObject(Card):
         # Wait for card animation
         await asyncio.sleep(1.2)
 
-        self.attack_animation()
-        self.apply_health()
+        await self.attack_animation()
+        await self.apply_health()
 
         if is_combo:
             self.apply_effects()
@@ -238,7 +238,7 @@ class CardObject(Card):
         await asyncio.sleep(beam_delay)
         impact.remove_object()
 
-    def apply_health(self) -> None:
+    async def apply_health(self) -> None:
         for target in self.targets:
             if isinstance(target, Ninja) and self.element == 's':
                 if target.client.disconnected:
@@ -256,7 +256,7 @@ class CardObject(Card):
                 if self.element == 'f':
                     target.stunned = True
 
-                target.set_health(target.hp - attack, wait=False)
+                await target.set_health(target.hp - attack, wait=False)
                 Explosion(self.game, target.x, target.y).play()
 
     def apply_effects(self) -> None:

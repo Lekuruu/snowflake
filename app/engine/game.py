@@ -124,11 +124,11 @@ class Game:
             client.switch_place(battle_place)
 
         # Wait for loading screen to finish
-        self.callbacks.wait_for_event('roomToRoomMinTime')
+        await self.callbacks.wait_for_event('roomToRoomMinTime')
         await asyncio.sleep(1)
 
         # Wait for players to finish loading assets
-        self.wait_for_players(lambda player: player.is_ready, timeout=20)
+        await self.wait_for_players(lambda player: player.is_ready, timeout=20)
 
         # Play background music
         Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
@@ -158,13 +158,13 @@ class Game:
         # Reset game time
         self.game_start = time.time() + 1
 
-        self.display_round_title()
+        await self.display_round_title()
         await asyncio.sleep(1.6)
 
         self.spawn_enemies()
-        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
+        await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
-        self.show_ui()
+        await self.show_ui()
         self.send_tip(TipPhase.MOVE)
 
         for client in self.disconnected_clients:
@@ -178,11 +178,11 @@ class Game:
             snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
-        self.run_game_loop()
+        await self.run_game_loop()
 
         self.remove_ui()
         self.remove_targets()
-        self.display_win_sequence()
+        await self.display_win_sequence()
 
         if not self.enemies:
             for client in self.clients:
@@ -216,7 +216,7 @@ class Game:
                 f'({len(self.enemies)} {"enemies" if len(self.enemies) > 1 else "enemy"})'
             )
 
-            self.run_until_next_round()
+            await self.run_until_next_round()
 
             for client in self.disconnected_clients:
                 # Hide disconnected ninjas
@@ -264,13 +264,13 @@ class Game:
             # Remove any existing enemies
             self.remove_enemies()
 
-            self.display_round_title()
+            await self.display_round_title()
             await asyncio.sleep(1.6)
 
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
-            self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
+            await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
     async def run_until_next_round(self) -> None:
         while True:
@@ -288,7 +288,7 @@ class Game:
                     client.select_move()
 
             self.show_targets()
-            self.wait_for_timer()
+            await self.wait_for_timer()
 
             self.hide_ghosts()
             self.remove_ui()
@@ -299,9 +299,9 @@ class Game:
             self.hide_targets()
             self.remove_ui()
 
-            self.move_ninjas()
-            self.do_ninja_actions()
-            self.do_enemy_actions()
+            await self.move_ninjas()
+            await self.do_ninja_actions()
+            await self.do_enemy_actions()
 
             # Check if any ninja is getting revived
             for ninja in self.ninjas:
@@ -328,7 +328,7 @@ class Game:
 
                     client.unlock_stamp(474)
 
-                self.wait_for_animations()
+                await self.wait_for_animations()
                 ninja.selected_object.set_health(1)
                 ninja.targets = []
                 ninja.idle_animation()
@@ -338,7 +338,7 @@ class Game:
                 enemy.update_flame()
 
             # Wait for any animations to finish
-            self.wait_for_animations()
+            await self.wait_for_animations()
 
             if self.check_round_completion():
                 break
@@ -413,11 +413,11 @@ class Game:
 
             await asyncio.sleep(0.05)
 
-    def wait_for_timer(self) -> None:
+    async def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
         self.grid.show_tiles()
         self.enable_cards()
-        self.timer.run()
+        await self.timer.run()
         self.grid.hide_tiles()
         self.disable_cards()
 
@@ -568,7 +568,7 @@ class Game:
         for ninja in self.ninjas:
             ninja.hide_ghost(reset_positions=False)
 
-    def move_ninjas(self) -> None:
+    async def move_ninjas(self) -> None:
         for ninja in self.ninjas:
             if ninja.placed_ghost:
                 ninja.client.update_cards()
@@ -579,7 +579,7 @@ class Game:
             )
 
         # Wait for move animations
-        self.wait_for_animations()
+        await self.wait_for_animations()
 
     def show_targets(self) -> None:
         for ninja in self.ninjas:
@@ -624,11 +624,11 @@ class Game:
         for rock in self.rocks:
             rock.remove_object()
 
-    def do_ninja_actions(self) -> None:
-        self.do_ninja_attacks()
-        self.do_powercard_attacks()
-        self.do_ninja_revive()
-        self.wait_for_animations()
+    async def do_ninja_actions(self) -> None:
+        await self.do_ninja_attacks()
+        await self.do_powercard_attacks()
+        await self.do_ninja_revive()
+        await self.wait_for_animations()
 
     async def do_ninja_attacks(self) -> None:
         ninjas_without_cards = [
@@ -646,10 +646,10 @@ class Game:
                     continue
 
                 if isinstance(target, Enemy):
-                    ninja.attack_target(target)
+                    await ninja.attack_target(target)
 
                 if isinstance(target, Ninja):
-                    ninja.heal_target(target)
+                    await ninja.heal_target(target)
 
                 if ninja.heals >= 15:
                     # Unlock "Heal 15" stamp
@@ -735,7 +735,7 @@ class Game:
 
             if next_move:
                 enemy.move_enemy(next_move.x, next_move.y)
-                self.wait_for_animations()
+                await self.wait_for_animations()
 
             if target is None:
                 # Set sprite to default direction
@@ -762,7 +762,7 @@ class Game:
                 # Flip ninja's sprite to face the enemy
                 target_object.mirror_mode = MirrorMode.X
 
-            self.wait_for_animations()
+            await self.wait_for_animations()
             target_object.reset_sprite_settings()
 
         # Remove enemy stunned state
@@ -773,7 +773,7 @@ class Game:
             enemy.stunned = False
             enemy.idle_animation()
 
-    def show_ui(self) -> None:
+    async def show_ui(self) -> None:
         for client in self.clients:
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.layer = 'bottomLayer'
@@ -789,7 +789,7 @@ class Game:
                 yPercent=1
             )
 
-        self.wait_for_window('cardjitsu_snowui.swf', loaded=True)
+        await self.wait_for_window('cardjitsu_snowui.swf', loaded=True)
 
     def send_tip(self, phase: TipPhase, client: "Penguin" | None = None) -> None:
         clients = [client] if client else self.clients
@@ -835,7 +835,7 @@ class Game:
         for client in self.clients:
             client.unlock_stamp(id)
 
-    def display_round_title(self) -> None:
+    async def display_round_title(self) -> None:
         round_time = ((self.game_start + 300) - time.time()) * 1000
 
         for client in self.clients:
@@ -853,7 +853,7 @@ class Game:
                 yPercent=0.15
             )
 
-        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
+        await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
 
     def display_combo_title(self, elements: List[str]) -> None:
         for client in self.clients:

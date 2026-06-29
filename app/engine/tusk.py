@@ -100,7 +100,7 @@ class TuskGame(Game):
         self.show_environment()
         self.spawn_ninjas()
         self.spawn_enemies()
-        self.wait_for_animations()
+        await self.wait_for_animations()
 
         for client in self.clients:
             # Close loading screen
@@ -388,7 +388,7 @@ class TuskGame(Game):
         if all(ninja.hp <= 0 for ninja in self.ninjas):
             self.tusk.win_animation()
             self.sensei.lose_animation()
-            self.wait_for_animations()
+            await self.wait_for_animations()
             return
 
         # Unlock "Final Battle" stamp

@@ -338,12 +338,12 @@ class Ninja(GameObject):
             self.rage.use(target.x, target.y)
             self.rage = None
 
-            target.set_health(
+            await target.set_health(
                 target.hp - self.attack * 1.5
             )
             return
 
-        target.set_health(
+        await target.set_health(
             target.hp - self.attack
         )
 

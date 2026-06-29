@@ -138,7 +138,7 @@ class Enemy(GameObject):
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
 
-    def set_health(self, hp: int, wait=True) -> None:
+    async def set_health(self, hp: int, wait=True) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
@@ -168,7 +168,7 @@ class Enemy(GameObject):
                 self.do_later(2.5, self.remove_object)
                 return
 
-            self.game.wait_for_animations()
+            await self.game.wait_for_animations()
             self.remove_object()
             return
 
@@ -965,7 +965,7 @@ class Tusk(Enemy):
 
             await asyncio.sleep((push_duration / len(x_range)) / 2)
 
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
 
     async def icicle_attack_random(self) -> None:
         self.icicle_attack_animation()
