@@ -175,7 +175,7 @@ class Ninja(GameObject):
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
 
-    def set_health(self, hp: int, show_effects=True) -> None:
+    async def set_health(self, hp: int, show_effects=True) -> None:
         if hp < self.hp and self.shield:
             self.shield.pop()
             self.shield = None
@@ -189,23 +189,23 @@ class Ninja(GameObject):
 
         if hp >= self.hp:
             # Ninja gained health
-            HealNumbers(
+            await HealNumbers(
                 self.game,
                 self.x,
                 self.y
             ).play(hp - self.hp)
-            self.revive_animation()
+            await self.revive_animation()
             self.hp = hp
             return
 
         if show_effects:
-            AttackTile(
+            await AttackTile(
                 self.game,
                 self.x,
                 self.y
             ).play(auto_remove=True)
 
-            DamageNumbers(
+            await DamageNumbers(
                 self.game,
                 self.x,
                 self.y
@@ -331,7 +331,7 @@ class Ninja(GameObject):
         # This delay seems to fix the mirror mode?
         await asyncio.sleep(0.25)
 
-        self.attack_animation(target.x, target.y)
+        await self.attack_animation(target.x, target.y)
         self.client.update_cards()
 
         if self.rage:
@@ -367,7 +367,7 @@ class Ninja(GameObject):
             self.rage.use(target.x, target.y)
             self.rage = None
 
-            target.set_health(
+            await target.set_health(
                 target.hp + self.attack * 1.5
             )
             return
@@ -515,11 +515,11 @@ class Ninja(GameObject):
 
         self.client.selected_card.place(x, y)
 
-    def use_powercard(self, is_combo=False) -> None:
+    async def use_powercard(self, is_combo=False) -> None:
         if not self.client.selected_card:
             return
 
-        self.client.selected_card.use(is_combo)
+        await self.client.selected_card.use(is_combo)
 
     """Animations"""
 
@@ -532,7 +532,7 @@ class Ninja(GameObject):
     def ko_animation(self) -> None:
         ...
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         ...
 
     def win_animation(self) -> None:
@@ -544,7 +544,7 @@ class Ninja(GameObject):
     def heal_animation(self) -> None:
         ...
 
-    def revive_animation(self) -> None:
+    async def revive_animation(self) -> None:
         ...
 
     def revive_other_animation(self) -> None:
@@ -641,13 +641,13 @@ class WaterNinja(Ninja):
             reset=True
         )
 
-    def revive_animation(self) -> None:
+    async def revive_animation(self) -> None:
         self.animate_object(
             f'waterninja_revived_anim',
             play_style='play_once',
             reset=True
         )
-        HealParticles(self.game, self.x, self.y).play()
+        await HealParticles(self.game, self.x, self.y).play()
 
         if self.is_reviving:
             self.revive_other_animation_loop()
@@ -756,17 +756,17 @@ class SnowNinja(Ninja):
         self.idle_animation()
 
         await asyncio.sleep(0.3)
-        self.projectile_animation(x, y)
+        await self.projectile_animation(x, y)
 
     async def projectile_animation(self, x: int, y: int) -> None:
         # This is kinda jank lol
         projectile = SnowProjectile(self.game, self.x, self.y)
-        projectile.play(x, y)
+        await projectile.play(x, y)
         await asyncio.sleep(0.2)
         projectile.remove_object()
 
         projectile = SnowProjectile(self.game, self.x, self.y)
-        projectile.play(x, y)
+        await projectile.play(x, y)
         self.do_later(0.2, projectile.remove_object)
 
     def heal_animation(self) -> None:
@@ -784,13 +784,13 @@ class SnowNinja(Ninja):
             reset=True
         )
 
-    def revive_animation(self) -> None:
+    async def revive_animation(self) -> None:
         self.animate_object(
             'snowninja_revive_anim',
             play_style='play_once',
             reset=True
         )
-        HealParticles(self.game, self.x, self.y).play()
+        await HealParticles(self.game, self.x, self.y).play()
 
         if self.is_reviving:
             self.revive_other_animation_loop()
@@ -899,9 +899,9 @@ class FireNinja(Ninja):
         self.idle_animation()
 
         await asyncio.sleep(1.45)
-        self.projectile_animation(x, y)
+        await self.projectile_animation(x, y)
 
-    def projectile_animation(self, x: int, y: int) -> None:
+    async def projectile_animation(self, x: int, y: int) -> None:
         projectile = FireProjectile(self.game, self.x, self.y)
         projectile.play(x, y)
         self.do_later(0.25, projectile.remove_object)
@@ -917,13 +917,13 @@ class FireNinja(Ninja):
             play_style='loop'
         )
 
-    def revive_animation(self) -> None:
+    async def revive_animation(self) -> None:
         self.animate_object(
             'fireninja_revived_anim',
             play_style='play_once',
             reset=True
         )
-        HealParticles(self.game, self.x, self.y).play()
+        await HealParticles(self.game, self.x, self.y).play()
 
         if self.is_reviving:
             self.revive_other_animation_loop()
@@ -1074,9 +1074,9 @@ class Sensei(GameObject):
             card.apply_health()
 
             if is_combo:
-                card.apply_effects()
+                await card.apply_effects()
 
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
 
     def place_card(self, x: int, y: int):
         card = app.engine.cards.CardObject(
@@ -1119,7 +1119,7 @@ class Sensei(GameObject):
             reset=True
         )
 
-    def attack_animation(self) -> None:
+    async def attack_animation(self) -> None:
         self.animate_object(
             'sensei_attackstart_anim',
             play_style='play_once',

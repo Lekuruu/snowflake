@@ -168,7 +168,7 @@ class Game:
         self.send_tip(TipPhase.MOVE)
 
         for client in self.disconnected_clients:
-            client.ninja.set_health(0)
+            await client.ninja.set_health(0)
 
         for client in self.clients:
             if client.has_power_cards:
@@ -329,13 +329,13 @@ class Game:
                     client.unlock_stamp(474)
 
                 await self.wait_for_animations()
-                ninja.selected_object.set_health(1)
+                await ninja.selected_object.set_health(1)
                 ninja.targets = []
                 ninja.idle_animation()
 
             # Update enemy flame
             for enemy in self.enemies:
-                enemy.update_flame()
+                await enemy.update_flame()
 
             # Wait for any animations to finish
             await self.wait_for_animations()
@@ -684,7 +684,7 @@ class Game:
             self.callbacks.wait_for_event('comboScreenComplete', timeout=6)
 
         for ninja in ninjas_with_cards:
-            ninja.use_powercard(is_combo)
+            await ninja.use_powercard(is_combo)
             await asyncio.sleep(1)
 
     async def do_ninja_revive(self) -> None:
@@ -1065,7 +1065,7 @@ class Game:
                 continue
 
             if ninja.hp <= 0:
-                ninja.set_health(1)
+                await ninja.set_health(1)
 
             ninja.win_animation()
 

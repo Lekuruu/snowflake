@@ -142,13 +142,13 @@ class Enemy(GameObject):
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
-        AttackTile(
+        await AttackTile(
             self.game,
             self.x,
             self.y
         ).play(auto_remove=True)
 
-        DamageNumbers(
+        await DamageNumbers(
             self.game,
             self.x,
             self.y
@@ -181,22 +181,22 @@ class Enemy(GameObject):
         # This seems to fix the mirror mode?
         await asyncio.sleep(0.25)
 
-        self.attack_animation()
-        target.set_health(target.hp - self.attack)
+        await self.attack_animation()
+        await target.set_health(target.hp - self.attack)
 
-    def flame_damage(self) -> None:
+    async def flame_damage(self) -> None:
         if self.hp <= 0:
             return
 
-        self.set_health(self.hp - 3)
+        await self.set_health(self.hp - 3)
 
-    def update_flame(self) -> None:
+    async def update_flame(self) -> None:
         if not self.flame:
             return
 
         if self.flame.rounds_left <= 0:
             # Stun enemy one more time before removing flame
-            self.flame_damage()
+            await self.flame_damage()
 
             self.flame.remove_object()
             self.flame = None
@@ -206,7 +206,7 @@ class Enemy(GameObject):
             return
 
         self.flame.rounds_left -= 1
-        self.flame_damage()
+        await self.flame_damage()
 
     def movable_tiles(self) -> Iterator[GameObject]:
         """Get all tiles that the enemy can move to from its current position"""
@@ -353,7 +353,7 @@ class Enemy(GameObject):
     def move_animation(self) -> None:
         ...
 
-    def attack_animation(self) -> None:
+    async def attack_animation(self) -> None:
         ...
 
     def ko_animation(self) -> None:
@@ -407,8 +407,8 @@ class Sly(Enemy):
         #       Wiki, it does an additional 1 damage per tile
         damage = self.attack + round(self.attack_per_tile * (distance - 1))
 
-        self.attack_animation(target.x, target.y)
-        target.set_health(target.hp - damage)
+        await self.attack_animation(target.x, target.y)
+        await target.set_health(target.hp - damage)
 
     def idle_animation(self, reset=False) -> None:
         self.animate_object(
@@ -442,13 +442,13 @@ class Sly(Enemy):
 
         await asyncio.sleep(1.45)
         projectile = SlyProjectile(self.game, self.x, self.y)
-        projectile.play(x, y)
+        await projectile.play(x, y)
 
         await asyncio.sleep(0.5)
         self.impact_sound()
         projectile.remove_object()
 
-        Explosion(
+        await Explosion(
             self.game,
             x,
             y
@@ -518,10 +518,10 @@ class Scrap(Enemy):
         # This seems to fix the mirror mode?
         await asyncio.sleep(0.25)
 
-        self.attack_animation(target.x, target.y)
-        target.set_health(target.hp - self.attack)
+        await self.attack_animation(target.x, target.y)
+        await target.set_health(target.hp - self.attack)
 
-        ScrapProjectileImpact(
+        await ScrapProjectileImpact(
             self.game,
             target.x,
             target.y
@@ -537,15 +537,15 @@ class Scrap(Enemy):
 
         for surrounding_target in surrounding_targets:
             object = self.game.grid[surrounding_target.x, surrounding_target.y]
-            object.set_health(object.hp - self.attack / 2)
+            await object.set_health(object.hp - self.attack / 2)
 
-            Explosion(
+            await Explosion(
                 self.game,
                 surrounding_target.x,
                 surrounding_target.y
             ).play()
 
-        ScrapImpactSurroundings(
+        await ScrapImpactSurroundings(
             self.game,
             target.x,
             target.y
@@ -589,7 +589,7 @@ class Scrap(Enemy):
         await asyncio.sleep(impact_time)
         self.impact_sound()
 
-        ScrapImpact(self.game, x, y).play()
+        await ScrapImpact(self.game, x, y).play()
 
     def ko_animation(self) -> None:
         self.animate_object(
@@ -683,8 +683,8 @@ class Tank(Enemy):
         # This seems to fix the mirror mode?
         await asyncio.sleep(0.25)
 
-        self.attack_animation(target.x, target.y)
-        target.set_health(target.hp - self.attack)
+        await self.attack_animation(target.x, target.y)
+        await target.set_health(target.hp - self.attack)
 
         effects: List[Effect] = []
 
@@ -693,10 +693,10 @@ class Tank(Enemy):
             right = self.game.grid[target.x+1, target.y]
 
             if left is not None and left.name in ('Water', 'Fire', 'Snow'):
-                left.set_health(left.hp - self.attack / 2)
+                await left.set_health(left.hp - self.attack / 2)
 
             if right is not None and right.name in ('Water', 'Fire', 'Snow'):
-                right.set_health(right.hp - self.attack / 2)
+                await right.set_health(right.hp - self.attack / 2)
 
             effects = [
                 TankSwipeHorizontal(self.game, target.x, target.y+1),
@@ -710,10 +710,10 @@ class Tank(Enemy):
             below = self.game.grid[target.x, target.y+1]
 
             if above is not None and above.name in ('Water', 'Fire', 'Snow'):
-                above.set_health(above.hp - self.attack / 2)
+                await above.set_health(above.hp - self.attack / 2)
 
             if below is not None and below.name in ('Water', 'Fire', 'Snow'):
-                below.set_health(below.hp - self.attack / 2)
+                await below.set_health(below.hp - self.attack / 2)
 
             effects = [
                 TankSwipeVertical(self.game, target.x, target.y),
@@ -723,7 +723,7 @@ class Tank(Enemy):
             ]
 
         for attack_tile in effects:
-            attack_tile.play()
+            await attack_tile.play()
 
         await asyncio.sleep(0.25)
 
@@ -945,7 +945,7 @@ class Tusk(Enemy):
                 if x - base_x < 0:
                     continue
 
-                TuskPushRock(
+                await TuskPushRock(
                     self.game,
                     x - base_x,
                     base_y
@@ -957,7 +957,7 @@ class Tusk(Enemy):
                 if x - base_x < 0:
                     continue
 
-                TuskPushRock(
+                await TuskPushRock(
                     self.game,
                     x - base_x,
                     base_y
@@ -968,7 +968,7 @@ class Tusk(Enemy):
         await self.game.wait_for_animations()
 
     async def icicle_attack_random(self) -> None:
-        self.icicle_attack_animation()
+        await self.icicle_attack_animation()
         await asyncio.sleep(1.1)
 
         # NOTE: The actual algorithm for this attack is unknown
@@ -1001,24 +1001,24 @@ class Tusk(Enemy):
         positions = set(random_positions + ninja_positions)
 
         for x, y in positions:
-            TuskIcicle(self.game, x, y).play()
+            await TuskIcicle(self.game, x, y).play()
 
         await asyncio.sleep(1.5)
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
 
     async def icicle_attack_paired(self) -> None:
-        self.icicle_attack_animation()
+        await self.icicle_attack_animation()
         await asyncio.sleep(1.1)
         effect = TuskIcicleRow(
             self.game,
             next(self.icicle_pairs)
         )
-        effect.play()
+        await effect.play()
 
         await asyncio.sleep(1)
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
 
-    def set_health(self, hp: int, wait=True) -> None:
+    async def set_health(self, hp: int, wait=True) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
@@ -1027,13 +1027,13 @@ class Tusk(Enemy):
 
         self.game.damage = (100 - damage_percentage)
 
-        AttackTile(
+        await AttackTile(
             self.game,
             self.x,
             self.y
         ).play(auto_remove=True)
 
-        DamageNumbers(
+        await DamageNumbers(
             self.game,
             self.x,
             self.y
@@ -1058,7 +1058,7 @@ class Tusk(Enemy):
 
         if self.hp <= 0:
             self.ko_animation()
-            self.game.wait_for_animations()
+            await self.game.wait_for_animations()
             self.remove_object()
             return
 
@@ -1101,7 +1101,7 @@ class Tusk(Enemy):
         self.push_attack_sound()
         self.idle_animation()
 
-    def icicle_attack_animation(self) -> None:
+    async def icicle_attack_animation(self) -> None:
         self.icicle_attack_sound_start()
         self.animate_object(
             'tusk_iciclesummon1_anim',
@@ -1109,7 +1109,7 @@ class Tusk(Enemy):
             reset=True
         )
         self.animate_sprite(0, 25, duration=1300)
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
         self.icicle_attack_sound_end()
         self.animate_object(
             'tusk_iciclesummon2_anim',

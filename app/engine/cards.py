@@ -169,7 +169,7 @@ class CardObject(Card):
         self.consume()
 
         # Wait for client to consume card
-        self.game.callbacks.wait_for_client(
+        await self.game.callbacks.wait_for_client(
             'ConsumeCardResponse',
             client=self.client,
             timeout=2
@@ -182,11 +182,11 @@ class CardObject(Card):
         await self.apply_health()
 
         if is_combo:
-            self.apply_effects()
+            await self.apply_effects()
 
         self.client.played_cards += 1
         self.check_stamps(is_combo)
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
 
     def consume(self) -> None:
         for client in self.game.clients:
@@ -201,7 +201,7 @@ class CardObject(Card):
             snow_ui.send_payload(payload_name, data)
 
     async def attack_animation(self) -> None:
-        self.client.ninja.power_animation()
+        await self.client.ninja.power_animation()
 
         beam_class = {
             'fire': FirePowerBeam,
@@ -210,7 +210,7 @@ class CardObject(Card):
         }[self.element_name]
 
         beam = beam_class(self.game, self.client.ninja.x, self.client.ninja.y)
-        beam.play()
+        await beam.play()
 
         impact_class = {
             'fire': FirePowerBottle,
@@ -223,7 +223,7 @@ class CardObject(Card):
             await asyncio.sleep(0.2)
 
         impact = impact_class(self.game, self.x, self.y)
-        impact.play()
+        await impact.play()
 
         if self.element == 'f':
             await asyncio.sleep(impact.duration)
@@ -244,7 +244,7 @@ class CardObject(Card):
                 if target.client.disconnected:
                     continue
 
-                target.set_health(target.hp + self.value)
+                await target.set_health(target.hp + self.value)
                 continue
 
             if isinstance(target, Enemy):
@@ -257,9 +257,9 @@ class CardObject(Card):
                     target.stunned = True
 
                 await target.set_health(target.hp - attack, wait=False)
-                Explosion(self.game, target.x, target.y).play()
+                await Explosion(self.game, target.x, target.y).play()
 
-    def apply_effects(self) -> None:
+    async def apply_effects(self) -> None:
         if self.element == 's':
             # Apply shield to all ninjas
             for ninja in self.game.ninjas:
@@ -273,7 +273,7 @@ class CardObject(Card):
                     continue
 
                 ninja.shield = Shield(self.game, ninja.x, ninja.y)
-                ninja.shield.play()
+                await ninja.shield.play()
 
         elif self.element == 'w':
             # Apply rage to all ninjas
@@ -288,7 +288,7 @@ class CardObject(Card):
                     continue
 
                 ninja.rage = Rage(self.game, ninja.x, ninja.y)
-                ninja.rage.play()
+                await ninja.rage.play()
 
         elif self.element == 'f':
             # Apply flame to all ninjas in targets
@@ -303,7 +303,7 @@ class CardObject(Card):
                     continue
 
                 target.flame = Flame(self.game, target.x, target.y)
-                target.flame.play()
+                await target.flame.play()
 
     def check_stamps(self, is_combo: bool) -> None:
         ninja_targets = [
@@ -408,10 +408,10 @@ class MemberCard(GameObject):
         await asyncio.sleep(2)
 
         beam = MemberReviveBeam(self.game, self.client.ninja.x, self.client.ninja.y)
-        beam.play()
+        await beam.play()
 
         self.client.ninja.play_sound('SFX_MG_CJSnow_PowercardReviveStart')
-        self.client.ninja.set_health(self.client.ninja.max_hp)
+        await self.client.ninja.set_health(self.client.ninja.max_hp)
         self.client.ninja.revive_membercard_animation()
         self.client.member_card = None
 

@@ -130,7 +130,7 @@ class TuskGame(Game):
         self.send_tip(TipPhase.MOVE)
 
         for client in self.disconnected_clients:
-            client.ninja.set_health(0)
+            await client.ninja.set_health(0)
 
         for client in self.clients:
             if client.has_power_cards:
@@ -254,7 +254,7 @@ class TuskGame(Game):
         await asyncio.sleep(1)
 
         for ninja in ninjas_with_cards:
-            ninja.use_powercard(is_combo)
+            await ninja.use_powercard(is_combo)
             await asyncio.sleep(1)
 
     async def display_round_title(self) -> None:
@@ -399,7 +399,7 @@ class TuskGame(Game):
                 continue
 
             if ninja.hp <= 0:
-                ninja.set_health(1)
+                await ninja.set_health(1)
 
             ninja.win_animation()
 

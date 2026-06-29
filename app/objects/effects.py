@@ -36,7 +36,7 @@ class Effect(GameObject):
         )
         self.duration = duration
 
-    def play(self) -> None:
+    async def play(self) -> None:
         self.place_object()
         self.place_sprite(self.name)
 
@@ -51,7 +51,7 @@ class AttackTile(Effect):
             y_offset=0.9998
         )
 
-    def play(self, auto_remove=False):
+    async def play(self, auto_remove=False):
         if not self.game.grid.is_valid(self.x, self.y):
             return
 
@@ -72,7 +72,7 @@ class HealTile(Effect):
             y_offset=0.9998
         )
 
-    def play(self, auto_remove=False):
+    async def play(self, auto_remove=False):
         if not self.game.grid.is_valid(self.x, self.y):
             return
 
@@ -94,7 +94,7 @@ class HealParticles(Effect):
             duration=0.737
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 10, duration=self.duration * 1000)
@@ -117,7 +117,7 @@ class AttackTileField:
                 y = self.center_y + y_offset
 
                 self.tiles.append(tile := AttackTile(self.game, x, y))
-                tile.play()
+                await tile.play()
 
         await asyncio.sleep(0.25)
         self.remove()
@@ -138,7 +138,7 @@ class DamageNumbers(Effect):
             duration=0.5
         )
 
-    def play(self, damage: int):
+    async def play(self, damage: int):
         frames = {
             3: (0, 4),
             4: (5, 9),
@@ -176,7 +176,7 @@ class HealNumbers(Effect):
             duration=0.5
         )
 
-    def play(self, hp: int):
+    async def play(self, hp: int):
         frames = {
             1: (0, 4),
             6: (5, 9),
@@ -206,7 +206,7 @@ class Explosion(Effect):
             duration=0.4
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 4, duration=self.duration * 260)
@@ -224,7 +224,7 @@ class SnowProjectile(Effect):
             duration=0.2
         )
 
-    def play(self, target_x: int, target_y: int):
+    async def play(self, target_x: int, target_y: int):
         self.set_offset(target_x, target_y)
         self.place_object()
 
@@ -294,7 +294,7 @@ class FireProjectile(Effect):
             y_offset=1
         )
 
-    def play(self, target_x: int, target_y: int):
+    async def play(self, target_x: int, target_y: int):
         self.set_offset(target_x, target_y)
         self.place_object()
         self.set_mirror_mode(target_x, target_y)
@@ -345,7 +345,7 @@ class SlyProjectile(Effect):
             duration=0.5
         )
 
-    def play(self, target_x: int, target_y: int):
+    async def play(self, target_x: int, target_y: int):
         if self.x > target_x:
             self.x_offset = 1
             self.y_offset = 0.8
@@ -369,7 +369,7 @@ class ScrapImpact(Effect):
             duration=0.4
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
         self.do_later(self.duration, self.remove_object)
@@ -385,7 +385,7 @@ class ScrapImpactLittle(Effect):
             y_offset=1
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
 
@@ -410,8 +410,8 @@ class ScrapImpactSurroundings:
 
                 self.effects.append(tile := AttackTile(self.game, x, y))
                 self.effects.append(impact := ScrapImpactLittle(self.game, x, y))
-                impact.play()
-                tile.play()
+                await impact.play()
+                await tile.play()
 
         await asyncio.sleep(0.35)
         self.remove()
@@ -512,7 +512,7 @@ class TankSwipeHorizontal(Effect):
             y_offset=1.005
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 6, duration=400)
@@ -528,7 +528,7 @@ class TankSwipeVertical(Effect):
             y_offset=1.005
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 6, duration=400)
@@ -544,7 +544,7 @@ class WaterPowerBeam(Effect):
             y_offset=1
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
 
@@ -560,7 +560,7 @@ class FirePowerBeam(Effect):
             duration=1.35
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
 
@@ -575,7 +575,7 @@ class SnowPowerBeam(Effect):
             y_offset=1.55
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
 
@@ -592,7 +592,7 @@ class SnowIgloo(Effect):
             origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
-    def play(self, play_sound: bool = True):
+    async def play(self, play_sound: bool = True):
         self.place_object()
         self.animate_object('snowninja_igloodrop_anim1', reset=True)
         self.animate_object('snowninja_igloodrop_anim2')
@@ -617,7 +617,7 @@ class WaterFishDrop(Effect):
             origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
-    def play(self, **kwargs):
+    async def play(self, **kwargs):
         self.place_object()
         self.animate_object(self.name)
         self.animate_sprite(0, 26, duration=1700)
@@ -636,7 +636,7 @@ class FirePowerBottle(Effect):
             origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
-    def play(self, **kwargs):
+    async def play(self, **kwargs):
         self.place_object()
         self.animate_object(self.name)
         self.animate_sprite(0, 16, duration=1060)
@@ -654,7 +654,7 @@ class Flame(Effect):
         )
         self.rounds_left = 2
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
 
@@ -669,7 +669,7 @@ class Shield(Effect):
             y_offset=1.0015
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite('effect_shield_loop')
 
@@ -690,7 +690,7 @@ class Rage(Effect):
             y_offset=1.0025
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite('effect_rageloop_anim')
 
@@ -712,7 +712,7 @@ class MemberReviveBeam(Effect):
             origin_mode=OriginMode.BOTTOM_MIDDLE
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 29, duration=1200)
@@ -728,13 +728,13 @@ class TuskIcicle(Effect):
             y_offset=1
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 15, duration=800)
         self.do_later(0.8, self.apply_damage)
 
-    def apply_damage(self) :
+    async def apply_damage(self) :
         target = self.game.grid[self.x, self.y]
 
         if not target:
@@ -746,7 +746,7 @@ class TuskIcicle(Effect):
         if target.hp <= 0:
             return
 
-        target.set_health(target.hp - self.game.tusk.attack)
+        await target.set_health(target.hp - self.game.tusk.attack)
         self.remove_object()
 
 class TuskIcicleRow:
@@ -760,8 +760,8 @@ class TuskIcicleRow:
         x_range.reverse()
 
         for x in x_range:
-            TuskIcicle(self.game, x, self.first_row).play()
-            TuskIcicle(self.game, x, self.second_row).play()
+            await TuskIcicle(self.game, x, self.first_row).play()
+            await TuskIcicle(self.game, x, self.second_row).play()
             await asyncio.sleep(0.09)
 
 class TuskPushRock(Effect):
@@ -776,7 +776,7 @@ class TuskPushRock(Effect):
             duration=0.75
         )
 
-    def play(self):
+    async def play(self):
         self.place_object()
         self.place_sprite(self.name)
         self.animate_sprite(0, 14, duration=self.duration * 1000)
