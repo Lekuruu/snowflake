@@ -691,10 +691,10 @@ class Tank(Enemy):
             left = self.game.grid[target.x-1, target.y]
             right = self.game.grid[target.x+1, target.y]
 
-            if left is not None and left.name in ('Water', 'Fire', 'Snow'):
+            if left is not None and left.name in ('Water', 'Fire', 'Snow') and left.hp > 0:
                 left.set_health(left.hp - self.attack / 2)
 
-            if right is not None and right.name in ('Water', 'Fire', 'Snow'):
+            if right is not None and right.name in ('Water', 'Fire', 'Snow') and right.hp > 0:
                 right.set_health(right.hp - self.attack / 2)
 
             effects = [
@@ -708,10 +708,10 @@ class Tank(Enemy):
             above = self.game.grid[target.x, target.y-1]
             below = self.game.grid[target.x, target.y+1]
 
-            if above is not None and above.name in ('Water', 'Fire', 'Snow'):
+            if above is not None and above.name in ('Water', 'Fire', 'Snow') and above.hp > 0:
                 above.set_health(above.hp - self.attack / 2)
 
-            if below is not None and below.name in ('Water', 'Fire', 'Snow'):
+            if below is not None and below.name in ('Water', 'Fire', 'Snow') and below.hp > 0:
                 below.set_health(below.hp - self.attack / 2)
 
             effects = [
