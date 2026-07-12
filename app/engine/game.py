@@ -893,7 +893,7 @@ class Game:
             snow_stamps = stamps.fetch_all_by_group(60, session=session)
 
             for client in self.clients:
-                if client.disconnected:
+                if client.disconnected or client.is_bot:
                     continue
 
                 if client.object.snow_ninja_rank < 24:
