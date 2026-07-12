@@ -256,7 +256,7 @@ class Penguin(MetaplaceProtocol):
         if config.DISABLE_STAMPS:
             return
 
-        if self.disconnected:
+        if self.disconnected or self.is_bot:
             return
 
         if not (stamp := stamps.fetch_one(id, session=session)):
