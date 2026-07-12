@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+import logging
 from typing import Dict, Callable
 
 from app.data import WindowAction, MessageType, EventType
@@ -39,6 +40,8 @@ class SWFWindow:
         self.layer = layer # TODO: topLayer, bottomLayer, toolLayer
         self.asset_path = '' # TODO
         self.loaded = False
+
+        self.logger = logging.getLogger("WindowManager")
 
         self.on_load: Callable | None = None
         self.on_close: Callable | None = None
