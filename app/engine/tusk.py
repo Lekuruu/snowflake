@@ -146,6 +146,13 @@ class TuskGame(Game):
         self.display_win_sequence()
 
         if not self.enemies:
+            for client in self.clients:
+                if not client.was_ko:
+                    continue
+
+                # Unlock "Up and at 'em" stamp
+                client.unlock_stamp(475)
+
             if all(client.was_ko for client in self.clients):
                 # Unlock "Team Revival" stamp
                 self.unlock_stamp(476)
