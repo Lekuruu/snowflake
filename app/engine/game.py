@@ -272,6 +272,7 @@ class Game:
                 # All players have disconnected
                 self.logger.debug("All ninjas have disconnected, ending session.")
                 self.close()
+                return
 
             for client in self.clients:
                 client.selected_card = None
