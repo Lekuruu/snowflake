@@ -220,10 +220,6 @@ class Game:
                 # Hide disconnected ninjas
                 client.ninja.remove_object()
 
-            if all(client.disconnected or client.is_bot for client in self.clients):
-                # All players have disconnected
-                self.close()
-
             if all(ninja.hp <= 0 for ninja in self.ninjas):
                 # All ninjas have been defeated
                 break
@@ -272,6 +268,11 @@ class Game:
 
     def run_until_next_round(self) -> None:
         while True:
+            if all(client.disconnected or client.is_bot for client in self.clients):
+                # All players have disconnected
+                self.logger.debug("All ninjas have disconnected, ending session.")
+                self.close()
+
             for client in self.clients:
                 client.selected_card = None
                 client.is_ready = False
