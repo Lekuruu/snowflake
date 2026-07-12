@@ -136,7 +136,7 @@ class GameObject:
             self.name,
             '0:1',  # TODO
             0,      # TODO
-            1,      # TODO
+            0 if self.on_click is None else 1,
             0       # TODO
         )
 
