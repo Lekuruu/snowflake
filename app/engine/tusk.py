@@ -145,6 +145,11 @@ class TuskGame(Game):
         self.remove_targets()
         self.display_win_sequence()
 
+        if not self.enemies:
+            if all(client.was_ko for client in self.clients):
+                # Unlock "Team Revival" stamp
+                self.unlock_stamp(476)
+
         self.display_payout()
         self.remove_objects()
         self.close()
@@ -275,7 +280,7 @@ class TuskGame(Game):
             snow_stamps = stamps.fetch_all_by_group(60, session=session)
 
             for client in self.clients:
-                if client.disconnected:
+                if client.disconnected or client.is_bot:
                     continue
 
                 if client.object.snow_ninja_rank < 24:
