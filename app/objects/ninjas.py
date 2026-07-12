@@ -272,14 +272,14 @@ class Ninja(GameObject):
             self.ghost.y = -1
 
     def on_ghost_click(self, client, object: GameObject, *args) -> None:
-        if client.ninja != self:
-            return
-
         if client.is_ready:
             return
 
         if client.selected_card:
             client.selected_card.place(object.x, object.y)
+            return
+
+        if client.ninja != self:
             return
 
         if self.client.selected_member_card:
