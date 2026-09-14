@@ -4,6 +4,6 @@ python-dotenv==1.2.3
 SQLAlchemy==2.0.52
 Twisted==26.4.0
 redis==8.1.0
-txwebsocket==1.1.1
+txwebsocket==1.1.2
 six==1.17.0
 pyopenssl==26.4.0
