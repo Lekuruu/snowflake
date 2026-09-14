@@ -1,5 +1,5 @@
 service-identity==26.1.0; python_version >= "3.11"
-psycopg2-binary==2.9.12
+psycopg2-binary==2.9.13
 python-dotenv==1.2.3
 SQLAlchemy==2.0.52
 Twisted==26.4.0
