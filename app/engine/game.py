@@ -411,7 +411,7 @@ class Game:
                     self.logger.warning(f'Window Timeout: {name}')
                     break
 
-            time.sleep(0.05)
+                time.sleep(0.05)
 
     def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
