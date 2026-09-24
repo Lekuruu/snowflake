@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from typing import Callable, Dict, List, Any, TYPE_CHECKING
 from twisted.internet import reactor
-from collections import defaultdict
 from dataclasses import dataclass
 from enum import IntEnum
 
@@ -37,8 +36,8 @@ class CallbackHandler:
     """This class manages callbacks for animations, sounds & window events"""
 
     def __init__(self, game: "Game"):
-        self.pending_actions: Dict[int, List[Action]] = defaultdict(list)
-        self.pending_events: Dict[Any, List[str]] = defaultdict(list)
+        self.pending_actions: Dict[int, List[Action]] = {}
+        self.pending_events: Dict[Any, List[str]] = {}
         self.game = game
 
     @property
@@ -101,31 +100,47 @@ class CallbackHandler:
             callback
         )
 
-        self.pending_actions[object_id].append(action)
+        self.pending_actions.setdefault(object_id, []).append(action)
         return action.handle_id
 
-    def action_done(self, id: int, object_id: int):
-        target_object = self.game.objects.by_id(object_id)
+    def action_done(self, id: int, object_id: int) -> None:
+        actions = self.pending_actions.get(object_id)
 
-        for action in self.pending_actions[object_id]:
-            if action.handle_id != id:
-                continue
+        if not actions:
+            return
 
-            if action.callback is not None:
-                reactor.callInThread(  # type: ignore
-                    action.callback,
-                    target_object
-                )
+        action = next(
+            (action for action in actions if action.handle_id == id),
+            None
+        )
 
-            self.pending_actions[object_id].remove(action)
-            break
+        if action is None:
+            return
+
+        actions.remove(action)
+
+        if not actions:
+            self.pending_actions.pop(object_id, None)
+
+        if action.callback is not None:
+            reactor.callInThread(
+                action.callback,
+                self.game.objects.by_id(object_id)
+            )
 
     def register_event(self, target: Any, event: str) -> None:
-        self.pending_events[target].append(event)
+        self.pending_events.setdefault(target, []).append(event)
 
     def event_done(self, event: str, target: Any) -> None:
-        if event in self.pending_events.get(target, []):
-            self.pending_events[target].remove(event)
+        events = self.pending_events.get(target)
+
+        if not events or event not in events:
+            return
+
+        events.remove(event)
+
+        if not events:
+            self.pending_events.pop(target, None)
 
     def remove_events(self, target: Any) -> None:
         if target in self.pending_events:
