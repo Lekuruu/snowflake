@@ -10,6 +10,7 @@ def on_element_selected(client: Penguin, data: dict):
     if client.element not in ('snow', 'water', 'fire'):
         client.logger.warning(f'Invalid element "{client.element}"')
         client.close_connection()
+        return
 
     client.server.matchmaking.add(client)
 
