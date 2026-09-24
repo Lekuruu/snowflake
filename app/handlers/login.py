@@ -66,19 +66,10 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     if not penguin.approval_en or penguin.rejection_en:
         client.name = f'P{pid}'
 
-    other_connections = client.server.players.with_id(pid)
-    other_connections.remove(client)
-
-    if other_connections:
-        for player in other_connections:
-            # TODO: Send error message
-            player.logger.warning('Closing duplicate connection.')
-            player.close_connection()
-
     if not config.DISABLE_AUTHENTICATION:
         session_token = session.redis.get(f'{pid}.mpsession')
 
-        if not session_token:
+        if session_token is None:
             client.logger.warning('Login attempt failed: Session token expired')
             client.send_login_error()
             client.close_connection()
@@ -94,6 +85,15 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
         client.logger.warning('Login attempt failed: Tried to access tusk battle without snow gem')
         client.close_connection()
         return
+
+    other_connections = client.server.players.with_id(pid)
+    other_connections.remove(client)
+
+    if other_connections:
+        for player in other_connections:
+            # TODO: Send error message
+            player.logger.warning('Closing duplicate connection')
+            player.close_connection()
 
     client.send_login_message('Successfully verified credentials server-side')
     client.logger.info(f'Logged in as "{penguin.nickname}" ({penguin.id})')
