@@ -108,6 +108,10 @@ class MatchmakingQueue:
         return players
 
     def fill_queue(self, player: Penguin) -> None:
+        if not player.in_queue or player.disconnected:
+            # Player cancelled matchmaking / disconnected before the timeout
+            return
+
         if player.battle_mode == 0 and not config.ALLOW_FORCESTART_SNOW:
             # Singleplayer snow is disabled
             return
