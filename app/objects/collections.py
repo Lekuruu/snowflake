@@ -80,7 +80,7 @@ class Games(LockedSet["Game"]):
         return next((game for game in self if game.id == id), None)
 
     def with_player(self, player: "Penguin") -> "Game" | None:
-        return next([game for game in self if player in game.clients], None)
+        return next((game for game in self if player in game.clients), None)
 
     def next_id(self) -> int:
         return max([game.id for game in self] or [0]) + 1
@@ -120,9 +120,7 @@ class ObjectCollection(LockedSet["GameObject"]):
 
     def update(self, objects: List["GameObject"]) -> None:
         for object in objects:
-            object.id = self.get_id()
-
-        super().update(objects)
+            self.add(object)
 
     def remove(self, object: "GameObject") -> None:
         if object in self:
