@@ -180,7 +180,7 @@ class WindowManager(Dict[str, SWFWindow]):
                 return
 
             if time.time() - start_time > timeout:
-                self.logger.warning(f'Window Timeout: {window.name}')
+                window.logger.warning(f'Window Timeout: {window.name}')
                 return
 
             time.sleep(0.05)
