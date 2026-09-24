@@ -15,6 +15,12 @@ def version_handler(client: Penguin):
 
 @session.events.register("/place_context", login_required=False)
 def context_handler(client: Penguin, place_name: str, param_string: str):
+    if client.logged_in:
+        # Client should not be able to update context after login
+        client.send_login_error()
+        client.close_connection()
+        return
+
     params = urllib.parse.parse_qs(param_string)
 
     if not (battle_mode := params.get('battleMode')):
