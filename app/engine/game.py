@@ -796,7 +796,7 @@ class Game:
 
         for client in clients:
             if phase in client.displayed_tips:
-                return
+                continue
 
             if not client.tip_mode:
                 continue
@@ -810,7 +810,7 @@ class Game:
                 # Wait for infotip to close
                 infotip = client.get_window('cardjitsu_snowinfotip.swf')
                 infotip.on_close = after_close
-                return
+                continue
 
             client.send_tip(phase)
 
