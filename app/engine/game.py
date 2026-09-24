@@ -404,6 +404,10 @@ class Game:
             start_time = time.time()
 
             while window.loaded != loaded:
+                if all(client.disconnected or client.is_bot for client in self.clients):
+                    self.close()
+                    return
+
                 if client.disconnected:
                     break
 
