@@ -1,8 +1,8 @@
 
 from __future__ import annotations
 
+from threading import Lock, Thread
 from typing import List, Callable
-from threading import Thread
 
 from app.engine.place import SnowLobby, SnowBattle, TuskBattle
 from app.protocols.metaplace import MetaplaceWorldServer
@@ -38,15 +38,25 @@ class SnowflakeWorld(MetaplaceWorldServer):
 
         self.logger = logging.getLogger("Snowflake")
         self.threads: List[Thread] = []
+        self.threads_lock = Lock()
         self.shutting_down = False
 
         self.sound_assets = app.session.sound_assets
         self.assets = app.session.assets
 
     def runThread(self, func: Callable, *args, **kwargs):
-        thread = Thread(target=func, args=args, kwargs=kwargs)
-        thread.start()
-        self.threads.append(thread)
+        def run():
+            try:
+                func(*args, **kwargs)
+            finally:
+                with self.threads_lock:
+                    self.threads.remove(thread)
+
+        thread = Thread(target=run)
+
+        with self.threads_lock:
+            self.threads.append(thread)
+            thread.start()
 
     def startFactory(self):
         self.register_place(SnowLobby())
@@ -60,5 +70,8 @@ class SnowflakeWorld(MetaplaceWorldServer):
 
         signal.signal(signal.SIGINT, force_exit)
 
-        for thread in self.threads:
+        with self.threads_lock:
+            threads = list(self.threads)
+
+        for thread in threads:
             thread.join()
