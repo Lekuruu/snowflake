@@ -36,8 +36,8 @@ class MatchmakingQueue:
 
             return match_types[player.battle_mode](*match)
 
-        reactor.callLater(  # type: ignore
-            config.MATCHMAKING_TIMEOUT,
+        reactor.callLater(
+            config.MATCHMAKING_TIMEOUT, # type: ignore
             self.fill_queue, player
         )
 
@@ -151,7 +151,7 @@ class MatchmakingQueue:
         match_types[player.battle_mode](*players)
 
     def create_normal_game(self, fire: Penguin | None, snow: Penguin | None, water: Penguin | None) -> None:
-        game = Game(fire, snow, water)
+        game = Game(fire, snow, water) # type: ignore
         game.server.games.add(game)
 
         for client in game.clients:
@@ -168,11 +168,11 @@ class MatchmakingQueue:
             # Remove from matchmaking queue
             self.remove(client)
 
-        # Start game loop
-        game.server.runThread(game.start)
+        # Start game loop in a twisted coroutine
+        game.launch()
 
     def create_tusk_game(self, fire: Penguin | None, snow: Penguin | None, water: Penguin | None) -> None:
-        game = TuskGame(fire, snow, water)
+        game = TuskGame(fire, snow, water) # type: ignore
         game.server.games.add(game)
 
         for client in game.clients:
@@ -189,5 +189,5 @@ class MatchmakingQueue:
             # Remove from matchmaking queue
             self.remove(client)
 
-        # Start game loop
-        game.server.runThread(game.start)
+        # Start game loop in a twisted coroutine
+        game.launch()

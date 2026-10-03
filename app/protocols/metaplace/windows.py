@@ -1,14 +1,15 @@
 
 from __future__ import annotations
-import logging
-from typing import Dict, Callable
+from typing import Dict, Callable, List
+from twisted.internet.defer import CancelledError, Deferred, TimeoutError
+from twisted.internet import reactor
 
 from app.data import WindowAction, MessageType, EventType
 from app import protocols
 
+import logging
 import config
 import json
-import time
 
 class SWFWindow:
     """
@@ -20,11 +21,11 @@ class SWFWindow:
     def __init__(
         self,
         client: protocols.MetaplaceProtocol,
+        name: str,
         url: str | None = None,
-        name: str | None = None,
         layer: str = 'topLayer'
     ) -> None:
-        if not name:
+        if not name and url:
             # "filename.swf"
             name = url.split('/')[-1]
 
@@ -41,6 +42,10 @@ class SWFWindow:
         self.asset_path = '' # TODO
         self.loaded = False
 
+        self.state_waiters: Dict[bool, List[Deferred]] = {
+            True: [],
+            False: []
+        }
         self.logger = logging.getLogger("WindowManager")
 
         self.on_load: Callable | None = None
@@ -49,7 +54,7 @@ class SWFWindow:
     def __repr__(self) -> str:
         return f"<SWF ({self.name})>"
 
-    def send(self, content: dict = {}, message_type = MessageType.RECEIVED_JSON, **kwargs):
+    def send(self, content: dict = {}, message_type = MessageType.RECEIVED_JSON, **kwargs) -> None:
         content.update(kwargs)
         self.client.send_tag(
             'UI_CLIENTEVENT',
@@ -58,7 +63,7 @@ class SWFWindow:
             json.dumps(content)
         )
 
-    def load(self, initial_payload: dict = None, **kwargs):
+    def load(self, initial_payload: dict | None = None, **kwargs) -> None:
         if config.APPLY_WINDOWMANAGER_OFFSET:
             kwargs['xPercent'] = kwargs.get('xPercent', 0) - 0.5
             kwargs['yPercent'] = kwargs.get('yPercent', 0) - 0.5
@@ -85,7 +90,7 @@ class SWFWindow:
             **kwargs
         )
 
-    def send_payload(self, trigger_name: str, payload: dict = {}, type = EventType.IMMEDIATE, **kwargs):
+    def send_payload(self, trigger_name: str, payload: dict = {}, type = EventType.IMMEDIATE, **kwargs) -> None:
         self.send(
             {
                 'jsonPayload': payload,
@@ -97,7 +102,7 @@ class SWFWindow:
             **kwargs
         )
 
-    def send_action(self, action: str, type = EventType.IMMEDIATE, **kwargs):
+    def send_action(self, action: str, type = EventType.IMMEDIATE, **kwargs) -> None:
         self.send(
             {
                 'action': action,
@@ -105,6 +110,48 @@ class SWFWindow:
             },
             **kwargs
         )
+
+    def set_loaded(self, loaded: bool) -> None:
+        self.loaded = loaded
+        waiters = self.state_waiters[loaded]
+        pending = list(waiters)
+        waiters.clear()
+
+        for waiter in pending:
+            if not waiter.called:
+                waiter.callback(True)
+
+    async def wait_for_state(self, loaded: bool = True, timeout: float = 8) -> bool:
+        if self.loaded == loaded:
+            return True
+
+        if self.client.disconnected:
+            return False
+
+        waiter = Deferred()
+        self.state_waiters[loaded].append(waiter)
+
+        try:
+            await waiter.addTimeout(timeout, reactor)
+            return True
+        except TimeoutError:
+            self.logger.warning(f'Window Timeout: {self.name}')
+        except CancelledError:
+            pass
+        finally:
+            if waiter in self.state_waiters[loaded]:
+                self.state_waiters[loaded].remove(waiter)
+
+        return False
+
+    def cancel_waiters(self) -> None:
+        for waiters in self.state_waiters.values():
+            pending = list(waiters)
+            waiters.clear()
+
+            for waiter in pending:
+                if not waiter.called:
+                    waiter.cancel()
 
 class WindowManager(Dict[str, SWFWindow]):
     """
@@ -135,16 +182,11 @@ class WindowManager(Dict[str, SWFWindow]):
     def __setitem__(self, name: str, window: SWFWindow) -> None:
         return super().__setitem__(name, window)
 
-    def get_window(self, name: str | None = None, url: str | None = None):
-        assert url or name, 'You must provide either a url or a name for the window.'
-
+    def get_window(self, name: str, url: str | None = None) -> SWFWindow:
         if name in self:
             return self[name]
 
-        if url is not None and (window_name := url.split('/')[-1]) in self:
-            return self[window_name]
-
-        window = SWFWindow(self.client, url, name)
+        window = SWFWindow(self.client, name, url)
         self[window.name] = window
         return window
 
@@ -166,19 +208,21 @@ class WindowManager(Dict[str, SWFWindow]):
 
         self['windowmanager.swf'] = SWFWindow(
             self.client,
-            self.swf_url,
-            'windowmanager.swf'
+            url=self.swf_url,
+            name='windowmanager.swf'
         )
 
-    def wait_for_window(self, window: SWFWindow, loaded: bool = True, timeout: int = 8):
-        start_time = time.time()
+    async def wait_for_window(
+        self,
+        window: SWFWindow,
+        loaded: bool = True,
+        timeout: float = 8
+    ) -> bool:
+        return await window.wait_for_state(
+            loaded,
+            timeout
+        )
 
-        while window.loaded != loaded:
-            if self.client.disconnected:
-                return
-
-            if time.time() - start_time > timeout:
-                window.logger.warning(f'Window Timeout: {window.name}')
-                return
-
-            time.sleep(0.05)
+    def cancel_waiters(self) -> None:
+        for window in list(self.values()):
+            window.cancel_waiters()

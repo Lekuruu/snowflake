@@ -29,16 +29,16 @@ import config
 class Penguin(MetaplaceProtocol):
     def __init__(self, server: "SnowflakeWorld", address: IPv4Address | IPv6Address):
         super().__init__(server, address)
-        self.address = address
-        self.server = server
+        self.address: IPv4Address | IPv6Address = address
+        self.server: "SnowflakeWorld" = server
 
         self.battle_mode: int = 0
         self.screen_size: str = ''
         self.asset_url: str = ''
 
-        self.object: PenguinObject | None = None
-        self.ninja: "Ninja" | None = None
-        self.game: "Game" | None = None
+        self.object: PenguinObject
+        self.ninja: "Ninja"
+        self.game: "Game" = None # type: ignore i don't care, we'll initialize this later
         self.element: str = ""
 
         self.tip_mode: bool = True
@@ -53,11 +53,15 @@ class Penguin(MetaplaceProtocol):
         self.power_card_stamina: int = 0
         self.played_cards: int = 0
 
-        self.login_time: int = 0
-        self.queue_time: int = 0
+        self.login_time: int | float = 0
+        self.queue_time: int | float = 0
+
+        self.stamp_notifications: List[dict] = []
+        self.stamp_notification_active = False
 
         self.mute_sounds: bool = False
         self.in_queue: bool = False
+        self.place_loaded: bool = False
         self.is_ready: bool = False
         self.is_bot: bool = False
         self.was_ko: bool = False
@@ -79,7 +83,10 @@ class Penguin(MetaplaceProtocol):
 
     @property
     def selected_member_card(self) -> bool:
-        return self.member_card and self.member_card.selected
+        if not self.member_card:
+            return False
+
+        return self.member_card.selected
 
     @property
     def placed_powercard(self) -> bool:
@@ -105,14 +112,24 @@ class Penguin(MetaplaceProtocol):
             # Remove any pending events
             self.game.callbacks.remove_events(self)
 
+        self.window_manager.cancel_waiters()
+
         # Put client in ready state, so that the game doesn't softlock
         self.is_ready = True
 
         return super().close_connection()
 
     def connectionLost(self, reason: Failure | None = None) -> None:
-        if self.in_game and self.ninja and self.game.ninjas:
+        has_ninja = hasattr(self, "ninja") and self.ninja
+
+        if self.in_game and has_ninja and self.game.ninjas:
             self.ninja.set_health(0)
+
+        if self.in_game:
+            self.game.callbacks.remove_events(self)
+
+        self.window_manager.cancel_waiters()
+        self.is_ready = True
 
         if reason is not None and not self.disconnected:
             self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
@@ -127,7 +144,7 @@ class Penguin(MetaplaceProtocol):
 
         super().send_tag(tag, *args)
 
-    def initialize_power_cards(self, session=None) -> None:
+    def initialize_power_cards(self, session: Session) -> None:
         card_color = {
             'snow': 'p',
             'water': 'b',
@@ -165,7 +182,7 @@ class Penguin(MetaplaceProtocol):
         self.power_cards.remove(next_card)
         return next_card
 
-    def power_card_by_id(self, card_id: int) -> Card | None:
+    def power_card_by_id(self, card_id: int) -> CardObject | None:
         return next((c for c in self.power_card_slots if c.id == card_id), None)
 
     def update_cards(self) -> None:
@@ -193,11 +210,11 @@ class Penguin(MetaplaceProtocol):
         snow_ui = self.get_window('cardjitsu_snowui.swf')
         snow_ui.send_payload('updateStamina', update)
 
-    def consume_card(self, is_combo=False) -> None:
+    async def consume_card(self, is_combo=False) -> None:
         if not self.selected_card:
             return
 
-        self.selected_card.use(is_combo)
+        await self.selected_card.use(is_combo)
 
     def send_to_room(self) -> None:
         # This will load a window, that sends the player back to the room
@@ -252,7 +269,7 @@ class Penguin(MetaplaceProtocol):
         infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.send_payload('disable')
 
-    def unlock_stamp(self, id: int, session: Session | None = None) -> None:
+    def unlock_stamp(self, id: int, session: Session = stamps.SessionProvider) -> None:
         if config.DISABLE_STAMPS:
             return
 
@@ -267,30 +284,42 @@ class Penguin(MetaplaceProtocol):
 
         self.logger.info(f'{self} unlocked stamp: "{stamp.name}"')
         self.unlocked_stamps.append(stamp.id)
+
         stamps.add(
             id, self.pid,
             session=session
         )
 
+        # Show stamp notification(s)
+        self.stamp_notifications.append({
+            'stamp': {
+                'stamp_id': stamp.id,
+                'stampGroupId': stamp.group_id,
+                'parent_group_id': 8, # TODO
+                'name': f'global_content.stamps.{stamp.id}.name',
+                'description': f'global_content.stamps.{stamp.id}.description',
+                'rank_token': f'global_content.stamps.{stamp.id}.rank_token',
+                'is_member': stamp.member,
+                'rank': stamp.rank
+            }
+        })
+        self.show_next_stamp()
+
+    def show_next_stamp(self) -> None:
+        if self.disconnected:
+            return
+
+        if not self.stamp_notifications or self.stamp_notification_active:
+            return
+
         window = self.get_window('stampearned.swf')
+        payload = self.stamp_notifications.pop(0)
+        self.stamp_notification_active = True
 
-        # Wait for previous window to close
-        self.window_manager.wait_for_window(window, loaded=False)
+        def on_close(client: "Penguin") -> None:
+            # Show remaining stamps on close, if we have any
+            client.stamp_notification_active = False
+            client.show_next_stamp()
 
-        # Load window
-        window.load(
-            {
-                'stamp':
-                {
-                    'stamp_id': stamp.id,
-                    'stampGroupId': stamp.group_id,
-                    'parent_group_id': 8, # TODO
-                    'name': f'global_content.stamps.{stamp.id}.name',
-                    'description': f'global_content.stamps.{stamp.id}.description',
-                    'rank_token': f'global_content.stamps.{stamp.id}.rank_token',
-                    'is_member': stamp.member,
-                    'rank': stamp.rank
-                }
-            },
-            assetPath=f'{config.WINDOW_BASEURL}/'
-        )
+        window.on_close = on_close
+        window.load(payload, assetPath=f'{config.WINDOW_BASEURL}/')

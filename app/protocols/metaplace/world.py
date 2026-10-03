@@ -22,7 +22,7 @@ class MetaplaceWorldServer(Factory):
         world_owner: str,
         stylesheet_id: str,
         policy_domain: str = "*",
-        policy_port: str = "*",
+        policy_port: str | int = "*",
         server_type: ServerType = ServerType.LIVE,
         build_type: BuildType = BuildType.RELEASE
     ) -> None:
@@ -57,7 +57,7 @@ class MetaplaceWorldServer(Factory):
         self.logger.info(f'Starting world server "{self.world_name}" ({port})')
         reactor.listenTCP(port, self)  # type: ignore
 
-    def buildProtocol(self, address: IPv4Address | IPv6Address) -> MetaplaceProtocol:
+    def buildProtocol(self, address: IPv4Address | IPv6Address) -> MetaplaceProtocol: # type: ignore
         self.logger.debug(f'-> "{address.host}:{address.port}"')
-        self.players.add(player := self.protocol(self, address))
+        self.players.add(player := self.protocol(self, address)) # type: ignore
         return player

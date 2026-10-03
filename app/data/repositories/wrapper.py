@@ -28,7 +28,7 @@ def session_wrapper(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if kwargs.get('session'):
+        if kwargs.get('session') and isinstance(kwargs['session'], Session):
             # Use existing session
             return func(*args, **kwargs)
 

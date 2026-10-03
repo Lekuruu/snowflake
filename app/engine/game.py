@@ -1,12 +1,18 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING, Callable, List
-from twisted.internet import reactor
+from twisted.internet.defer import Deferred
+from twisted.python.failure import Failure
+from twisted.internet import defer
 
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from app.data.repositories import stamps, penguins, items
+from app.data.repositories import (
+    penguins,
+    stamps,
+    items
+)
 from app.data import (
     ExpRequirements,
     SnowRewards,
@@ -22,14 +28,19 @@ from app.objects.sound import Sound
 
 from .callbacks import CallbackHandler
 from .cards import MemberCard
+from .ai import PenguinAI
 from .timer import Timer
 from .grid import Grid
+from .utils import delay
 
 import app.session
 import logging
 import random
 import config
 import time
+
+class GameClosed(Exception):
+    """Raised to stop a game coroutine"""
 
 class Game:
     def __init__(self, fire: "Penguin", snow: "Penguin", water: "Penguin") -> None:
@@ -57,6 +68,9 @@ class Game:
         self.backgrounds = []
         self.rocks = []
 
+        self.closed = False
+        self.deferred: Deferred | None = None
+
     @property
     def clients(self) -> List["Penguin"]:
         return [
@@ -78,7 +92,7 @@ class Game:
             *self.objects.with_name('Fire'),
             *self.objects.with_name('Water'),
             *self.objects.with_name('Snow')
-        ]
+        ] # type: ignore
 
     @property
     def enemies(self) -> List[Enemy]:
@@ -86,7 +100,7 @@ class Game:
             *self.objects.with_name('Sly'),
             *self.objects.with_name('Scrap'),
             *self.objects.with_name('Tank')
-        ]
+        ] # type: ignore
 
     @property
     def bonus_criteria_met(self) -> bool:
@@ -96,7 +110,36 @@ class Game:
             'under_time': (time.time() < self.game_start + 300)
         }[self.bonus_criteria]
 
-    def start(self) -> None:
+    def launch(self) -> None:
+        game_deferred = defer.Deferred.fromCoroutine(self.start())
+        self.deferred = game_deferred
+        game_deferred.addErrback(self.on_game_failed)
+
+    def close(self) -> None:
+        if not self.closed:
+            self.logger.info('Game closed')
+            self.closed = True
+
+            if self in self.server.games:
+                self.server.games.remove(self)
+
+        raise GameClosed()
+
+    def on_game_failed(self, failure: Failure) -> None:
+        if failure.check(GameClosed):
+            return None
+
+        self.logger.error(failure.getTraceback())
+
+        if not self.closed:
+            self.closed = True
+
+            if self in self.server.games:
+                self.server.games.remove(self)
+
+        return None
+
+    async def start(self) -> None:
         with app.session.database.managed_session() as session:
             for client in self.clients:
                 client.game = self
@@ -108,7 +151,7 @@ class Game:
                 client.initialize_power_cards(session=session)
 
         # Wait for "prepare to battle" screen to end
-        time.sleep(3)
+        await delay(3)
 
         # Close player select window
         for client in self.clients:
@@ -118,18 +161,57 @@ class Game:
         # Place clients in battle place
         battle_place = self.server.places['snow_battle']
 
+        min_time_waiter = self.callbacks.register_event(
+            self, 'roomToRoomMinTime'
+        )
+        ready_waiters = {
+            client: self.callbacks.register_event(client, 'roomToRoomComplete')
+            for client in self.clients
+            if not client.disconnected and not client.is_bot
+        }
+
         for client in self.clients:
+            client.place_loaded = client.is_bot
             client.switch_place(battle_place)
 
-        # Wait for loading screen to finish
-        self.callbacks.wait_for_event('roomToRoomMinTime')
-        time.sleep(1)
+        # Wait for fake loading screen to finish
+        await self.callbacks.wait_for_event(
+            'roomToRoomMinTime',
+            waiter=min_time_waiter
+        )
+        await delay(1)
 
         # Wait for players to finish loading assets
-        self.wait_for_players(lambda player: player.is_ready, timeout=20)
+        load_operations = []
+
+        for client, waiter in ready_waiters.items():
+            load_coroutine = self.callbacks.wait_for_client(
+                'roomToRoomComplete',
+                client,
+                timeout=20,
+                waiter=waiter
+            )
+            load_operations.append(
+                defer.Deferred.fromCoroutine(load_coroutine)
+            )
+
+        clients_ready = await defer.gatherResults(
+            load_operations,
+            consumeErrors=True
+        )
+
+        if not all(clients_ready):
+            pending = [
+                str(client) for client in ready_waiters
+                if not client.place_loaded
+            ]
+            self.logger.warning(
+                f'Continuing after load timeout for: {", ".join(pending)}'
+            )
 
         # Play background music
-        Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
+        background_music = Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True)
+        background_music.play(self)
 
         self.initialize_objects()
         self.show_environment()
@@ -151,18 +233,18 @@ class Game:
             )
 
         # Wait for windows
-        time.sleep(1)
+        await delay(1)
 
         # Reset game time
         self.game_start = time.time() + 1
 
-        self.display_round_title()
-        time.sleep(1.6)
+        await self.display_round_title()
+        await delay(1.6)
 
         self.spawn_enemies()
-        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
+        await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
-        self.show_ui()
+        await self.show_ui()
         self.send_tip(TipPhase.MOVE)
 
         for client in self.disconnected_clients:
@@ -176,11 +258,11 @@ class Game:
             snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
-        self.run_game_loop()
+        await self.run_game_loop()
 
         self.remove_ui()
         self.remove_targets()
-        self.display_win_sequence()
+        await self.display_win_sequence()
 
         if not self.enemies:
             for client in self.clients:
@@ -198,23 +280,20 @@ class Game:
                 # Unlock "Bonus Win" stamp
                 self.unlock_stamp(473)
 
+        background_music.stop(self)
+        self.hide_game_ui()
         self.display_payout()
         self.remove_objects()
         self.close()
 
-    def close(self) -> None:
-        self.logger.info('Game closed')
-        self.server.games.remove(self)
-        exit()
-
-    def run_game_loop(self) -> None:
+    async def run_game_loop(self) -> None:
         while True:
             self.logger.info(
                 f'Starting round {self.round + 1} '
                 f'({len(self.enemies)} {"enemies" if len(self.enemies) > 1 else "enemy"})'
             )
 
-            self.run_until_next_round()
+            await self.run_until_next_round()
 
             for client in self.disconnected_clients:
                 # Hide disconnected ninjas
@@ -258,15 +337,15 @@ class Game:
             # Remove any existing enemies
             self.remove_enemies()
 
-            self.display_round_title()
-            time.sleep(1.6)
+            await self.display_round_title()
+            await delay(1.6)
 
             # Create new enemies
             self.create_enemies()
             self.spawn_enemies()
-            self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
+            await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
-    def run_until_next_round(self) -> None:
+    async def run_until_next_round(self) -> None:
         while True:
             if all(client.disconnected or client.is_bot for client in self.clients):
                 # All players have disconnected
@@ -285,23 +364,24 @@ class Game:
                     self.send_tip(TipPhase.CARD, client)
 
                 if client.is_bot:
+                    assert isinstance(client, PenguinAI)
                     client.select_move()
 
             self.show_targets()
-            self.wait_for_timer()
+            await self.wait_for_timer()
 
             self.hide_ghosts()
             self.remove_ui()
             self.hide_targets()
-            time.sleep(1.25)
+            await delay(1.25)
 
             # Sometimes the targets are still visible?
             self.hide_targets()
             self.remove_ui()
 
-            self.move_ninjas()
-            self.do_ninja_actions()
-            self.do_enemy_actions()
+            await self.move_ninjas()
+            await self.do_ninja_actions()
+            await self.do_enemy_actions()
 
             # Check if any ninja is getting revived
             for ninja in self.ninjas:
@@ -328,7 +408,7 @@ class Game:
 
                     client.unlock_stamp(474)
 
-                self.wait_for_animations()
+                await self.wait_for_animations()
                 ninja.selected_object.set_health(1)
                 ninja.targets = []
                 ninja.idle_animation()
@@ -338,7 +418,7 @@ class Game:
                 enemy.update_flame()
 
             # Wait for any animations to finish
-            self.wait_for_animations()
+            await self.wait_for_animations()
 
             if self.check_round_completion():
                 break
@@ -364,7 +444,7 @@ class Game:
         for player in self.clients:
             player.send_tag(tag, *args)
 
-    def wait_for_players(self, condition: Callable, timeout=8) -> None:
+    async def wait_for_players(self, condition: Callable, timeout=8) -> bool:
         """Wait for all players to finish a condition"""
         start_time = time.time()
 
@@ -378,50 +458,54 @@ class Game:
             while not condition(player) and not self.server.shutting_down:
                 if time.time() - start_time > timeout:
                     self.logger.warning(f'Player Timeout: {player}')
-                    return
+                    return False
 
-                time.sleep(0.05)
+                await delay(0.05)
 
-    def wait_for_animations(self, timeout=8) -> None:
+        return True
+
+    async def wait_for_animations(self, timeout=8) -> bool:
         """Wait for all animations to finish"""
-        start_time = time.time()
+        return await self.callbacks.wait_for_animations(timeout)
 
-        while self.callbacks.pending_animations:
-            if time.time() - start_time > timeout:
-                self.logger.warning(f'Animation Timeout: {self.callbacks.pending_animations}')
-                self.callbacks.reset_animations()
-                break
+    def remove_after_animations(self, game_object: GameObject) -> None:
+        """Remove the given game object after all animations have finished"""
+        async def remove() -> None:
+            await self.wait_for_animations()
 
-            time.sleep(0.05)
+            if self.objects.by_id(game_object.id) is game_object:
+                game_object.remove_object()
 
-    def wait_for_window(self, name: str, loaded=True, timeout=8) -> None:
-        """Wait for a window to load/close"""
+        deferred = defer.Deferred.fromCoroutine(remove())
+        deferred.addErrback(
+            lambda failure: self.logger.error(failure.getTraceback())
+        )
+
+    async def wait_for_window(self, name: str, loaded=True, timeout=8) -> bool:
+        """Wait for a window to load / close"""
+        waits = []
+
         for client in self.clients:
             if client.is_bot:
                 continue
 
-            window = client.get_window(name)
-            start_time = time.time()
+            waits.append(
+                defer.Deferred.fromCoroutine(
+                    client.get_window(name).wait_for_state(loaded, timeout)
+                )
+            )
 
-            while window.loaded != loaded:
-                if all(client.disconnected or client.is_bot for client in self.clients):
-                    self.close()
-                    return
+        if all(client.disconnected or client.is_bot for client in self.clients):
+            self.close()
 
-                if client.disconnected:
-                    break
+        results = await defer.gatherResults(waits, consumeErrors=True)
+        return all(results)
 
-                if time.time() - start_time > timeout:
-                    self.logger.warning(f'Window Timeout: {name}')
-                    break
-
-                time.sleep(0.05)
-
-    def wait_for_timer(self) -> None:
+    async def wait_for_timer(self) -> None:
         """Wait for the timer to finish"""
         self.grid.show_tiles()
         self.enable_cards()
-        self.timer.run()
+        await self.timer.run()
         self.grid.hide_tiles()
         self.disable_cards()
 
@@ -437,7 +521,6 @@ class Game:
             {'x': 0, 'y': 2},
             {'x': 0, 'y': 4}
         ]
-
         ninja_classes = {
             'snow': SnowNinja,
             'fire': FireNinja,
@@ -566,24 +649,49 @@ class Game:
             if not client.selected_member_card:
                 continue
 
-            client.member_card.remove()
+            client.member_card.remove() # type: ignore (already checked)
+
+    def hide_game_ui(self) -> None:
+        window_names = (
+            'cardjitsu_snowinfotip.swf',
+            'cardjitsu_snowtimer.swf',
+            'cardjitsu_snowui.swf',
+            'cardjitsu_snowclose.swf'
+        )
+
+        for client in self.clients:
+            if client.disconnected:
+                continue
+
+            if client.is_bot:
+                continue
+
+            client.last_tip = None
+            infotip = client.get_window('cardjitsu_snowinfotip.swf')
+            infotip.on_close = None  # Do not open a queued tip
+
+            for name in window_names:
+                client.get_window(name).close()
 
     def hide_ghosts(self) -> None:
         for ninja in self.ninjas:
             ninja.hide_ghost(reset_positions=False)
 
-    def move_ninjas(self) -> None:
+    async def move_ninjas(self) -> None:
         for ninja in self.ninjas:
             if ninja.placed_ghost:
                 ninja.client.update_cards()
 
             ninja.move_ninja(
-                ninja.ghost.x,
-                ninja.ghost.y
+                ninja.ghost.grid_x,
+                ninja.ghost.grid_y
             )
 
         # Wait for move animations
-        self.wait_for_animations()
+        await self.wait_for_animations()
+
+        for ninja in self.ninjas:
+            ninja.reset_sprite_settings()
 
     def show_targets(self) -> None:
         for ninja in self.ninjas:
@@ -600,11 +708,11 @@ class Game:
     def show_environment(self) -> None:
         for background in self.backgrounds:
             obj = self.objects.by_id(background.id)
-            obj.place_sprite(background.name)
+            if obj: obj.place_sprite(background.name)
 
         for rock in self.rocks:
             obj = self.objects.by_id(rock.id)
-            obj.place_sprite(rock.name)
+            if obj: obj.place_sprite(rock.name)
 
     def remove_objects(self) -> None:
         self.remove_targets()
@@ -628,40 +736,38 @@ class Game:
         for rock in self.rocks:
             rock.remove_object()
 
-    def do_ninja_actions(self) -> None:
-        self.do_ninja_attacks()
-        self.do_powercard_attacks()
-        self.do_ninja_revive()
-        self.wait_for_animations()
+    async def do_ninja_actions(self) -> None:
+        await self.do_ninja_attacks()
+        await self.do_powercard_attacks()
+        await self.do_ninja_revive()
+        await self.wait_for_animations()
 
-    def do_ninja_attacks(self) -> None:
+    async def do_ninja_attacks(self) -> None:
         ninjas_without_cards = [
             ninja for ninja in self.ninjas
             if not ninja.client.selected_card
             and not ninja.client.selected_member_card
         ]
+        ninja_actions = [
+            (ninja, ninja.selected_object)
+            for ninja in ninjas_without_cards
+            if ninja.selected_target and ninja.selected_object is not None
+        ]
 
-        for ninja in ninjas_without_cards:
-            if ninja.selected_target:
-                target = ninja.selected_object
+        for ninja, target in ninja_actions:
+            if isinstance(target, Enemy):
+                await ninja.attack_target(target)
 
-                if target is None:
-                    # Target has been removed/defeated
-                    continue
+            if isinstance(target, Ninja):
+                await ninja.heal_target(target)
 
-                if isinstance(target, Enemy):
-                    ninja.attack_target(target)
+            if ninja.heals >= 15:
+                # Unlock "Heal 15" stamp
+                self.snow.unlock_stamp(477)
 
-                if isinstance(target, Ninja):
-                    ninja.heal_target(target)
+            await self.wait_for_animations(timeout=3)
 
-                if ninja.heals >= 15:
-                    # Unlock "Heal 15" stamp
-                    self.snow.unlock_stamp(477)
-
-                time.sleep(1)
-
-    def do_powercard_attacks(self) -> None:
+    async def do_powercard_attacks(self) -> None:
         ninjas_with_cards = [
             ninja for ninja in self.ninjas
             if ninja.client.placed_powercard
@@ -680,18 +786,23 @@ class Game:
                 # Unlock "3 Combos" stamp
                 self.unlock_stamp(485)
 
-            self.display_combo_title([
+            combo_waiter = self.callbacks.register_event(
+                self, 'comboScreenComplete'
+            )
+            await self.display_combo_title([
                 ninja.client.element
                 for ninja in ninjas_with_cards
             ])
-
-            self.callbacks.wait_for_event('comboScreenComplete', timeout=6)
+            await self.callbacks.wait_for_event(
+                'comboScreenComplete',
+                timeout=6, waiter=combo_waiter
+            )
 
         for ninja in ninjas_with_cards:
-            ninja.use_powercard(is_combo)
-            time.sleep(1)
+            await ninja.use_powercard(is_combo)
+            await self.wait_for_animations()
 
-    def do_ninja_revive(self) -> None:
+    async def do_ninja_revive(self) -> None:
         ninjas_with_member_cards = [
             client for client in self.clients
             if client.selected_member_card
@@ -703,26 +814,21 @@ class Game:
                     continue
 
                 revive_splash = client.get_window('cardjitsu_snowrevive.swf')
-                revive_splash.load(
-                    xPercent=0.2,
-                    yPercent=0
-                )
+                revive_splash.load(xPercent=0.2, yPercent=0)
 
             # Wait for revive splash to load and close
-            self.wait_for_window('cardjitsu_snowrevive.swf', loaded=True)
-            self.wait_for_window('cardjitsu_snowrevive.swf', loaded=False)
+            await self.wait_for_window('cardjitsu_snowrevive.swf', loaded=True)
+            await self.wait_for_window('cardjitsu_snowrevive.swf', loaded=False)
 
             for ninja in ninjas_with_member_cards:
-                ninja.member_card.consume()
-                time.sleep(1)
+                await ninja.member_card.consume() # type: ignore (already checked)
+                await self.wait_for_animations()
 
-    def do_enemy_actions(self) -> None:
+    async def do_enemy_actions(self) -> None:
         if config.DISABLE_ENEMY_AI:
             return
 
         for enemy in self.enemies:
-            time.sleep(0.5)
-
             if enemy.hp <= 0:
                 # Enemy is dead
                 continue
@@ -738,17 +844,17 @@ class Game:
                 continue
 
             if next_move:
-                enemy.move_enemy(next_move.x, next_move.y)
-                self.wait_for_animations()
+                enemy.move_enemy(next_move.grid_x, next_move.grid_y)
+                await self.wait_for_animations()
 
             if target is None:
                 # Set sprite to default direction
                 enemy.reset_sprite_settings()
                 continue
 
-            target_object = self.grid[target.x, target.y]
+            target_object = self.grid[target.grid_x, target.grid_y]
 
-            if target_object is None:
+            if target_object is None or not isinstance(target_object, Ninja):
                 # Ninja doesn't exist?
                 continue
 
@@ -760,13 +866,13 @@ class Game:
                 # Enemy's sprite might be flipped to wrong direction
                 enemy.reset_sprite_settings()
 
-            enemy.attack_target(target_object)
+            await enemy.attack_target(target_object)
 
             if target_object.x > enemy.x:
                 # Flip ninja's sprite to face the enemy
                 target_object.mirror_mode = MirrorMode.X
 
-            self.wait_for_animations()
+            await self.wait_for_animations()
             target_object.reset_sprite_settings()
 
         # Remove enemy stunned state
@@ -777,7 +883,7 @@ class Game:
             enemy.stunned = False
             enemy.idle_animation()
 
-    def show_ui(self) -> None:
+    async def show_ui(self) -> None:
         for client in self.clients:
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.layer = 'bottomLayer'
@@ -793,7 +899,7 @@ class Game:
                 yPercent=1
             )
 
-        self.wait_for_window('cardjitsu_snowui.swf', loaded=True)
+        await self.wait_for_window('cardjitsu_snowui.swf', loaded=True)
 
     def send_tip(self, phase: TipPhase, client: "Penguin" | None = None) -> None:
         clients = [client] if client else self.clients
@@ -823,8 +929,10 @@ class Game:
 
     def enable_cards(self) -> None:
         for client in self.clients:
+            is_alive = client.ninja.hp > 0
+            payload_trigger = "enableCards" if is_alive else "enableMemberCard"
             snow_ui = client.get_window('cardjitsu_snowui.swf')
-            snow_ui.send_payload('enableCards')
+            snow_ui.send_payload(payload_trigger)
 
     def disable_cards(self) -> None:
         for client in self.clients:
@@ -839,7 +947,7 @@ class Game:
         for client in self.clients:
             client.unlock_stamp(id)
 
-    def display_round_title(self) -> None:
+    async def display_round_title(self) -> None:
         round_time = ((self.game_start + 300) - time.time()) * 1000
 
         for client in self.clients:
@@ -857,9 +965,9 @@ class Game:
                 yPercent=0.15
             )
 
-        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
+        await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
 
-    def display_combo_title(self, elements: List[str]) -> None:
+    async def display_combo_title(self, elements: List[str]) -> None:
         for client in self.clients:
             combo_title = client.get_window('cardjitsu_snowcombos.swf')
             combo_title.layer = 'bottomLayer'
@@ -871,7 +979,7 @@ class Game:
                 yPercent=0.5
             )
 
-        self.wait_for_window(
+        await self.wait_for_window(
             'cardjitsu_snowcombos.swf',
             loaded=True,
             timeout=4
@@ -1058,8 +1166,8 @@ class Game:
                     yPercent=0.05
                 )
 
-    def display_win_sequence(self) -> None:
-        time.sleep(2)
+    async def display_win_sequence(self) -> None:
+        await delay(2)
 
         if all(ninja.hp <= 0 for ninja in self.ninjas):
             return
@@ -1073,4 +1181,4 @@ class Game:
 
             ninja.win_animation()
 
-        time.sleep(3.5)
+        await delay(3.5)

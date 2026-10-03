@@ -1,27 +1,26 @@
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, List, Tuple
 
 if TYPE_CHECKING:
     from app.engine.game import Game
 
 from app.data import MirrorMode, OriginMode
 from app.objects import GameObject
-
-import time
+from app.engine.utils import delay
 
 class Effect(GameObject):
     def __init__(
         self,
         game: "Game",
         name: str,
-        x: int,
-        y: int,
-        x_offset: int = 0,
-        y_offset: int = 0,
+        x: int | float,
+        y: int | float,
+        x_offset: int | float = 0,
+        y_offset: int | float = 0,
         origin_mode: OriginMode = OriginMode.NONE,
         mirror_mode: MirrorMode = MirrorMode.NONE,
-        duration: int = 0
+        duration: int | float = 0
     ):
         super().__init__(
             game,
@@ -40,7 +39,7 @@ class Effect(GameObject):
         self.place_sprite(self.name)
 
 class AttackTile(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "ui_tile_attack",
@@ -51,7 +50,7 @@ class AttackTile(Effect):
         )
 
     def play(self, auto_remove=False):
-        if not self.game.grid.is_valid(self.x, self.y):
+        if not self.game.grid.is_valid(self.grid_x, self.grid_y):
             return
 
         self.place_object()
@@ -61,7 +60,7 @@ class AttackTile(Effect):
             self.do_later(0.2, self.remove_object)
 
 class HealTile(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "ui_tile_heal",
@@ -72,7 +71,7 @@ class HealTile(Effect):
         )
 
     def play(self, auto_remove=False):
-        if not self.game.grid.is_valid(self.x, self.y):
+        if not self.game.grid.is_valid(self.grid_x, self.grid_y):
             return
 
         self.place_object()
@@ -82,7 +81,7 @@ class HealTile(Effect):
             self.do_later(0.2, self.remove_object)
 
 class HealParticles(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "ui_healfx_anim",
@@ -100,13 +99,13 @@ class HealParticles(Effect):
         self.do_later(self.duration, self.remove_object)
 
 class AttackTileField:
-    def __init__(self, game: "Game", center_x: int, center_y: int):
+    def __init__(self, game: "Game", center_x: int | float, center_y: int | float):
         self.game = game
         self.center_x = center_x
         self.center_y = center_y
         self.tiles = []
 
-    def play(self):
+    async def play(self):
         x_offsets = range(-1, 2)
         y_offsets = range(-1, 2)
 
@@ -118,7 +117,7 @@ class AttackTileField:
                 self.tiles.append(tile := AttackTile(self.game, x, y))
                 tile.play()
 
-        time.sleep(0.25)
+        await delay(0.25)
         self.remove()
 
     def remove(self):
@@ -126,7 +125,7 @@ class AttackTileField:
             tile.remove_object()
 
 class DamageNumbers(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "ui_attack_numbers_anim",
@@ -137,7 +136,7 @@ class DamageNumbers(Effect):
             duration=0.5
         )
 
-    def play(self, damage: int):
+    def play(self, damage: int = 0):
         frames = {
             3: (0, 4),
             4: (5, 9),
@@ -164,7 +163,7 @@ class DamageNumbers(Effect):
         self.do_later(self.duration, self.remove_object)
 
 class HealNumbers(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "ui_heal_numbers_anim",
@@ -175,7 +174,7 @@ class HealNumbers(Effect):
             duration=0.5
         )
 
-    def play(self, hp: int):
+    def play(self, hp: int = 0):
         frames = {
             1: (0, 4),
             6: (5, 9),
@@ -194,7 +193,7 @@ class HealNumbers(Effect):
         self.do_later(self.duration, self.remove_object)
 
 class Explosion(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "effect_explosion_anim",
@@ -212,7 +211,7 @@ class Explosion(Effect):
         self.do_later(self.duration, self.remove_object)
 
 class SnowProjectile(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "snow_projectile",
@@ -223,7 +222,7 @@ class SnowProjectile(Effect):
             duration=0.2
         )
 
-    def play(self, target_x: int, target_y: int):
+    def play(self, target_x: int = 0, target_y: int = 0):
         self.set_offset(target_x, target_y)
         self.place_object()
 
@@ -283,7 +282,7 @@ class SnowProjectile(Effect):
         return "snowninja_projectileangle_anim"
 
 class FireProjectile(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "fire_projectile",
@@ -293,7 +292,7 @@ class FireProjectile(Effect):
             y_offset=1
         )
 
-    def play(self, target_x: int, target_y: int):
+    def play(self, target_x: int = 0, target_y: int = 0):
         self.set_offset(target_x, target_y)
         self.place_object()
         self.set_mirror_mode(target_x, target_y)
@@ -333,7 +332,7 @@ class FireProjectile(Effect):
         return "fireninja_projectile_right_anim"
 
 class SlyProjectile(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "sly_projectile_anim",
@@ -344,7 +343,7 @@ class SlyProjectile(Effect):
             duration=0.5
         )
 
-    def play(self, target_x: int, target_y: int):
+    def play(self, target_x: int = 0, target_y: int = 0):
         if self.x > target_x:
             self.x_offset = 1
             self.y_offset = 0.8
@@ -357,7 +356,7 @@ class SlyProjectile(Effect):
         self.move_object(target_x, target_y, duration=self.duration * 1000)
 
 class ScrapImpact(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "scrap_attackeffect_anim",
@@ -374,7 +373,7 @@ class ScrapImpact(Effect):
         self.do_later(self.duration, self.remove_object)
 
 class ScrapImpactLittle(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "scrap_attacklittleeffect_anim",
@@ -389,20 +388,20 @@ class ScrapImpactLittle(Effect):
         self.place_sprite(self.name)
 
 class ScrapImpactSurroundings:
-    def __init__(self, game: "Game", center_x: int, center_y: int):
+    def __init__(self, game: "Game", center_x: int | float, center_y: int | float):
         self.game = game
         self.center_x = center_x
         self.center_y = center_y
         self.effects: List[Effect] = []
 
-    def play(self):
+    async def play(self):
         x_offsets = range(-1, 2)
         y_offsets = range(-1, 2)
 
         for x_offset in x_offsets:
             for y_offset in y_offsets:
-                x = self.center_x + x_offset
-                y = self.center_y + y_offset
+                x = int(self.center_x + x_offset)
+                y = int(self.center_y + y_offset)
 
                 if not self.game.grid.is_valid(x, y):
                     continue
@@ -412,7 +411,7 @@ class ScrapImpactSurroundings:
                 impact.play()
                 tile.play()
 
-        time.sleep(0.35)
+        await delay(0.35)
         self.remove()
 
     def remove(self):
@@ -420,7 +419,7 @@ class ScrapImpactSurroundings:
             effect.remove_object()
 
 class ScrapProjectile(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "scrap_projectile",
@@ -430,7 +429,7 @@ class ScrapProjectile(Effect):
             y_offset=1.5
         )
 
-    def play_east(self, target_x: int, target_y: int):
+    def play_east(self, target_x: int | float, target_y: int | float):
         if target_x < 0 or target_x > 8:
             return
 
@@ -441,7 +440,7 @@ class ScrapProjectile(Effect):
         self.place_sprite("scrap_projectileeast_anim")
         self.move_object(target_x, target_y, duration=180)
 
-    def play_north(self, target_x: int, target_y: int):
+    def play_north(self, target_x: int | float, target_y: int | float):
         if target_x < 0 or target_x > 8:
             return
 
@@ -452,7 +451,7 @@ class ScrapProjectile(Effect):
         self.place_sprite("scrap_projectilenorth_anim")
         self.move_object(target_x, target_y, duration=180)
 
-    def play_northeast(self, target_x: int, target_y: int):
+    def play_northeast(self, target_x: int | float, target_y: int | float):
         if target_x < 0 or target_x > 8:
             return
 
@@ -464,14 +463,14 @@ class ScrapProjectile(Effect):
         self.move_object(target_x, target_y, duration=180)
 
 class ScrapProjectileImpact:
-    def __init__(self, game: "Game", center_x: int, center_y: int):
+    def __init__(self, game: "Game", center_x: int | float, center_y: int | float):
         self.game = game
         self.center_x = center_x
         self.center_y = center_y
         self.effects: List[ScrapProjectile] = []
         self.duration = 0.4
 
-    def play(self):
+    async def play(self):
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
         projectile.play_east(self.center_x + 1, self.center_y)
 
@@ -496,12 +495,12 @@ class ScrapProjectileImpact:
         self.effects.append(projectile := ScrapProjectile(self.game, self.center_x, self.center_y))
         projectile.play_northeast(self.center_x - 1, self.center_y + 0.8)
 
-        time.sleep(self.duration)
+        await delay(self.duration)
         for effect in self.effects:
             effect.remove_object()
 
 class TankSwipeHorizontal(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "tank_swipe_horiz_anim",
@@ -517,7 +516,7 @@ class TankSwipeHorizontal(Effect):
         self.animate_sprite(0, 6, duration=400)
 
 class TankSwipeVertical(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "tank_swipe_vert_anim",
@@ -533,7 +532,7 @@ class TankSwipeVertical(Effect):
         self.animate_sprite(0, 6, duration=400)
 
 class WaterPowerBeam(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "waterninja_powercard_water_loop_anim",
@@ -548,7 +547,7 @@ class WaterPowerBeam(Effect):
         self.place_sprite(self.name)
 
 class FirePowerBeam(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "fireninja_powerskyfire_anim",
@@ -564,7 +563,7 @@ class FirePowerBeam(Effect):
         self.place_sprite(self.name)
 
 class SnowPowerBeam(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "snowninja_beam_anim",
@@ -579,7 +578,7 @@ class SnowPowerBeam(Effect):
         self.place_sprite(self.name)
 
 class SnowIgloo(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "snowninja_igloodrop",
@@ -604,7 +603,7 @@ class SnowIgloo(Effect):
             )
 
 class WaterFishDrop(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "waterninja_powercard_fishdrop_anim",
@@ -623,7 +622,7 @@ class WaterFishDrop(Effect):
         self.animate_object('blank_png')
 
 class FirePowerBottle(Effect):
-    def __init__(self, game: "Game", x: int, y: int):
+    def __init__(self, game: "Game", x: int | float, y: int | float):
         super().__init__(
             game,
             "fireninja_powerbottle_anim",
@@ -642,7 +641,7 @@ class FirePowerBottle(Effect):
         self.animate_object('blank_png')
 
 class Flame(Effect):
-    def __init__(self, game: "Game", x: int, y: int) -> None:
+    def __init__(self, game: "Game", x: int | float, y: int | float) -> None:
         super().__init__(
             game,
             "effect_resisualfiredamage_anim",
@@ -658,7 +657,7 @@ class Flame(Effect):
         self.place_sprite(self.name)
 
 class Shield(Effect):
-    def __init__(self, game: "Game", x: int, y: int) -> None:
+    def __init__(self, game: "Game", x: int | float, y: int | float) -> None:
         super().__init__(
             game,
             "effect_shield",
@@ -679,7 +678,7 @@ class Shield(Effect):
         self.do_later(0.2, self.remove_object)
 
 class Rage(Effect):
-    def __init__(self, game: "Game", x: int, y: int) -> None:
+    def __init__(self, game: "Game", x: int | float, y: int | float) -> None:
         super().__init__(
             game,
             "effect_rage",
@@ -700,7 +699,7 @@ class Rage(Effect):
         self.do_later(0.7, self.remove_object)
 
 class MemberReviveBeam(Effect):
-    def __init__(self, game: "Game", x: int, y: int) -> None:
+    def __init__(self, game: "Game", x: int | float, y: int | float) -> None:
         super().__init__(
             game,
             "effect_revivebeam_anim",
@@ -717,7 +716,7 @@ class MemberReviveBeam(Effect):
         self.animate_sprite(0, 29, duration=1200)
 
 class TuskIcicle(Effect):
-    def __init__(self, game: "Game", x: int, y: int) -> None:
+    def __init__(self, game: "Game", x: int | float, y: int | float) -> None:
         super().__init__(
             game,
             "tusk_icicle_drop_anim",
@@ -734,7 +733,7 @@ class TuskIcicle(Effect):
         self.do_later(0.8, self.apply_damage)
 
     def apply_damage(self) :
-        target = self.game.grid[self.x, self.y]
+        target = self.game.grid[self.grid_x, self.grid_y]
         self.remove_object()
 
         if not target:
@@ -743,28 +742,28 @@ class TuskIcicle(Effect):
         if target.name not in ('Water', 'Fire', 'Snow'):
             return
 
-        if target.hp <= 0:
+        if target.hp <= 0: # type: ignore
             return
 
-        target.set_health(target.hp - self.game.tusk.attack)
-        
+        target.set_health(target.hp - self.game.tusk.attack) # type: ignore
+
 class TuskIcicleRow:
-    def __init__(self, game: "Game", row: int) -> None:
+    def __init__(self, game: "Game", row: Tuple[int, int]) -> None:
         self.first_row = row[0]
         self.second_row = row[1]
         self.game = game
 
-    def play(self):
+    async def play(self):
         x_range = list(self.game.grid.x_range)
         x_range.reverse()
 
         for x in x_range:
             TuskIcicle(self.game, x, self.first_row).play()
             TuskIcicle(self.game, x, self.second_row).play()
-            time.sleep(0.09)
+            await delay(0.09)
 
 class TuskPushRock(Effect):
-    def __init__(self, game: "Game", x: int, y: int) -> None:
+    def __init__(self, game: "Game", x: int | float, y: int | float) -> None:
         super().__init__(
             game,
             "effect_tusk_push",

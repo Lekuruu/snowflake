@@ -29,6 +29,7 @@ def on_room_to_room_complete(client: Penguin, data: dict):
         return
 
     # Client has loaded all assets
+    client.place_loaded = True
     client.is_ready = True
 
 @session.framework.register('roomToRoomScreenClosed')

@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 from typing import Callable, Dict, List, Any, TYPE_CHECKING
+from twisted.internet.defer import CancelledError, Deferred, TimeoutError
 from twisted.internet import reactor
 from dataclasses import dataclass
 from enum import IntEnum
-
-import time
 
 if TYPE_CHECKING:
     from app.engine.game import Game
@@ -18,6 +17,8 @@ class ActionType(IntEnum):
 
 @dataclass
 class Action:
+    """An animation or sound that the client will report as done"""
+
     name: str
     handle_id: int
     object_id: int
@@ -33,11 +34,30 @@ class Action:
         return self.handle_id == action.handle_id
 
 class CallbackHandler:
-    """This class manages callbacks for animations, sounds & window events"""
+    """
+    CallbackHandler allows us to track actions & events sent to the client
+    and let the game wait for them to finish.
+
+    Animations & sounds are stored as "actions". Each action has a handle ID
+    and the ID of the object playing it. Both IDs are sent to the client.
+    When the action ends, the client sends them back and `action_done(...)`
+    removes the matching action.
+
+    `wait_for_animations(...)` creates a waiter to wait for pending animations.
+    This pauses only the code waiting for them, not the entire server.
+    When no animations remain, all animation waiters are given a callback and
+    their code continues.
+
+    Specific framework messages are refered to as "events".
+    For example, this would be "ConsumeCardResponse" or "comboScreenComplete".
+    `wait_for_client(...)` & `wait_for_event(...)` are both creating waiters for
+    these, similar to the animation waiters.
+    """
 
     def __init__(self, game: "Game"):
         self.pending_actions: Dict[int, List[Action]] = {}
-        self.pending_events: Dict[Any, List[str]] = {}
+        self.pending_events: Dict[Any, Dict[str, List[Deferred]]] = {}
+        self.animation_waiters: List[Deferred] = []
         self.game = game
 
     @property
@@ -72,18 +92,26 @@ class CallbackHandler:
             if action.type == ActionType.Sound
         ]
 
+    def next_id(self) -> int:
+        return max(self.ids or [0]) + 1
+
     def by_id(self, id: int) -> Action | None:
         return next((action for action in self.actions if action.handle_id == id), None)
 
     def by_name(self, name: str) -> Action | None:
         return next((action for action in self.actions if action.name == name), None)
 
-    def remove(self, object_id: int) -> None:
-        if object_id in self.pending_actions:
-            self.pending_actions.pop(object_id, None)
+    def remove(
+        self,
+        object_id: int,
+        *,
+        complete_waiters: bool = True
+    ) -> None:
+        """Remove all actions for an object"""
+        self.pending_actions.pop(object_id, None)
 
-    def next_id(self) -> int:
-        return max(self.ids or [0]) + 1
+        if complete_waiters:
+            self.complete_animation_waiters()
 
     def register_action(
         self,
@@ -92,6 +120,7 @@ class CallbackHandler:
         object_id: int,
         callback: Callable | None = None
     ) -> int:
+        """Register an animation or sound & return its new handle ID"""
         action = Action(
             name,
             self.next_id(),
@@ -104,6 +133,7 @@ class CallbackHandler:
         return action.handle_id
 
     def action_done(self, id: int, object_id: int) -> None:
+        """Handles a client message saying that an action has finished"""
         actions = self.pending_actions.get(object_id)
 
         if not actions:
@@ -123,63 +153,149 @@ class CallbackHandler:
             self.pending_actions.pop(object_id, None)
 
         if action.callback is not None:
-            reactor.callInThread(
-                action.callback,
-                self.game.objects.by_id(object_id)
-            )
+            action.callback(self.game.objects.by_id(object_id))
 
-    def register_event(self, target: Any, event: str) -> None:
-        self.pending_events.setdefault(target, []).append(event)
+        self.complete_animation_waiters()
+
+    def register_event(self, target: Any, event: str) -> Deferred:
+        """Register & store a client event"""
+        waiter = Deferred()
+        events = self.pending_events.setdefault(target, {})
+        events.setdefault(event, []).append(waiter)
+        return waiter
 
     def event_done(self, event: str, target: Any) -> None:
-        events = self.pending_events.get(target)
+        """Resolve all waiters for an event"""
+        events = self.pending_events.get(target, {})
+        waiters = events.pop(event, [])
 
-        if not events or event not in events:
+        if not waiters:
             return
-
-        events.remove(event)
 
         if not events:
             self.pending_events.pop(target, None)
 
+        self.finish_waiters(waiters, event)
+
     def remove_events(self, target: Any) -> None:
-        if target in self.pending_events:
-            self.pending_events.pop(target, None)
+        """Cancel every event waiter for a target"""
+        events = self.pending_events.pop(target, {})
 
-    def wait_for_client(self, event: str, client: "Penguin", timeout=8) -> None:
+        for waiters in events.values():
+            self.cancel_waiters(waiters)
+
+    async def wait_for_client(
+        self,
+        event: str,
+        client: "Penguin",
+        timeout: float = 8,
+        waiter: Deferred | None = None
+    ) -> bool:
         """Wait for an event to be called by the client"""
-        self.register_event(client, event)
+        waiter = waiter or self.register_event(client, event)
+        return await self.await_event(waiter, client, event, timeout)
 
-        start_time = time.time()
-
-        while event in self.pending_events.get(client, []):
-            if client.disconnected:
-                self.remove_events(client)
-                break
-
-            if time.time() - start_time > timeout:
-                self.game.logger.warning(f"Event Timeout: {event}")
-                self.remove_events(client)
-                break
-
-            time.sleep(0.05)
-
-    def wait_for_event(self, event: str, timeout=8) -> None:
+    async def wait_for_event(
+        self,
+        event: str,
+        timeout: float = 8,
+        waiter: Deferred | None = None
+    ) -> bool:
         """Wait for an event to be called by any of the clients"""
-        self.register_event(self.game, event)
+        waiter = waiter or self.register_event(self.game, event)
+        return await self.await_event(waiter, self.game, event, timeout)
 
-        start_time = time.time()
+    async def wait_for_animations(self, timeout: float = 8) -> bool:
+        """Wait until no registered animations remain, or until timeout"""
+        if not self.pending_animations:
+            return True
 
-        while event in self.pending_events.get(self.game, []):
-            if time.time() - start_time > timeout:
-                self.game.logger.warning(f"Event Timeout: {event}")
-                self.reset_events()
-                break
+        waiter = Deferred()
+        self.animation_waiters.append(waiter)
 
-            time.sleep(0.05)
+        try:
+            await waiter.addTimeout(timeout, reactor)
+            return True
+        except TimeoutError:
+            self.game.logger.warning(f'Animation Timeout: {self.pending_animations}')
+            self.reset_animations()
+        except CancelledError:
+            pass
+        finally:
+            if waiter in self.animation_waiters:
+                self.animation_waiters.remove(waiter)
+
+        return False
 
     def reset_animations(self) -> None:
+        """Clear pending actions after a timeout & send fail signal to waiters"""
         self.pending_actions.clear()
+        self.finish_waiters(self.animation_waiters, False)
+
+    def complete_animation_waiters(self) -> None:
+        """Send a success signal to all animation waiters"""
+        if not self.pending_animations:
+            self.finish_waiters(self.animation_waiters, True)
 
     def reset_events(self) -> None:
-        self.pending_events.clear()
+        for target in list(self.pending_events):
+            self.remove_events(target)
+
+    async def await_event(
+        self,
+        waiter: Deferred,
+        target: Any,
+        event: str,
+        timeout: float
+    ) -> bool:
+        """Wait for an event with a given timeout"""
+        try:
+            await waiter.addTimeout(timeout, reactor)
+            return True
+        except TimeoutError:
+            self.game.logger.warning(f'Event Timeout: {event}')
+        except CancelledError:
+            pass
+        finally:
+            self.remove_event_waiter(target, event, waiter)
+
+        return False
+
+    def remove_event_waiter(
+        self,
+        target: Any,
+        event: str,
+        waiter: Deferred
+    ) -> None:
+        events = self.pending_events.get(target)
+        if not events:
+            return
+
+        waiters = events.get(event)
+        if waiters and waiter in waiters:
+            waiters.remove(waiter)
+
+        if waiters == []:
+            events.pop(event, None)
+        if not events:
+            self.pending_events.pop(target, None)
+
+    @staticmethod
+    def finish_waiters(waiters: List[Deferred], result: Any) -> None:
+        """Give every unfinished waiter a result"""
+        pending = list(waiters)
+        waiters.clear()
+
+        for waiter in pending:
+            if not waiter.called:
+                waiter.callback(result)
+
+    @staticmethod
+    def cancel_waiters(waiters: List[Deferred]) -> None:
+        """Cancel every unfinished waiter"""
+        pending = list(waiters)
+        waiters.clear()
+
+        for waiter in pending:
+            if not waiter.called:
+                waiter.cancel()

@@ -16,7 +16,7 @@ import random
 import config
 
 
-def delay(minimum: int, maximum: int) -> Callable:
+def delay(minimum: int | float, maximum: int | float) -> Callable:
     def decorator(func: Callable) -> Callable:
         return lambda *args, **kwargs: reactor.callLater(
             random.uniform(minimum, maximum),
@@ -24,7 +24,7 @@ def delay(minimum: int, maximum: int) -> Callable:
         )
     return decorator
 
-def manhatten_distance(x1: int, y1: int, x2: int, y2: int) -> int:
+def manhatten_distance(x1: int, y1: int, x2: int, y2: int) -> int | float:
     return abs(x1 - x2) + abs(y1 - y2)
 
 
@@ -291,13 +291,13 @@ class PenguinAI(Penguin):
             return
 
         self.debug(f'ghost placed: ({tile.x},{tile.y}) from ({self.ninja.x},{self.ninja.y})')
-        self.ninja.place_ghost(tile.x, tile.y)
+        self.ninja.place_ghost(tile.grid_x, tile.grid_y)
 
     def living_enemies(self) -> list[Enemy]:
         return [enemy for enemy in self.game.enemies if enemy.hp > 0]
 
     def available_tiles(self) -> list[GameObject]:
-        current_tile = self.game.grid[self.ninja.x, self.ninja.y]
+        current_tile = self.game.grid[self.ninja.grid_x, self.ninja.grid_y]
         tiles = list(self.ninja.movable_tiles())
 
         if current_tile:
@@ -305,9 +305,12 @@ class PenguinAI(Penguin):
 
         return tiles
 
-    def nearest_enemy_distance(self, tile: GameObject, enemies: Iterable[Enemy]) -> int:
+    def nearest_enemy_distance(self, tile: GameObject, enemies: Iterable[Enemy]) -> int | float:
         return min(
-            manhatten_distance(tile.x, tile.y, enemy.x, enemy.y)
+            manhatten_distance(
+                tile.grid_x, tile.grid_y,
+                enemy.grid_x, enemy.grid_y
+            )
             for enemy in enemies
         )
 
@@ -318,7 +321,7 @@ class PenguinAI(Penguin):
         prefer_closest: bool
     ) -> GameObject | None:
         enemies = [
-            self.game.grid[target.x, target.y]
+            self.game.grid[target.grid_x, target.grid_y]
             for target in targets
         ]
         enemies = [enemy for enemy in enemies if isinstance(enemy, Enemy)]
@@ -328,10 +331,10 @@ class PenguinAI(Penguin):
 
         def score(enemy: Enemy):
             distance = manhatten_distance(
-                enemy.x,
-                enemy.y,
-                from_tile.x,
-                from_tile.y
+                enemy.grid_x,
+                enemy.grid_y,
+                from_tile.grid_x,
+                from_tile.grid_y
             )
 
             if prefer_closest:
@@ -340,7 +343,11 @@ class PenguinAI(Penguin):
             return (enemy.hp, -distance)
 
         enemy = min(enemies, key=score)
-        return self.game.grid.get_tile(enemy.x, enemy.y)
+
+        return self.game.grid.get_tile(
+            enemy.grid_x,
+            enemy.grid_y
+        )
 
     def best_move_for_attack(
         self,
@@ -354,7 +361,7 @@ class PenguinAI(Penguin):
         attack_candidates = []
 
         for tile in self.available_tiles():
-            targets = list(self.ninja.attackable_tiles(tile.x, tile.y))
+            targets = list(self.ninja.attackable_tiles(tile.grid_x, tile.grid_y))
 
             if not targets:
                 continue
@@ -448,13 +455,13 @@ class PenguinAI(Penguin):
         heal_candidates = []
 
         for tile in self.available_tiles():
-            heal_tiles = list(self.ninja.healable_tiles(tile.x, tile.y))
+            heal_tiles = list(self.ninja.healable_tiles(tile.grid_x, tile.grid_y))
 
             if not heal_tiles:
                 continue
 
             for heal_tile in heal_tiles:
-                ally = self.game.grid[heal_tile.x, heal_tile.y]
+                ally = self.game.grid[heal_tile.grid_x, heal_tile.grid_y]
 
                 if not isinstance(ally, Ninja):
                     continue
@@ -526,20 +533,20 @@ class PenguinAI(Penguin):
         if not tiles:
             return None
 
-        current_tile = self.game.grid[self.ninja.x, self.ninja.y]
+        current_tile = self.game.grid[self.ninja.grid_x, self.ninja.grid_y]
 
         # Prefer tiles that reduce average distance to allies
         # On ties, prefer moving over staying
         best_tile = min(
             tiles,
             key=lambda tile: (
-                sum(manhatten_distance(tile.x, tile.y, ally.x, ally.y) for ally in allies) / len(allies),
+                sum(manhatten_distance(tile.grid_x, tile.grid_y, ally.grid_x, ally.grid_y) for ally in allies) / len(allies),
                 0 if (current_tile and tile != current_tile) else 1
             )
         )
 
         avg_distance = sum(
-            manhatten_distance(best_tile.x, best_tile.y, ally.x, ally.y)
+            manhatten_distance(best_tile.grid_x, best_tile.grid_y, ally.grid_x, ally.grid_y)
             for ally in allies
         ) / len(allies)
 
@@ -561,24 +568,24 @@ class PenguinAI(Penguin):
 
     def can_heal_ninja(self, target: Ninja) -> bool:
         tiles = self.game.grid.surrounding_tiles(
-            target.x,
-            target.y
+            target.grid_x,
+            target.grid_y
         )
 
         for tile in tiles:
             can_move = self.game.grid.can_move_to_tile(
                 self.ninja,
-                tile.x,
-                tile.y
+                tile.grid_x,
+                tile.grid_y
             )
 
             if not can_move:
                 continue
 
-            self.ninja.place_ghost(tile.x, tile.y)
+            self.ninja.place_ghost(tile.grid_x, tile.grid_y)
             return True
 
-        current_tile = self.game.grid[self.ninja.x, self.ninja.y]
+        current_tile = self.game.grid[self.ninja.grid_x, self.ninja.grid_y]
 
         if current_tile in tiles:
             return True

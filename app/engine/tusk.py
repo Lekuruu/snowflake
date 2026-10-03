@@ -1,12 +1,14 @@
 
 from __future__ import annotations
+from turtle import back
+from twisted.internet.defer import Deferred
+from twisted.internet import defer
 from typing import List
 
 from app.objects.ninjas import WaterNinja, FireNinja, SnowNinja, Sensei
 from app.objects.collections import ObjectCollection
 from app.objects.gameobject import GameObject
 from app.objects.enemies import Enemy, Tusk
-from app.objects.ninjas import Ninja
 from app.objects.sound import Sound
 
 from app.data import TipPhase, ExpRequirements, SnowRewards
@@ -18,6 +20,7 @@ from .penguin import Penguin
 from .timer import Timer
 from .game import Game
 from .grid import Grid
+from .utils import delay
 
 import app.session
 import logging
@@ -32,8 +35,8 @@ class TuskGame(Game):
         self.snow = snow
         self.id = -1
 
-        self.sensei: Sensei | None = None
-        self.tusk: Tusk | None = None
+        self.sensei: Sensei
+        self.tusk: Tusk
 
         self.total_combos = 0
         self.damage = 0
@@ -52,15 +55,18 @@ class TuskGame(Game):
         self.backgrounds = []
         self.rocks = []
 
+        self.closed = False
+        self.deferred: Deferred | None = None
+
     @property
     def enemies(self) -> List[Enemy]:
-        return self.objects.with_name('Tusk')
+        return self.objects.with_name('Tusk') # type: ignore
 
     @property
     def bonus_criteria_met(self) -> bool:
         return False
 
-    def start(self) -> None:
+    async def start(self) -> None:
         with app.session.database.managed_session() as session:
             for client in self.clients:
                 client.game = self
@@ -72,7 +78,7 @@ class TuskGame(Game):
                 client.initialize_power_cards(session=session)
 
         # Wait for "prepare to battle" screen to end
-        time.sleep(3)
+        await delay(3)
 
         # Close player select window
         for client in self.clients:
@@ -82,24 +88,63 @@ class TuskGame(Game):
         # Place clients in battle place
         battle_place = self.server.places['tusk_battle']
 
+        min_time_waiter = self.callbacks.register_event(
+            self, 'roomToRoomMinTime'
+        )
+        ready_waiters = {
+            client: self.callbacks.register_event(client, 'roomToRoomComplete')
+            for client in self.clients
+            if not client.disconnected and not client.is_bot
+        }
+
         for client in self.clients:
+            client.place_loaded = client.is_bot
             client.switch_place(battle_place)
 
         # Wait for loading screen to finish
-        self.callbacks.wait_for_event('roomToRoomMinTime')
-        time.sleep(1)
+        await self.callbacks.wait_for_event(
+            'roomToRoomMinTime',
+            waiter=min_time_waiter
+        )
+        await delay(1)
 
         # Wait for players to finish loading assets
-        self.wait_for_players(lambda player: player.is_ready, timeout=20)
+        load_operations = []
+
+        for client, waiter in ready_waiters.items():
+            load_coroutine = self.callbacks.wait_for_client(
+                'roomToRoomComplete',
+                client,
+                timeout=20,
+                waiter=waiter
+            )
+            load_operations.append(
+                defer.Deferred.fromCoroutine(load_coroutine)
+            )
+
+        clients_ready = await defer.gatherResults(
+            load_operations,
+            consumeErrors=True
+        )
+
+        if not all(clients_ready):
+            pending = [
+                str(client) for client in ready_waiters
+                if not client.place_loaded
+            ]
+            self.logger.warning(
+                f'Continuing after load timeout for: {", ".join(pending)}'
+            )
 
         # Play background music
-        Sound.from_name('mus_mg_201303_cjsnow_tuskthemecaveamb', looping=True).play(self)
+        background_music = Sound.from_name('mus_mg_201303_cjsnow_tuskthemecaveamb', looping=True)
+        background_music.play(self)
 
         self.initialize_objects()
         self.show_environment()
         self.spawn_ninjas()
         self.spawn_enemies()
-        self.wait_for_animations()
+        await self.wait_for_animations()
 
         for client in self.clients:
             # Close loading screen
@@ -117,15 +162,15 @@ class TuskGame(Game):
             )
 
         # Wait for windows
-        time.sleep(1)
+        await delay(1)
 
         # Reset game time
         self.game_start = time.time() + 1
 
-        self.display_round_title()
-        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
+        await self.display_round_title()
+        await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=False)
 
-        self.show_ui()
+        await self.show_ui()
         self.send_tip(TipPhase.MOVE)
 
         for client in self.disconnected_clients:
@@ -139,11 +184,11 @@ class TuskGame(Game):
             snow_ui.send_payload('noCards')
 
         # Run game loop until game ends
-        self.run_game_loop()
+        await self.run_game_loop()
 
         self.remove_ui()
         self.remove_targets()
-        self.display_win_sequence()
+        await self.display_win_sequence()
 
         if not self.enemies:
             for client in self.clients:
@@ -157,6 +202,8 @@ class TuskGame(Game):
                 # Unlock "Team Revival" stamp
                 self.unlock_stamp(476)
 
+        background_music.stop(self)
+        self.hide_game_ui()
         self.display_payout()
         self.remove_objects()
         self.close()
@@ -226,12 +273,11 @@ class TuskGame(Game):
         self.tusk.remove_object()
         self.sensei.remove_object()
 
-    def do_powercard_attacks(self) -> None:
+    async def do_powercard_attacks(self) -> None:
         ninjas_with_cards = [
             ninja for ninja in self.ninjas
             if ninja.client.placed_powercard
         ]
-
         elements = [
             ninja.client.element
             for ninja in ninjas_with_cards
@@ -258,17 +304,23 @@ class TuskGame(Game):
                 # Unlock "4 Ninja Combo" stamp
                 self.unlock_stamp(468)
 
-            self.display_combo_title(elements)
-            self.callbacks.wait_for_event('comboScreenComplete', timeout=6)
+            combo_waiter = self.callbacks.register_event(
+                self, 'comboScreenComplete'
+            )
+            await self.display_combo_title(elements)
+            await self.callbacks.wait_for_event(
+                'comboScreenComplete',
+                timeout=6, waiter=combo_waiter
+            )
 
-        self.sensei.update_state()
-        time.sleep(1)
+        await self.sensei.update_state()
+        await self.wait_for_animations()
 
         for ninja in ninjas_with_cards:
-            ninja.use_powercard(is_combo)
-            time.sleep(1)
+            await ninja.use_powercard(is_combo)
+            await self.wait_for_animations()
 
-    def display_round_title(self) -> None:
+    async def display_round_title(self) -> None:
         for client in self.clients:
             round_title = client.get_window('cardjitsu_snowrounds.swf')
             round_title.layer = 'bottomLayer'
@@ -280,7 +332,7 @@ class TuskGame(Game):
                 yPercent=0.15
             )
 
-        self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
+        await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
 
     def display_payout(self) -> None:
         with app.session.database.managed_session() as session:
@@ -393,13 +445,13 @@ class TuskGame(Game):
                     yPercent=0.05
                 )
 
-    def display_win_sequence(self) -> None:
-        time.sleep(2)
+    async def display_win_sequence(self) -> None:
+        await delay(2)
 
         if all(ninja.hp <= 0 for ninja in self.ninjas):
             self.tusk.win_animation()
             self.sensei.lose_animation()
-            self.wait_for_animations()
+            await self.wait_for_animations()
             return
 
         # Unlock "Final Battle" stamp
@@ -416,4 +468,4 @@ class TuskGame(Game):
 
         self.sensei.win_animation()
 
-        time.sleep(3.5)
+        await delay(3.5)

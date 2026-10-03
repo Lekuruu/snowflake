@@ -15,7 +15,7 @@ def on_card_clicked(client: Penguin, data: dict):
     value = data['value']
     id = data['cardId']
 
-    if not (card := client.power_card_by_id(id)):
+    if (card := client.power_card_by_id(id)) is None:
         return
 
     if card.value != value:
@@ -37,7 +37,7 @@ def on_card_clicked(client: Penguin, data: dict):
     client.selected_card = card
     client.ninja.remove_targets()
     client.game.grid.hide_tiles_for_client(client)
-    client.game.grid.change_tiles_for_client(client, 'ui_tile_attack', ghost=True, ignore_objects=True)
+    client.game.grid.change_powercard_tiles_for_client(client, 'ui_tile_attack')
     client.ninja.play_sound('sfx_mg_2013_cjsnow_uitargetred', client)
 
 @session.framework.register('unselectCard')
@@ -55,10 +55,13 @@ def on_card_deselect(client: Penguin, data: dict):
     client.selected_card = None
     client.ninja.show_targets()
     client.game.grid.hide_tiles_for_client(client)
-    client.game.grid.change_tiles_for_client(client, 'ui_tile_move')
+    client.game.grid.show_tiles_for_client(client)
 
 @session.framework.register('ConsumeCardResponse')
 def on_card_consumed(client: Penguin, data: dict):
+    if not client.selected_card:
+        return
+
     try:
         client.power_card_slots.remove(client.selected_card)
         client.selected_card = None
@@ -124,7 +127,8 @@ def on_membercard_deselect(client: Penguin, data: dict):
 
     if client.ninja.hp > 0:
         client.ninja.show_targets()
-        client.game.grid.change_tiles_for_client(client, 'ui_tile_move')
+        client.game.grid.hide_tiles_for_client(client)
+        client.game.grid.show_tiles_for_client(client)
 
 @session.framework.register('comboScreenComplete')
 def on_combo_screen_complete(client: Penguin, data: dict):
