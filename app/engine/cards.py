@@ -4,7 +4,7 @@ from typing import Iterable, Sequence, Tuple, TYPE_CHECKING
 
 from .utils import delay
 from app.data import Card, TipPhase
-from app.objects import GameObject, LocalGameObject
+from app.objects import GameObject
 from app.objects.enemies import Enemy
 from app.objects.ninjas import Ninja
 from app.objects.effects import (
@@ -40,8 +40,8 @@ class CardObject(Card):
             x_offset=0.5,
             y_offset=1.015
         )
-        self.pattern = LocalGameObject(
-            client,
+        self.pattern = GameObject(
+            client.game,
             'ui_card_pattern',
             x_offset=0.5,
             y_offset=1
