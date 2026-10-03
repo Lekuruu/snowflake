@@ -203,6 +203,7 @@ class TuskGame(Game):
                 self.unlock_stamp(476)
 
         background_music.stop(self)
+        self.hide_game_ui()
         self.display_payout()
         self.remove_objects()
         self.close()

@@ -281,6 +281,7 @@ class Game:
                 self.unlock_stamp(473)
 
         background_music.stop(self)
+        self.hide_game_ui()
         self.display_payout()
         self.remove_objects()
         self.close()
@@ -649,6 +650,28 @@ class Game:
                 continue
 
             client.member_card.remove() # type: ignore (already checked)
+
+    def hide_game_ui(self) -> None:
+        window_names = (
+            'cardjitsu_snowinfotip.swf',
+            'cardjitsu_snowtimer.swf',
+            'cardjitsu_snowui.swf',
+            'cardjitsu_snowclose.swf'
+        )
+
+        for client in self.clients:
+            if client.disconnected:
+                continue
+
+            if client.is_bot:
+                continue
+
+            client.last_tip = None
+            infotip = client.get_window('cardjitsu_snowinfotip.swf')
+            infotip.on_close = None  # Do not open a queued tip
+
+            for name in window_names:
+                client.get_window(name).close()
 
     def hide_ghosts(self) -> None:
         for ninja in self.ninjas:
