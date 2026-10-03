@@ -331,6 +331,9 @@ class Ninja(GameObject):
         self.targets = []
 
     async def attack_target(self, target: Enemy):
+        if target.hp <= 0:
+            return
+
         # This delay seems to fix the mirror mode?
         await delay(0.25)
 
