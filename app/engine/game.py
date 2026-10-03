@@ -210,7 +210,8 @@ class Game:
             )
 
         # Play background music
-        Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True).play(self)
+        background_music = Sound.from_name('mus_mg_201303_cjsnow_gamewindamb', looping=True)
+        background_music.play(self)
 
         self.initialize_objects()
         self.show_environment()
@@ -279,6 +280,7 @@ class Game:
                 # Unlock "Bonus Win" stamp
                 self.unlock_stamp(473)
 
+        background_music.stop(self)
         self.display_payout()
         self.remove_objects()
         self.close()

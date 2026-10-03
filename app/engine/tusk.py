@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+from turtle import back
 from twisted.internet.defer import Deferred
 from twisted.internet import defer
 from typing import List
@@ -136,7 +137,8 @@ class TuskGame(Game):
             )
 
         # Play background music
-        Sound.from_name('mus_mg_201303_cjsnow_tuskthemecaveamb', looping=True).play(self)
+        background_music = Sound.from_name('mus_mg_201303_cjsnow_tuskthemecaveamb', looping=True)
+        background_music.play(self)
 
         self.initialize_objects()
         self.show_environment()
@@ -200,6 +202,7 @@ class TuskGame(Game):
                 # Unlock "Team Revival" stamp
                 self.unlock_stamp(476)
 
+        background_music.stop(self)
         self.display_payout()
         self.remove_objects()
         self.close()
