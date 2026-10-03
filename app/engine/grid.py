@@ -125,18 +125,19 @@ class Grid:
 
         return False
 
-    def enemy_spawn_location(self, max_attempts=100) -> Tuple[int, int]:
+    def enemy_spawn_location(self) -> Coordinates:
         """Get a random enemy spawn location"""
-        spawn_range = [range(7, 9), range(5)]
+        spawn_locations = [
+            (x, y)
+            for x in self.x_range[-2:]
+            for y in self.y_range
+            if self.can_move(x, y)
+        ]
 
-        for _ in range(max_attempts):
-            x = random.choice(spawn_range[0])
-            y = random.choice(spawn_range[1])
+        if not spawn_locations:
+            raise RuntimeError('No available enemy spawn locations')
 
-            if self.can_move(x, y):
-                return (x, y)
-
-        return (8, 4)
+        return random.choice(spawn_locations)
 
     def is_valid(self, x: int, y: int) -> bool:
         """Check if a tile is valid"""
