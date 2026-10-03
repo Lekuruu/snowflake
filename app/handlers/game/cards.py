@@ -55,7 +55,7 @@ def on_card_deselect(client: Penguin, data: dict):
     client.selected_card = None
     client.ninja.show_targets()
     client.game.grid.hide_tiles_for_client(client)
-    client.game.grid.change_tiles_for_client(client, 'ui_tile_move')
+    client.game.grid.show_tiles_for_client(client)
 
 @session.framework.register('ConsumeCardResponse')
 def on_card_consumed(client: Penguin, data: dict):
@@ -127,7 +127,8 @@ def on_membercard_deselect(client: Penguin, data: dict):
 
     if client.ninja.hp > 0:
         client.ninja.show_targets()
-        client.game.grid.change_tiles_for_client(client, 'ui_tile_move')
+        client.game.grid.hide_tiles_for_client(client)
+        client.game.grid.show_tiles_for_client(client)
 
 @session.framework.register('comboScreenComplete')
 def on_combo_screen_complete(client: Penguin, data: dict):

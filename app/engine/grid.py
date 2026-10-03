@@ -191,42 +191,55 @@ class Grid:
         tile_frame.place_sprite('ui_tile_frame')
 
         for client in self.game.clients:
-            if not client.ninja:
-                continue
+            self.show_tiles_for_client(client)
 
-            if client.ninja.hp <= 0:
-                continue
+    def show_tiles_for_client(self, client: "Penguin") -> None:
+        if not client.ninja:
+            return
 
-            for tile in client.ninja.tiles_in_range():
-                tile_position = (round(tile.x), round(tile.y))
+        if client.ninja.hp <= 0:
+            return
 
-                if not self.can_move(*tile_position):
-                    # Client cannot move to the tile
-                    tile_name = 'ui_tile_no_move'
-
-                    if isinstance((ninja := self[*tile_position]), Ninja):
-                        if ninja == client.ninja:
-                            tile_name = 'ui_tile_move'
-
-                        elif (
-                            ninja.hp <= 0 and
-                            not ninja.client.disconnected
-                        ):
-                            # Client can revive the ninja
-                            tile_name = 'ui_tile_heal'
-
-                        elif (
-                            ninja.hp < ninja.max_hp and
-                            not ninja.client.disconnected and
-                            client.element == 'snow'
-                        ):
-                            # Client can heal the ninja
-                            tile_name = 'ui_tile_heal'
-
-                    tile.place_sprite(tile_name, client)
-                    continue
-
+        for tile in client.ninja.tiles_in_range():
+            if self.can_move(*tile.grid_coordinates):
                 tile.place_sprite('ui_tile_move', client)
+                continue
+
+            occupant = self[*tile.grid_coordinates]
+
+            if occupant is client.ninja.ghost:
+                tile.place_sprite('ui_tile_move', client)
+                continue
+
+            if occupant is client.ninja:
+                tile.place_sprite('ui_tile_move', client)
+                continue
+
+            # Client cannot move to the tile
+            tile_name = 'ui_tile_no_move'
+
+            if not isinstance(occupant, Ninja):
+                # Either an enemy or an obstacle
+                tile.place_sprite(tile_name, client)
+                continue
+
+            can_revive = (
+                occupant.hp <= 0 and
+                not occupant.client.disconnected
+            )
+            can_heal = (
+                occupant.hp < occupant.max_hp and
+                not occupant.client.disconnected and
+                client.element == 'snow'
+            )
+
+            if can_revive:
+                tile_name = 'ui_tile_heal'
+
+            elif can_heal:
+                tile_name = 'ui_tile_heal'
+
+            tile.place_sprite(tile_name, client)
 
     def hide_tiles(self) -> None:
         """Hide all initialized tiles, including the tile frame"""
