@@ -400,8 +400,8 @@ class ScrapImpactSurroundings:
 
         for x_offset in x_offsets:
             for y_offset in y_offsets:
-                x = self.center_x + x_offset
-                y = self.center_y + y_offset
+                x = int(self.center_x + x_offset)
+                y = int(self.center_y + y_offset)
 
                 if not self.game.grid.is_valid(x, y):
                     continue

@@ -140,6 +140,10 @@ class Grid:
 
     def is_valid(self, x: int, y: int) -> bool:
         """Check if a tile is valid"""
+        if type(x) is not int or type(y) is not int:
+            # We can't deal with floats on the grid
+            return False
+
         return x in self.x_range and y in self.y_range
 
     def can_move(self, x: int, y: int) -> bool:
