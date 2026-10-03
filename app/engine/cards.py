@@ -26,7 +26,14 @@ if TYPE_CHECKING:
 
 class CardObject(Card):
     def __init__(self, card: Card, client: "Penguin") -> None:
-        self.__dict__.update(card.__dict__)
+        self.id = card.id
+        self.name = card.name
+        self.set_id = card.set_id
+        self.power_id = card.power_id
+        self.element = card.element
+        self.color = card.color
+        self.value = card.value
+        self.description = card.description
 
         assert client.game, "Client must be in a game to create a CardObject"
         self.game = client.game
@@ -52,11 +59,11 @@ class CardObject(Card):
 
     @property
     def x(self):
-        return self.object.x
+        return self.object.grid_x
 
     @property
     def y(self):
-        return self.object.y
+        return self.object.grid_y
 
     @property
     def targets(self) -> Iterable[GameObject]:
