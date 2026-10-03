@@ -341,16 +341,10 @@ class Ninja(GameObject):
             self.rage.use(target.grid_x, target.grid_y)
             self.rage = None
 
-            target.set_health(
-                target.hp - self.attack * 1.5,
-                defer_defeat=True
-            )
+            target.set_health(target.hp - self.attack * 1.5)
             return
 
-        target.set_health(
-            target.hp - self.attack,
-            defer_defeat=True
-        )
+        target.set_health(target.hp - self.attack)
 
     async def heal_target(self, target: "Ninja"):
         if self.client.last_tip == TipPhase.HEAL:

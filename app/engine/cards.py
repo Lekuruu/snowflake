@@ -260,10 +260,7 @@ class CardObject(Card):
                 if self.element == 'f':
                     target.stunned = True
 
-                target.set_health(
-                    target.hp - attack,
-                    defer_defeat=True
-                )
+                target.set_health(target.hp - attack)
                 Explosion(self.game, target.x, target.y).play()
 
     def apply_effects(self) -> None:

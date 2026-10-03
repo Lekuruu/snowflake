@@ -142,7 +142,7 @@ class Enemy(GameObject):
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
 
-    def set_health(self, hp: int, defer_defeat: bool = False) -> None:
+    def set_health(self, hp: int) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
@@ -161,12 +161,7 @@ class Enemy(GameObject):
         self.hp = hp
 
         if self.hp <= 0:
-            if defer_defeat:
-                self.hit_animation()
-                return
-
-            if self.start_defeat():
-                self.game.remove_after_animations(self)
+            self.start_defeat()
             return
 
         self.hit_animation()
@@ -177,10 +172,11 @@ class Enemy(GameObject):
 
         self.defeat_started = True
         self.ko_animation()
-        self.award_defeat_rewards()
+        self.update_defeat_rewards()
+        self.game.remove_after_animations(self)
         return True
 
-    def award_defeat_rewards(self) -> None:
+    def update_defeat_rewards(self) -> None:
         if self.game.round < 3:
             return
 
@@ -1040,7 +1036,7 @@ class Tusk(Enemy):
         await delay(1)
         await self.game.wait_for_animations()
 
-    def set_health(self, hp: int, defer_defeat: bool = False) -> None:
+    def set_health(self, hp: int) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
@@ -1079,12 +1075,7 @@ class Tusk(Enemy):
                 break
 
         if self.hp <= 0:
-            if defer_defeat:
-                self.hit_animation()
-                return
-
-            if self.start_defeat():
-                self.game.remove_after_animations(self)
+            self.start_defeat()
             return
 
         self.hit_animation()

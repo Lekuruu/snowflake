@@ -478,18 +478,6 @@ class Game:
             lambda failure: self.logger.error(failure.getTraceback())
         )
 
-    async def finish_enemy_defeats(self) -> None:
-        """Play all death animations for enemies with 0 hp & remove them from the game"""
-        defeated_enemies = [
-            enemy for enemy in self.enemies
-            if enemy.start_defeat()
-        ]
-        await self.wait_for_animations()
-
-        for enemy in defeated_enemies:
-            if self.objects.by_id(enemy.id) is enemy:
-                enemy.remove_object()
-
     async def wait_for_window(self, name: str, loaded=True, timeout=8) -> bool:
         """Wait for a window to load / close"""
         waits = []
@@ -722,9 +710,8 @@ class Game:
 
     async def do_ninja_actions(self) -> None:
         await self.do_ninja_attacks()
-        await self.finish_enemy_defeats()
+        await self.wait_for_animations()
         await self.do_powercard_attacks()
-        await self.finish_enemy_defeats()
         await self.do_ninja_revive()
         await self.wait_for_animations()
 
