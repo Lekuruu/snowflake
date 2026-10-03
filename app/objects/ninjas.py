@@ -406,6 +406,19 @@ class Ninja(GameObject):
             if distance <= self.move:
                 yield tile
 
+    def powercard_tiles_in_range(self) -> Iterator[GameObject]:
+        center_x = self.ghost.grid_x if self.placed_ghost else self.grid_x
+        center_y = self.ghost.grid_y if self.placed_ghost else self.grid_y
+
+        for tile in self.game.grid.tiles:
+            distance = self.game.grid.distance(
+                (center_x, center_y),
+                (tile.grid_x, tile.grid_y)
+            )
+
+            if distance <= self.range:
+                yield tile
+
     def movable_tiles(self) -> Iterator[GameObject]:
         for tile in self.tiles_in_range():
             if not self.game.grid.can_move(tile.grid_x, tile.grid_y):
@@ -525,7 +538,7 @@ class Ninja(GameObject):
 
         tile = self.game.grid.get_tile(x, y)
 
-        if tile not in self.ghost_tiles_in_range():
+        if tile not in self.powercard_tiles_in_range():
             return
 
         self.client.selected_card.place(x, y)

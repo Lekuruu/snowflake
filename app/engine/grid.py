@@ -277,6 +277,17 @@ class Grid:
             for tile in tiles:
                 tile.place_sprite(name, client)
 
+    def change_powercard_tiles_for_client(
+        self,
+        client: "Penguin",
+        name: str
+    ) -> None:
+        """Change the power card placement tiles for a client"""
+        assert client.ninja, "Client must have a ninja object"
+
+        for tile in client.ninja.powercard_tiles_in_range():
+            tile.place_sprite(name, client)
+
     def hide_tiles_for_client(self, client: "Penguin") -> None:
         """Hide all tiles for a specific client"""
         for tile in self.tiles:
