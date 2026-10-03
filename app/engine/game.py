@@ -8,7 +8,11 @@ from twisted.internet import defer
 if TYPE_CHECKING:
     from .penguin import Penguin
 
-from app.data.repositories import stamps, penguins, items
+from app.data.repositories import (
+    penguins,
+    stamps,
+    items
+)
 from app.data import (
     ExpRequirements,
     SnowRewards,
