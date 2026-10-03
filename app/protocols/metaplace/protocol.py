@@ -101,14 +101,14 @@ class MetaplaceProtocol(LineOnlyReceiver):
         if reason is not None and not self.disconnected:
             self.logger.warning(f"Connection lost: {reason.getErrorMessage()}")
 
-        self.server.players.remove(self)
+        self.server.players.remove(self) # type: ignore
         self.disconnected = True
 
     def close_connection(self) -> None:
         if not self.transport:
             return
 
-        self.transport.loseConnection()
+        self.transport.loseConnection() # type: ignore
         self.connectionLost()
 
     def send_tag(self, tag: str, *args) -> None:
@@ -142,7 +142,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def get_window(self, name: str | None = None, url: str | None = None):
         return self.window_manager.get_window(name, url)
 
-    def load_window(self, name: str, initial_payload: dict = None, **kwargs) -> None:
+    def load_window(self, name: str, initial_payload: dict | None = None, **kwargs) -> None:
         return self.window_manager.get_window(name).load(initial_payload, **kwargs)
 
     def send_version(self, version: str):
@@ -171,7 +171,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
     def register_input(
         self,
         input_id: str,
-        script_id: int,
+        script_id: int | str,
         target: InputTarget,
         event: InputType,
         key_modifier: InputModifier,

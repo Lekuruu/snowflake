@@ -1,7 +1,8 @@
 
 from __future__ import annotations
-from typing import Iterable, List, Tuple, TYPE_CHECKING
+from typing import Iterable, Tuple, TYPE_CHECKING
 
+from .utils import delay
 from app.data import Card, TipPhase
 from app.objects import GameObject, LocalGameObject
 from app.objects.enemies import Enemy
@@ -19,8 +20,6 @@ from app.objects.effects import (
     Flame,
     Rage
 )
-
-import time
 
 if TYPE_CHECKING:
     from app.engine import Penguin
@@ -121,9 +120,9 @@ class CardObject(Card):
         self.pattern.x = x
         self.pattern.y = y
         self.pattern.place_object()
-        self.pattern.place_sprite(f'ui_card_pattern{len(x_range)}x{len(y_range)}')
+        self.pattern.place_sprite(f'ui_card_pattern{len(x_range)}x{len(y_range)}') # type: ignore
 
-    def pattern_range(self, x: int, y: int) -> Tuple[range[int], range[int]]:
+    def pattern_range(self, x: int, y: int) -> Tuple[Iterable[int], Iterable[int]]:
         max_x = max(*self.game.grid.x_range)
         min_x = min(*self.game.grid.x_range)
         max_y = max(*self.game.grid.y_range)
@@ -152,7 +151,7 @@ class CardObject(Card):
 
         return x_range, y_range
 
-    def use(self, is_combo=False) -> None:
+    async def use(self, is_combo=False) -> None:
         assert self.client.ninja, "Client must have a ninja to use a card"
 
         if self.client.ninja.hp <= 0:
@@ -165,19 +164,24 @@ class CardObject(Card):
             return
 
         # Play card animation
+        consume_waiter = self.game.callbacks.register_event(
+            self.client,
+            'ConsumeCardResponse'
+        )
         self.consume()
 
         # Wait for client to consume card
-        self.game.callbacks.wait_for_client(
+        await self.game.callbacks.wait_for_client(
             'ConsumeCardResponse',
             client=self.client,
-            timeout=2
+            timeout=2,
+            waiter=consume_waiter
         )
 
         # Wait for card animation
-        time.sleep(1.2)
+        await delay(1.2)
 
-        self.attack_animation()
+        await self.attack_animation()
         self.apply_health()
 
         if is_combo:
@@ -185,7 +189,7 @@ class CardObject(Card):
 
         self.client.played_cards += 1
         self.check_stamps(is_combo)
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
 
     def consume(self) -> None:
         for client in self.game.clients:
@@ -199,8 +203,9 @@ class CardObject(Card):
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload(payload_name, data)
 
-    def attack_animation(self) -> None:
-        self.client.ninja.power_animation()
+    async def attack_animation(self) -> None:
+        assert self.client.ninja, "Client must have a ninja to use a card"
+        await self.client.ninja.power_animation()
 
         beam_class = {
             'fire': FirePowerBeam,
@@ -219,22 +224,22 @@ class CardObject(Card):
 
         if self.element != 's':
             # Wait for attack animation
-            time.sleep(0.2)
+            await delay(0.2)
 
         impact = impact_class(self.game, self.x, self.y)
         impact.play()
 
         if self.element == 'f':
-            time.sleep(impact.duration)
+            await delay(impact.duration)
             impact.remove_object()
-            time.sleep(beam.duration - impact.duration)
+            await delay(beam.duration - impact.duration)
             beam.remove_object()
             return
 
         beam_delay = 0.85
-        time.sleep(impact.duration - beam_delay)
+        await delay(impact.duration - beam_delay)
         beam.remove_object()
-        time.sleep(beam_delay)
+        await delay(beam_delay)
         impact.remove_object()
 
     def apply_health(self) -> None:
@@ -255,7 +260,10 @@ class CardObject(Card):
                 if self.element == 'f':
                     target.stunned = True
 
-                target.set_health(target.hp - attack, wait=False)
+                target.set_health(
+                    target.hp - attack,
+                    defer_defeat=True
+                )
                 Explosion(self.game, target.x, target.y).play()
 
     def apply_effects(self) -> None:
@@ -388,7 +396,7 @@ class MemberCard(GameObject):
         self.x = -1
         self.y = -1
 
-    def consume(self) -> None:
+    async def consume(self) -> None:
         assert self.client.ninja, "Client must have a ninja to consume a MemberCard"
 
         if not self.selected:
@@ -404,7 +412,7 @@ class MemberCard(GameObject):
             snow_ui.send_payload(payload_name)
 
         # Wait for card animation
-        time.sleep(2)
+        await delay(2)
 
         beam = MemberReviveBeam(self.game, self.client.ninja.x, self.client.ninja.y)
         beam.play()
@@ -414,6 +422,6 @@ class MemberCard(GameObject):
         self.client.ninja.revive_membercard_animation()
         self.client.member_card = None
 
-        time.sleep(1.2)
+        await delay(1.2)
         self.client.ninja.play_sound('SFX_MG_CJSnow_PowercardReviveEnd')
         beam.remove_object()

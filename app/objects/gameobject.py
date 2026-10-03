@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Tuple
 from twisted.internet import reactor
 
 if TYPE_CHECKING:
@@ -48,20 +48,13 @@ class GameObject:
         self.target = self.game
 
         # Place object in grid
-        if grid: self.game.grid[x, y] = self
+        if grid:
+            self.game.grid[self.grid_x, self.grid_y] = self
 
         self._origin_mode = origin_mode
         self._mirror_mode = mirror_mode
         self._x_scale = x_scale
         self._y_scale = y_scale
-
-    def __eq__(self, other: object) -> bool:
-        if not getattr(other, 'id', None):
-            return False
-        return self.id == other.id
-
-    def __hash__(self) -> int:
-        return hash(self.id)
 
     @property
     def origin_mode(self) -> OriginMode:
@@ -90,7 +83,7 @@ class GameObject:
         )
 
     @property
-    def x_scale(self) -> int:
+    def x_scale(self) -> int | float:
         return self._x_scale
 
     @x_scale.setter
@@ -103,7 +96,7 @@ class GameObject:
         )
 
     @property
-    def y_scale(self) -> int:
+    def y_scale(self) -> int | float:
         return self._y_scale
 
     @y_scale.setter
@@ -115,7 +108,19 @@ class GameObject:
             mirror_mode=self._mirror_mode
         )
 
-    def do_later(self, seconds: int, func: Callable, *args) -> None:
+    @property
+    def grid_x(self) -> int:
+        return round(self.x)
+
+    @property
+    def grid_y(self) -> int:
+        return round(self.y)
+
+    @property
+    def grid_coordinates(self) -> Tuple[int, int]:
+        return self.grid_x, self.grid_y
+
+    def do_later(self, seconds: int | float, func: Callable, *args) -> None:
         reactor.callLater(seconds, func, *args)  # type: ignore
 
     def place_object(self) -> None:
@@ -154,12 +159,20 @@ class GameObject:
                 scale_y=self.y_scale
             )
 
-    def move_object(self, x: int, y: int, duration: int = 600) -> None:
+    def move_object(
+        self,
+        x: int | float,
+        y: int | float,
+        duration: int | float = 600
+    ) -> None:
         self.x = x
         self.y = y
 
         if self.grid:
-            self.game.grid.move(self, x, y)
+            self.game.grid.move(
+                self,
+                round(x), round(y)
+            )
 
         self.target.send_tag(
             'O_SLIDE',
@@ -191,6 +204,7 @@ class GameObject:
     ) -> None:
         asset = self.target.server.assets.by_name(name)
         handle_id = -1
+        assert asset
 
         if reset:
             self.remove_pending_actions()
@@ -218,9 +232,11 @@ class GameObject:
     def set_camera_target(self) -> None:
         self.target.send_tag('O_PLAYER', self.id)
 
-    def place_sprite(self, name: str, target: "Penguin" | None = None) -> None:
+    def place_sprite(self, name: str, client: "Penguin" | None = None) -> None:
         asset = self.target.server.assets.by_name(name)
-        target = target or self.target
+        target = client or self.target
+        assert target and hasattr(target, 'send_tag')
+        assert asset
 
         target.send_tag(
             'O_SPRITE',
@@ -232,6 +248,7 @@ class GameObject:
 
     def load_sprite(self, name: str) -> None:
         asset = self.target.server.assets.by_name(name)
+        assert asset
 
         self.target.send_tag(
             'S_LOADSPRITE',
@@ -244,7 +261,7 @@ class GameObject:
         end_frame: int = 0,
         backwards: bool = False,
         play_style = 'play_once',
-        duration: int = 50,
+        duration: int | float = 50,
     ) -> None:
         self.target.send_tag(
             'O_SPRITEANIM',
@@ -258,8 +275,8 @@ class GameObject:
 
     def sprite_settings(
         self,
-        scale_x: int = 1,
-        scale_y: int = 1,
+        scale_x: int | float = 1,
+        scale_y: int | float = 1,
         origin_mode: OriginMode = OriginMode.NONE,
         mirror_mode: MirrorMode = MirrorMode.NONE
     ) -> None:
@@ -308,6 +325,7 @@ class GameObject:
         callback: Callable | None = None
     ) -> Sound:
         asset = self.target.server.sound_assets.by_name(sound_name)
+        assert asset
 
         sound = Sound.from_index(
             asset.index,

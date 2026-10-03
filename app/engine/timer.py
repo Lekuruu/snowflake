@@ -1,11 +1,10 @@
 
 from typing import TYPE_CHECKING
 from app.data import TipPhase
+from .utils import delay
 
 if TYPE_CHECKING:
     from .game import Game
-
-import time
 
 class Timer:
     def __init__(self, game: "Game") -> None:
@@ -14,24 +13,24 @@ class Timer:
         self.loaded = False
         self.running = False
 
-    def run(self) -> None:
+    async def run(self) -> None:
         if not self.loaded:
-            self.load()
+            await self.load()
             self.loaded = True
 
         self.running = True
         self.show()
 
         while self.tick > 0:
-            self.update_tick()
+            await self.update_tick()
 
         self.running = False
         self.tick = 10
         self.hide()
 
-    def update_tick(self, seconds: int = 1, interval: int = 0.25) -> None:
+    async def update_tick(self, seconds: int | float = 1, interval: float = 0.25) -> None:
         while seconds > 0:
-            time.sleep(interval)
+            await delay(interval)
             seconds -= interval
 
             if self.game.server.shutting_down:
@@ -56,7 +55,7 @@ class Timer:
         self.tick -= 1
         self.update()
 
-    def load(self) -> None:
+    async def load(self) -> None:
         for client in self.game.clients:
             timer = client.get_window('cardjitsu_snowtimer.swf')
             timer.layer = 'bottomLayer'
@@ -68,7 +67,7 @@ class Timer:
                 yPercent=0
             )
 
-        self.game.wait_for_window('cardjitsu_snowtimer.swf', loaded=True)
+        await self.game.wait_for_window('cardjitsu_snowtimer.swf', loaded=True)
 
     def update(self) -> None:
         for client in self.game.clients:

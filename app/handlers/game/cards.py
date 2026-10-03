@@ -15,7 +15,7 @@ def on_card_clicked(client: Penguin, data: dict):
     value = data['value']
     id = data['cardId']
 
-    if not (card := client.power_card_by_id(id)):
+    if (card := client.power_card_by_id(id)) is None:
         return
 
     if card.value != value:
@@ -59,6 +59,9 @@ def on_card_deselect(client: Penguin, data: dict):
 
 @session.framework.register('ConsumeCardResponse')
 def on_card_consumed(client: Penguin, data: dict):
+    if not client.selected_card:
+        return
+
     try:
         client.power_card_slots.remove(client.selected_card)
         client.selected_card = None

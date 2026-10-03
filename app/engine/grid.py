@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 import random
 import math
 
+Coordinates = Tuple[int, int]
+
 class Grid:
     def __init__(self, x_range: int, y_range: int, game: "Game") -> None:
         self.array: List[List[GameObject | None]] = [[None] * y_range for _ in range(x_range)]
@@ -39,10 +41,10 @@ class Grid:
             value.x, value.y = index[0], index[1]
 
     @property
-    def obstacles(self) -> List[Tuple[int, int]]:
+    def obstacles(self) -> List[Coordinates]:
         """Get all "obstacles" on the grid"""
         return (
-            [(obj.x, obj.y) for obj in self.game.rocks]
+            [(obj.grid_x, obj.grid_y) for obj in self.game.rocks]
             # TODO: Should ninjas & enemies be obstacles?
         )
 
@@ -57,7 +59,7 @@ class Grid:
 
     def add(self, obj: GameObject) -> None:
         """Add a game object to the grid"""
-        self.__setitem__((obj.x, obj.y), obj)
+        self.__setitem__((obj.grid_x, obj.grid_y), obj)
 
     def remove(self, obj: GameObject) -> None:
         """Remove a game object from the grid"""
@@ -69,7 +71,7 @@ class Grid:
         self.remove(obj)
         self[x, y] = obj
 
-    def coordinates(self, obj: GameObject) -> Tuple[int, int]:
+    def coordinates(self, obj: GameObject) -> Coordinates:
         """Get the coordinates of an object"""
         for x in range(9):
             for y in range(5):
@@ -78,11 +80,11 @@ class Grid:
                 return (x, y)
         return (-1, -1)
 
-    def distance(self, start: Tuple[int, int], target: Tuple[int, int]) -> int:
+    def distance(self, start: Coordinates, target: Coordinates) -> int | float:
         """Get the manhatten distance between two tiles"""
         return abs(start[0] - target[0]) + abs(start[1] - target[1])
 
-    def distance_with_obstacles(self, start: Tuple[int, int], target: Tuple[int, int]) -> int | float:
+    def distance_with_obstacles(self, start: Coordinates, target: Coordinates) -> int | float:
         """Get the Manhattan distance between two tiles, accounting for obstacles"""
         if target in self.obstacles:
             return math.inf
@@ -95,7 +97,7 @@ class Grid:
         distance = self.distance(start, target)
         return distance
 
-    def is_obstacle_between(self, start: Tuple[int, int], target: Tuple[int, int], obstacle: Tuple[int, int]) -> bool:
+    def is_obstacle_between(self, start: Coordinates, target: Coordinates, obstacle: Coordinates) -> bool:
         """Check if an obstacle lies on the line segment between start and target"""
         x1, y1 = start
         x2, y2 = target
@@ -169,19 +171,24 @@ class Grid:
 
     def show_tiles(self) -> None:
         """Show all initialized tiles, including the tile frame"""
-        tile_frame = self.game.objects.by_name('ui_tile_frame')
+        tile_frame = self.game.objects.by_name_required('ui_tile_frame')
         tile_frame.place_sprite('ui_tile_frame')
 
         for client in self.game.clients:
+            if not client.ninja:
+                continue
+
             if client.ninja.hp <= 0:
                 continue
 
             for tile in client.ninja.tiles_in_range():
-                if not self.can_move(tile.x, tile.y):
+                tile_position = (round(tile.x), round(tile.y))
+
+                if not self.can_move(*tile_position):
                     # Client cannot move to the tile
                     tile_name = 'ui_tile_no_move'
 
-                    if isinstance((ninja := self[tile.x, tile.y]), Ninja):
+                    if isinstance((ninja := self[*tile_position]), Ninja):
                         if ninja == client.ninja:
                             tile_name = 'ui_tile_move'
 
@@ -207,7 +214,7 @@ class Grid:
 
     def hide_tiles(self) -> None:
         """Hide all initialized tiles, including the tile frame"""
-        tile_frame = self.game.objects.by_name('ui_tile_frame')
+        tile_frame = self.game.objects.by_name_required('ui_tile_frame')
         tile_frame.hide()
 
         for tile in self.tiles:
@@ -216,16 +223,22 @@ class Grid:
     def place_tile(self, x: int, y: int, sprite: str = 'ui_tile_move') -> None:
         """Place a tile at a specific location"""
         tile = self.get_tile(x, y)
-        tile.place_sprite(sprite)
+        if tile:
+            tile.place_sprite(sprite)
 
     def change_tiles(self, name: str) -> None:
         """Change the sprites of all tiles to a new sprite"""
         for client in self.game.clients:
+            if not client.ninja:
+                continue
+
             for tile in client.ninja.movable_tiles():
                 tile.place_sprite(name, client)
 
     def change_tiles_for_client(self, client: "Penguin", name: str, ghost=False, ignore_objects=False) -> None:
         """Change the sprites of all tiles to a new sprite for a specific client"""
+        assert client.ninja, "Client must have a ninja object"
+
         if not ignore_objects:
             tiles = client.ninja.movable_tiles() if not ghost else \
                     client.ninja.movable_ghost_tiles()
@@ -234,7 +247,11 @@ class Grid:
                 tile.place_sprite(name, client)
 
             if client.ninja.placed_ghost:
-                ghost_tile = self.get_tile(client.ninja.ghost.x, client.ninja.ghost.y)
+                ghost_tile = self.get_tile(
+                    client.ninja.ghost.grid_x,
+                    client.ninja.ghost.grid_y
+                )
+                assert ghost_tile
                 ghost_tile.place_sprite(name, client)
 
         else:
@@ -254,13 +271,21 @@ class Grid:
         return next((tile for tile in self.tiles if tile.x == x and tile.y == y), None)
 
     def on_tile_click(self, client: "Penguin", tile: GameObject, *args) -> None:
+        assert client.ninja, "Client must have a ninja object"
+
         if client.selected_card:
-            client.ninja.place_powercard(tile.x, tile.y)
+            client.ninja.place_powercard(tile.grid_x, tile.grid_y)
             return
 
-        ninja = self.game.objects.by_name(client.element.capitalize())
-        ninja.place_ghost(tile.x, tile.y)
+        ninja = self.game.objects.by_name_required(client.element.capitalize())
+        assert isinstance(ninja, Ninja), "Ninja object of unexpected type"
 
+        ninja.place_ghost(
+            tile.grid_x,
+            tile.grid_y
+        )
+
+        # Hide "Move" tip when user clicked on a tile
         if client.tip_mode and client.last_tip == TipPhase.MOVE:
             client.game.hide_tip(client)
 
@@ -277,14 +302,16 @@ class Grid:
                 if x == center_x and y == center_y:
                     continue
 
-                yield self.get_tile(x, y)
+                tile = self.get_tile(x, y)
+                assert tile
+                yield tile
 
     def surrounding_objects(self, x: int, y: int, distance: int = 1) -> Iterator[GameObject]:
         """Get the surrounding objects of a tile, in a rectangle-like pattern"""
         tiles = self.surrounding_tiles(x, y, distance)
 
         for tile in tiles:
-            if (object := self[tile.x, tile.y]) is not None:
+            if (object := self[tile.grid_x, tile.grid_y]) is not None:
                 yield object
 
     def objects_in_range(self, x_range: range, y_range: range) -> Iterator[GameObject]:

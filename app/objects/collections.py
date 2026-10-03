@@ -181,6 +181,11 @@ class ObjectCollection(LockedSet["GameObject"]):
     def by_name(self, name: str) -> "GameObject" | Ninja | None:
         return next((object for object in self if object.name == name), None)
 
+    def by_name_required(self, name: str) -> "GameObject" | Ninja:
+        result = self.by_name(name)
+        assert result
+        return result
+
     def with_id(self, id: int) -> List["GameObject" | Ninja]:
         return [object for object in self if object.id == id]
 

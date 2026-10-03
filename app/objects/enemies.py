@@ -2,15 +2,15 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Iterator, Tuple, List
-from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
     from app.engine.tusk import TuskGame
     from app.engine.game import Game
 
-from app.data import MirrorMode
+from app.engine.utils import delay
 from app.objects import GameObject
+from app.data import MirrorMode
 from app.objects.effects import (
     ScrapImpactSurroundings,
     ScrapProjectileImpact,
@@ -30,7 +30,6 @@ from app.objects.effects import (
 
 import itertools
 import random
-import time
 
 class Enemy(GameObject):
     name: str = 'Enemy'
@@ -74,6 +73,7 @@ class Enemy(GameObject):
 
         self.flame: Flame | None = None
         self.stunned = False
+        self.defeat_started = False
 
     def remove_object(self) -> None:
         self.health_bar.remove_object()
@@ -86,7 +86,12 @@ class Enemy(GameObject):
         self.spawn_animation()
         self.idle_animation()
 
-    def move_object(self, x: int, y: int) -> None:
+    def move_object(
+        self,
+        x: int | float,
+        y: int | float,
+        duration: int | float = 600  # overwritten by move_duration
+    ) -> None:
         if self.flame:
             self.flame.move_object(x, y, self.move_duration)
 
@@ -137,7 +142,7 @@ class Enemy(GameObject):
     def reset_healthbar(self) -> None:
         self.health_bar.animate_sprite()
 
-    def set_health(self, hp: int, wait=True) -> None:
+    def set_health(self, hp: int, defer_defeat: bool = False) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
@@ -156,31 +161,41 @@ class Enemy(GameObject):
         self.hp = hp
 
         if self.hp <= 0:
-            self.ko_animation()
-
-            if self.game.round >= 3:
-                # Bonus Round awards exp & coins per enemy
-                self.game.coins += 60
-                self.game.exp += 75
-
-            if not wait:
-                self.do_later(2.5, self.remove_object)
+            if defer_defeat:
+                self.hit_animation()
                 return
 
-            self.game.wait_for_animations()
-            self.remove_object()
+            if self.start_defeat():
+                self.game.remove_after_animations(self)
             return
 
         self.hit_animation()
 
-    def attack_target(self, target: "Ninja") -> None:
+    def start_defeat(self) -> bool:
+        if self.hp > 0 or self.defeat_started:
+            return False
+
+        self.defeat_started = True
+        self.ko_animation()
+        self.award_defeat_rewards()
+        return True
+
+    def award_defeat_rewards(self) -> None:
+        if self.game.round < 3:
+            return
+
+        # Bonus Round awards exp & coins per enemy
+        self.game.coins += 60
+        self.game.exp += 75
+
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
         # This seems to fix the mirror mode?
-        time.sleep(0.25)
+        await delay(0.25)
 
-        self.attack_animation()
+        await self.attack_animation(target.grid_x, target.grid_y)
         target.set_health(target.hp - self.attack)
 
     def flame_damage(self) -> None:
@@ -210,12 +225,12 @@ class Enemy(GameObject):
     def movable_tiles(self) -> Iterator[GameObject]:
         """Get all tiles that the enemy can move to from its current position"""
         for tile in self.game.grid.tiles:
-            if not self.game.grid.can_move(tile.x, tile.y):
+            if not self.game.grid.can_move(tile.grid_x, tile.grid_y):
                 continue
 
             distance = self.game.grid.distance_with_obstacles(
-                (self.x, self.y),
-                (tile.x, tile.y)
+                (self.grid_x, self.grid_y),
+                (tile.grid_x, tile.grid_y)
             )
 
             if distance <= self.move:
@@ -224,7 +239,7 @@ class Enemy(GameObject):
     def attackable_tiles(self, target_x: int, target_y: int, range: int | None = None) -> Iterator[GameObject]:
         """Get all tiles that the enemy can attack from its current position"""
         for tile in self.game.grid.tiles:
-            target_object = self.game.grid[tile.x, tile.y]
+            target_object = self.game.grid[tile.grid_x, tile.grid_y]
 
             if not target_object:
                 continue
@@ -232,12 +247,12 @@ class Enemy(GameObject):
             if not target_object.name in ('Water', 'Fire', 'Snow'):
                 continue
 
-            if target_object.hp <= 0:
+            if target_object.hp <= 0: # type: ignore
                 continue
 
             distance = self.game.grid.distance_with_obstacles(
                 (target_x, target_y),
-                (tile.x, tile.y)
+                (tile.grid_x, tile.grid_y)
             )
 
             if distance <= (range or self.range):
@@ -245,15 +260,16 @@ class Enemy(GameObject):
 
     def next_target(self) -> Tuple[GameObject | None, GameObject | None]:
         """Find and return the next move and attack"""
-        available_moves = list(self.movable_tiles()) + [self.game.grid[self.x, self.y]]
+        available_moves = list(self.movable_tiles()) + [self.game.grid[self.grid_x, self.grid_y]]
 
         if not available_moves:
             return None, None
 
         # Get move with most available targets
         moves = {
-            move: list(self.attackable_tiles(move.x, move.y))
+            move: list(self.attackable_tiles(move.grid_x, move.grid_y))
             for move in available_moves
+            if move is not None
         }
 
         if not any(moves.values()):
@@ -269,8 +285,8 @@ class Enemy(GameObject):
             # Sort targets by most damage
             moves[move].sort(
                 key=lambda target: self.simulate_damage(
-                    move.x,
-                    move.y,
+                    move.grid_x,
+                    move.grid_y,
                     target
                 ),
                 reverse=True
@@ -280,23 +296,23 @@ class Enemy(GameObject):
         sorted_moves = sorted(
             moves.items(),
             key=lambda m: self.simulate_damage(
-                m[0].x,
-                m[0].y,
+                m[0].grid_x,
+                m[0].grid_y,
                 m[1][0]
             ),
             reverse=True
         )
 
         highest_damage = self.simulate_damage(
-            sorted_moves[0][0].x,
-            sorted_moves[0][0].y,
+            sorted_moves[0][0].grid_x,
+            sorted_moves[0][0].grid_y,
             sorted_moves[0][1][0]
         )
 
         # If multiple moves have the same damage, pick a random one
         next_move, targets = random.choice([
             (move, targets) for move, targets in sorted_moves
-            if self.simulate_damage(move.x, move.y, targets[0]) == highest_damage
+            if self.simulate_damage(move.grid_x, move.grid_y, targets[0]) == highest_damage
         ])
 
         return next_move, targets[0]
@@ -332,7 +348,7 @@ class Enemy(GameObject):
             key=lambda tile: abs(tile.x - self.x) + abs(tile.y - self.y)
         )
 
-    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int | float:
         """Simulate the damage that the enemy would do to a target"""
         return self.attack
 
@@ -352,7 +368,7 @@ class Enemy(GameObject):
     def move_animation(self) -> None:
         ...
 
-    def attack_animation(self) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         ...
 
     def ko_animation(self) -> None:
@@ -393,12 +409,12 @@ class Sly(Enemy):
     move: int = 3
     move_duration: int = 1200
 
-    def attack_target(self, target: "Ninja") -> None:
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
         # This seems to fix the mirror mode?
-        time.sleep(0.25)
+        await delay(0.25)
 
         distance = abs(self.x - target.x) + abs(self.y - target.y)
 
@@ -406,7 +422,7 @@ class Sly(Enemy):
         #       Wiki, it does an additional 1 damage per tile
         damage = self.attack + round(self.attack_per_tile * (distance - 1))
 
-        self.attack_animation(target.x, target.y)
+        await self.attack_animation(target.grid_x, target.grid_y)
         target.set_health(target.hp - damage)
 
     def idle_animation(self, reset=False) -> None:
@@ -425,11 +441,11 @@ class Sly(Enemy):
         )
         self.idle_animation()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x < x:
             self.mirror_mode = MirrorMode.X
 
-        time.sleep(0.25)
+        await delay(0.25)
         self.animate_object(
             'sly_attack_anim',
             play_style='play_once',
@@ -439,11 +455,11 @@ class Sly(Enemy):
         self.idle_animation()
         self.attack_sound()
 
-        time.sleep(1.45)
+        await delay(1.45)
         projectile = SlyProjectile(self.game, self.x, self.y)
         projectile.play(x, y)
 
-        time.sleep(0.5)
+        await delay(0.5)
         self.impact_sound()
         projectile.remove_object()
 
@@ -503,40 +519,40 @@ class Scrap(Enemy):
     move: int = 2
     move_duration: int = 1200
 
-    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int | float:
         """Simulate the damage that the enemy would do to a target"""
-        surrounding_targets = list(self.attackable_tiles(target.x, target.y, range=1))
+        surrounding_targets = list(self.attackable_tiles(target.grid_x, target.grid_y, range=1))
         surrounding_targets.remove(target)
 
         return self.attack + (self.attack / 2) * len(surrounding_targets)
 
-    def attack_target(self, target: "Ninja") -> None:
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
         # This seems to fix the mirror mode?
-        time.sleep(0.25)
+        await delay(0.25)
 
-        self.attack_animation(target.x, target.y)
+        await self.attack_animation(target.grid_x, target.grid_y)
         target.set_health(target.hp - self.attack)
 
-        ScrapProjectileImpact(
+        await ScrapProjectileImpact(
             self.game,
             target.x,
             target.y
         ).play()
 
         surrounding_targets = [
-            object for object in self.game.grid.surrounding_objects(target.x, target.y)
-            if object.name in ('Water', 'Fire', 'Snow') and object.hp > 0
+            object for object in self.game.grid.surrounding_objects(target.grid_x, target.grid_y)
+            if object.name in ('Water', 'Fire', 'Snow') and object.hp > 0 # type: ignore
         ]
 
         if surrounding_targets:
             self.impact_sound()
 
         for surrounding_target in surrounding_targets:
-            object = self.game.grid[surrounding_target.x, surrounding_target.y]
-            object.set_health(object.hp - self.attack / 2)
+            object = self.game.grid[surrounding_target.grid_x, surrounding_target.grid_y]
+            object.set_health(object.hp - self.attack / 2) # type: ignore
 
             Explosion(
                 self.game,
@@ -544,7 +560,7 @@ class Scrap(Enemy):
                 surrounding_target.y
             ).play()
 
-        ScrapImpactSurroundings(
+        await ScrapImpactSurroundings(
             self.game,
             target.x,
             target.y
@@ -567,7 +583,7 @@ class Scrap(Enemy):
         self.idle_animation()
         self.move_sound()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x < x:
             self.mirror_mode = MirrorMode.X
 
@@ -579,13 +595,13 @@ class Scrap(Enemy):
         )
         self.idle_animation()
 
-        time.sleep(0.7)
+        await delay(0.7)
         self.attack_sound()
 
         distance = abs(self.x - x) + abs(self.y - y)
         impact_time = 0.9 + (distance * 0.1)
 
-        time.sleep(impact_time)
+        await delay(impact_time)
         self.impact_sound()
 
         ScrapImpact(self.game, x, y).play()
@@ -640,7 +656,7 @@ class Tank(Enemy):
     move: int = 1
     move_duration: int = 1100
 
-    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int:
+    def simulate_damage(self, x_position: int, y_position: int, target: GameObject) -> int | float:
         """Simulate the damage that the enemy would do to a target"""
         # Horizontal swipe
         if x_position == target.x:
@@ -675,44 +691,47 @@ class Tank(Enemy):
         # This should never happen, unless range is greater than 1
         return self.attack
 
-    def attack_target(self, target: "Ninja") -> None:
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
         # This seems to fix the mirror mode?
-        time.sleep(0.25)
+        await delay(0.25)
 
-        self.attack_animation(target.x, target.y)
+        target_x = target.grid_x
+        target_y = target.grid_y
+
+        await self.attack_animation(target_x, target_y)
         target.set_health(target.hp - self.attack)
 
         effects: List[Effect] = []
 
-        if self.x == target.x:
-            left = self.game.grid[target.x-1, target.y]
-            right = self.game.grid[target.x+1, target.y]
+        if self.grid_x == target_x:
+            left = self.game.grid[target_x-1, target_y]
+            right = self.game.grid[target_x+1, target_y]
 
-            if left is not None and left.name in ('Water', 'Fire', 'Snow') and left.hp > 0:
-                left.set_health(left.hp - self.attack / 2)
+            if left is not None and left.name in ('Water', 'Fire', 'Snow') and left.hp > 0: # type: ignore
+                left.set_health(left.hp - self.attack / 2) # type: ignore
 
-            if right is not None and right.name in ('Water', 'Fire', 'Snow') and right.hp > 0:
-                right.set_health(right.hp - self.attack / 2)
+            if right is not None and right.name in ('Water', 'Fire', 'Snow') and right.hp > 0: # type: ignore
+                right.set_health(right.hp - self.attack / 2) # type: ignore
 
             effects = [
-                TankSwipeHorizontal(self.game, target.x, target.y+1),
-                AttackTile(self.game, target.x-1, target.y),
-                AttackTile(self.game, target.x+1, target.y),
-                AttackTile(self.game, target.x, target.y)
+                TankSwipeHorizontal(self.game, target_x, target_y+1),
+                AttackTile(self.game, target_x-1, target_y),
+                AttackTile(self.game, target_x+1, target_y),
+                AttackTile(self.game, target_x, target_y)
             ]
 
-        elif self.y == target.y:
-            above = self.game.grid[target.x, target.y-1]
-            below = self.game.grid[target.x, target.y+1]
+        elif self.grid_y == target_y:
+            above = self.game.grid[target_x, target_y-1]
+            below = self.game.grid[target_x, target_y+1]
 
-            if above is not None and above.name in ('Water', 'Fire', 'Snow') and above.hp > 0:
-                above.set_health(above.hp - self.attack / 2)
+            if above is not None and above.name in ('Water', 'Fire', 'Snow') and above.hp > 0: # type: ignore
+                above.set_health(above.hp - self.attack / 2) # type: ignore
 
-            if below is not None and below.name in ('Water', 'Fire', 'Snow') and below.hp > 0:
-                below.set_health(below.hp - self.attack / 2)
+            if below is not None and below.name in ('Water', 'Fire', 'Snow') and below.hp > 0: # type: ignore
+                below.set_health(below.hp - self.attack / 2) # type: ignore
 
             effects = [
                 TankSwipeVertical(self.game, target.x, target.y),
@@ -724,7 +743,7 @@ class Tank(Enemy):
         for attack_tile in effects:
             attack_tile.play()
 
-        time.sleep(0.25)
+        await delay(0.25)
 
         for attack_tile in effects:
             attack_tile.remove_object()
@@ -746,7 +765,7 @@ class Tank(Enemy):
         self.idle_animation()
         self.move_sound()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x < x:
             self.mirror_mode = MirrorMode.X
 
@@ -758,7 +777,7 @@ class Tank(Enemy):
             reset=True
         )
         self.idle_animation()
-        time.sleep(0.15)
+        await delay(0.15)
 
     def ko_animation(self) -> None:
         self.animate_object(
@@ -822,6 +841,7 @@ class Tusk(Enemy):
             x_offset=0.5,
             y_offset=1.005
         )
+        self.game: "TuskGame"
 
         # First attack will either be 'push' or 'icicle_random'
         self.next_attack = random.choice([
@@ -840,15 +860,15 @@ class Tusk(Enemy):
         # Block tiles around tusk to match sprite's size
 
         # Next to tusk
-        self.game.grid.block_tile(self.x - 1, self.y)
+        self.game.grid.block_tile(self.grid_x - 1, self.grid_y)
         # Below tusk
-        self.game.grid.block_tile(self.x - 1, self.y + 1)
-        self.game.grid.block_tile(self.x, self.y + 1)
+        self.game.grid.block_tile(self.grid_x - 1, self.grid_y + 1)
+        self.game.grid.block_tile(self.grid_x, self.grid_y + 1)
         # Above tusk
-        self.game.grid.block_tile(self.x - 1, self.y - 1)
-        self.game.grid.block_tile(self.x, self.y - 1)
+        self.game.grid.block_tile(self.grid_x - 1, self.grid_y - 1)
+        self.game.grid.block_tile(self.grid_x, self.grid_y - 1)
 
-    def attack_target(self, target: "Ninja") -> None:
+    async def attack_target(self, target: "Ninja") -> None:
         if target.hp <= 0:
             return
 
@@ -858,7 +878,7 @@ class Tusk(Enemy):
             'icicle_paired': self.icicle_attack_paired
         }
 
-        attacks[self.next_attack]()
+        await attacks[self.next_attack]()
         self.determine_next_attack(target)
 
     def determine_next_attack(self, closest_target: "Ninja") -> None:
@@ -880,7 +900,7 @@ class Tusk(Enemy):
         if random.random() <= push_attack_chance:
             self.next_attack = 'push'
 
-    def push_attack(self) -> None:
+    async def push_attack(self) -> None:
         self.push_attack_animation()
 
         push_duration = 2.25
@@ -896,7 +916,7 @@ class Tusk(Enemy):
 
             while (
                 (result_x, ninja.y) in ninja_positions or
-                not self.game.grid.can_move(result_x, ninja.y)
+                not self.game.grid.can_move(result_x, ninja.grid_y)
             ):
                 result_x += 1
 
@@ -921,7 +941,7 @@ class Tusk(Enemy):
 
             ninja_positions.append((result_x, ninja.y))
 
-        time.sleep(attack_delay)
+        await delay(attack_delay)
         x_range = list(self.game.grid.x_range)
         x_range.reverse()
 
@@ -950,7 +970,7 @@ class Tusk(Enemy):
                     base_y
                 ).play()
 
-            time.sleep((push_duration / len(x_range)) / 2)
+            await delay((push_duration / len(x_range)) / 2)
 
             for base_x, base_y in last_positions:
                 if x - base_x < 0:
@@ -962,13 +982,13 @@ class Tusk(Enemy):
                     base_y
                 ).play()
 
-            time.sleep((push_duration / len(x_range)) / 2)
+            await delay((push_duration / len(x_range)) / 2)
 
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
 
-    def icicle_attack_random(self) -> None:
-        self.icicle_attack_animation()
-        time.sleep(1.1)
+    async def icicle_attack_random(self) -> None:
+        await self.icicle_attack_animation()
+        await delay(1.1)
 
         # NOTE: The actual algorithm for this attack is unknown
         #       I am just going to improvise for now
@@ -1002,22 +1022,22 @@ class Tusk(Enemy):
         for x, y in positions:
             TuskIcicle(self.game, x, y).play()
 
-        time.sleep(1.5)
-        self.game.wait_for_animations()
+        await delay(1.5)
+        await self.game.wait_for_animations()
 
-    def icicle_attack_paired(self) -> None:
-        self.icicle_attack_animation()
-        time.sleep(1.1)
+    async def icicle_attack_paired(self) -> None:
+        await self.icicle_attack_animation()
+        await delay(1.1)
         effect = TuskIcicleRow(
             self.game,
             next(self.icicle_pairs)
         )
-        effect.play()
+        await effect.play()
 
-        time.sleep(1)
-        self.game.wait_for_animations()
+        await delay(1)
+        await self.game.wait_for_animations()
 
-    def set_health(self, hp: int, wait=True) -> None:
+    def set_health(self, hp: int, defer_defeat: bool = False) -> None:
         hp = max(0, min(hp, self.max_hp))
         self.animate_healthbar(self.hp, hp, duration=500)
 
@@ -1056,12 +1076,19 @@ class Tusk(Enemy):
                 break
 
         if self.hp <= 0:
-            self.ko_animation()
-            self.game.wait_for_animations()
-            self.remove_object()
+            if defer_defeat:
+                self.hit_animation()
+                return
+
+            if self.start_defeat():
+                self.game.remove_after_animations(self)
             return
 
         self.hit_animation()
+
+    def award_defeat_rewards(self) -> None:
+        """Tusk rewards are calculated from damage percentage"""
+        ...
 
     def animate_healthbar(self, start_hp: int, end_hp: int, duration: int = 500) -> None:
         backwards = False
@@ -1100,7 +1127,7 @@ class Tusk(Enemy):
         self.push_attack_sound()
         self.idle_animation()
 
-    def icicle_attack_animation(self) -> None:
+    async def icicle_attack_animation(self) -> None:
         self.icicle_attack_sound_start()
         self.animate_object(
             'tusk_iciclesummon1_anim',
@@ -1108,7 +1135,7 @@ class Tusk(Enemy):
             reset=True
         )
         self.animate_sprite(0, 25, duration=1300)
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
         self.icicle_attack_sound_end()
         self.animate_object(
             'tusk_iciclesummon2_anim',

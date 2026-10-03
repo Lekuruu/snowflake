@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, List, Iterator
-from twisted.internet import reactor
 
 if TYPE_CHECKING:
     from app.engine.penguin import Penguin
@@ -29,9 +28,9 @@ from app.objects.effects import (
 
 from app.objects.enemies import Enemy, Tusk
 from app.objects import GameObject
+from app.engine.utils import delay
 
 import app.engine.cards
-import time
 
 class Ninja(GameObject):
     name: str = 'Ninja'
@@ -107,7 +106,12 @@ class Ninja(GameObject):
         self.ghost.remove_object()
         super().remove_object()
 
-    def move_object(self, x: int, y: int, duration: int | None = None) -> None:
+    def move_object(
+        self,
+        x: int | float,
+        y: int | float,
+        duration: int | float = 0
+    ) -> None:
         duration = duration or self.move_duration
 
         self.health_bar.move_object(x, y, duration)
@@ -132,7 +136,7 @@ class Ninja(GameObject):
             return
 
         for ninja in self.game.ninjas:
-            if not ninja.selected_object:
+            if not ninja.selected_target:
                 continue
 
             if ninja.selected_target.object == self:
@@ -292,28 +296,28 @@ class Ninja(GameObject):
         self.remove_targets()
 
         healable_tiles = self.healable_tiles(
-            self.x if not self.placed_ghost else self.ghost.x,
-            self.y if not self.placed_ghost else self.ghost.y
+            self.grid_x if not self.placed_ghost else self.ghost.grid_x,
+            self.grid_y if not self.placed_ghost else self.ghost.grid_y
         )
 
         for tile in healable_tiles:
-            self.targets.append(target := Target(self, tile.x, tile.y))
+            self.targets.append(target := Target(self, tile.grid_x, tile.grid_y))
             target.show_heal()
 
         attackable_tiles = self.attackable_tiles(
-            self.x if not self.placed_ghost else self.ghost.x,
-            self.y if not self.placed_ghost else self.ghost.y
+            self.grid_x if not self.placed_ghost else self.ghost.grid_x,
+            self.grid_y if not self.placed_ghost else self.ghost.grid_y
         )
 
         for tile in attackable_tiles:
-            target_object = self.game.grid[tile.x, tile.y]
+            target_object = self.game.grid[tile.grid_x, tile.grid_y]
 
             if isinstance(target_object, Tusk):
-                self.targets.append(target := TuskTarget(self, tile.x, tile.y))
+                self.targets.append(target := TuskTarget(self, tile.grid_x, tile.grid_y))
                 target.show_attack()
                 return
 
-            self.targets.append(target := Target(self, tile.x, tile.y))
+            self.targets.append(target := Target(self, tile.grid_x, tile.grid_y))
             target.show_attack()
 
     def hide_targets(self) -> None:
@@ -326,27 +330,29 @@ class Ninja(GameObject):
 
         self.targets = []
 
-    def attack_target(self, target: Enemy):
+    async def attack_target(self, target: Enemy):
         # This delay seems to fix the mirror mode?
-        time.sleep(0.25)
+        await delay(0.25)
 
-        self.attack_animation(target.x, target.y)
+        await self.attack_animation(target.grid_x, target.grid_y)
         self.client.update_cards()
 
         if self.rage:
-            self.rage.use(target.x, target.y)
+            self.rage.use(target.grid_x, target.grid_y)
             self.rage = None
 
             target.set_health(
-                target.hp - self.attack * 1.5
+                target.hp - self.attack * 1.5,
+                defer_defeat=True
             )
             return
 
         target.set_health(
-            target.hp - self.attack
+            target.hp - self.attack,
+            defer_defeat=True
         )
 
-    def heal_target(self, target: "Ninja"):
+    async def heal_target(self, target: "Ninja"):
         if self.client.last_tip == TipPhase.HEAL:
             self.game.hide_tip(self.client)
 
@@ -360,10 +366,10 @@ class Ninja(GameObject):
         self.heals += 1
         self.heal_animation()
         self.client.update_cards()
-        time.sleep(0.4)
+        await delay(0.4)
 
         if self.rage:
-            self.rage.use(target.x, target.y)
+            self.rage.use(target.grid_x, target.grid_y)
             self.rage = None
 
             target.set_health(
@@ -378,8 +384,8 @@ class Ninja(GameObject):
     def tiles_in_range(self) -> Iterator[GameObject]:
         for tile in self.game.grid.tiles:
             distance = self.game.grid.distance(
-                (self.x, self.y),
-                (tile.x, tile.y)
+                (self.grid_x, self.grid_y),
+                (tile.grid_x, tile.grid_y)
             )
 
             if distance <= self.move:
@@ -393,8 +399,8 @@ class Ninja(GameObject):
 
         for tile in self.game.grid.tiles:
             distance = self.game.grid.distance(
-                (self.ghost.x, self.ghost.y),
-                (tile.x, tile.y)
+                (self.ghost.grid_x, self.ghost.grid_y),
+                (tile.grid_x, tile.grid_y)
             )
 
             if distance <= self.move:
@@ -402,7 +408,7 @@ class Ninja(GameObject):
 
     def movable_tiles(self) -> Iterator[GameObject]:
         for tile in self.tiles_in_range():
-            if not self.game.grid.can_move(tile.x, tile.y):
+            if not self.game.grid.can_move(tile.grid_x, tile.grid_y):
                 continue
 
             yield tile
@@ -414,17 +420,17 @@ class Ninja(GameObject):
             return
 
         for tile in self.ghost_tiles_in_range():
-            if not self.game.grid.can_move(tile.x, tile.y):
+            if not self.game.grid.can_move(tile.grid_x, tile.grid_y):
                 continue
 
             yield tile
 
-    def attackable_tiles(self, target_x: int, target_y: int) -> Iterator[Enemy]:
+    def attackable_tiles(self, target_x: int, target_y: int) -> Iterator[GameObject]:
         if self.hp <= 0:
-            return []
+            return
 
         for tile in self.game.grid.tiles:
-            target_object = self.game.grid[tile.x, tile.y]
+            target_object = self.game.grid[tile.grid_x, tile.grid_y]
 
             if not isinstance(target_object, Enemy):
                 continue
@@ -440,8 +446,8 @@ class Ninja(GameObject):
             # Enemy has a bigger tile range to be attacked from
             # Check if the ninja can attack in that range
             surrounding_tiles = self.game.grid.surrounding_tiles(
-                center_x=tile.x,
-                center_y=tile.y,
+                center_x=tile.grid_x,
+                center_y=tile.grid_y,
                 distance=target_object.tile_range
             )
 
@@ -454,9 +460,9 @@ class Ninja(GameObject):
                 if distance <= self.range:
                     yield tile
 
-    def healable_tiles(self, target_x: int, target_y: int) -> Iterator["Ninja"]:
+    def healable_tiles(self, target_x: int, target_y: int) -> Iterator[GameObject]:
         if self.hp <= 0:
-            return []
+            return
 
         for ninja in self.game.ninjas:
             if ninja.client.disconnected:
@@ -473,23 +479,33 @@ class Ninja(GameObject):
             if ninja.hp > 0 and self.name == 'Snow':
                 # Only snow can heal ninjas that are not dead
                 distance = self.game.grid.distance(
-                    (ninja.x, ninja.y),
+                    (ninja.grid_x, ninja.grid_y),
                     (target_x, target_y)
                 )
 
                 if distance <= self.range:
-                    yield self.game.grid.get_tile(ninja.x, ninja.y)
+                    tile = self.game.grid.get_tile(
+                        ninja.grid_x,
+                        ninja.grid_y
+                    )
+                    assert tile
+                    yield tile
 
             else:
                 if ninja.hp > 0:
                     continue
 
                 # Ninja is dead, limit range to surrounding tiles
-                tiles = self.game.grid.surrounding_tiles(ninja.x, ninja.y)
+                tiles = self.game.grid.surrounding_tiles(ninja.grid_x, ninja.grid_y)
                 current_tile = self.game.grid.get_tile(target_x, target_y)
 
                 if current_tile in tiles:
-                    yield self.game.grid.get_tile(ninja.x, ninja.y)
+                    tile = self.game.grid.get_tile(
+                        ninja.grid_x,
+                        ninja.grid_y
+                    )
+                    assert tile
+                    yield tile
 
     def place_powercard(self, x: int, y: int) -> None:
         if not self.game.timer.running:
@@ -514,11 +530,11 @@ class Ninja(GameObject):
 
         self.client.selected_card.place(x, y)
 
-    def use_powercard(self, is_combo=False) -> None:
+    async def use_powercard(self, is_combo=False) -> None:
         if not self.client.selected_card:
             return
 
-        self.client.selected_card.use(is_combo)
+        await self.client.selected_card.use(is_combo)
 
     """Animations"""
 
@@ -531,7 +547,7 @@ class Ninja(GameObject):
     def ko_animation(self) -> None:
         ...
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         ...
 
     def win_animation(self) -> None:
@@ -555,7 +571,7 @@ class Ninja(GameObject):
     def revive_membercard_animation(self) -> None:
         ...
 
-    def power_animation(self) -> None:
+    async def power_animation(self) -> None:
         ...
 
     """Sounds"""
@@ -618,7 +634,7 @@ class WaterNinja(Ninja):
 
         self.idle_animation()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
             self.mirror_mode = MirrorMode.X
 
@@ -630,7 +646,7 @@ class WaterNinja(Ninja):
         )
         self.idle_animation()
 
-        time.sleep(0.45)
+        await delay(0.45)
         self.attack_sound()
 
     def win_animation(self) -> None:
@@ -679,7 +695,7 @@ class WaterNinja(Ninja):
         )
         self.idle_animation()
 
-    def power_animation(self) -> None:
+    async def power_animation(self) -> None:
         self.animate_object(
             'waterninja_powercard_summon_anim',
             play_style='play_once',
@@ -687,7 +703,7 @@ class WaterNinja(Ninja):
         )
         self.idle_animation()
         self.powercard_sound()
-        time.sleep(0.65)
+        await delay(0.65)
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attackwater')
@@ -741,7 +757,7 @@ class SnowNinja(Ninja):
 
         self.idle_animation()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
             self.mirror_mode = MirrorMode.X
 
@@ -754,14 +770,14 @@ class SnowNinja(Ninja):
         )
         self.idle_animation()
 
-        time.sleep(0.3)
-        self.projectile_animation(x, y)
+        await delay(0.3)
+        await self.projectile_animation(x, y)
 
-    def projectile_animation(self, x: int, y: int) -> None:
+    async def projectile_animation(self, x: int, y: int) -> None:
         # This is kinda jank lol
         projectile = SnowProjectile(self.game, self.x, self.y)
         projectile.play(x, y)
-        time.sleep(0.2)
+        await delay(0.2)
         projectile.remove_object()
 
         projectile = SnowProjectile(self.game, self.x, self.y)
@@ -822,7 +838,7 @@ class SnowNinja(Ninja):
         )
         self.idle_animation()
 
-    def power_animation(self) -> None:
+    async def power_animation(self) -> None:
         self.animate_object(
             'snowninja_powercard_anim',
             play_style='play_once',
@@ -830,7 +846,7 @@ class SnowNinja(Ninja):
         )
         self.idle_animation()
         self.powercard_sound()
-        time.sleep(0.45)
+        await delay(0.45)
 
     def attack_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_attacksnow')
@@ -884,7 +900,7 @@ class FireNinja(Ninja):
 
         self.idle_animation()
 
-    def attack_animation(self, x: int, y: int) -> None:
+    async def attack_animation(self, x: int, y: int) -> None:
         if self.x > x:
             self.mirror_mode = MirrorMode.X
 
@@ -897,7 +913,7 @@ class FireNinja(Ninja):
         )
         self.idle_animation()
 
-        time.sleep(1.45)
+        await delay(1.45)
         self.projectile_animation(x, y)
 
     def projectile_animation(self, x: int, y: int) -> None:
@@ -955,7 +971,7 @@ class FireNinja(Ninja):
         )
         self.idle_animation()
 
-    def power_animation(self) -> None:
+    async def power_animation(self) -> None:
         self.animate_object(
             'fireninja_power_anim',
             play_style='play_once',
@@ -963,7 +979,7 @@ class FireNinja(Ninja):
         )
         self.idle_animation()
         self.powercard_sound()
-        time.sleep(1)
+        await delay(1)
 
     def move_sound(self) -> None:
         self.play_sound('sfx_mg_2013_cjsnow_footsteppenguinfire')
@@ -998,7 +1014,7 @@ class Sensei(GameObject):
             'water': 'snow'
         }[self.element_state]
 
-    def update_state(self) -> None:
+    async def update_state(self) -> None:
         self.power_state += 1
 
         if self.power_state >= 4:
@@ -1006,23 +1022,21 @@ class Sensei(GameObject):
             self.power_state = 1
             self.element_state = self.next_element
 
-        action = {
-            0: lambda: self.idle_animation(),
-            1: lambda: self.idle_animation(),
-            2: lambda: self.powerup_animation(),
-            3: lambda: self.do_powerup()
-        }
+        if self.power_state == 2:
+            self.powerup_animation()
+        elif self.power_state == 3:
+            await self.do_powerup()
+        else:
+            self.idle_animation()
 
-        action[self.power_state]()
-
-    def do_powerup(self) -> None:
+    async def do_powerup(self) -> None:
         if not self.game.enemies:
             return
 
-        time.sleep(0.5)
-        self.attack_animation()
+        await delay(0.5)
+        await self.attack_animation()
         self.attack_sound()
-        time.sleep(0.5)
+        await delay(0.5)
 
         beam_class = {
             'fire': FirePowerBeam,
@@ -1040,7 +1054,7 @@ class Sensei(GameObject):
         beam.x_offset = beam_offset[0]
         beam.y_offset = beam_offset[1]
         beam.play()
-        time.sleep(0.65)
+        await delay(0.65)
 
         positions = [
             (1, 2),
@@ -1049,16 +1063,16 @@ class Sensei(GameObject):
         ]
 
         impacts = []
-        delay = 0.35
+        impact_delay = 0.35
 
         for x, y in positions:
             impacts.append(self.place_card(x, y))
-            time.sleep(delay)
+            await delay(impact_delay)
 
         if self.element_state == 'snow':
             self.snow_impact_sound()
 
-        time.sleep(impacts[0][1].duration - delay)
+        await delay(impacts[0][1].duration - impact_delay)
 
         beam.remove_object()
         self.idle_animation()
@@ -1075,14 +1089,14 @@ class Sensei(GameObject):
             if is_combo:
                 card.apply_effects()
 
-        self.game.wait_for_animations()
+        await self.game.wait_for_animations()
 
     def place_card(self, x: int, y: int):
         card = app.engine.cards.CardObject(
             Card(
                 element=self.element_state[0],
                 value=10
-            ), self
+            ), self # type: ignore
         )
         card.object.x = x
         card.object.y = y
@@ -1118,7 +1132,7 @@ class Sensei(GameObject):
             reset=True
         )
 
-    def attack_animation(self) -> None:
+    async def attack_animation(self) -> None:
         self.animate_object(
             'sensei_attackstart_anim',
             play_style='play_once',
