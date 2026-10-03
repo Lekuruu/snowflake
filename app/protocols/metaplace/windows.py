@@ -21,8 +21,8 @@ class SWFWindow:
     def __init__(
         self,
         client: protocols.MetaplaceProtocol,
+        name: str,
         url: str | None = None,
-        name: str | None = None,
         layer: str = 'topLayer'
     ) -> None:
         if not name and url:
@@ -53,6 +53,63 @@ class SWFWindow:
 
     def __repr__(self) -> str:
         return f"<SWF ({self.name})>"
+
+    def send(self, content: dict = {}, message_type = MessageType.RECEIVED_JSON, **kwargs) -> None:
+        content.update(kwargs)
+        self.client.send_tag(
+            'UI_CLIENTEVENT',
+            self.client.server.world_id,
+            message_type.value,
+            json.dumps(content)
+        )
+
+    def load(self, initial_payload: dict | None = None, **kwargs) -> None:
+        if config.APPLY_WINDOWMANAGER_OFFSET:
+            kwargs['xPercent'] = kwargs.get('xPercent', 0) - 0.5
+            kwargs['yPercent'] = kwargs.get('yPercent', 0) - 0.5
+
+        self.send(
+            {
+                'windowUrl': self.url,
+                'layerName': self.layer,
+                'assetPath': self.asset_path,
+                'initializationPayload': initial_payload,
+                'action': WindowAction.LOAD_WINDOW.value,
+                'type': EventType.PLAY_ACTION.value
+            },
+            **kwargs
+        )
+
+    def close(self, **kwargs):
+        self.send(
+            {
+                'targetWindow': self.url,
+                'action': WindowAction.CLOSE_WINDOW.value,
+                'type': EventType.PLAY_ACTION.value,
+            },
+            **kwargs
+        )
+
+    def send_payload(self, trigger_name: str, payload: dict = {}, type = EventType.IMMEDIATE, **kwargs) -> None:
+        self.send(
+            {
+                'jsonPayload': payload,
+                'targetWindow': self.url,
+                'triggerName': trigger_name,
+                'action': WindowAction.JSON_PAYLOAD.value,
+                'type': type.value
+            },
+            **kwargs
+        )
+
+    def send_action(self, action: str, type = EventType.IMMEDIATE, **kwargs) -> None:
+        self.send(
+            {
+                'action': action,
+                'type': type.value
+            },
+            **kwargs
+        )
 
     def set_loaded(self, loaded: bool) -> None:
         self.loaded = loaded
@@ -96,63 +153,6 @@ class SWFWindow:
                 if not waiter.called:
                     waiter.cancel()
 
-    def send(self, content: dict = {}, message_type = MessageType.RECEIVED_JSON, **kwargs):
-        content.update(kwargs)
-        self.client.send_tag(
-            'UI_CLIENTEVENT',
-            self.client.server.world_id,
-            message_type.value,
-            json.dumps(content)
-        )
-
-    def load(self, initial_payload: dict | None = None, **kwargs):
-        if config.APPLY_WINDOWMANAGER_OFFSET:
-            kwargs['xPercent'] = kwargs.get('xPercent', 0) - 0.5
-            kwargs['yPercent'] = kwargs.get('yPercent', 0) - 0.5
-
-        self.send(
-            {
-                'windowUrl': self.url,
-                'layerName': self.layer,
-                'assetPath': self.asset_path,
-                'initializationPayload': initial_payload,
-                'action': WindowAction.LOAD_WINDOW.value,
-                'type': EventType.PLAY_ACTION.value
-            },
-            **kwargs
-        )
-
-    def close(self, **kwargs):
-        self.send(
-            {
-                'targetWindow': self.url,
-                'action': WindowAction.CLOSE_WINDOW.value,
-                'type': EventType.PLAY_ACTION.value,
-            },
-            **kwargs
-        )
-
-    def send_payload(self, trigger_name: str, payload: dict = {}, type = EventType.IMMEDIATE, **kwargs):
-        self.send(
-            {
-                'jsonPayload': payload,
-                'targetWindow': self.url,
-                'triggerName': trigger_name,
-                'action': WindowAction.JSON_PAYLOAD.value,
-                'type': type.value
-            },
-            **kwargs
-        )
-
-    def send_action(self, action: str, type = EventType.IMMEDIATE, **kwargs):
-        self.send(
-            {
-                'action': action,
-                'type': type.value
-            },
-            **kwargs
-        )
-
 class WindowManager(Dict[str, SWFWindow]):
     """
     This class represents the window manager, which is responsible for loading and closing swf files/windows.
@@ -182,18 +182,11 @@ class WindowManager(Dict[str, SWFWindow]):
     def __setitem__(self, name: str, window: SWFWindow) -> None:
         return super().__setitem__(name, window)
 
-    def get_window(self, name: str | None = None, url: str | None = None) -> SWFWindow:
-        assert url or name, 'You must provide either a url or a name for the window.'
-
+    def get_window(self, name: str, url: str | None = None) -> SWFWindow:
         if name in self:
             return self[name]
 
-        if url is not None and (window_name := url.split('/')[-1]) in self:
-            return self[window_name]
-
-        # TODO: We basically use names for identifying windows everywhere
-        #       Doesn't make any sense to do either name or url
-        window = SWFWindow(self.client, url, name)
+        window = SWFWindow(self.client, name, url)
         self[window.name] = window
         return window
 
@@ -215,8 +208,8 @@ class WindowManager(Dict[str, SWFWindow]):
 
         self['windowmanager.swf'] = SWFWindow(
             self.client,
-            self.swf_url,
-            'windowmanager.swf'
+            url=self.swf_url,
+            name='windowmanager.swf'
         )
 
     async def wait_for_window(

@@ -139,11 +139,13 @@ class MetaplaceProtocol(LineOnlyReceiver):
 
         self.send_tag('W_ASSETSCOMPLETE', self.pid)
 
-    def get_window(self, name: str | None = None, url: str | None = None) -> SWFWindow:
+    def get_window(self, name: str, url: str | None = None) -> SWFWindow:
         return self.window_manager.get_window(name, url)
 
-    def load_window(self, name: str, initial_payload: dict | None = None, **kwargs) -> None:
-        return self.window_manager.get_window(name).load(initial_payload, **kwargs)
+    def load_window(self, name: str, initial_payload: dict | None = None, **kwargs) -> SWFWindow:
+        window = self.window_manager.get_window(name)
+        window.load(initial_payload, **kwargs)
+        return window
 
     def send_version(self, version: str):
         self.send_tag('S_VERSION', version)
