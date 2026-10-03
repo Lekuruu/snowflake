@@ -911,20 +911,23 @@ class Tusk(Enemy):
         ninja_positions = []
 
         for ninja in ninjas:
-            # Determine the end position for the push
-            result_x = 0
+            # Find the leftmost free tile before the ninja
+            # If the row has no valid destination, leave the ninja in its current position
+            result_x = next(
+                (
+                    x for x in self.game.grid.x_range
+                    if x < ninja.grid_x                           # before the ninja
+                    and (x, ninja.grid_y) not in ninja_positions  # not already occupied
+                    and self.game.grid.can_move(x, ninja.grid_y)  # able to move to this tile
+                ),
+                ninja.grid_x  # fallback to current position if no valid destination was found
+            )
 
-            while (
-                (result_x, ninja.y) in ninja_positions or
-                not self.game.grid.can_move(result_x, ninja.grid_y)
-            ):
-                result_x += 1
-
-            if result_x < ninja.x:
+            if result_x < ninja.grid_x:
                 # Move ninja to the left
                 self.do_later(
                     attack_delay, ninja.move_object,
-                    result_x, ninja.y,
+                    result_x, ninja.grid_y,
                     push_duration * 1000
                 )
 
@@ -936,10 +939,10 @@ class Tusk(Enemy):
                     ninja.hp - self.attack, False
                 )
 
-            if result_x > ninja.x:
-                result_x = ninja.x
-
-            ninja_positions.append((result_x, ninja.y))
+            ninja_positions.append((
+                result_x,
+                ninja.grid_y
+            ))
 
         await delay(attack_delay)
         x_range = list(self.game.grid.x_range)
