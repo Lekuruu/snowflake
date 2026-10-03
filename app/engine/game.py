@@ -932,6 +932,9 @@ class Game:
 
     def enable_cards(self) -> None:
         for client in self.clients:
+            if client.ninja.hp <= 0:
+                continue
+
             snow_ui = client.get_window('cardjitsu_snowui.swf')
             snow_ui.send_payload('enableCards')
 
