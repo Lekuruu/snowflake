@@ -814,10 +814,7 @@ class Game:
                     continue
 
                 revive_splash = client.get_window('cardjitsu_snowrevive.swf')
-                revive_splash.load(
-                    xPercent=0.2,
-                    yPercent=0
-                )
+                revive_splash.load(xPercent=0.2, yPercent=0)
 
             # Wait for revive splash to load and close
             await self.wait_for_window('cardjitsu_snowrevive.swf', loaded=True)

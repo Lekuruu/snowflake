@@ -182,7 +182,7 @@ class WindowManager(Dict[str, SWFWindow]):
     def __setitem__(self, name: str, window: SWFWindow) -> None:
         return super().__setitem__(name, window)
 
-    def get_window(self, name: str | None = None, url: str | None = None):
+    def get_window(self, name: str | None = None, url: str | None = None) -> SWFWindow:
         assert url or name, 'You must provide either a url or a name for the window.'
 
         if name in self:
@@ -191,6 +191,8 @@ class WindowManager(Dict[str, SWFWindow]):
         if url is not None and (window_name := url.split('/')[-1]) in self:
             return self[window_name]
 
+        # TODO: We basically use names for identifying windows everywhere
+        #       Doesn't make any sense to do either name or url
         window = SWFWindow(self.client, url, name)
         self[window.name] = window
         return window

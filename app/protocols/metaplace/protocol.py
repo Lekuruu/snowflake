@@ -9,7 +9,7 @@ from typing import List, Any, TYPE_CHECKING
 if TYPE_CHECKING:
     from app.protocols import MetaplaceWorldServer
 
-from app.protocols.metaplace import Place, Camera3D, Physics, WindowManager
+from app.protocols.metaplace import Place, Camera3D, Physics, WindowManager, SWFWindow
 from app.objects import ObjectCollection
 from app.data import (
     InputModifier,
@@ -139,7 +139,7 @@ class MetaplaceProtocol(LineOnlyReceiver):
 
         self.send_tag('W_ASSETSCOMPLETE', self.pid)
 
-    def get_window(self, name: str | None = None, url: str | None = None):
+    def get_window(self, name: str | None = None, url: str | None = None) -> SWFWindow:
         return self.window_manager.get_window(name, url)
 
     def load_window(self, name: str, initial_payload: dict | None = None, **kwargs) -> None:
