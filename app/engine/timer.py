@@ -81,7 +81,11 @@ class Timer:
         for client in self.game.clients:
             timer = client.get_window('cardjitsu_snowtimer.swf')
             timer.send_payload('Timer_Start')
-            timer.send_payload('enableConfirm')
+
+            if client.ninja.hp > 0:
+                # KO'd ninjas apparently can't use confirm
+                # https://youtu.be/OP8owGrePTg?t=496
+                timer.send_payload('enableConfirm')
 
     def hide(self) -> None:
         for client in self.game.clients:
