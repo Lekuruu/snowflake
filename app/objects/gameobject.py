@@ -189,8 +189,9 @@ class GameObject:
         self.game.grid.remove(self)
         self.remove_pending_actions()
 
-    def remove_pending_actions(self) -> None:
-        self.game.callbacks.remove(self.id)
+    def remove_pending_actions(self, complete_waiters: bool = True) -> None:
+        """Stop tracking this object's animations and sounds"""
+        self.game.callbacks.remove(self.id, complete_waiters=complete_waiters)
 
     def animate_object(
         self,
@@ -202,12 +203,15 @@ class GameObject:
         register: bool = True,
         callback: Callable | None = None
     ) -> None:
+        """Tell the client to animate this object"""
         asset = self.target.server.assets.by_name(name)
         handle_id = -1
         assert asset
 
         if reset:
-            self.remove_pending_actions()
+            # Don't finish waiters until a replacement animation
+            # has been registered & sent to the client
+            self.remove_pending_actions(complete_waiters=False)
 
         if register:
             handle_id = self.game.callbacks.register_action(
@@ -228,6 +232,9 @@ class GameObject:
             self.id,
             handle_id
         )
+
+        if reset:
+            self.game.callbacks.complete_animation_waiters()
 
     def set_camera_target(self) -> None:
         self.target.send_tag('O_PLAYER', self.id)

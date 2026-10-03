@@ -37,6 +37,7 @@ class Sound(Asset):
         response_object_id: int = -1
     ) -> "Sound":
         asset = session.sound_assets.by_index(index)
+        assert asset, f"No sound asset found with index: {index}"
 
         return cls(
             asset.index,
@@ -59,6 +60,7 @@ class Sound(Asset):
         response_object_id: int = -1
     ) -> "Sound":
         asset = session.sound_assets.by_name(name)
+        assert asset, f"No sound asset found with name: {name}"
 
         return cls(
             asset.index,
@@ -70,10 +72,18 @@ class Sound(Asset):
             response_object_id
         )
 
-    def play(self, target: "Game" | "Penguin", object_id: int = -1, callback: Callable | None = None) -> None:
+    def play(
+        self,
+        target: "Game" | "Penguin",
+        object_id: int = -1,
+        callback: Callable | None = None
+    ) -> None:
+        """Play the sound & track it when it is sent through a game"""
+        from app.engine.game import Game
+
         handle_id = -1
 
-        if target.__class__.__name__ == "Game":
+        if isinstance(target, Game):
             handle_id = target.callbacks.register_action(
                 self.name,
                 ActionType.Sound,
