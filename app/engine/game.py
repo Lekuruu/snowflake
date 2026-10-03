@@ -932,11 +932,10 @@ class Game:
 
     def enable_cards(self) -> None:
         for client in self.clients:
-            if client.ninja.hp <= 0:
-                continue
-
+            is_alive = client.ninja.hp > 0
+            payload_trigger = "enableCards" if is_alive else "enableMemberCard"
             snow_ui = client.get_window('cardjitsu_snowui.swf')
-            snow_ui.send_payload('enableCards')
+            snow_ui.send_payload(payload_trigger)
 
     def disable_cards(self) -> None:
         for client in self.clients:
