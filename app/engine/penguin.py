@@ -189,6 +189,12 @@ class Penguin(MetaplaceProtocol):
         if self.disconnected:
             return
 
+        snow_ui = self.get_window('cardjitsu_snowui.swf')
+
+        if not self.has_power_cards:
+            snow_ui.send_payload('noCards')
+            return
+
         self.power_card_stamina += 2
 
         update = {
@@ -207,7 +213,6 @@ class Penguin(MetaplaceProtocol):
             if len(self.power_card_slots) > 3:
                 update['cycle'] = True
 
-        snow_ui = self.get_window('cardjitsu_snowui.swf')
         snow_ui.send_payload('updateStamina', update)
 
     async def consume_card(self, is_combo=False) -> None:
