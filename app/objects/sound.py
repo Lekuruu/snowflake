@@ -98,5 +98,5 @@ class Sound(Asset):
 
         target.send_tag(
             'FX_STOPSOUND',
-            f'0:{action.handle_id}'
+            f'{action.handle_id}'
         )
