@@ -511,13 +511,13 @@ class Ninja(GameObject):
         if self.client.is_ready:
             return
 
-        if isinstance(x, float) or isinstance(y, float):
-            return
-
-        if not self.game.grid.is_valid(x, y):
+        if not self.client.selected_card:
             return
 
         if self.hp <= 0:
+            return
+
+        if not self.game.grid.is_valid(x, y):
             return
 
         tile = self.game.grid.get_tile(x, y)
