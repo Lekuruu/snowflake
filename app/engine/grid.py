@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Tuple, Iterator
+from typing import TYPE_CHECKING, List, Tuple, Iterator, Sequence
 from app.objects.enemies import Enemy
 from app.objects.ninjas import Ninja
 from app.objects import GameObject
@@ -314,10 +314,10 @@ class Grid:
             if (object := self[tile.grid_x, tile.grid_y]) is not None:
                 yield object
 
-    def objects_in_range(self, x_range: range, y_range: range) -> Iterator[GameObject]:
+    def objects_in_range(self, x_range: Sequence[int], y_range: Sequence[int]) -> Iterator[GameObject]:
         """Get all objects within a x & y range, while accounting for enemy's tile range"""
         for object in self.objects:
-            if (object.x in x_range) and (object.y in y_range):
+            if (object.grid_x in x_range) and (object.grid_y in y_range):
                 yield object
 
             if isinstance(object, Enemy):
@@ -325,12 +325,12 @@ class Grid:
                     continue
 
                 enemy_x_range = range(
-                    object.x - object.tile_range,
-                    object.x + object.tile_range + 1
+                    object.grid_x - object.tile_range,
+                    object.grid_x + object.tile_range + 1
                 )
                 enemy_y_range = range(
-                    object.y - object.tile_range,
-                    object.y + object.tile_range + 1
+                    object.grid_y - object.tile_range,
+                    object.grid_y + object.tile_range + 1
                 )
 
                 if any(

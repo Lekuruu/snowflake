@@ -1,6 +1,6 @@
 
 from __future__ import annotations
-from typing import Iterable, Tuple, TYPE_CHECKING
+from typing import Iterable, Sequence, Tuple, TYPE_CHECKING
 
 from .utils import delay
 from app.data import Card, TipPhase
@@ -60,9 +60,9 @@ class CardObject(Card):
 
     @property
     def targets(self) -> Iterable[GameObject]:
-        return set(self.game.grid.objects_in_range(
-            *self.pattern_range(self.x, self.y)
-        ))
+        pattern_range = self.pattern_range(self.x, self.y)
+        in_range = self.game.grid.objects_in_range(*pattern_range)
+        return set(in_range)
 
     @property
     def element_name(self) -> str:
@@ -120,9 +120,9 @@ class CardObject(Card):
         self.pattern.x = x
         self.pattern.y = y
         self.pattern.place_object()
-        self.pattern.place_sprite(f'ui_card_pattern{len(x_range)}x{len(y_range)}') # type: ignore
+        self.pattern.place_sprite(f'ui_card_pattern{len(x_range)}x{len(y_range)}')
 
-    def pattern_range(self, x: int, y: int) -> Tuple[Iterable[int], Iterable[int]]:
+    def pattern_range(self, x: int, y: int) -> Tuple[Sequence[int], Sequence[int]]:
         max_x = max(*self.game.grid.x_range)
         min_x = min(*self.game.grid.x_range)
         max_y = max(*self.game.grid.y_range)
