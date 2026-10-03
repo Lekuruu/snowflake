@@ -102,7 +102,8 @@ class TuskGame(Game):
 
         # Wait for loading screen to finish
         await self.callbacks.wait_for_event(
-            'roomToRoomMinTime', waiter=min_time_waiter
+            'roomToRoomMinTime',
+            waiter=min_time_waiter
         )
         await delay(1)
 
@@ -273,7 +274,6 @@ class TuskGame(Game):
             ninja for ninja in self.ninjas
             if ninja.client.placed_powercard
         ]
-
         elements = [
             ninja.client.element
             for ninja in ninjas_with_cards
@@ -305,19 +305,16 @@ class TuskGame(Game):
             )
             await self.display_combo_title(elements)
             await self.callbacks.wait_for_event(
-                'comboScreenComplete', timeout=6, waiter=combo_waiter
+                'comboScreenComplete',
+                timeout=6, waiter=combo_waiter
             )
 
         await self.sensei.update_state()
+        await self.wait_for_animations()
 
-        if ninjas_with_cards:
-            await delay(1)
-
-        for index, ninja in enumerate(ninjas_with_cards):
+        for ninja in ninjas_with_cards:
             await ninja.use_powercard(is_combo)
-
-            if index < len(ninjas_with_cards) - 1:
-                await delay(1)
+            await self.wait_for_animations()
 
     async def display_round_title(self) -> None:
         for client in self.clients:

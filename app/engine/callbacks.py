@@ -184,9 +184,7 @@ class CallbackHandler:
             await waiter.addTimeout(timeout, reactor)
             return True
         except TimeoutError:
-            self.game.logger.warning(
-                f'Animation Timeout: {self.pending_animations}'
-            )
+            self.game.logger.warning(f'Animation Timeout: {self.pending_animations}')
             self.reset_animations()
         except CancelledError:
             pass

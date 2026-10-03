@@ -646,7 +646,7 @@ class Game:
             if not client.selected_member_card:
                 continue
 
-            client.member_card.remove()
+            client.member_card.remove() # type: ignore (already checked)
 
     def hide_ghosts(self) -> None:
         for ninja in self.ninjas:
@@ -710,7 +710,6 @@ class Game:
 
     async def do_ninja_actions(self) -> None:
         await self.do_ninja_attacks()
-        await self.wait_for_animations()
         await self.do_powercard_attacks()
         await self.do_ninja_revive()
         await self.wait_for_animations()
@@ -721,14 +720,13 @@ class Game:
             if not ninja.client.selected_card
             and not ninja.client.selected_member_card
         ]
-
         ninja_actions = [
             (ninja, ninja.selected_object)
             for ninja in ninjas_without_cards
             if ninja.selected_target and ninja.selected_object is not None
         ]
 
-        for index, (ninja, target) in enumerate(ninja_actions):
+        for ninja, target in ninja_actions:
             if isinstance(target, Enemy):
                 await ninja.attack_target(target)
 
@@ -739,8 +737,7 @@ class Game:
                 # Unlock "Heal 15" stamp
                 self.snow.unlock_stamp(477)
 
-            if index < len(ninja_actions) - 1:
-                await delay(1)
+            await self.wait_for_animations(timeout=3)
 
     async def do_powercard_attacks(self) -> None:
         ninjas_with_cards = [
@@ -768,16 +765,14 @@ class Game:
                 ninja.client.element
                 for ninja in ninjas_with_cards
             ])
-
             await self.callbacks.wait_for_event(
-                'comboScreenComplete', timeout=6, waiter=combo_waiter
+                'comboScreenComplete',
+                timeout=6, waiter=combo_waiter
             )
 
-        for index, ninja in enumerate(ninjas_with_cards):
+        for ninja in ninjas_with_cards:
             await ninja.use_powercard(is_combo)
-
-            if index < len(ninjas_with_cards) - 1:
-                await delay(1)
+            await self.wait_for_animations()
 
     async def do_ninja_revive(self) -> None:
         ninjas_with_member_cards = [
@@ -802,15 +797,13 @@ class Game:
 
             for ninja in ninjas_with_member_cards:
                 await ninja.member_card.consume() # type: ignore (already checked)
-                await delay(1)
+                await self.wait_for_animations()
 
     async def do_enemy_actions(self) -> None:
         if config.DISABLE_ENEMY_AI:
             return
 
         for enemy in self.enemies:
-            await delay(0.5)
-
             if enemy.hp <= 0:
                 # Enemy is dead
                 continue
