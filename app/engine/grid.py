@@ -84,8 +84,8 @@ class Grid:
 
     def coordinates(self, obj: GameObject) -> Coordinates:
         """Get the coordinates of an object"""
-        for x in range(9):
-            for y in range(5):
+        for x in self.x_range:
+            for y in self.y_range:
                 if self[x, y] != obj:
                     continue
                 return (x, y)
