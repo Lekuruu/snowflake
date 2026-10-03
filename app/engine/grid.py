@@ -68,7 +68,18 @@ class Grid:
 
     def move(self, obj: GameObject, x: int, y: int) -> None:
         """Move a game object to a new location"""
-        self.remove(obj)
+        current_position = self.coordinates(obj)
+        target_position = (x, y)
+
+        if current_position == target_position:
+            return
+
+        if not self.can_move(x, y):
+            return
+
+        if self.is_valid(*current_position):
+            self[current_position] = None
+
         self[x, y] = obj
 
     def coordinates(self, obj: GameObject) -> Coordinates:

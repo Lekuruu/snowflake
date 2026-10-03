@@ -171,7 +171,7 @@ class GameObject:
         if self.grid:
             self.game.grid.move(
                 self,
-                round(x), round(y)
+                self.grid_x, self.grid_y
             )
 
         self.target.send_tag(
