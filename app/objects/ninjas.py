@@ -1020,11 +1020,16 @@ class Sensei(GameObject):
             self.element_state = self.next_element
 
         if self.power_state == 2:
+            # Charging up, almost ready to unleash his power
             self.powerup_animation()
-        elif self.power_state == 3:
+            return
+
+        if self.power_state == 3:
+            # Haiyaa!!!!!
             await self.do_powerup()
-        else:
-            self.idle_animation()
+            return
+
+        self.idle_animation()
 
     async def do_powerup(self) -> None:
         if not self.game.enemies:
