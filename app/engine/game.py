@@ -722,6 +722,7 @@ class Game:
 
     async def do_ninja_actions(self) -> None:
         await self.do_ninja_attacks()
+        await self.finish_enemy_defeats()
         await self.do_powercard_attacks()
         await self.finish_enemy_defeats()
         await self.do_ninja_revive()
