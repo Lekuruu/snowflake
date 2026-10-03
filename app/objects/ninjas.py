@@ -135,6 +135,9 @@ class Ninja(GameObject):
         if x == -1 or y == -1:
             return
 
+        if self.x > x:
+            self.mirror_mode = MirrorMode.X
+
         for ninja in self.game.ninjas:
             if not ninja.selected_target:
                 continue

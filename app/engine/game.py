@@ -667,6 +667,9 @@ class Game:
         # Wait for move animations
         await self.wait_for_animations()
 
+        for ninja in self.ninjas:
+            ninja.reset_sprite_settings()
+
     def show_targets(self) -> None:
         for ninja in self.ninjas:
             ninja.show_targets()
