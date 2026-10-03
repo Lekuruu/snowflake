@@ -33,21 +33,28 @@ class Timer:
             await delay(interval)
             seconds -= interval
 
-            if self.game.server.shutting_down:
-                self.game.close()
+            if self.check_close():
                 return
 
-            if all(client.disconnected for client in self.game.clients):
-                self.game.close()
-                return
+            ready = all(
+                # Check ready state only for ninjas with hp > 0
+                client.is_ready for client in self.game.clients
+                if not client.disconnected and client.ninja.hp > 0
+            )
 
-            if all(client.is_ready for client in self.game.clients if not client.disconnected):
+            if ready:
                 self.tick = 0
                 return
 
             if self.tick == 3:
                 for client in self.game.clients:
+                    if client.disconnected:
+                        continue
+
                     if client.is_ready:
+                        continue
+
+                    if client.ninja.hp <= 0:
                         continue
 
                     self.game.send_tip(TipPhase.CONFIRM, client)
@@ -92,3 +99,14 @@ class Timer:
             timer = client.get_window('cardjitsu_snowtimer.swf')
             timer.send_payload('skipToTransitionOut')
             timer.send_payload('disableConfirm')
+
+    def check_close(self) -> bool:
+        if self.game.server.shutting_down:
+            self.game.close()
+            return True
+
+        if all(client.disconnected for client in self.game.clients):
+            self.game.close()
+            return True
+
+        return False
