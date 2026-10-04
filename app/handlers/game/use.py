@@ -1,5 +1,5 @@
 
-from app.engine import Penguin
+from app.engine.penguin import Penguin
 from app import session
 
 def local_use_handler(client: Penguin, object_id: int, x: int, y: int, local_x: float, local_y: float):

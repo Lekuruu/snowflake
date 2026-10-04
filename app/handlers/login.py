@@ -1,7 +1,6 @@
 
 from app.protocols import MetaplaceProtocol
 from app.engine.penguin import Penguin
-from app.data import penguins, cards
 from app import session
 
 import urllib.parse
@@ -58,7 +57,7 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
         client.close_connection()
         return
 
-    if not (penguin := penguins.fetch_by_id(pid)):
+    if not (penguin := client.server.data.fetch_penguin(pid)):
         client.logger.warning('Login attempt failed: Penguin not found')
         client.send_login_error()
         client.close_connection()
@@ -73,7 +72,7 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
         client.name = f'P{pid}'
 
     if not config.DISABLE_AUTHENTICATION:
-        session_token = session.redis.get(f'{pid}.mpsession')
+        session_token = client.server.data.fetch_session_token(pid)
 
         if session_token is None:
             client.logger.warning('Login attempt failed: Session token expired')
@@ -81,7 +80,7 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
             client.close_connection()
             return
 
-        if token != session_token.decode():
+        if token != session_token:
             client.logger.warning('Login attempt failed: Invalid session token')
             client.send_login_error()
             client.close_connection()

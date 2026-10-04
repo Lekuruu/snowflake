@@ -7,9 +7,8 @@ from twisted.internet import reactor
 
 from app.engine.penguin import Penguin
 from app.objects.ninjas import Ninja
-from app.objects import GameObject
 from app.objects.enemies import Enemy
-from app.data import penguins
+from app.objects import GameObject
 
 import logging
 import random
@@ -19,7 +18,7 @@ import config
 def delay(minimum: int | float, maximum: int | float) -> Callable:
     def decorator(func: Callable) -> Callable:
         return lambda *args, **kwargs: reactor.callLater(
-            random.uniform(minimum, maximum),
+            random.uniform(minimum, maximum),  # type: ignore
             func, *args, **kwargs
         )
     return decorator
@@ -36,8 +35,11 @@ class PenguinAI(Penguin):
         battle_mode: int
     ) -> None:
         super().__init__(server, IPv4Address('TCP', '127.0.0.1', 69420))
+
         self.logger = logging.getLogger(f'AI ({element.capitalize()})')
-        self.object = penguins.fetch_random()
+        self.object = server.data.fetch_random_penguin()
+        assert self.object is not None, "The data provider has no penguin for AI players"
+
         self.name = self.object.nickname
         self.element = element
         self.battle_mode = battle_mode
@@ -112,7 +114,7 @@ class PenguinAI(Penguin):
                 continue
 
             self.debug(f'revive target selected: ({ninja.x},{ninja.y})')
-            self.select_target(ninja.x, ninja.y)
+            self.select_target(ninja.grid_x, ninja.grid_y)
             self.confirm_move()
             return
 
@@ -165,7 +167,7 @@ class PenguinAI(Penguin):
                 self.place_ghost(move)
 
             if target:
-                self.select_target(target.x, target.y)
+                self.select_target(target.grid_x, target.grid_y)
                 return
 
             # If we can't heal yet, move closer to injured allies so we can next turn
@@ -203,7 +205,7 @@ class PenguinAI(Penguin):
             self.place_ghost(move)
 
         if target:
-            self.select_target(target.x, target.y)
+            self.select_target(target.grid_x, target.grid_y)
             return
 
         move = self.best_positioning_tile(prefer_far=True)
@@ -237,7 +239,7 @@ class PenguinAI(Penguin):
             self.place_ghost(move)
 
         if target:
-            self.select_target(target.x, target.y)
+            self.select_target(target.grid_x, target.grid_y)
             return
 
         move = self.best_standoff_tile(self.ninja.range)
@@ -277,7 +279,7 @@ class PenguinAI(Penguin):
             self.place_ghost(move)
 
         if target:
-            self.select_target(target.x, target.y)
+            self.select_target(target.grid_x, target.grid_y)
             return
 
         move = self.best_positioning_tile(prefer_far=False)
@@ -592,6 +594,6 @@ class PenguinAI(Penguin):
 
         return False
 
-    def unlock_stamp(self, id=..., session=...) -> None:
+    def unlock_stamp(self, id: int) -> None:
         # Bots don't have an account for stamps
         pass

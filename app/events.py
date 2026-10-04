@@ -3,7 +3,7 @@ from typing import Callable, Dict, List, TYPE_CHECKING
 import logging
 
 if TYPE_CHECKING:
-    from app.engine import Penguin
+    from app.engine.penguin import Penguin
 
 class EventHandler:
     def __init__(self) -> None:

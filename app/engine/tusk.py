@@ -12,7 +12,6 @@ from app.objects.enemies import Enemy, Tusk
 from app.objects.sound import Sound
 
 from app.data import TipPhase, ExpRequirements, SnowRewards
-from app.data import stamps, penguins, items
 
 from .callbacks import CallbackHandler
 from .cards import MemberCard
@@ -22,7 +21,6 @@ from .game import Game
 from .grid import Grid
 from .utils import delay
 
-import app.session
 import logging
 import random
 import config
@@ -67,15 +65,14 @@ class TuskGame(Game):
         return False
 
     async def start(self) -> None:
-        with app.session.database.managed_session() as session:
-            for client in self.clients:
-                client.game = self
+        for client in self.clients:
+            client.game = self
 
-                # Initialize member card
-                client.member_card = MemberCard(client)
+            # Initialize member card
+            client.member_card = MemberCard(client)
 
-                # Initialize power cards
-                client.initialize_power_cards(session=session)
+            # Initialize power cards
+            client.initialize_power_cards()
 
         # Wait for "prepare to battle" screen to end
         await delay(3)
@@ -335,115 +332,109 @@ class TuskGame(Game):
         await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
 
     def display_payout(self) -> None:
-        with app.session.database.managed_session() as session:
-            snow_stamps = stamps.fetch_all_by_group(60, session=session)
+        data = self.server.data
+        snow_stamps = data.fetch_stamps(60)
 
-            for client in self.clients:
-                if client.disconnected or client.is_bot:
-                    continue
+        for client in self.clients:
+            if client.disconnected or client.is_bot:
+                continue
 
-                if client.object.snow_ninja_rank < 24:
-                    required_exp = ExpRequirements.get(client.object.snow_ninja_rank + 1, 3000)
-                    current_exp = round((client.object.snow_ninja_progress / 100) * required_exp)
+            if client.object.snow_ninja_rank < 24:
+                required_exp = ExpRequirements.get(client.object.snow_ninja_rank + 1, 3000)
+                current_exp = round((client.object.snow_ninja_progress / 100) * required_exp)
 
-                    # Calculate new exp
-                    result_exp = current_exp + self.exp
-                    exp_percentage = round(result_exp / required_exp * 100)
+                # Calculate new exp
+                result_exp = current_exp + self.exp
+                exp_percentage = round(result_exp / required_exp * 100)
 
-                    # Calculate new rank
-                    ranks_gained = exp_percentage // 100
-                    result_rank = round(client.object.snow_ninja_rank + ranks_gained)
+                # Calculate new rank
+                ranks_gained = exp_percentage // 100
+                result_rank = round(client.object.snow_ninja_rank + ranks_gained)
 
-                else:
-                    # Clamp rank to 24
-                    result_rank = 24
-                    exp_percentage = 100
+            else:
+                # Clamp rank to 24
+                result_rank = 24
+                exp_percentage = 100
 
-                # Enable double coins when player has unlocked all stamps
-                double_coins = stamps.completed_group(client.pid, 60, session=session)
-                coins = self.coins * (2 if double_coins else 1)
+            # Enable double coins when player has unlocked all stamps
+            double_coins = data.has_completed_stamp_group(client.pid, 60)
+            coins = self.coins * (2 if double_coins else 1)
 
-                updates = {
-                    'coins': client.object.coins + coins,
-                    'snow_ninja_rank': result_rank,
-                    'snow_ninja_progress': exp_percentage % 100
-                }
+            updates = {
+                'coins': client.object.coins + coins,
+                'snow_ninja_rank': result_rank,
+                'snow_ninja_progress': exp_percentage % 100
+            }
 
-                if len(self.enemies) <= 0:
-                    # Update win count
-                    key = f'snow_progress_{client.element}_wins'
-                    wins = getattr(client.object, key, 0)
-                    updates[key] = wins + 1
+            if len(self.enemies) <= 0:
+                # Update win count
+                key = f'snow_progress_{client.element}_wins'
+                wins = getattr(client.object, key, 0)
+                updates[key] = wins + 1
 
-                if not config.DISABLE_REWARDS:
-                    # Update penguin data
-                    penguins.update(
-                        client.pid, updates,
-                        session=session
-                    )
+            if not config.DISABLE_REWARDS:
+                payout_item_ids = []
 
-                    if result_rank != client.object.snow_ninja_rank:
-                        self.logger.info(f'{client} ranked up from {client.object.snow_ninja_rank} to {result_rank}')
+                for rank in range(client.object.snow_ninja_rank + 1, result_rank + 1):
+                    if not (item := SnowRewards.get(rank)):
+                        continue
 
-                    for rank in range(client.object.snow_ninja_rank + 1, result_rank + 1):
-                        if not (item := SnowRewards.get(rank)):
-                            continue
+                    payout_item_ids.append(item)
 
-                        # Add item to inventory
-                        items.add(
-                            client.pid, item,
-                            session=session
-                        )
+                if not self.enemies:
+                    # Award "Tusk's Cloak" item
+                    payout_item_ids.append(3160)
 
-                        self.logger.info(f'{client} unlocked item {item}')
-
-                    if not self.enemies:
-                        # Award "Tusk's Cloak" item
-                        items.add(
-                            client.pid, 3160,
-                            session=session
-                        )
-
-                        self.logger.info(f'{client} unlocked item 3160')
-
-                # Display payout swf window
-                payout = client.get_window('cardjitsu_snowpayout.swf')
-                payout.layer = 'bottomLayer'
-                payout.load(
-                    {
-                        "coinsEarned": coins,
-                        "doubleCoins": double_coins,
-                        "damage": min(self.damage, 100),
-                        "isBoss": 1,
-                        "rank": client.object.snow_ninja_rank + 1,
-                        "round": self.get_payout_round(),
-                        "showItems": 1,
-                        "stampList": [
-                            {
-                                "stamp_id": stamp.id,
-                                "name": f'global_content.stamps.{stamp.id}.name',
-                                "description": f'global_content.stamps.{stamp.id}.description',
-                                "rank_token": f'global_content.stamps.{stamp.id}.rank_token',
-                                "rank": stamp.rank,
-                                "is_member": stamp.member,
-                            }
-                            for stamp in snow_stamps
-                        ],
-                        "stamps": [
-                            {
-                                "_id": stamp.id,
-                                "new": stamp.id in client.unlocked_stamps
-                            }
-                            for stamp in stamps.fetch_by_penguin_id(client.pid, 60)
-                        ],
-                        "xpStart": client.object.snow_ninja_progress,
-                        "xpEnd": exp_percentage if result_rank < 24 else 100,
-                    },
-                    loadDescription="",
-                    assetPath="",
-                    xPercent=0.08,
-                    yPercent=0.05
+                data.apply_payout(
+                    client.pid,
+                    updates=updates,
+                    item_ids=payout_item_ids
                 )
+
+                if result_rank != client.object.snow_ninja_rank:
+                    self.logger.info(f'{client} ranked up from {client.object.snow_ninja_rank} to {result_rank}')
+
+                for item_id in payout_item_ids:
+                    self.logger.info(f'{client} unlocked item {item_id}')
+
+            # Display payout swf window
+            payout = client.get_window('cardjitsu_snowpayout.swf')
+            payout.layer = 'bottomLayer'
+            payout.load(
+                {
+                    "coinsEarned": coins,
+                    "doubleCoins": double_coins,
+                    "damage": min(self.damage, 100),
+                    "isBoss": 1,
+                    "rank": client.object.snow_ninja_rank + 1,
+                    "round": self.get_payout_round(),
+                    "showItems": 1,
+                    "stampList": [
+                        {
+                            "stamp_id": stamp.id,
+                            "name": f'global_content.stamps.{stamp.id}.name',
+                            "description": f'global_content.stamps.{stamp.id}.description',
+                            "rank_token": f'global_content.stamps.{stamp.id}.rank_token',
+                            "rank": stamp.rank,
+                            "is_member": stamp.member,
+                        }
+                        for stamp in snow_stamps
+                    ],
+                    "stamps": [
+                        {
+                            "_id": stamp.id,
+                            "new": stamp.id in client.unlocked_stamps
+                        }
+                        for stamp in data.fetch_penguin_stamps(client.pid, 60)
+                    ],
+                    "xpStart": client.object.snow_ninja_progress,
+                    "xpEnd": exp_percentage if result_rank < 24 else 100,
+                },
+                loadDescription="",
+                assetPath="",
+                xPercent=0.08,
+                yPercent=0.05
+            )
 
     async def display_win_sequence(self) -> None:
         await delay(2)

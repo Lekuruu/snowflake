@@ -4,11 +4,14 @@ from __future__ import annotations
 from app.engine.place import SnowLobby, SnowBattle, TuskBattle
 from app.protocols.metaplace import MetaplaceWorldServer
 from app.engine.matchmaking import MatchmakingQueue
-from app.data import ServerType, BuildType
+from app.data import BuildType, DataProvider, ServerType
+from app.data import load_data_provider
 from app.engine.penguin import Penguin
 from app.objects import Games
 
 import app.session
+import app.handlers
+import app.data.assets
 import logging
 import signal
 import config
@@ -38,6 +41,7 @@ class SnowflakeWorld(MetaplaceWorldServer):
 
         self.sound_assets = app.session.sound_assets
         self.assets = app.session.assets
+        self.data: DataProvider = load_data_provider(config.DATA_PROVIDER)
 
     def startFactory(self):
         self.register_place(SnowLobby())

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.objects.ninjas import Ninja
-    from app.engine import Penguin
+    from app.engine.penguin import Penguin
 
 from app.objects.gameobject import LocalGameObject, GameObject
 from app.data import TipPhase

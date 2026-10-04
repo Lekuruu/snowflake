@@ -10,16 +10,14 @@ if TYPE_CHECKING:
 
 from twisted.internet.address import IPv4Address, IPv6Address
 from twisted.python.failure import Failure
-from sqlalchemy.orm import Session
 
 from app.engine.cards import CardObject, MemberCard
 from app.protocols import MetaplaceProtocol
-from app.data import stamps, cards
 from app.data import (
-    Penguin as PenguinObject,
+    PenguinData,
     EventType,
     TipPhase,
-    Card
+    StampData
 )
 
 import app.session
@@ -36,7 +34,7 @@ class Penguin(MetaplaceProtocol):
         self.screen_size: str = ''
         self.asset_url: str = ''
 
-        self.object: PenguinObject
+        self.object: PenguinData
         self.ninja: "Ninja"
         self.game: "Game" = None # type: ignore i don't care, we'll initialize this later
         self.element: str = ""
@@ -144,7 +142,7 @@ class Penguin(MetaplaceProtocol):
 
         super().send_tag(tag, *args)
 
-    def initialize_power_cards(self, session: Session) -> None:
+    def initialize_power_cards(self) -> None:
         card_color = {
             'snow': 'p',
             'water': 'b',
@@ -157,10 +155,9 @@ class Penguin(MetaplaceProtocol):
             'fire': 'f'
         }[self.element]
 
-        power_cards = cards.fetch_power_cards_by_penguin_id(
+        power_cards = self.server.data.fetch_power_cards(
             self.pid,
-            element_name,
-            session=session
+            element_name
         )
 
         for card in power_cards:
@@ -274,26 +271,22 @@ class Penguin(MetaplaceProtocol):
         infotip = self.get_window('cardjitsu_snowinfotip.swf')
         infotip.send_payload('disable')
 
-    def unlock_stamp(self, id: int, session: Session = stamps.SessionProvider) -> None:
+    def unlock_stamp(self, id: int) -> None:
         if config.DISABLE_STAMPS:
             return
 
         if self.disconnected or self.is_bot:
             return
 
-        if not (stamp := stamps.fetch_one(id, session=session)):
+        stamp = self.server.data.award_stamp(self.pid, id)
+        if stamp is None:
             return
 
-        if stamps.exists(id, self.pid, session=session):
-            return
+        self.notify_stamp(stamp)
 
+    def notify_stamp(self, stamp: StampData) -> None:
         self.logger.info(f'{self} unlocked stamp: "{stamp.name}"')
         self.unlocked_stamps.append(stamp.id)
-
-        stamps.add(
-            id, self.pid,
-            session=session
-        )
 
         # Show stamp notification(s)
         self.stamp_notifications.append({

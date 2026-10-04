@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from app.engine.game import Game
 
 from app.objects.target import Target, TuskTarget
-from app.data import MirrorMode, TipPhase, Card
+from app.data import CardData, MirrorMode, TipPhase
 from app.objects.effects import (
     WaterPowerBeam,
     SnowPowerBeam,
@@ -1111,7 +1111,7 @@ class Sensei(GameObject):
 
     def place_card(self, x: int, y: int):
         card = app.engine.cards.CardObject(
-            Card(
+            CardData(
                 element=self.element_state[0],
                 value=10
             ), self # type: ignore
