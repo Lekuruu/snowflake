@@ -7,7 +7,8 @@ RUN apk add \
     openssl-dev \
     libffi-dev \
     redis \
-    postgresql-client
+    postgresql-client \
+    tk
 
 WORKDIR /usr/src/snowflake
 
