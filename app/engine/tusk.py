@@ -331,8 +331,7 @@ class TuskGame(Game):
         await self.wait_for_window('cardjitsu_snowrounds.swf', loaded=True)
 
     def display_payout(self) -> None:
-        data = self.server.data
-        snow_stamps = data.fetch_stamps(60)
+        snow_stamps = self.server.data.fetch_stamps(60)
 
         for client in self.clients:
             if client.disconnected or client.is_bot:
@@ -356,7 +355,7 @@ class TuskGame(Game):
                 exp_percentage = 100
 
             # Enable double coins when player has unlocked all stamps
-            double_coins = data.has_completed_stamp_group(client.pid, 60)
+            double_coins = self.server.data.has_completed_stamp_group(client.pid, 60)
             coins = self.coins * (2 if double_coins else 1)
 
             updates = {
@@ -384,7 +383,8 @@ class TuskGame(Game):
                     # Award "Tusk's Cloak" item
                     payout_item_ids.append(3160)
 
-                data.apply_payout(
+                # Persist payout in data provider (e.g. the houdini database)
+                awarded_stamps = self.server.data.apply_payout(
                     client.pid,
                     updates=updates,
                     item_ids=payout_item_ids
@@ -395,6 +395,9 @@ class TuskGame(Game):
 
                 for item_id in payout_item_ids:
                     self.logger.info(f'{client} unlocked item {item_id}')
+
+                for stamp in awarded_stamps:
+                    client.notify_stamp(stamp)
 
             # Display payout swf window
             payout = client.get_window('cardjitsu_snowpayout.swf')
@@ -424,7 +427,7 @@ class TuskGame(Game):
                             "_id": stamp.id,
                             "new": stamp.id in client.unlocked_stamps
                         }
-                        for stamp in data.fetch_penguin_stamps(client.pid, 60)
+                        for stamp in self.server.data.fetch_penguin_stamps(client.pid, 60)
                     ],
                     "xpStart": client.object.snow_ninja_progress,
                     "xpEnd": exp_percentage if result_rank < 24 else 100,

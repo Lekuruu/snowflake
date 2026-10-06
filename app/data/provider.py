@@ -80,8 +80,6 @@ def load_data_provider(reference: str) -> DataProvider:
     provider = factory()
 
     if not isinstance(provider, DataProvider):
-        raise TypeError(
-            f"{reference} did not create a DataProvider instance"
-        )
+        raise TypeError(f"{reference} did not create a DataProvider instance")
 
     return provider

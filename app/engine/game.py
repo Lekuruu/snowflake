@@ -997,8 +997,8 @@ class Game:
             self.display_beta_payout()
             return
 
-        data = self.server.data
-        snow_stamps = data.fetch_stamps(60)
+        snow_stamps = self.server.data.fetch_stamps(60)
+        has_won = len(self.enemies) <= 0
 
         for client in self.clients:
             if client.disconnected or client.is_bot:
@@ -1022,7 +1022,7 @@ class Game:
                 exp_percentage = 100
 
             # Enable double coins when player has unlocked all stamps
-            double_coins = data.has_completed_stamp_group(client.pid, 60)
+            double_coins = self.server.data.has_completed_stamp_group(client.pid, 60)
             coins = self.coins * (2 if double_coins else 1)
 
             updates = {
@@ -1031,12 +1031,13 @@ class Game:
                 'snow_ninja_progress': exp_percentage  % 100
             }
             payout_stamp_ids = []
+            payout_item_ids = []
 
             if result_rank >= 13 and not config.DISABLE_STAMPS:
                 # Unlock "Snow Pro" stamp
                 payout_stamp_ids.append(487)
 
-            if len(self.enemies) <= 0:
+            if has_won:
                 # Update win count
                 key = f'snow_progress_{client.element}_wins'
                 wins = getattr(client.object, key, 0)
@@ -1048,36 +1049,31 @@ class Game:
                         'water': 471,
                         'snow': 469
                     }
-
                     payout_stamp_ids.append(stamp_ids[client.element])
 
-            payout_updates = {}
-            payout_item_ids = []
+            for rank in range(client.object.snow_ninja_rank + 1, result_rank + 1):
+                if not (item := SnowRewards.get(rank)):
+                    continue
+
+                payout_item_ids.append(item)
 
             if not config.DISABLE_REWARDS:
-                payout_updates = updates
+                # Persist payout in data provider (e.g. the houdini database)
+                awarded_stamps = self.server.data.apply_payout(
+                    client.pid,
+                    updates=updates,
+                    item_ids=payout_item_ids,
+                    stamp_ids=payout_stamp_ids
+                )
 
-                for rank in range(client.object.snow_ninja_rank + 1, result_rank + 1):
-                    if not (item := SnowRewards.get(rank)):
-                        continue
+                if updates and result_rank != client.object.snow_ninja_rank:
+                    self.logger.info(f'{client} ranked up from {client.object.snow_ninja_rank} to {result_rank}')
 
-                    payout_item_ids.append(item)
+                for item_id in payout_item_ids:
+                    self.logger.info(f'{client} unlocked item {item_id}')
 
-            awarded_stamps = data.apply_payout(
-                client.pid,
-                updates=payout_updates,
-                item_ids=payout_item_ids,
-                stamp_ids=payout_stamp_ids
-            )
-
-            if payout_updates and result_rank != client.object.snow_ninja_rank:
-                self.logger.info(f'{client} ranked up from {client.object.snow_ninja_rank} to {result_rank}')
-
-            for item_id in payout_item_ids:
-                self.logger.info(f'{client} unlocked item {item_id}')
-
-            for stamp in awarded_stamps:
-                client.notify_stamp(stamp)
+                for stamp in awarded_stamps:
+                    client.notify_stamp(stamp)
 
             # Display payout swf window
             payout = client.get_window('cardjitsu_snowpayout.swf')
@@ -1107,7 +1103,7 @@ class Game:
                             "_id": stamp.id,
                             "new": stamp.id in client.unlocked_stamps
                         }
-                        for stamp in data.fetch_penguin_stamps(client.pid, 60)
+                        for stamp in self.server.data.fetch_penguin_stamps(client.pid, 60)
                     ],
                     "xpStart": client.object.snow_ninja_progress,
                     "xpEnd": exp_percentage if result_rank < 24 else 100,
@@ -1127,17 +1123,16 @@ class Game:
             exp_gained = (self.get_payout_round() * 11) + 1
             beta_reward_item = 1600
 
-            if not config.DISABLE_REWARDS:
-
-                if exp_gained >= 100:
-                    # Add item to inventory
-                    self.server.data.apply_payout(
-                        client.pid,
-                        updates={},
-                        item_ids=[beta_reward_item]
-                    )
-
-                    self.logger.info(f'{client} unlocked item {beta_reward_item}')
+            if not config.DISABLE_REWARDS and exp_gained >= 100:
+                # Add item to inventory
+                self.server.data.apply_payout(
+                    client.pid,
+                    updates={},
+                    item_ids=[beta_reward_item]
+                )
+                self.logger.info(
+                    f'{client} unlocked item {beta_reward_item}'
+                )
 
             # Display payout swf window
             payout = client.get_window('cardjitsu_snowpayoutbeta.swf')
