@@ -437,12 +437,20 @@ class PenguinAI(Penguin):
         return False
 
     def can_heal_ninja(self, target: Ninja) -> bool:
-        tiles = self.game.grid.surrounding_tiles(
+        tile_iterator = self.game.grid.surrounding_tiles(
             target.grid_x,
             target.grid_y
         )
 
-        for tile in tiles:
+        surrounding_tiles = list(tile_iterator)
+        current_tile = self.game.grid[self.ninja.grid_x, self.ninja.grid_y]
+
+        if current_tile in surrounding_tiles:
+            # We are already on a tile where we can heal
+            return True
+
+        # Check if any surrounding tiles allow us to heal
+        for tile in surrounding_tiles:
             can_move = self.game.grid.can_move_to_tile(
                 self.ninja,
                 tile.grid_x,
@@ -453,11 +461,6 @@ class PenguinAI(Penguin):
                 continue
 
             self.ninja.place_ghost(tile.grid_x, tile.grid_y)
-            return True
-
-        current_tile = self.game.grid[self.ninja.grid_x, self.ninja.grid_y]
-
-        if current_tile in tiles:
             return True
 
         return False
