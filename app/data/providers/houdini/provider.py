@@ -27,14 +27,9 @@ class HoudiniDataProvider(DataProvider):
     """Data provider for the standard Houdini PostgreSQL & Redis stack"""
 
     def __init__(self, engine: Engine | None = None, redis: Redis | None = None) -> None:
-        self.engine = engine or self.create_engine()
-
-        self.session_factory = sessionmaker(
-            bind=self.engine,
-            autoflush=False,
-            expire_on_commit=False
+        self.database_engine = (
+            engine or self.create_engine()
         )
-
         self.redis = redis or Redis(
             config.REDIS_HOST,
             config.REDIS_PORT,
@@ -42,11 +37,17 @@ class HoudiniDataProvider(DataProvider):
             config.REDIS_PASSWORD
         )
 
+        self.session_factory = sessionmaker(
+            bind=self.database_engine,
+            autoflush=False,
+            expire_on_commit=False
+        )
+
     @staticmethod
     def create_engine() -> Engine:
-        username = quote_plus(config.POSTGRES_USER)
-        password = quote_plus(config.POSTGRES_PASSWORD)
-        database = quote_plus(config.POSTGRES_DBNAME)
+        username = quote_plus(config.POSTGRES_USER) if config.POSTGRES_USER else ""
+        password = quote_plus(config.POSTGRES_PASSWORD) if config.POSTGRES_PASSWORD else ""
+        database = quote_plus(config.POSTGRES_DBNAME) if config.POSTGRES_DBNAME else ""
 
         return create_engine(
             f"postgresql://{username}:{password}@"
