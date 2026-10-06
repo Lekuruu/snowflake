@@ -1,7 +1,6 @@
 
 from __future__ import annotations
 from typing import Mapping, Sequence
-
 from urllib.parse import quote_plus
 
 from redis import Redis
@@ -127,15 +126,15 @@ class HoudiniDataProvider(DataProvider):
 
     def fetch_power_cards(self, penguin_id: int, element: str) -> list[CardData]:
         with self.session_factory() as session:
-            query = select(Card, PenguinCard.quantity) \
-                .join(
-                    PenguinCard, Card.id == PenguinCard.card_id
-                ) \
-                .where(
+            query = (
+                select(Card, PenguinCard.quantity).
+                join(PenguinCard, Card.id == PenguinCard.card_id).
+                where(
                     PenguinCard.penguin_id == penguin_id,
                     Card.element == element,
                     Card.power_id > 0
                 )
+            )
 
             return [
                 self.card(card)
