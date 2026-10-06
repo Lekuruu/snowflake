@@ -1,5 +1,5 @@
 
-from app.engine import Penguin
+from app.engine.penguin import Penguin
 from app.data import TipPhase
 from app import session
 

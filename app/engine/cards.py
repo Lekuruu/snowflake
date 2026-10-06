@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Iterable, Sequence, Tuple, TYPE_CHECKING
 
 from .utils import delay
-from app.data import Card, TipPhase
+from app.data import CardData, TipPhase
 from app.objects import GameObject
 from app.objects.enemies import Enemy
 from app.objects.ninjas import Ninja
@@ -22,10 +22,10 @@ from app.objects.effects import (
 )
 
 if TYPE_CHECKING:
-    from app.engine import Penguin
+    from app.engine.penguin import Penguin
 
-class CardObject(Card):
-    def __init__(self, card: Card, client: "Penguin") -> None:
+class CardObject:
+    def __init__(self, card: CardData, client: "Penguin") -> None:
         self.id = card.id
         self.name = card.name
         self.set_id = card.set_id

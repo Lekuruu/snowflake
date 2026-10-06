@@ -1,2 +1,2 @@
 
-from .penguin import Penguin
+"""Card-Jitsu Snow game engine."""

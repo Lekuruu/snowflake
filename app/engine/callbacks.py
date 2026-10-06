@@ -9,7 +9,7 @@ from enum import IntEnum
 
 if TYPE_CHECKING:
     from app.engine.game import Game
-    from app.engine import Penguin
+    from app.engine.penguin import Penguin
 
 class ActionType(IntEnum):
     Animation = 0

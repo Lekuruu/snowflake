@@ -1,5 +1,5 @@
 
-# Modified sqlalchemy classes from solero/houdini:
+# SQLAlchemy models for the standard Houdini database:
 # https://github.com/solero/houdini/tree/master/houdini/data/
 
 from __future__ import annotations
