@@ -49,18 +49,6 @@ class PenguinAI(Penguin):
         self.logged_in = True
         self.is_bot = True
 
-    def debug(self, message: str) -> None:
-        if not config.ENABLE_NINJA_AI_DEBUG_LOGGING:
-            return
-
-        self.logger.info(message)
-
-    def tile_debug(self, tile: GameObject | None) -> str:
-        if tile is None:
-            return 'None'
-
-        return f'({tile.x},{tile.y})'
-
     @delay(0.25, 2)
     def confirm_move(self) -> None:
         if self.is_ready:
@@ -82,21 +70,13 @@ class PenguinAI(Penguin):
 
     @delay(0.5, 3)
     def select_move(self) -> None:
-        self.debug(
-            f'select_move start: pos=({self.ninja.x},{self.ninja.y}) '
-            f'hp={self.ninja.hp}/{self.ninja.max_hp}'
-        )
-
         # Check for k.o. state
         if self.ninja.hp <= 0:
             if not self.member_card:
-                self.debug('ninja is KO and has no member card, confirming move')
-                self.confirm_move()
+                # k.o and no member card availabe :(
                 return
 
-            self.debug('ninja is KO and uses member card revive')
             self.member_card.place()
-            self.confirm_move()
             return
 
         # Check for k.o. allies
@@ -113,7 +93,7 @@ class PenguinAI(Penguin):
             if not self.can_heal_ninja(ninja):
                 continue
 
-            self.debug(f'revive target selected: ({ninja.x},{ninja.y})')
+            # We have an ally to revive!
             self.select_target(ninja.grid_x, ninja.grid_y)
             self.confirm_move()
             return
@@ -123,10 +103,8 @@ class PenguinAI(Penguin):
             'water': self.water_actions,
             'fire': self.fire_actions
         }
-
         actions[self.element]()
         self.confirm_move()
-        self.debug('select_move complete: confirmed')
 
     def select_target(self, x: int, y: int) -> None:
         target = next(
@@ -136,10 +114,8 @@ class PenguinAI(Penguin):
         )
 
         if not target:
-            self.debug(f'select_target miss: no target at ({x},{y})')
             return
 
-        self.debug(f'select_target hit: ({x},{y}) type={target.type}')
         target.select()
 
     def snow_actions(self) -> None:
@@ -156,13 +132,6 @@ class PenguinAI(Penguin):
         if injured_allies:
             move, target = self.best_move_for_heal(injured_allies)
 
-            self.debug(
-                'snow heal eval: '
-                f'injured={len(injured_allies)} '
-                f'move={self.tile_debug(move)} '
-                f'target={self.tile_debug(target)}'
-            )
-
             if move:
                 self.place_ghost(move)
 
@@ -172,11 +141,6 @@ class PenguinAI(Penguin):
 
             # If we can't heal yet, move closer to injured allies so we can next turn
             move = self.best_move_toward_allies(injured_allies)
-
-            self.debug(
-                'snow reposition toward allies: '
-                f'move={self.tile_debug(move)}'
-            )
 
             if move:
                 self.place_ghost(move)
@@ -192,13 +156,6 @@ class PenguinAI(Penguin):
             living_enemies,
             prefer_closest=False,
             prefer_far_from_enemies=True
-        )
-
-        self.debug(
-            'snow attack eval: '
-            f'enemies={len(living_enemies)} '
-            f'move={self.tile_debug(move)} '
-            f'target={self.tile_debug(target)}'
         )
 
         if move:
@@ -227,14 +184,6 @@ class PenguinAI(Penguin):
             prefer_far_from_enemies=True
         )
 
-        self.debug(
-            'fire attack eval: '
-            f'enemies={len(living_enemies)} '
-            f'move={self.tile_debug(move)} '
-            f'target={self.tile_debug(target)} '
-            f'mode=prefer_farthest_target'
-        )
-
         if move:
             self.place_ghost(move)
 
@@ -242,13 +191,9 @@ class PenguinAI(Penguin):
             self.select_target(target.grid_x, target.grid_y)
             return
 
+        # We can't attack :(
+        # Find a fallback position to go to
         move = self.best_standoff_tile(self.ninja.range)
-
-        self.debug(
-            'fire fallback positioning: '
-            f'move={self.tile_debug(move)} '
-            f'target_standoff={self.ninja.range}'
-        )
 
         if move:
             self.place_ghost(move)
@@ -267,14 +212,6 @@ class PenguinAI(Penguin):
             prefer_far_from_enemies=False
         )
 
-        self.debug(
-            'water attack eval: '
-            f'enemies={len(living_enemies)} '
-            f'move={self.tile_debug(move)} '
-            f'target={self.tile_debug(target)} '
-            f'mode=prefer_closest_target'
-        )
-
         if move:
             self.place_ghost(move)
 
@@ -286,35 +223,6 @@ class PenguinAI(Penguin):
 
         if move:
             self.place_ghost(move)
-
-    def place_ghost(self, tile: GameObject) -> None:
-        if tile.x == self.ninja.x and tile.y == self.ninja.y:
-            self.debug(f'ghost not placed: already on ({tile.x},{tile.y})')
-            return
-
-        self.debug(f'ghost placed: ({tile.x},{tile.y}) from ({self.ninja.x},{self.ninja.y})')
-        self.ninja.place_ghost(tile.grid_x, tile.grid_y)
-
-    def living_enemies(self) -> list[Enemy]:
-        return [enemy for enemy in self.game.enemies if enemy.hp > 0]
-
-    def available_tiles(self) -> list[GameObject]:
-        current_tile = self.game.grid[self.ninja.grid_x, self.ninja.grid_y]
-        tiles = list(self.ninja.movable_tiles())
-
-        if current_tile:
-            tiles.append(current_tile)
-
-        return tiles
-
-    def nearest_enemy_distance(self, tile: GameObject, enemies: Iterable[Enemy]) -> int | float:
-        return min(
-            manhatten_distance(
-                tile.grid_x, tile.grid_y,
-                enemy.grid_x, enemy.grid_y
-            )
-            for enemy in enemies
-        )
 
     def best_enemy_target(
         self,
@@ -358,9 +266,8 @@ class PenguinAI(Penguin):
         prefer_far_from_enemies: bool
     ) -> tuple[GameObject | None, GameObject | None]:
         best_move = None
-        best_targets = []
         best_score = None
-        attack_candidates = []
+        best_targets = []
 
         for tile in self.available_tiles():
             targets = list(self.ninja.attackable_tiles(tile.grid_x, tile.grid_y))
@@ -375,86 +282,27 @@ class PenguinAI(Penguin):
                 attack_count,
                 -nearest_enemy if prefer_closest else nearest_enemy
             )
-            attack_candidates.append(
-                {
-                    'tile': (tile.x, tile.y),
-                    'attack_count': attack_count,
-                    'nearest_enemy': nearest_enemy,
-                    'score': score,
-                    'targets': [(t.x, t.y) for t in targets]
-                }
-            )
 
             if best_score is None or score > best_score:
                 best_move = tile
-                best_targets = targets
                 best_score = score
+                best_targets = targets
 
         if best_move is None:
-            if not attack_candidates:
-                self.debug('attack eval: no candidate tiles with targets')
-                return None, None
-
-            self.debug(
-                'attack candidates existed but no best move picked: '
-                f'{attack_candidates}'
-            )
+            # Either no attack candidates or no move picked
             return None, None
 
+        # Select what enemy to attack if we have multiple
         target = self.best_enemy_target(
             best_targets, best_move,
             prefer_closest=(not prefer_far_from_enemies)
         )
-
-        self.debug(
-            'attack scoring: '
-            f'prefer_closest={prefer_closest} '
-            f'prefer_far_from_enemies={prefer_far_from_enemies} '
-            f'candidates={attack_candidates} '
-            f'chosen_move={self.tile_debug(best_move)} '
-            f'chosen_target={self.tile_debug(target)} '
-            f'chosen_score={best_score}'
-        )
         return best_move, target
-
-    def best_standoff_tile(self, target_distance: int) -> GameObject | None:
-        enemies = self.living_enemies()
-
-        if not enemies:
-            return None
-
-        tiles = self.available_tiles()
-
-        if not tiles:
-            return None
-
-        current_tile = self.game.grid[self.ninja.x, self.ninja.y]
-
-        # Prefer tiles that get closer to the desired standoff distance
-        # On ties, keep a little extra distance for safer positioning
-        best_tile = min(
-            tiles,
-            key=lambda tile: (
-                abs(self.nearest_enemy_distance(tile, enemies) - target_distance),
-                -self.nearest_enemy_distance(tile, enemies),
-                0 if (current_tile and tile != current_tile) else 1
-            )
-        )
-
-        self.debug(
-            'standoff eval: '
-            f'target_distance={target_distance} '
-            f'chosen_tile={self.tile_debug(best_tile)} '
-            f'chosen_distance={self.nearest_enemy_distance(best_tile, enemies)}'
-        )
-
-        return best_tile
 
     def best_move_for_heal(self, allies: list[Ninja]) -> tuple[GameObject | None, GameObject | None]:
         best_move = None
-        best_target = None
         best_score = None
-        heal_candidates = []
+        best_target = None
 
         for tile in self.available_tiles():
             heal_tiles = list(self.ninja.healable_tiles(tile.grid_x, tile.grid_y))
@@ -475,32 +323,41 @@ class PenguinAI(Penguin):
                     # Prioritize revives above regular heals
                     score = (2, 0)
 
-                heal_candidates.append(
-                    {
-                        'from': (tile.x, tile.y),
-                        'target': (heal_tile.x, heal_tile.y),
-                        'ally_hp': ally.hp,
-                        'ally_max_hp': ally.max_hp,
-                        'score': score
-                    }
-                )
-
                 if best_score is None or score > best_score:
                     best_move = tile
-                    best_target = heal_tile
                     best_score = score
+                    best_target = heal_tile
 
-        self.debug(
-            'heal scoring: '
-            f'allies={len(allies)} '
-            f'candidates={heal_candidates} '
-            f'chosen_move={self.tile_debug(best_move)} '
-            f'chosen_target={self.tile_debug(best_target)} '
-            f'chosen_score={best_score}'
-        )
         return best_move, best_target
 
+    def best_standoff_tile(self, target_distance: int) -> GameObject | None:
+        """Choose a tile that keeps the ninja near the given distance from enemies"""
+        enemies = self.living_enemies()
+
+        if not enemies:
+            return None
+
+        tiles = self.available_tiles()
+
+        if not tiles:
+            return None
+
+        current_tile = self.game.grid[self.ninja.grid_x, self.ninja.grid_y]
+
+        # Prefer tiles that get closer to the desired standoff distance
+        # On ties, keep a little extra distance for safer positioning
+        best_tile = min(
+            tiles,
+            key=lambda tile: (
+                abs(self.nearest_enemy_distance(tile, enemies) - target_distance),
+                -self.nearest_enemy_distance(tile, enemies),
+                0 if (current_tile and tile != current_tile) else 1
+            )
+        )
+        return best_tile
+
     def best_positioning_tile(self, prefer_far: bool) -> GameObject | None:
+        """Choose the available tile nearest / farthest from the closest enemy"""
         enemies = self.living_enemies()
 
         if not enemies:
@@ -516,17 +373,10 @@ class PenguinAI(Penguin):
             (lambda tile: -self.nearest_enemy_distance(tile, enemies))
         )
         best_tile = max(tiles, key=key)
-
-        self.debug(
-            'positioning eval: '
-            f'prefer_far={prefer_far} '
-            f'best_tile={self.tile_debug(best_tile)} '
-            f'distance={self.nearest_enemy_distance(best_tile, enemies)}'
-        )
         return best_tile
 
     def best_move_toward_allies(self, allies: list[Ninja]) -> GameObject | None:
-        """Move Snow closer to injured allies to improve heal reach next turn."""
+        """Move snow ninja closer to injured allies to improve heal reach next turn"""
         if not allies:
             return None
 
@@ -546,20 +396,38 @@ class PenguinAI(Penguin):
                 0 if (current_tile and tile != current_tile) else 1
             )
         )
-
-        avg_distance = sum(
-            manhatten_distance(best_tile.grid_x, best_tile.grid_y, ally.grid_x, ally.grid_y)
-            for ally in allies
-        ) / len(allies)
-
-        self.debug(
-            'ally proximity eval: '
-            f'allies={len(allies)} '
-            f'chosen_tile={self.tile_debug(best_tile)} '
-            f'avg_distance={avg_distance:.1f}'
-        )
-
         return best_tile
+
+    def place_ghost(self, tile: GameObject) -> None:
+        if tile.x == self.ninja.x and tile.y == self.ninja.y:
+            # Already placed the ghost here
+            return
+
+        self.ninja.place_ghost(tile.grid_x, tile.grid_y)
+
+    def living_enemies(self) -> list[Enemy]:
+        return [
+            enemy for enemy in self.game.enemies
+            if enemy.hp > 0
+        ]
+
+    def available_tiles(self) -> list[GameObject]:
+        current_tile = self.game.grid[self.ninja.grid_x, self.ninja.grid_y]
+        tiles = list(self.ninja.movable_tiles())
+
+        if current_tile:
+            tiles.append(current_tile)
+
+        return tiles
+
+    def nearest_enemy_distance(self, tile: GameObject, enemies: Iterable[Enemy]) -> int | float:
+        return min(
+            manhatten_distance(
+                tile.grid_x, tile.grid_y,
+                enemy.grid_x, enemy.grid_y
+            )
+            for enemy in enemies
+        )
 
     def is_ninja_getting_revived(self, ninja: Ninja) -> bool:
         for ninja in self.game.ninjas:
