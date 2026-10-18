@@ -109,6 +109,12 @@ def login_handler(client: Penguin, server_type: str, pid: int, token: str):
     client.send_login_message('Finalizing login, creating final user object')
     client.send_login_reply()
 
+    if client.place is None:
+        client.logger.warning('Login attempt failed: No place context set')
+        client.send_login_error()
+        client.close_connection()
+        return
+
     client.set_asset_url(f'{config.MEDIA_DOMAIN}/game/mpassets')
     client.send_world_type()
     client.send_world()
