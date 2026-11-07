@@ -28,6 +28,7 @@ class Target(LocalGameObject):
         self.selected = False
         self.type = 'attack'
         self.ninja = ninja
+        self.tile: GameObject | None = self.game.grid.get_tile(x, y) 
         self.attack_intro_sprite = 'ui_target_red_attack_intro_anim'
         self.attack_idle_sprite = 'ui_target_red_attack_idle_anim'
         self.heal_intro_sprite = 'ui_target_white_heal_intro_anim'
@@ -45,6 +46,8 @@ class Target(LocalGameObject):
         if self.selected:
             return
 
+        # TODO: Should we show ui_tile_attack here?
+
         self.type = 'attack'
         self.place_object()
         self.animate_object(self.attack_intro_sprite, reset=True)
@@ -55,6 +58,9 @@ class Target(LocalGameObject):
     def show_heal(self) -> None:
         if self.selected:
             return
+
+        if self.tile:
+            self.tile.place_sprite('ui_tile_heal', self.client)
 
         self.type = 'heal'
         self.place_object()
@@ -103,6 +109,22 @@ class Target(LocalGameObject):
             return
 
         self.select()
+
+    def remove_object(self) -> None:
+        super().remove_object()
+
+        if not self.tile:
+            return
+
+        if self.ninja.hp <= 0:
+            self.tile.hide(self.client)
+            return
+
+        if self.tile not in self.ninja.ghost_tiles_in_range():
+            self.tile.hide(self.client)
+            return
+
+        self.game.grid.update_tile_for_client(self.tile, self.client)
 
 class TuskTarget(Target):
     def __init__(self, ninja: "Ninja", x: int = -1, y: int = -1) -> None:

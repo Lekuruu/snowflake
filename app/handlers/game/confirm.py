@@ -23,6 +23,8 @@ def on_confirm_clicked(client: Penguin, data: dict):
     confirm.place_sprite(confirm.name)
     confirm.play_sound('SFX_MG_2013_CJSnow_UIPlayerReady_VBR8')
 
+    # TODO: Hide all targets except the one that was selected
+
     snow_ui = client.get_window('cardjitsu_snowui.swf')
     snow_ui.send_payload('disableCards')
 
